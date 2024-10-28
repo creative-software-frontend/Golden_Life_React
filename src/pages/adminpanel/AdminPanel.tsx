@@ -29,6 +29,8 @@ import {
     ShoppingCart,
     Pill,
     ChefHat,
+    HelpCircleIcon,
+    LogInIcon,
 } from "lucide-react"
 
 import {
@@ -92,6 +94,8 @@ const data = {
         { id: "grocery", name: "Grocery", icon: ShoppingCart },
         { id: "pharmacy", name: "Pharmacy", icon: Pill },
         { id: "cookups", name: "Cookups", icon: ChefHat },
+        { id: "cookups2", name: "Cookups", icon: ChefHat },
+        { id: "cookups3", name: "Cookups", icon: ChefHat },
     ],
     navMain: {
         grocery: [
@@ -253,22 +257,11 @@ export default function AdminPanel() {
             <Sidebar collapsible="icon">
                 <SidebarHeader >
                     <div className="flex items-center justify-between p-2">
-                        <img src={logo} alt="logo" className="w-full " />
-
-                        <Avatar className="h-6 w-6 rounded-lg">
-                            {/* <Image src={logo} alt="shadcn" /> */}
-                            {/* <AvatarImage
-                                src={data.user.avatar}
-                                alt={data.user.name}
-                            /> */}
-                            {/* <AvatarFallback className="rounded-lg">CN</AvatarFallback> */}
-                        </Avatar>
-                        {/* <h1 className="text-base font-semibold">BoogleMeds</h1> */}
-                        {/* <div className="w-8" /> Spacer for alignment */}
+                        <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
                     </div>
                 </SidebarHeader>
                 <div className="px-4 py-3 border-b ">
-                    <div className='flex  flex-row  justify-between gap-4'>
+                    {/* <div className='flex  flex-row  justify-between gap-4'>
                         {data.categories.map((category) => (
                             <button
                                 key={category.id}
@@ -286,7 +279,27 @@ export default function AdminPanel() {
                             </button>
               
                         ))}
+                    </div> */}
+
+                    <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2 ">
+                        {data.categories.map((category) => (
+                            <button
+                                key={category.id}
+                                size="icon"
+                                onClick={() => setActiveCategory(category.id)}
+                                className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
+                                    ? "bg-red-400 border border-red-400 text-white"
+                                    : "border border-red-300 text-gray-700"
+                                    }`}
+                                aria-label={category.name}
+                            >
+                                <category.icon className="h-6 w-6 mb-1" />
+                                <span className="text-xs">{category.name}</span>
+                            </button>
+                        ))}
                     </div>
+
+
                     {/* 
                     <div className={`hidden md:flex ${isClosed ? "flex-row gap-2 p-2" : "flex-row gap-4 p-4"} justify-between`}>
                         {data.categories.map((category) => (
@@ -355,27 +368,33 @@ export default function AdminPanel() {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton
                                         size="lg"
-                                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
                                     >
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage
-                                                src={data.user.avatar}
-                                                alt={data.user.name}
-                                            />
-                                            <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">
-                                                {data.user.name}
-                                            </span>
-                                            <span className="truncate text-xs">
-                                                {data.user.email}
-                                            </span>
+                                        {/* Left Side: Help Button */}
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-teal-500 rounded-full p-1">
+                                                <HelpCircleIcon className="h-4 w-4 text-white" /> {/* Icon with teal background and white color */}
+                                            </div>
+                                            <span className="text-teal-600">Help</span>
                                         </div>
-                                        <ChevronsUpDown className="ml-auto size-4" />
+
+                                        {/* Separator */}
+                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
+
+                                        {/* Right Side: Login Button */}
+                                        <button className="flex items-center gap-2">
+                                            <span className="text-blue-400">Login</span>
+                                            <div className="bg-blue-400 rounded-full p-1">
+                                                <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
+                                            </div>
+                                        </button>
                                     </SidebarMenuButton>
+
+
+
+
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent
+                                {/* <DropdownMenuContent
                                     className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                                     side="bottom"
                                     align="end"
@@ -429,15 +448,15 @@ export default function AdminPanel() {
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>Log out</span>
                                     </DropdownMenuItem>
-                                </DropdownMenuContent>
+                                </DropdownMenuContent> */}
                             </DropdownMenu>
                         </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarFooter>
                 <SidebarRail />
             </Sidebar>
-            <SidebarInset className="-ms-32">
-                <header className="  flex h-16 shrink-0 items-center  transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+            <SidebarInset className="-ms-32 ">
+                <header className=" m-0 pt-0 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                     <div className="flex items-center gap-2 px-4 w-full ">
                         {/* <SidebarTrigger
                             onClick={() => setIsClosed(!isClosed)}
@@ -447,23 +466,10 @@ export default function AdminPanel() {
                         <input
                             type="text"
                             placeholder="Search..."
-                            className="w-full px-4 py-2 text-gray-800 rounded-md focus:outline"
+                            className="w-full px-4 py-2 text-gray-800 rounded-md bg-gray-300 focus:outline-none focus:ring focus:ring-white-400"
                         />
 
-                        {/* <Separator orientation="vertical" className="mr-2 h-4" /> */}
-                        {/* <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        {data.categories.find(c => c.id === activeCategory)?.name}
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Menu</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb> */}
+
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
