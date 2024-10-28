@@ -23,7 +23,7 @@ export default {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-          DEFAULT: '#1D4ED8', // Primary color (default)
+          DEFAULT: '#FAC12B', // Primary color (default)
           light: '#3B82F6', // Lighter shade
           dark: '#1E40AF', // Darker shade
         },
