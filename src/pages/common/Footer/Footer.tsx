@@ -52,9 +52,7 @@ const Footer = () => {
                             <Link to="#" className="flex-1">
                                 <img src={playstore} alt='Play Store' className="object-cover h-10 w-full object-cover text-gray-600" />
                             </Link>
-                            <Link to="#" className="flex-1">
-                                <img src={appstore} alt='App Store' className="object-cover h-10 w-full object-cover text-gray-600" />
-                            </Link>
+                            
                         </div>
                         <div className="text-right">
                             <div className="flex items-center justify-end">
