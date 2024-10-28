@@ -13,7 +13,7 @@ const Footer = () => {
             <div className=" mx-4 bg-gray-300">
                 <div className="pt-6 grid grid-cols-1 md:grid-cols-4 ">
                     <div className=''>
-                        <h3 className="font-bold text-xl  mb-4 text-gray-600">About Chaldal</h3>
+                        <h3 className="font-bold text-xl  mb-4 text-gray-600">About Golden Life</h3>
                         <ul className="space-y-2 text-start ms-16">
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900 text-start">Our Story</Link></li>
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900">Team</Link></li>
@@ -83,7 +83,7 @@ const Footer = () => {
                     <div className="border border-gray-300 shadow bg-white py-2">
 
                         <div className=" mt-4 flex flex-wrap justify-between items-center mx-2">
-                            <p className="text-gray-600 ms-16">&copy; 2013 Golden Life.</p>
+                            <p className="text-gray-600 ms-16">&copy; 2024 Golden Life Shopping.</p>
                             <div className="flex space-x-4">
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Linkedin size={20} className="text-gray-600" />
