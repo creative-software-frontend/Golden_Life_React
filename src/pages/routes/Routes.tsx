@@ -6,16 +6,16 @@ import UserLayout from "@/layout/userlayout/UserLayout";
 export const routes = createBrowserRouter([
     {
         path: '/',
-        element: <UserLayout />,
+        element: <AdminPanel />,
 
-        children: [
+        // children: [
 
-            {
-                path: '/',
-                element: <AdminPanel />
-            },
+        //     {
+        //         path: '/',
+        //         element: <AdminPanel />
+        //     },
 
-        ]
+        // ]
 
     },
     {

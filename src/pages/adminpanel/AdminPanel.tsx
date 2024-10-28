@@ -211,7 +211,7 @@ export default function AdminPanel() {
 
     return (
         // <div className="flex h-screen">
-            <SidebarProvider >
+        <SidebarProvider className=''>
                 {/* <div className="w-[20%] min-w-[250px]"> Sidebar container */}
                     <Sidebar collapsible="icon">
                         <SidebarHeader >
@@ -224,7 +224,6 @@ export default function AdminPanel() {
                                 {data.categories.map((category) => (
                                     <button
                                         key={category.id}
-                                        size="icon"
                                         onClick={() => setActiveCategory(category.id)}
                                         className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                             ? "bg-primary-default border border-primary-default text-white"
@@ -314,7 +313,7 @@ export default function AdminPanel() {
                 {/* </div> */}
                 {/* <div className="flex-1 overflow-hidden"> Main content area */}
                     <SidebarInset >
-                        <header className=" m-0 pt-0 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                        <header className=" -ms-32 pt-0 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                             <div className="flex items-center gap-2 px-4 w-full">
                                 <input
                                     type="text"
@@ -323,9 +322,21 @@ export default function AdminPanel() {
                                 />
                             </div>
                         </header>
-                        <main className="flex-1 overflow-auto ">
+                <div className="-ms-32 mx-auto">
+
+                        <main  >
 
                             <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                </div>
+                                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                </div>
                                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                                     <div className="aspect-video rounded-xl bg-muted/50" />
                                     <div className="aspect-video rounded-xl bg-muted/50" />
@@ -336,6 +347,7 @@ export default function AdminPanel() {
                             <Outlet />
                             <Footer />
                         </main>
+                    </div>    
                     </SidebarInset>
                 {/* </div> */}
             </SidebarProvider>

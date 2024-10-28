@@ -8,7 +8,7 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div className="min-h-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
       <RouterProvider router={routes} />
 
     </div>

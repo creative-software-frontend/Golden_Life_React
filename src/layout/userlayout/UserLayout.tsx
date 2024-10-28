@@ -1,4 +1,3 @@
-import Footer from '@/pages/common/Footer/Footer';
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
@@ -13,8 +12,8 @@ const UserLayout: React.FC = () => {
             </header> */}
 
             {/* Main Content Area */}
-            <main className="flex-grow">
-                <Outlet /> {/* Renders child routes */}
+            <main className="bg-green-700">
+                <Outlet /> Renders child routes
             </main>
 
             {/* Footer */}
