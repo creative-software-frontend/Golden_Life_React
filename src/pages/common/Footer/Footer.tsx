@@ -48,7 +48,7 @@ const Footer = () => {
 
                         <div className="flex justify-between gap-3  p-2">
                             <Link to="#" className="">
-                                <img src={playstore} alt='Play Store' className="object-cover h-10 w-full  text-gray-600" />
+                                <img src={playstore} alt='Play Store' className="object-cover h-15 w-full  text-gray-600" />
                             </Link>
                             {/* <Link to="#" className="flex-1">
                                 <img src={appstore} alt='App Store' className="object-cover h-10 w-full  text-gray-600" />
@@ -56,7 +56,7 @@ const Footer = () => {
                         </div>
                         <div className="text-right">
                             <div className="flex items-center justify-end">
-                                <Phone className="h-4 w-4 text-gray-600 mr-2" /> {/* Phone icon */}
+                                <Phone className="h-4 w-4 text-gray-800 mr-2" /> {/* Phone icon */}
                                 <p className="text-2xl text-gray-500 font-bold">0000000000000</p>
                             </div>
                             <p className="text-gray-500 text-lg">or support@goldenlife.com</p>
@@ -82,7 +82,7 @@ const Footer = () => {
                     </div>
                     <div className="border-0 -mb-8  border-gray-300  bg-white py-2">
 
-                        <div className=" mt-4 flex flex-wrap justify-between items-center mx-2">
+                        <div className=" mt-4 flex flex-wrap justify-between items-left mx-2">
                             <p className="text-gray-600 ms-16">&copy; 2024 Golden Life Shopping.</p>
                             <div className="flex space-x-4">
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
@@ -100,6 +100,7 @@ const Footer = () => {
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Instagram size={20} className="text-gray-600" />
                                 </Link>
+
 
                                 <div className="flex items-center space-x-1 bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Globe size={20} className="text-gray-600" />
