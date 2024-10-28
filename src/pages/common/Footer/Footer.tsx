@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Globe, CreditCard, Download, Phone } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Globe, CreditCard, Download, Phone, Youtube, Linkedin } from 'lucide-react';
 import mastercard from '../../../../public/image/Mastercard-logo.svg'
 import paypal from '../../../../public/image/paypal.png'
 import visa from '../../../../public/image/visa.png'
@@ -52,7 +52,9 @@ const Footer = () => {
                             <Link to="#" className="flex-1">
                                 <img src={playstore} alt='Play Store' className="object-cover h-10 w-full object-cover text-gray-600" />
                             </Link>
-                            
+                            <Link to="#" className="flex-1">
+                                <img src={appstore} alt='App Store' className="object-cover h-10 w-full object-cover text-gray-600" />
+                            </Link>
                         </div>
                         <div className="text-right">
                             <div className="flex items-center justify-end">
@@ -84,6 +86,12 @@ const Footer = () => {
                             <p className="text-gray-600 ms-16">&copy; 2013 Golden Life.</p>
                             <div className="flex space-x-4">
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+                                    <Linkedin size={20} className="text-gray-600" />
+                                </Link>
+                                <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+                                    <Youtube size={20} className="text-gray-600" />
+                                </Link>
+                                <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Facebook size={20} className="text-gray-600" />
                                 </Link>
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
@@ -92,6 +100,7 @@ const Footer = () => {
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Instagram size={20} className="text-gray-600" />
                                 </Link>
+                             
                                 <div className="flex items-center space-x-1 bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Globe size={20} className="text-gray-600" />
                                     <span className="text-gray-600">English (EN)</span>
