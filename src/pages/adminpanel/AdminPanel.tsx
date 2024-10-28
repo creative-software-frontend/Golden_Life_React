@@ -246,7 +246,7 @@ export default function AdminPanel() {
     const [activeCategory, setActiveCategory] = React.useState("grocery")
     // const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
-    const [isClosed, setIsClosed] = React.useState(false)
+    // const [isClosed, setIsClosed] = React.useState(false)
 
     return (
         <SidebarProvider >
@@ -268,7 +268,7 @@ export default function AdminPanel() {
                     </div>
                 </SidebarHeader>
                 <div className="px-4 py-3 border-b ">
-                    <div className={`flex ${isClosed ? 'flex-col' : "flex-row"}  justify-between gap-4`}>
+                    <div className='flex  flex-row  justify-between gap-4'>
                         {data.categories.map((category) => (
                             <button
                                 key={category.id}
@@ -282,13 +282,9 @@ export default function AdminPanel() {
                                 aria-label={category.name}
                             >
                                 <category.icon className="h-6 w-6 mb-1" />
-                                <span className={` ${isClosed ? 'hidden' : "text-sm"}`}>{category.name}</span>
+                                <span className="text-sm">{category.name}</span>
                             </button>
-                        //    <button>
-                        //         <category.icon className="h-6 w-6 mb-1" />
-
-                        //         <span className="text-xs">{category.name}</span>
-                        //    </button>
+              
                         ))}
                     </div>
                     {/* 
@@ -443,11 +439,11 @@ export default function AdminPanel() {
             <SidebarInset className="-ms-32">
                 <header className="  flex h-16 shrink-0 items-center  transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                     <div className="flex items-center gap-2 px-4 w-full ">
-                        <SidebarTrigger
+                        {/* <SidebarTrigger
                             onClick={() => setIsClosed(!isClosed)}
 
 
-                            className="-ml-1" />
+                            className="-ml-1" /> */}
                         <input
                             type="text"
                             placeholder="Search..."
