@@ -43,11 +43,11 @@
 
 /* additional css for scroolbar */
 /* Custom thin scrollbar styling */
-.hide-scrollbar::-webkit-scrollbar {
+.category-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
-.hide-scrollbar {
+.catagory-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }

@@ -4,48 +4,16 @@ import * as React from "react"
 import logo from '../../../public/image/logo.jpg'
 
 import {
-    AudioWaveform,
-    BadgeCheck,
-    Bell,
     BookOpen,
     Bot,
     ChevronRight,
-    ChevronsUpDown,
-    Command,
-    CreditCard,
-    Folder,
-    Forward,
-    Frame,
-    GalleryVerticalEnd,
-    LogOut,
-    Map,
-    MoreHorizontal,
-    PieChart,
-    Plus,
-    Settings2,
-    Sparkles,
     SquareTerminal,
-    Trash2,
     ShoppingCart,
     Pill,
     ChefHat,
     HelpCircleIcon,
     LogInIcon,
 } from "lucide-react"
-
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import {
     Collapsible,
     CollapsibleContent,
@@ -53,15 +21,8 @@ import {
 } from "@/components/ui/collapsible"
 import {
     DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
 import {
     Sidebar,
     SidebarContent,
@@ -71,7 +32,6 @@ import {
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
-    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarMenuSub,
@@ -79,9 +39,9 @@ import {
     SidebarMenuSubItem,
     SidebarProvider,
     SidebarRail,
-    SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
+import { Outlet } from "react-router-dom"
+import Footer from "../common/Footer/Footer"
 
 // This is sample data.
 const data = {
@@ -248,240 +208,137 @@ const data = {
 
 export default function AdminPanel() {
     const [activeCategory, setActiveCategory] = React.useState("grocery")
-    // const [activeCategory, setActiveCategory] = useState<number | null>(null);
-
-    // const [isClosed, setIsClosed] = React.useState(false)
 
     return (
-        <SidebarProvider >
-            <Sidebar collapsible="icon">
-                <SidebarHeader >
-                    <div className="flex items-center justify-between p-2">
-                        <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
-                    </div>
-                </SidebarHeader>
-                <div className="px-4 py-3 border-b ">
-                    {/* <div className='flex  flex-row  justify-between gap-4'>
-                        {data.categories.map((category) => (
-                            <button
-                                key={category.id}
-                                // variant="ghost"
-                                size="icon"
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`h-16 w-20 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-red-400 border border-red-400 text-white"
-                                    : "border border-red-300 text-gray-700"
-                                    }`}
-                                aria-label={category.name}
-                            >
-                                <category.icon className="h-6 w-6 mb-1" />
-                                <span className="text-sm">{category.name}</span>
-                            </button>
-              
-                        ))}
-                    </div> */}
-
-                    <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2 ">
-                        {data.categories.map((category) => (
-                            <button
-                                key={category.id}
-                                size="icon"
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-red-400 border border-red-400 text-white"
-                                    : "border border-red-300 text-gray-700"
-                                    }`}
-                                aria-label={category.name}
-                            >
-                                <category.icon className="h-6 w-6 mb-1" />
-                                <span className="text-xs">{category.name}</span>
-                            </button>
-                        ))}
-                    </div>
-
-
-                    {/* 
-                    <div className={`hidden md:flex ${isClosed ? "flex-row gap-2 p-2" : "flex-row gap-4 p-4"} justify-between`}>
-                        {data.categories.map((category) => (
-                            <Button
-                                key={category.id}
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`h-16 ${isClosed ? "w-10" : "w-20"} flex items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-red-400 border border-red-400 text-white"
-                                    : "border border-red-300 text-gray-700"
-                                    }`}
-                                aria-label={category.name}
-                            >
-                                <category.icon className="h-6 w-6 mb-1" />
-                                {!isClosed && <span className="text-xs">{category.name}</span>}
-                            </Button>
-                        ))}
-                    </div> */}
-
-                </div>
-
-
-                <SidebarContent>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
-                        <SidebarMenu>
-                            {data.navMain[activeCategory].map((item) => (
-                                <Collapsible
-                                    key={item.title}
-                                    asChild
-                                    defaultOpen={item.isActive}
-                                    className="group/collapsible"
-                                >
-                                    <SidebarMenuItem>
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}>
-                                                {item.icon && <item.icon />}
-                                                <span>{item.title}</span>
-                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <SidebarMenuSub>
-                                                {item.items?.map((subItem) => (
-                                                    <SidebarMenuSubItem key={subItem.title}>
-                                                        <SidebarMenuSubButton asChild>
-                                                            <a href={subItem.url}>
-                                                                <span>{subItem.title}</span>
-                                                            </a>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>
-                                                ))}
-                                            </SidebarMenuSub>
-                                        </CollapsibleContent>
-                                    </SidebarMenuItem>
-                                </Collapsible>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroup>
-                </SidebarContent>
-                <SidebarFooter>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton
-                                        size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+        // <div className="flex h-screen">
+            <SidebarProvider >
+                {/* <div className="w-[20%] min-w-[250px]"> Sidebar container */}
+                    <Sidebar collapsible="icon">
+                        <SidebarHeader >
+                            <div className="flex items-center justify-between p-2">
+                                <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
+                            </div>
+                        </SidebarHeader>
+                        <div className="px-4 py-3 border-b ">
+                            <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
+                                {data.categories.map((category) => (
+                                    <button
+                                        key={category.id}
+                                        size="icon"
+                                        onClick={() => setActiveCategory(category.id)}
+                                        className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
+                                            ? "bg-primary-default border border-primary-default text-white"
+                                            : "border border-primary-default text-gray-700"
+                                            }`}
+                                        aria-label={category.name}
                                     >
-                                        {/* Left Side: Help Button */}
-                                        <div className="flex items-center gap-2">
-                                            <div className="bg-teal-500 rounded-full p-1">
-                                                <HelpCircleIcon className="h-4 w-4 text-white" /> {/* Icon with teal background and white color */}
-                                            </div>
-                                            <span className="text-teal-600">Help</span>
-                                        </div>
+                                        <category.icon className="h-6 w-6 mb-1" />
+                                        <span className="text-xs">{category.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <SidebarContent>
+                            <SidebarGroup>
+                                <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                                <SidebarMenu>
+                                    {data.navMain[activeCategory].map((item) => (
+                                        <Collapsible
+                                            key={item.title}
+                                            asChild
+                                            defaultOpen={item.isActive}
+                                            className="group/collapsible"
+                                        >
+                                            <SidebarMenuItem>
+                                                <CollapsibleTrigger asChild>
+                                                    <SidebarMenuButton tooltip={item.title}>
+                                                        {item.icon && <item.icon />}
+                                                        <span>{item.title}</span>
+                                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                    </SidebarMenuButton>
+                                                </CollapsibleTrigger>
+                                                <CollapsibleContent>
+                                                    <SidebarMenuSub>
+                                                        {item.items?.map((subItem) => (
+                                                            <SidebarMenuSubItem key={subItem.title}>
+                                                                <SidebarMenuSubButton asChild>
+                                                                    <a href={subItem.url}>
+                                                                        <span>{subItem.title}</span>
+                                                                    </a>
+                                                                </SidebarMenuSubButton>
+                                                            </SidebarMenuSubItem>
+                                                        ))}
+                                                    </SidebarMenuSub>
+                                                </CollapsibleContent>
+                                            </SidebarMenuItem>
+                                        </Collapsible>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroup>
+                        </SidebarContent>
+                        <SidebarFooter>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <SidebarMenuButton
+                                                size="lg"
+                                                className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+                                            >
+                                                {/* Left Side: Help Button */}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="bg-teal-500 rounded-full p-1">
+                                                        <HelpCircleIcon className="h-4 w-4 text-white" /> {/* Icon with teal background and white color */}
+                                                    </div>
+                                                    <span className="text-teal-600">Help</span>
+                                                </div>
 
-                                        {/* Separator */}
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
+                                                {/* Separator */}
+                                                <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
 
-                                        {/* Right Side: Login Button */}
-                                        <button className="flex items-center gap-2">
-                                            <span className="text-blue-400">Login</span>
-                                            <div className="bg-blue-400 rounded-full p-1">
-                                                <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
-                                            </div>
-                                        </button>
-                                    </SidebarMenuButton>
+                                                {/* Right Side: Login Button */}
+                                                <button className="flex items-center gap-2">
+                                                    <span className="text-blue-400">Login</span>
+                                                    <div className="bg-blue-400 rounded-full p-1">
+                                                        <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
+                                                    </div>
+                                                </button>
+                                            </SidebarMenuButton>
+                                        </DropdownMenuTrigger>
+                                    </DropdownMenu>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarFooter>
+                        <SidebarRail />
+                    </Sidebar>
+                {/* </div> */}
+                {/* <div className="flex-1 overflow-hidden"> Main content area */}
+                    <SidebarInset >
+                        <header className=" m-0 pt-0 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                            <div className="flex items-center gap-2 px-4 w-full">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    className="w-full px-4 py-2 text-gray-800 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring focus:ring-primary-default"
+                                />
+                            </div>
+                        </header>
+                        <main className="flex-1 overflow-auto ">
 
-
-
-
-                                </DropdownMenuTrigger>
-                                {/* <DropdownMenuContent
-                                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                                    side="bottom"
-                                    align="end"
-                                    sideOffset={4}
-                                >
-                                    <DropdownMenuLabel className="p-0 font-normal">
-                                        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                            <Avatar className="h-8 w-8 rounded-lg">
-                                                <AvatarImage
-                                                    src={data.user.avatar}
-                                                    alt={data.user.name}
-                                                />
-                                                <AvatarFallback className="rounded-lg">
-                                                    CN
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                                <span className="truncate font-semibold">
-                                                    {data.user.name}
-                                                </span>
-                                                <span className="truncate text-xs">
-                                                    {data.user.email}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                            <Sparkles className="mr-2 h-4 w-4" />
-                                            <span>Upgrade to Pro</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                            <BadgeCheck className="mr-2 h-4 w-4" />
-                                            <span>Account</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <CreditCard className="mr-2 h-4 w-4" />
-                                            <span>Billing</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Bell className="mr-2 h-4 w-4" />
-                                            <span>Notifications</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
-                                        <LogOut className="mr-2 h-4 w-4" />
-                                        <span>Log out</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent> */}
-                            </DropdownMenu>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarFooter>
-                <SidebarRail />
-            </Sidebar>
-            <SidebarInset className="-ms-32 ">
-                <header className=" m-0 pt-0 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className="flex items-center gap-2 px-4 w-full ">
-                        {/* <SidebarTrigger
-                            onClick={() => setIsClosed(!isClosed)}
-
-
-                            className="-ml-1" /> */}
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full px-4 py-2 text-gray-800 rounded-md bg-gray-300 focus:outline-none focus:ring focus:ring-white-400"
-                        />
-
-
-                    </div>
-                </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                        <div className="aspect-video rounded-xl bg-muted/50" />
-                        <div className="aspect-video rounded-xl bg-muted/50" />
-                        <div className="aspect-video rounded-xl bg-muted/50" />
-                    </div>
-                    <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
+                            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                    <div className="aspect-video rounded-xl bg-muted/50" />
+                                </div>
+                                {/* <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" /> */}
+                            </div>
+                            <Outlet />
+                            <Footer />
+                        </main>
+                    </SidebarInset>
+                {/* </div> */}
+            </SidebarProvider>
+        // </div>
     )
 }

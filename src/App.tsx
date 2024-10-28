@@ -1,15 +1,17 @@
 
+import { RouterProvider } from 'react-router-dom'
 import './App.css'
-import AdminPanel from './pages/adminpanel/AdminPanel'
+import { routes } from './pages/routes/Routes'
+
 
 function App() {
 
 
   return (
-    <>
-      <AdminPanel />
-      
-    </>
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      <RouterProvider router={routes} />
+
+    </div>
   )
 }
 
