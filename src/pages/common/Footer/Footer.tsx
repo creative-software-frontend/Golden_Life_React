@@ -4,8 +4,8 @@ import mastercard from '../../../../public/image/Mastercard-logo.svg'
 import paypal from '../../../../public/image/paypal.png'
 import visa from '../../../../public/image/visa.png'
 import bkash from '../../../../public/image/bkash2.png'
-import playstore from '../../../../public/image/playstore.png'
-import appstore from '../../../../public/image/appstore.jpg'
+import playstore from '../../../../public/Play Store.png'
+import paywith from '../../../../public/Pay-With.png'
 
 const Footer = () => {
     return (
@@ -13,7 +13,7 @@ const Footer = () => {
             <div className=" mx-4 bg-gray-300">
                 <div className="pt-6 grid grid-cols-1 md:grid-cols-4 ">
                     <div className=''>
-                        <h3 className="font-bold text-xl  mb-4 text-gray-600">About Golden Life</h3>
+                        <h3 className="font-bold text-xl  mb-4 text-gray-600 ms-8">About Golden Life</h3>
                         <ul className="space-y-2 text-start ms-16">
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900 text-start">Our Story</Link></li>
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900">Team</Link></li>
@@ -26,6 +26,7 @@ const Footer = () => {
                         <ul className="space-y-2  text-start ms-12">
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900">Contact Us</Link></li>
                             <li><Link to="#" className="text-gray-600 hover:text-gray-900">FAQ</Link></li>
+                            <li><Link to="#" className="text-gray-600 hover:text-gray-900">Help</Link></li>
                         </ul>
                     </div>
                     <div >
@@ -50,11 +51,11 @@ const Footer = () => {
 
                         <div className="flex justify-between gap-3  p-2">
                             <Link to="#" className="flex-1">
-                                <img src={playstore} alt='Play Store' className="object-cover h-10 w-full object-cover text-gray-600" />
+                                <img src={playstore} alt='Play Store' className="object-cover h-10 w-full  text-gray-600" />
                             </Link>
-                            <Link to="#" className="flex-1">
-                                <img src={appstore} alt='App Store' className="object-cover h-10 w-full object-cover text-gray-600" />
-                            </Link>
+                            {/* <Link to="#" className="flex-1">
+                                <img src={appstore} alt='App Store' className="object-cover h-10 w-full  text-gray-600" />
+                            </Link> */}
                         </div>
                         <div className="text-right">
                             <div className="flex items-center justify-end">
@@ -68,15 +69,17 @@ const Footer = () => {
                 </div>
                 <div className="">
                     <div className="flex flex-wrap justify-between items-center mb-4">
-                        <div className='flex justify-evenly'>
+                        <div className='flex justify-start items-center'>
                             <h3 className="font-bold text-lg mb-2  text-gray-500 ms-16">Payment Methods</h3>
-                            <div className="flex space-x-4 ml-2">
-                                <img src={mastercard} alt="Visa" className="h-8 w-8 object-cover" />
+                            <img src={paywith} alt="paywith" className="h-1/2 w-2/3 object-cover" />
+
+                            {/* <div className="">
+                                <img src={paywith} alt="paywith" className="h-1/2 w-1/2 object-cover" />
                                 <img src={paypal} alt="Visa" className="h-8 w-8 object-cover" />
                                 <img src={visa} alt="Visa" className="h-8 w-8 object-cover" />
                                 <img src={bkash} alt="Visa" className="h-8 w-8 object-cover" />
 
-                            </div>
+                            </div> */}
                         </div>
 
                     </div>
