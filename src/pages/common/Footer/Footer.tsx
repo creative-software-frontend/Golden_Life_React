@@ -59,7 +59,7 @@ const Footer = () => {
                         <div className="text-right">
                             <div className="flex items-center justify-end">
                                 <Phone className="h-4 w-4 text-gray-600 mr-2" /> {/* Phone icon */}
-                                <p className="text-2xl text-gray-500 font-bold">16710</p>
+                                <p className="text-2xl text-gray-500 font-bold">0000000000000</p>
                             </div>
                             <p className="text-gray-500 text-lg">or support@goldenlife.com</p>
                         </div>
@@ -83,7 +83,7 @@ const Footer = () => {
                     <div className="border border-gray-300 shadow bg-white py-2">
 
                         <div className=" mt-4 flex flex-wrap justify-between items-center mx-2">
-                            <p className="text-gray-600 ms-16">&copy; 2013 Chaldal Limited</p>
+                            <p className="text-gray-600 ms-16">&copy; 2013 Golden Life.</p>
                             <div className="flex space-x-4">
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Facebook size={20} className="text-gray-600" />

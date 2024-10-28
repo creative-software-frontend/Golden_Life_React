@@ -1,2 +1,2 @@
+primary #FF9100
 #67AC79
-#FF9100
