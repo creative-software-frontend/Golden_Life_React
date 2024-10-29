@@ -52,14 +52,14 @@ const data = {
         avatar: "/avatars/shadcn.jpg",
     },
     categories: [
-        { id: "grocery", name: "Grocery", icon: ShoppingCart },
+        { id: "shopping", name: "shopping", icon: ShoppingCart },
         { id: "pharmacy", name: "Pharmacy", icon: Pill },
         { id: "cookups", name: "Cookups", icon: ChefHat },
         { id: "cookups2", name: "Cookups", icon: ChefHat },
         { id: "cookups3", name: "Cookups", icon: ChefHat },
     ],
     navMain: {
-        grocery: [
+        shopping: [
             {
                 title: "Fruits & Vegetables",
                 url: "#",
@@ -208,7 +208,7 @@ const data = {
 }
 
 export default function AdminPanel() {
-    const [activeCategory, setActiveCategory] = React.useState("grocery")
+    const [activeCategory, setActiveCategory] = React.useState("shopping")
 
     return (
         // <div className="flex h-screen">
@@ -299,12 +299,14 @@ export default function AdminPanel() {
                                         <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
 
                                         {/* Right Side: Login Button */}
-                                        <button className="flex items-center gap-2">
-                                            <span className="text-blue-400">Login</span>
-                                            <div className="bg-blue-400 rounded-full p-1">
-                                                <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
-                                            </div>
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button className="flex items-center gap-2">
+                                                <div className="bg-blue-400 rounded-full p-1">
+                                                    <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
+                                                </div>
+                                                <span className="text-blue-400">Login</span>
+                                            </button>
+                                        </div>
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>
@@ -317,12 +319,12 @@ export default function AdminPanel() {
             {/* <div className="flex-1 overflow-hidden"> Main content area */}
             <SidebarInset >
                 <Header />
-                <header className="   -ms-32 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className=" flex items-center gap-2 px-4 w-full  top-0 bg-white z-10">
+                <header className="  relative  -ms-20 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                    <div className="z-0 flex items-center gap-2 px-4 w-full  top-0 bg-white -order-1rder">
                         <input
                             type="text"
                             placeholder="Search..."
-                            className=" w-full px-4 py-2 text-gray-800 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring focus:ring-primary-default"
+                            className="sticky top-0 w-full px-4 py-2 text-gray-800 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring focus:ring-primary-default"
                         />
                     </div>
 
@@ -336,7 +338,7 @@ export default function AdminPanel() {
                         />
                     </div>
                 </header> */}
-                <div className="-ms-32 ">
+                <div className="-ms-20 ">
 
                     <main  >
 
