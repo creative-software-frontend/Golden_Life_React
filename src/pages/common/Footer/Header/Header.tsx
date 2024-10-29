@@ -32,24 +32,25 @@ const Header: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Address Selector */}
-                <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
-                    <MapPin size={20} className="text-white" />
-                    <select className="bg-primary-default transition outline-none text-white">
-                        <option value="Dhaka">Dhaka</option>
-                        <option value="Chittagong">Chittagong</option>
-                        <option value="Khulna">Khulna</option>
-                    </select>
-                </div>
+                
 
                 {/* Center - Hotline */}
-                <div className="flex items-center text-lg font-semibold text-red-400">
+                {/* <div className="flex items-center text-lg font-semibold text-red-400">
                     Hotline: +1-800-555-1234
-                </div>
+                </div> */}
 
                 {/* Right Side - Login and Language Buttons */}
                 <div className="flex items-center">
                     {/* Login Icon with Dropdown */}
+                    {/* Address Selector */}
+                    <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
+                        <MapPin size={20} className="text-white" />
+                        <select className="bg-primary-default transition outline-none text-white">
+                            <option value="Dhaka">Dhaka</option>
+                            <option value="Chittagong">Chittagong</option>
+                            <option value="Khulna">Khulna</option>
+                        </select>
+                    </div>
                     <div className="relative z-10">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4 mr-1" />
