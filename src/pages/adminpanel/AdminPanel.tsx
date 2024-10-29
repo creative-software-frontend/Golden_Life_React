@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import logo from '../../../public/image/logo.jpg'
+import logo from '../../../public/image/logo/logo.jpg'
 
 import {
     BookOpen,
