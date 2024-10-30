@@ -51,13 +51,13 @@ const Header: React.FC = () => {
                             <option value="Khulna">Khulna</option>
                         </select>
                     </div>
-                    <div className="relative z-10">
+                    <div className="relative ">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4 mr-1" />
                         </button>
                         {/* Dropdown Menu */}
                         {dropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
+                            <div className="z-10 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
                                 <ul>
                                     <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Profile</li>
                                     <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Settings</li>
@@ -104,10 +104,19 @@ const Header: React.FC = () => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                                    {/* Close Button at Top Right */}
+                                    <button
+                                        type="button"
+                                        className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+                                        onClick={() => setIsModalOpen(false)}
+                                    >
+                                        Close
+                                    </button>
+
                                     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
                                         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                                             <img
-                                                className="mx-auto h-10 w-auto"
+                                                className="mx-auto h-15 w-auto"
                                                 src={logo}
                                                 alt="Your Company"
                                             />
@@ -119,39 +128,34 @@ const Header: React.FC = () => {
                                         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                                             <form className="space-y-6" action="#" method="POST">
                                                 <div>
-                                                    <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                                                        Email address
+                                                    <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
+                                                        Phone Number
                                                     </label>
                                                     <div className="mt-2">
                                                         <input
-                                                            id="email"
-                                                            name="email"
-                                                            type="email"
-                                                            autoComplete="email"
+                                                            id="phone"
+                                                            name="phone"
+                                                            type="tel"
+                                                            autoComplete="tel"
                                                             required
+                                                            placeholder="Enter your phone number"
                                                             className="p-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <div className="flex items-center justify-between">
-                                                        <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                                                            Password
-                                                        </label>
-                                                        <div className="text-sm">
-                                                            <a href="#" className="font-semibold text-primary-default hover:text-primary-default">
-                                                                Forgot password?
-                                                            </a>
-                                                        </div>
-                                                    </div>
+                                                    <label htmlFor="otp" className="block text-sm font-medium leading-6 text-gray-900">
+                                                        OTP
+                                                    </label>
                                                     <div className="mt-2">
                                                         <input
-                                                            id="password"
-                                                            name="password"
-                                                            type="password"
-                                                            autoComplete="current-password"
+                                                            id="otp"
+                                                            name="otp"
+                                                            type="text" // use "number" if you want numeric input only
+                                                            autoComplete="one-time-code"
                                                             required
+                                                            placeholder="Enter the OTP"
                                                             className="p-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                         />
                                                     </div>
@@ -166,25 +170,10 @@ const Header: React.FC = () => {
                                                     </button>
                                                 </div>
                                             </form>
-
-                                            {/* <p className="mt-10 text-center text-sm text-gray-500">
-                                                Not a member?{' '}
-                                                <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                                                    Start a 14 day free trial
-                                                </a>
-                                            </p> */}
                                         </div>
                                     </div>
-                                    <div className="mt-5 sm:ml-10 sm:mt-4 sm:flex sm:pl-4">
-                                        <button
-                                            type="button"
-                                            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto"
-                                            onClick={() => setIsModalOpen(false)}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
                                 </Dialog.Panel>
+
                             </Transition.Child>
                         </div>
                     </div>
