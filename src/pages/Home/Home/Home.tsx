@@ -320,11 +320,11 @@ export default function AdminPanel() {
             <SidebarInset >
                 <Header />
                 <header className="  relative  -ms-20 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className="z-0 flex items-center gap-2 px-4 w-full  top-0 bg-white -order-1rder">
+                    <div className=" z-0 flex items-center gap-2 px-4 w-full  top-0 bg-white -order-1rder">
                         <input
                             type="text"
                             placeholder="Search..."
-                            className="sticky top-0 w-full px-4 py-2 text-gray-800 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring focus:ring-primary-default"
+                            className=" fixed top-16 left-100  w-4/6 px-4 py-2 text-gray-800 rounded-md bg-white border-primary-default border   "
                         />
                     </div>
 
@@ -340,7 +340,7 @@ export default function AdminPanel() {
                 </header> */}
                 <div className="-ms-20 ">
 
-                    <main  >
+                    <main  className="pt-6" >
 
                         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                             <div className="grid auto-rows-min gap-4 md:grid-cols-3">
