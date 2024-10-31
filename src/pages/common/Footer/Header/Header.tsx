@@ -8,6 +8,8 @@ const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
     const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
     const cancelButtonRef = useRef(null);
+    const [activeMenu, setActiveMenu] = useState(null); // Track active menu item
+
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev);
@@ -22,11 +24,19 @@ const Header: React.FC = () => {
 
     return (
         <div>
-            <header className="shadow fixed top-6 left-100 w-4/6 mx-4 -mt-7 flex items-center justify-between bg-gray-100 p-2 -ms-16">
-                {/* Left Side - Menu Buttons */}
+            <header className="shadow fixed top-6 left-100 w-4/6  -mt-7 flex items-center justify-between bg-gray-50 p-2 -ms-16 z-10">
                 <div className="flex items-center gap-2">
                     {menus.map((menu) => (
-                        <button key={menu.id} className="px-2 py-2 border border-primary-default rounded bg-white text-gray-500">
+                        <button
+                            key={menu.id}
+                            onClick={() => setActiveMenu(menu.id)}
+                            className={`px-2 py-2 border border-primary-default rounded text-gray-500 
+            ${activeMenu === menu.id ? "text-white" : "bg-white"}`}
+                            style={{
+                                backgroundColor: activeMenu === menu.id ? "#67AC79" : "white", // Customize active color
+                                color: activeMenu === menu.id ? "white" : "#6B7280", // Customize text color for active state
+                            }}
+                        >
                             {menu.label}
                         </button>
                     ))}
@@ -57,8 +67,8 @@ const Header: React.FC = () => {
                         </button>
                         {/* Dropdown Menu */}
                         {dropdownOpen && (
-                            <div className="z-10 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
-                                <ul>
+                            <div className="z-20 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
+                                <ul className='z-20'>
                                     <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Profile</li>
                                     <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Settings</li>
                                     <li onClick={() => setIsModalOpen(true)} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">

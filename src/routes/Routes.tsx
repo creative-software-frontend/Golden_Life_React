@@ -2,12 +2,14 @@ import { createBrowserRouter } from "react-router-dom";
 import Home from "../pages/Home/Home/Home";
 import ErrorPage from "../pages/errorpage/Errorpage";
 import Help from "@/pages/Home/Help/Help/Help";
+// import HeroSection from "@/pages/Home/HeroSection/HeroSection";
+// import BannerSection from "@/pages/Home/BannerSection/BannerSection";
 
 export const routes = createBrowserRouter([
     {
         path: '/',
         element: <Home />,
-        
+
 
         children: [
 
@@ -16,8 +18,12 @@ export const routes = createBrowserRouter([
             //     element: <Home />
             // },
             // {
-            //     path: 'help',
-            //     element: <Help />
+            //     path: '/',
+            //     element: <HeroSection />
+            // },
+            // {
+            //     path: '/',
+            //     element: <BannerSection />
             // },
 
         ]

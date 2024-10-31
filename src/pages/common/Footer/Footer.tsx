@@ -7,7 +7,7 @@ import paywith from '../../../../public/Pay-With.png'
 const Footer = () => {
     return (
         <footer >
-            <div className=" mx-4 bg-gray-300">
+            <div className=" mx-2  bg-gray-300 -ms-16 pt-4">
                 <div className="pt-6 grid grid-cols-1 md:grid-cols-4 ">
                     <div className=''>
                         <h3 className="font-bold text-xl  mb-4 text-gray-600 ms-8">About Golden Life</h3>
@@ -102,9 +102,14 @@ const Footer = () => {
                                 </Link>
 
 
-                                <div className="flex items-center space-x-1 bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+                                {/* <div className="flex items-center space-x-1 bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Globe size={20} className="text-gray-600" />
                                     <span className="text-gray-600">English (EN)</span>
+                                </div> */}
+                                <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
+                                    <button className="text-gray-500 px-3 py-1 ">EN</button>
+                                    <div className="h-6 w-[1px] bg-white mx-2"></div>
+                                    <button className="text-white px-3 py-1">BN</button>
                                 </div>
                             </div>
 
