@@ -46,6 +46,7 @@ import Header from "@/pages/common/Footer/Header/Header"
 import HeroSection from "../HeroSection/HeroSection"
 import BannerSection from "../BannerSection/BannerSection"
 import Shopping from "../product/shopping/Shopping"
+import BabyProducts from "./BabyProducts/BabyProducts"
 
 // This is sample data.
 const data = {
@@ -352,6 +353,7 @@ export default function AdminPanel() {
                         <HeroSection />
                         <BannerSection />
                         <Shopping />
+                        <BabyProducts />
 
                         {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                             <div className="grid auto-rows-min gap-4 md:grid-cols-3">

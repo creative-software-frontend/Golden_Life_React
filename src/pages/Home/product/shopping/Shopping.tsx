@@ -31,7 +31,38 @@ const categories = [
         description: 'Enhance your beauty with our products.',
         image: 'https://cdn.images.express.co.uk/img/dynamic/1/590x/shopping-385445.jpg?r=1686998680160',
     },
+    {
+        id: 5,
+        title: 'Sports',
+        description: 'Gear up for your favorite sports and activities.',
+        image: 'https://cdn.pixabay.com/photo/2017/06/20/20/57/sport-2421770_1280.jpg',
+    },
+    {
+        id: 6,
+        title: 'Books',
+        description: 'Dive into a world of knowledge and imagination.',
+        image: 'https://cdn.pixabay.com/photo/2016/11/29/09/05/book-1868050_1280.jpg',
+    },
+    {
+        id: 7,
+        title: 'Toys',
+        description: 'Fun and educational toys for kids of all ages.',
+        image: 'https://cdn.pixabay.com/photo/2016/09/22/19/15/doll-1588453_1280.jpg',
+    },
+    {
+        id: 8,
+        title: 'Jewelry',
+        description: 'Elegant and stylish jewelry for every occasion.',
+        image: 'https://cdn.pixabay.com/photo/2018/05/07/17/56/diamond-3371572_1280.jpg',
+    },
+    {
+        id: 9,
+        title: 'Health & Wellness',
+        description: 'Products to enhance your health and well-being.',
+        image: 'https://cdn.pixabay.com/photo/2020/03/30/10/11/supplements-4980473_1280.jpg',
+    },
 ];
+
 
 const Shopping: React.FC = () => {
     return (
