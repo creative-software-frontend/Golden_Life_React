@@ -22,7 +22,7 @@ const Header: React.FC = () => {
 
     return (
         <div>
-            <header className="fixed top-6 left-100 w-4/6 mx-4 -mt-7 flex items-center justify-between bg-gray-100 p-2 -ms-16">
+            <header className="shadow fixed top-6 left-100 w-4/6 mx-4 -mt-7 flex items-center justify-between bg-gray-100 p-2 -ms-16">
                 {/* Left Side - Menu Buttons */}
                 <div className="flex items-center gap-2">
                     {menus.map((menu) => (
@@ -70,7 +70,7 @@ const Header: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
-                        <button className="text-white px-3 py-1">EN</button>
+                        <button className="text-gray-500 px-3 py-1 ">EN</button>
                         <div className="h-6 w-[1px] bg-white mx-2"></div>
                         <button className="text-white px-3 py-1">BN</button>
                     </div>

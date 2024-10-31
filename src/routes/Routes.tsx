@@ -7,6 +7,7 @@ export const routes = createBrowserRouter([
     {
         path: '/',
         element: <Home />,
+        
 
         children: [
 
@@ -14,13 +15,17 @@ export const routes = createBrowserRouter([
             //     path: '/',
             //     element: <Home />
             // },
-            {
-                path: 'help',
-                element: <Help />
-            },
+            // {
+            //     path: 'help',
+            //     element: <Help />
+            // },
 
         ]
 
+    },
+    {
+        path: '/help',  // Separate route for Help page
+        element: <Help />,
     },
     {
         path: '*',
