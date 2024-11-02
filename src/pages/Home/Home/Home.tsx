@@ -338,10 +338,11 @@ export default function AdminPanel() {
                     <main className="pt-6" >
                         <HeroSection />
                         <BannerSection />
+                        <Categories />
                         {/* <Shopping />
                         <BabyProducts /> */}
                         <ProductCategories />
-                        <Categories />
+                        
                         <FreshSell />
                        
 
