@@ -42,7 +42,7 @@ export default function ProductCategories() {
     <div className="py-10 -ms-16 shadow mb-5">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-medium">
+          <div className="bg-primary-light text-black px-4 py-1 rounded-full text-sm font-medium">
             Special Products
           </div>
           <Link to="#" className="text-red-500 text-sm font-medium flex items-center hover:underline">
@@ -67,7 +67,7 @@ export default function ProductCategories() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                 </div>
-                <h3 className="mt-2 text-sm font-medium text-gray-900 line-clamp-2">
+                <h3 className="mt-2 text-lg font-medium text-gray-600 line-clamp-2">
                   {product.title}
                 </h3>
               </Link>
