@@ -48,6 +48,9 @@ import BannerSection from "../BannerSection/BannerSection"
 import Shopping from "../product/shopping/Shopping"
 import BabyProducts from "./BabyProducts/BabyProducts"
 import ProductCategories from '../ProductCategories/ProductCategories';
+import Categories from "../Categories/Categories"
+import FreshSell from "../FreshSell/FreshSell"
+import Cart from "../Cart/Cart"
 
 // This is sample data.
 const data = {
@@ -324,25 +327,7 @@ export default function AdminPanel() {
             {/* <div className="flex-1 overflow-hidden"> Main content area */}
             <SidebarInset >
                 <Header />
-                <header className="  relative z-10 -ms-20 flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className="  flex items-center gap-2 px-4 w-full  top-0 bg-gray-50 -order-1rder">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className=" fixed top-16 left-100  w-4/6 px-4 py-2 text-gray-800 rounded-md bg-gray-100 border-primary-default border   "
-                        />
-                    </div>
 
-                </header>
-                {/* <header className="  max-w-5xl  sticky top-0 z-60 flex h-10 items-center bg-gray-100 ">
-                    <div className="flex items-center gap-2 px-4 w-full max-w-7xl mx-auto">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full max-w-5xl px-4 py-2 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
-                        />
-                    </div>
-                </header> */}
 
 
 
@@ -350,12 +335,15 @@ export default function AdminPanel() {
 
                 <div className="w-4/5 ">
 
-                    <main  className="pt-6" >
+                    <main className="pt-6" >
                         <HeroSection />
                         <BannerSection />
-                        <Shopping />
-                        <BabyProducts />
+                        {/* <Shopping />
+                        <BabyProducts /> */}
                         <ProductCategories />
+                        <Categories />
+                        <FreshSell />
+                       
 
                         {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                             <div className="grid auto-rows-min gap-4 md:grid-cols-3">

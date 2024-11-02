@@ -59,7 +59,7 @@ export default function ProductCategories() {
         >
           <div className="flex gap-4">
             {products.map((product) => (
-              <Link key={product.id} to="#" className="flex-none w-[160px] group">
+              <Link key={product.id} to="#" className="flex-none w-[160px] group border border-gray-300 rounded-lg p-2">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   <img
                     src={product.image}

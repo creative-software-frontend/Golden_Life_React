@@ -1,9 +1,7 @@
-// BannerSlider.tsx
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css/pagination"; // Only import pagination CSS
+import { Pagination, Autoplay } from "swiper/modules";
 
 // Import your images
 import banner1 from '../../../../public/image/Banner/Screenshot_3.png';
@@ -18,14 +16,13 @@ const HeroSection = () => {
     ];
 
     return (
-        <div className="flex justify-center py-8 -ms-24 px-8 ">
-            <div className="w-full max-w-5xl "> {/* Consistent and centered width */}
+        <div className="flex justify-center py-8 -ms-24 px-8">
+            <div className="w-full max-w-5xl"> {/* Consistent and centered width */}
                 <Swiper
-                    modules={[Navigation, Pagination, Autoplay]}
+                    modules={[Pagination, Autoplay]} // Removed Navigation
                     spaceBetween={30}
                     slidesPerView={1}
-                    navigation
-                    pagination={{ clickable: true }}
+                    pagination={{ clickable: true }} // Pagination will be shown
                     autoplay={{ delay: 5000, disableOnInteraction: false }}
                     className="rounded-lg shadow-lg"
                 >

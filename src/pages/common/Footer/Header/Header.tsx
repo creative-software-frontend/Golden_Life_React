@@ -1,57 +1,34 @@
-import { MapPin, UserIcon } from 'lucide-react';
+import { CameraIcon, MapPin, UserIcon } from 'lucide-react';
 import { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-// import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import logo from '../../../../../public/image/logo/logo.jpg'
+import logo from '../../../../../public/image/logo/logo.jpg';
 
 const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false); // State to manage dropdown visibility
     const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
     const cancelButtonRef = useRef(null);
-    const [activeMenu, setActiveMenu] = useState(null); // Track active menu item
-
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev);
     };
 
-    const menus = [
-        { id: 'pharmacy', label: 'Pharmacy' },
-        { id: 'fashion', label: 'Fashion' },
-        { id: 'electronics', label: 'Electronics' },
-        { id: 'beauty', label: 'Beauty' },
-    ];
-
     return (
-        <div>
-            <header className="shadow fixed top-6 left-100 w-4/6  -mt-7 flex items-center justify-between bg-gray-50 p-2 -ms-16 z-10">
-                <div className="flex items-center gap-2">
-                    {menus.map((menu) => (
-                        <button
-                            key={menu.id}
-                            onClick={() => setActiveMenu(menu.id)}
-                            className={`px-2 py-2 border border-primary-default rounded text-gray-500 
-            ${activeMenu === menu.id ? "text-white" : "bg-white"}`}
-                            style={{
-                                backgroundColor: activeMenu === menu.id ? "#67AC79" : "white", // Customize active color
-                                color: activeMenu === menu.id ? "white" : "#6B7280", // Customize text color for active state
-                            }}
-                        >
-                            {menu.label}
-                        </button>
-                    ))}
+        <div className=''>
+            <header className="shadow fixed top-6 left-100 w-4/6 -mt-7 flex items-center justify-between bg-gray-50 p-2 -ms-16 z-10">
+                <div className="relative flex items-center gap-2 w-full p-2">
+                    {/* Search Input Field */}
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-full pr-10 py-1 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
+                    />
+                    <CameraIcon className="absolute right-3 h-7 w-7 m-2 text-gray-500" />
                 </div>
 
 
 
-                {/* Center - Hotline */}
-                {/* <div className="flex items-center text-lg font-semibold text-red-400">
-                    Hotline: +1-800-555-1234
-                </div> */}
-
-                {/* Right Side - Login and Language Buttons */}
+                {/* Right Side - Address Selector and User Icon */}
                 <div className="flex items-center">
-                    {/* Login Icon with Dropdown */}
                     {/* Address Selector */}
                     <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
                         <MapPin size={20} className="text-white" />
@@ -61,7 +38,7 @@ const Header: React.FC = () => {
                             <option value="Khulna">Khulna</option>
                         </select>
                     </div>
-                    <div className="relative ">
+                    <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4 mr-1" />
                         </button>
@@ -69,9 +46,9 @@ const Header: React.FC = () => {
                         {dropdownOpen && (
                             <div className="z-20 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
                                 <ul className='z-20'>
-                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Profile</li>
-                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer">Settings</li>
-                                    <li onClick={() => setIsModalOpen(true)} className="hover:bg-gray-100 px-4 py-2 cursor-pointer">
+                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Profile</li>
+                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Settings</li>
+                                    <li onClick={() => setIsModalOpen(true)} className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">
                                         Login
                                     </li>
                                 </ul>
@@ -79,8 +56,9 @@ const Header: React.FC = () => {
                         )}
                     </div>
 
+
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
-                        <button className="text-gray-500 px-3 py-1 ">EN</button>
+                        <button className="text-gray-500 px-3 py-1">EN</button>
                         <div className="h-6 w-[1px] bg-white mx-2"></div>
                         <button className="text-white px-3 py-1">BN</button>
                     </div>
@@ -183,7 +161,6 @@ const Header: React.FC = () => {
                                         </div>
                                     </div>
                                 </Dialog.Panel>
-
                             </Transition.Child>
                         </div>
                     </div>

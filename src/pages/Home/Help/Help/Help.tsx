@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { XCircle } from 'lucide-react';
 import { Disclosure } from '@headlessui/react';
 import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/react/24/outline';
-import Footer from '@/pages/common/Footer/Footer';
+// import Footer from '@/pages/common/Footer/Footer';
 import { Link } from 'react-router-dom';
 
 const faqs = [
@@ -177,7 +177,7 @@ const HelpSection: React.FC = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };
