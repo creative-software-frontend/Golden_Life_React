@@ -45,8 +45,6 @@ import Footer from "../../common/Footer/Footer"
 import Header from "@/pages/common/Footer/Header/Header"
 import HeroSection from "../HeroSection/HeroSection"
 import BannerSection from "../BannerSection/BannerSection"
-import Shopping from "../product/shopping/Shopping"
-import BabyProducts from "./BabyProducts/BabyProducts"
 import ProductCategories from '../ProductCategories/ProductCategories';
 import Categories from "../Categories/Categories"
 import FreshSell from "../FreshSell/FreshSell"
@@ -327,14 +325,7 @@ export default function AdminPanel() {
             {/* <div className="flex-1 overflow-hidden"> Main content area */}
             <SidebarInset >
                 <Header />
-
-
-
-
-
-
                 <div className="w-4/5 ">
-
                     <main className="pt-6" >
                         <HeroSection />
                         <BannerSection />
@@ -342,27 +333,7 @@ export default function AdminPanel() {
                         {/* <Shopping />
                         <BabyProducts /> */}
                         <ProductCategories />
-                        
                         <FreshSell />
-                       
-
-                        {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                            </div>
-                            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                            </div>
-                            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                                <div className="aspect-video rounded-xl bg-muted/50" />
-                            </div>
-                        </div> */}
                         <Outlet />
                         <Footer />
                     </main>

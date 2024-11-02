@@ -6,7 +6,7 @@ import sampleImage3 from '../../../../public/image/Banner/Screenshot_3.png';
 const Banner: React.FC = () => {
     return (
         <div className="-ms-20 container mx-auto max-w-7xl px-4">
-            <div className="flex justify-between gap-2 py-4" style={{ width: '110%' }}>
+            <div className="flex justify-between gap-2 py-4" style={{ width: '107%' }}>
 
                 {/* First Image Div */}
                 <div style={{ width: '50%' }}>

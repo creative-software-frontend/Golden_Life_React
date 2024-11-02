@@ -117,7 +117,7 @@ export default function FreshSell() {
     };
 
     return (
-        <div className="py-10 -ms-16 mb-5">
+        <div className="py-10 -ms-20 mb-5" style={{ width: "108%" }}>
             <div className="container mx-auto max-w-7xl px-4">
                 <div className="w-full">
                     <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-between">

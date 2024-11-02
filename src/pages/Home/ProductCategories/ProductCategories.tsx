@@ -39,7 +39,7 @@ export default function ProductCategories() {
   };
 
   return (
-    <div className="py-10 -ms-12 shadow mb-5 bg-primary-default">
+    <div className="py-10 -ms-16 shadow mb-5 bg-primary-default" style={{ width: '104%' }}>
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between mb-4">
           <div className="bg-primary-light text-black px-4 py-1 rounded-full text-sm font-medium">

@@ -7,7 +7,7 @@ import paywith from '../../../../public/Pay-With.png'
 const Footer = () => {
     return (
         <footer >
-            <div className=" mx-2  bg-gray-300 -ms-16 pt-4">
+            <div className=" mx-6  bg-gray-300 -ms-16 pt-4">
                 <div className="pt-6 grid grid-cols-1 md:grid-cols-4 ">
                     <div className=''>
                         <h3 className="font-bold text-xl  mb-4 text-gray-600 ms-8">About Golden Life</h3>
