@@ -47,6 +47,7 @@ import HeroSection from "../HeroSection/HeroSection"
 import BannerSection from "../BannerSection/BannerSection"
 import Shopping from "../product/shopping/Shopping"
 import BabyProducts from "./BabyProducts/BabyProducts"
+import ProductCategories from '../ProductCategories/ProductCategories';
 
 // This is sample data.
 const data = {
@@ -354,6 +355,7 @@ export default function AdminPanel() {
                         <BannerSection />
                         <Shopping />
                         <BabyProducts />
+                        <ProductCategories />
 
                         {/* <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                             <div className="grid auto-rows-min gap-4 md:grid-cols-3">
