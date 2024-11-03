@@ -324,21 +324,19 @@ export default function AdminPanel() {
             {/* </div> */}
             {/* <div className="flex-1 overflow-hidden"> Main content area */}
             <SidebarInset >
-                <Header />
-                <div className="w-4/5 ">
-                    <main className="pt-6" >
-                        <HeroSection />
-                        <BannerSection />
-                        <Categories />
-                        
-                        {/* <Shopping />
+                <main className="pt-6 -ms-20" >
+                    <Header />
+                    <HeroSection />
+                    <BannerSection />
+                    <Categories />
+
+                    {/* <Shopping />
                         <BabyProducts /> */}
-                        <ProductCategories />
-                        <FreshSell />
-                        <Outlet />
-                        <Footer />
-                    </main>
-                </div>
+                    <ProductCategories />
+                    <FreshSell />
+                    <Outlet />
+                    <Footer />
+                </main>
             </SidebarInset>
             {/* </div> */}
         </SidebarProvider>

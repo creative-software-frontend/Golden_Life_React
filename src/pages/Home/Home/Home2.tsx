@@ -443,6 +443,51 @@ export default function Example() {
                     </main>
                 </div>
             </div>
+            <div>
+                <h3 className="font-bold text-xl  mb-4 text-gray-600 ">Customer Service</h3>
+                <ul className="space-y-2  text-start ">
+                    <li><Link to="#" className="text-gray-600 hover:text-gray-900">Contact Us</Link></li>
+                    <li><Link to="#" className="text-gray-600 hover:text-gray-900">FAQ</Link></li>
+                    <li><Link to="#" className="text-gray-600 hover:text-gray-900">Help</Link></li>
+                </ul>
+            </div>
+            <div >
+                <h3 className="font-bold text-xl  mb-4 text-gray-600 ">For Business</h3>
+                <ul className="space-y-2  text-start ">
+                    <li><Link to="#" className="text-gray-600 hover:text-gray-900">Corporate</Link></li>
+                </ul>
+            </div>
+            <div className="space-y-3 px-2  ">
+                <div className="flex items-center">
+                    <div className="flex w-full py-1 border-primary-default border rounded-lg bg-white">
+                        <input
+                            type="text"
+                            placeholder="+88"
+                            className="  px-3 py-2 w-full focus:outline-none"
+                        />
+                        <button className="bg-primary-default  text-white px-2 mr-1 text-nowrap rounded-lg">
+                            Get app
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex justify-between gap-3  p-2">
+                    <Link to="#" className="">
+                        <img src={playstore} alt='Play Store' className="object-cover h-15 w-full  text-gray-600" />
+                    </Link>
+                    {/* <Link to="#" className="flex-1">
+                                <img src={appstore} alt='App Store' className="object-cover h-10 w-full  text-gray-600" />
+                            </Link> */}
+                </div >
+                <div className="text-start">
+                    <div className="flex items-center justify-end">
+                        <Phone className="h-4 w-4 text-gray-800 mr-2" />
+                        <p className="text-2xl text-gray-500 font-bold">0000000000000</p>
+                    </div>
+                    <p className="text-gray-500 text-lg ">or support@goldenlife.com</p>
+                </div>
+
+            </div >
         </>
     )
 }

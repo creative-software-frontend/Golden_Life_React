@@ -16,27 +16,25 @@ const HeroSection = () => {
     ];
 
     return (
-        <div className="flex justify-center py-8 -ms-20 px-5">
-            <div className="w-full max-w-5xl"> {/* Consistent and centered width */}
-                <Swiper
-                    modules={[Pagination, Autoplay]} // Removed Navigation
-                    spaceBetween={30}
-                    slidesPerView={1}
-                    pagination={{ clickable: true }} // Pagination will be shown
-                    autoplay={{ delay: 5000, disableOnInteraction: false }}
-                    className="rounded-lg shadow-lg"
-                >
-                    {banners.map((banner) => (
-                        <SwiperSlide key={banner.id} className="relative">
-                            <img
-                                src={banner.image}
-                                alt={banner.title}
-                                className="w-full h-[400px] object-cover rounded-lg"
-                            />
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </div>
+        <div className="flex justify-start py-8 max-w-[1040px] ">
+            <Swiper
+                modules={[Pagination, Autoplay]} // Removed Navigation
+                spaceBetween={30}
+                slidesPerView={1}
+                pagination={{ clickable: true }} // Pagination will be shown
+                autoplay={{ delay: 5000, disableOnInteraction: false }}
+                className="rounded-lg shadow-lg"
+            >
+                {banners.map((banner) => (
+                    <SwiperSlide key={banner.id} className="relative">
+                        <img
+                            src={banner.image}
+                            alt={banner.title}
+                            className="w-full h-[400px]  rounded-lg"
+                        />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
         </div>
     );
 };

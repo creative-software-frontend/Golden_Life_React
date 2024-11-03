@@ -83,7 +83,7 @@ const HelpSection: React.FC = () => {
             )}
           </div>
           <button className="mt-4 px-4 py-2 bg-white text-primary-default rounded-full font-semibold hover:bg-gray-100">
-            All
+            Your faq here 
           </button>
         </div>
       </section>
@@ -111,33 +111,26 @@ const HelpSection: React.FC = () => {
         <div className="hidden sm:block">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              <Link
-                to='/faq'
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-              >
-              FAQ
-              </Link>
+             
 
               <Link
-                to="/story"
+                to="/our-story"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
                 Our Story
               </Link>
-
               <Link
-                to="team"
-                className="border-primary-default text-primary-default text-sm font-semibold whitespace-nowrap border-b-2 py-4 px-1 font-medium"
-                aria-current="page"
+                to='/help'
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-                Team 
+                FAQ
               </Link>
 
               <Link
                 to="/career"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-               career
+               Career
               </Link>
               <Link
                 to="/contact"
@@ -146,10 +139,10 @@ const HelpSection: React.FC = () => {
               Contact
               </Link>
               <Link
-                to="/privacy"
+                to="/privacy-policy"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-              PrivacyPolicy
+              Privacy Policy
               </Link>
               <Link
                 to="/terms"

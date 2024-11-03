@@ -3,6 +3,7 @@ import Home from "../pages/Home/Home/Home";
 import ErrorPage from "../pages/errorpage/Errorpage";
 import Help from "@/pages/Home/Help/Help/Help";
 import OrderDetails from "@/pages/Home/Home/OrderDetails/OrderDetails";
+import Story from "@/pages/Home/Story/Story";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
 // import BannerSection from "@/pages/Home/BannerSection/BannerSection";
 
@@ -33,6 +34,10 @@ export const routes = createBrowserRouter([
     {
         path: '/help',  // Separate route for Help page
         element: <Help />,
+    },
+    {
+        path: '/our-story',  // Separate route for Help page
+        element: <Story />,
     },
     {
         path: '/orderdetails',  // Separate route for Help page

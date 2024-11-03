@@ -14,7 +14,7 @@ const Header: React.FC = () => {
 
     return (
         <div >
-            <header style={{ width: '67%' }} className="shadow fixed top-6 left-100 w-4/6 -mt-7 flex items-center justify-between bg-gray-50 p-2 -ms-16 z-10 rounded">
+            <header className=" shadow md:w-[1040px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     {/* Search Input Field */}
                     <input
