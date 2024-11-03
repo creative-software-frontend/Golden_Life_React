@@ -66,8 +66,7 @@ export default function Categories() {
     ]
 
     return (
-        // <div className="py-10 -ms-16  mb-5">
-        <div className="py-10  container mx-auto max-w-7xl  " style={{ width: '100%' }}>
+        <div className="py-10 md:max-w-[1040px]  " >
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
@@ -79,7 +78,7 @@ export default function Categories() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:max-w-[1240px]">
                 {categories.map((category) => (
                     <Link
                         key={category.id}
@@ -101,6 +100,6 @@ export default function Categories() {
             </div>
 
         </div>
-        // </div>
+
     )
 }
