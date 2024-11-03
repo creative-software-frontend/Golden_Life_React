@@ -16,7 +16,7 @@ const HeroSection = () => {
     ];
 
     return (
-        <div className="flex justify-center py-8 -ms-24 px-8">
+        <div className="flex justify-center py-8 -ms-20 px-5">
             <div className="w-full max-w-5xl"> {/* Consistent and centered width */}
                 <Swiper
                     modules={[Pagination, Autoplay]} // Removed Navigation

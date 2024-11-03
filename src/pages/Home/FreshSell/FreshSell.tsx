@@ -172,14 +172,14 @@ export default function FreshSell() {
                             </Link>
                         ))}
                     </div>
-                    <div className="flex justify-center mt-4">
+                    {/* <div className="flex justify-center mt-4">
                         <button
                             className="bg-orange-500 text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-orange-600 transition-colors"
                         >
                             <Plus className="h-5 w-5" />
                             Add New Product
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

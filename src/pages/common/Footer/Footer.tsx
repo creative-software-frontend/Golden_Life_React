@@ -54,12 +54,12 @@ const Footer = () => {
                                 <img src={appstore} alt='App Store' className="object-cover h-10 w-full  text-gray-600" />
                             </Link> */}
                         </div>
-                        <div className="text-right">
+                        <div className="text-start">
                             <div className="flex items-center justify-end">
                                 <Phone className="h-4 w-4 text-gray-800 mr-2" /> {/* Phone icon */}
                                 <p className="text-2xl text-gray-500 font-bold">0000000000000</p>
                             </div>
-                            <p className="text-gray-500 text-lg">or support@goldenlife.com</p>
+                            <p className="text-gray-500 text-lg ">or support@goldenlife.com</p>
                         </div>
 
                     </div>
@@ -82,8 +82,8 @@ const Footer = () => {
                     </div>
                     <div className="border-0 -mb-8  border-gray-300  bg-white py-2">
 
-                        <div className=" mt-4 flex flex-wrap justify-between items-left mx-2">
-                            <p className="text-gray-600 ms-16">&copy; 2024 Golden Life Shopping.</p>
+                        <div className="mt-4 flex flex-wrap justify-between items-center mx-2">
+                            <p className="text-gray-600 text-start">&copy; 2024 Golden Life Shopping.</p>
                             <div className="flex space-x-4">
                                 <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                     <Linkedin size={20} className="text-gray-600" />
@@ -101,19 +101,14 @@ const Footer = () => {
                                     <Instagram size={20} className="text-gray-600" />
                                 </Link>
 
-
-                                {/* <div className="flex items-center space-x-1 bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                    <Globe size={20} className="text-gray-600" />
-                                    <span className="text-gray-600">English (EN)</span>
-                                </div> */}
                                 <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
-                                    <button className="text-gray-500 px-3 py-1 ">EN</button>
+                                    <button className="text-gray-500 px-3 py-1">EN</button>
                                     <div className="h-6 w-[1px] bg-white mx-2"></div>
                                     <button className="text-white px-3 py-1">BN</button>
                                 </div>
                             </div>
-
                         </div>
+
                     </div>
                 </div>
 

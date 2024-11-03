@@ -46,8 +46,8 @@ const Header: React.FC = () => {
                         {dropdownOpen && (
                             <div className="z-20 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
                                 <ul className='z-20'>
-                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Profile</li>
-                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Settings</li>
+                                    {/* <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Profile</li>
+                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Settings</li> */}
                                     <li onClick={() => setIsModalOpen(true)} className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">
                                         Login
                                     </li>

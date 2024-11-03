@@ -67,14 +67,14 @@ export default function Categories() {
 
     return (
         // <div className="py-10 -ms-16  mb-5">
-        <div className="py-10 -ms-12  mb-5 container mx-auto max-w-7xl  " style={{ width: '100%' }}>
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-medium">Categories</h2>
+        <div className="py-10 -ms-12  container mx-auto max-w-7xl  " style={{ width: '100%' }}>
+            <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
+                <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
                     to=''
-                    className="text-orange-500 text-sm font-medium flex items-center hover:underline"
+                    className="text-white text-sm font-medium flex items-center hover:underline"
                 >
-                    View All
+                    All Categories
                     <ChevronRight className="h-6 w-6" />
                 </Link>
             </div>
