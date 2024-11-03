@@ -49,6 +49,7 @@ import ProductCategories from '../ProductCategories/ProductCategories';
 import Categories from "../Categories/Categories"
 import FreshSell from "../FreshSell/FreshSell"
 import Cart from "../Cart/Cart"
+import LiveChat from "@/pages/LiveChat/Livechat"
 
 // This is sample data.
 const data = {
@@ -329,7 +330,8 @@ export default function AdminPanel() {
                     <HeroSection />
                     <BannerSection />
                     <Categories />
-
+                    <Cart />
+                  
                     {/* <Shopping />
                         <BabyProducts /> */}
                     <ProductCategories />
@@ -339,7 +341,9 @@ export default function AdminPanel() {
                 </main>
             </SidebarInset>
             {/* </div> */}
+
         </SidebarProvider>
+        
         // </div>
     )
 }
