@@ -89,6 +89,7 @@ const HelpSection: React.FC = () => {
       </section>
 
       {/* Tabs Section */}
+      {/* for small screen */}
       <div className='m-4'>
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">
@@ -111,32 +112,50 @@ const HelpSection: React.FC = () => {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
               <Link
-                to="my-account"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-lg font-medium"
+                to='/faq'
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-                My Account
+              FAQ
               </Link>
 
               <Link
-                to="company"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-lg font-medium"
+                to="/story"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-                Company
+                Our Story
               </Link>
 
               <Link
-                to="team-members"
-                className="border-primary-default text-primary-default text-lg font-semibold whitespace-nowrap border-b-2 py-4 px-1 font-medium"
+                to="team"
+                className="border-primary-default text-primary-default text-sm font-semibold whitespace-nowrap border-b-2 py-4 px-1 font-medium"
                 aria-current="page"
               >
-                Team Members
+                Team 
               </Link>
 
               <Link
-                to="billing"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-lg font-medium"
+                to="/career"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
               >
-                Billing
+               career
+              </Link>
+              <Link
+                to="/contact"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
+              >
+              Contact
+              </Link>
+              <Link
+                to="/privacy"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
+              >
+              PrivacyPolicy
+              </Link>
+              <Link
+                to="/terms"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
+              >
+              Terms of use
               </Link>
             </nav>
           </div>
@@ -146,7 +165,7 @@ const HelpSection: React.FC = () => {
 
       {/* FAQ Section */}
       <div className="bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 lg:py-40">
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 sm:px-8 sm:py-40">
           <div className="mx-auto max-w-4xl divide-y divide-gray-900/10">
             <h2 className="text-4xl font-bold leading-10 tracking-tight text-gray-900">Frequently Asked Questions</h2>
             <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">

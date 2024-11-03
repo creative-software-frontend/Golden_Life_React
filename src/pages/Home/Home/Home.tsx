@@ -330,6 +330,7 @@ export default function AdminPanel() {
                         <HeroSection />
                         <BannerSection />
                         <Categories />
+                        
                         {/* <Shopping />
                         <BabyProducts /> */}
                         <ProductCategories />
