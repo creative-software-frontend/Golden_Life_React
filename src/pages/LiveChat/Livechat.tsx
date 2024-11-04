@@ -1,6 +1,10 @@
 'use client'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp, faTelegram } from '@fortawesome/free-brands-svg-icons';
+// import { Telegram } from 'lucide-react'; // Use Lucid Icons for Telegram
 import React, { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom';
 
 type Message = {
     id: number
@@ -97,13 +101,21 @@ export default function LiveChat() {
                     </form>
                 </div>
             </div>
-            <div className="fixed top-[85%] -translate-y-1/2 right-0 z-40 h-16 rounded-l-full bg-white px-2 shadow-lg hover:bg-gray-100">
+            <div className="fixed top-[87%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2 shadow-lg hover:bg-gray-100 border-2 border-primary-light">
                 <button
-                    onClick={() => setIsOpen(true)}
-                    className="px-4 py-4 text-black-500"
+                    onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
+                    className="px-4 py-2 text-black-500"
                 >
                     Chat with us
                 </button>
+                <div className="flex justify-center  space-x-2">
+                    <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
+                        <FontAwesomeIcon icon={faWhatsapp} className="h-6 w-6 text-green-600 hover:text-green-700" />
+                    </Link>
+                    <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer">
+                        <FontAwesomeIcon icon={faTelegram} className="h-6 w-6 text-blue-600 hover:text-blue-700" />
+                    </Link>
+                </div>
             </div>
 
 

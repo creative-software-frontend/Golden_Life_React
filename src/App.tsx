@@ -1,5 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 import './App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { routes } from './routes/Routes';
 
 function App() {
