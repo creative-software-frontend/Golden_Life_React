@@ -97,14 +97,16 @@ export default function LiveChat() {
                     </form>
                 </div>
             </div>
-            <div className="fixed top-[60%] -translate-y-1/2 right-0 z-40 h-16 rounded-l-full bg-white px-2 shadow-lg hover:bg-gray-100">
+            <div className="fixed top-[85%] -translate-y-1/2 right-0 z-40 h-16 rounded-l-full bg-white px-2 shadow-lg hover:bg-gray-100">
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="px-4 py-4 text-blaack-500"
+                    className="px-4 py-4 text-black-500"
                 >
                     Chat with us
                 </button>
             </div>
+
+
         </>
     )
 }

@@ -67,9 +67,9 @@ export default function Cart() {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed right-0 top-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-l-full px-4 py-2 shadow-lg z-50"
+                className="fixed right-0 top-[75%] -translate-y-1/2 bg-white border border-gray-300 rounded-l-full px-4 py-2 shadow-lg z-50"
             >
-                <div className="flex items-center ">
+                <div className="flex items-center">
                     <ShoppingBag className="h-6 w-6" />
                     <div className="border-l border-gray-300 h-8 mx-2" />
                     <div>
@@ -78,6 +78,9 @@ export default function Cart() {
                     </div>
                 </div>
             </button>
+
+
+
 
             {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50">
