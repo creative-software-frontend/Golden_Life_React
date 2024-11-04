@@ -11,6 +11,7 @@ import Faq from "@/pages/Home/Faq/Faq";
 import TermsOfUse from "@/pages/Home/Home/TermsOfUse/TermsOfUse";
 import AllCategories from "@/pages/Home/AllCategories/AllCategories";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
+// import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
 // import BannerSection from "@/pages/Home/BannerSection/BannerSection";
 
@@ -70,6 +71,10 @@ export const routes = createBrowserRouter([
 
         ]
 
+    },
+    {
+        path: '/orderdetails',  // Separate route for Help page
+        element: <OrderDetails />,
     },
 
 
