@@ -1,89 +1,10 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+
 
 const Contact = () => {
   return (
       <div className="min-h-screen ">
-          {/* Banner Section */}
-          <section className="bg-primary-default py-20 m-4 relative">
-              <div className="text-center text-white">
-                  <h1 className="text-3xl md:text-5xl font-bold mb-4">Welcome to Our Contact Page</h1>
-                  {/*  */}
-                  <button className="mt-4 px-4 py-2 bg-white text-primary-default rounded-full font-semibold hover:bg-gray-100">
-                      Explore Stories
-                  </button>
-              </div>
-          </section>
-
-
-
-
-          {/* Tabs Section */}
-          {/* for small screen */}
-          <div className='m-4'>
-              <div className="sm:hidden">
-                  <label htmlFor="tabs" className="sr-only">
-                      Select a tab
-                  </label>
-                  <select
-                      id="tabs"
-                      name="tabs"
-                      className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                      defaultValue="Team Members" // Set the default value to the current tab
-                  >
-                      <option value="My Account">My Account</option>
-                      <option value="Company">Company</option>
-                      <option value="Team Members">Team Members</option>
-                      <option value="Billing">Billing</option>
-                  </select>
-              </div>
-
-              <div className="hidden sm:block">
-                  <div className="border-b border-gray-200">
-                      <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-
-
-                          <Link
-                              to="/our-story"
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              Our Story
-                          </Link>
-                          <Link
-                              to='/help'
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              FAQ
-                          </Link>
-
-                          <Link
-                              to="/career"
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              Career
-                          </Link>
-                          <Link
-                              to="/contact"
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              Contact
-                          </Link>
-                          <Link
-                              to="/privacy-policy"
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              Privacy Policy
-                          </Link>
-                          <Link
-                              to="/terms"
-                              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium"
-                          >
-                              Terms of use
-                          </Link>
-                      </nav>
-                  </div>
-              </div>
-          </div>
+        
+     
           {/* Hero Section */}
           <section className="text-center mb-12">
               <h1 className="text-5xl font-bold mb-4 text-gray-800">Get in Touch</h1>
