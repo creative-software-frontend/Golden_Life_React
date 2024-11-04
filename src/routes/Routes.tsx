@@ -9,7 +9,7 @@ import UserLayout from "@/layout/userlayout/UserLayout";
 import HelpLayout from "@/layout/HelpLayout/HelpLayout";
 import Faq from "@/pages/Home/Faq/Faq";
 import TermsOfUse from "@/pages/Home/Home/TermsOfUse/TermsOfUse";
-import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
+// import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
 // import BannerSection from "@/pages/Home/BannerSection/BannerSection";
 
@@ -72,10 +72,10 @@ export const routes = createBrowserRouter([
     },
 
 
-    {
-        path: '/checkout',
-        element: <CheckoutModal />, // Error page for undefined routes
-    },
+    // {
+    //     path: '/checkout',
+    //     element: <CheckoutModal />, // Error page for undefined routes
+    // },
     {
         path: '*',
         element: <ErrorPage />, // Error page for undefined routes
