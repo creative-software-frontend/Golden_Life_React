@@ -66,7 +66,7 @@ export default function Categories() {
     ]
 
     return (
-        <div className="py-10 md:max-w-[1040px]  " >
+        <div className="py-10  -mt-8 md:max-w-[1040px]  " >
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
