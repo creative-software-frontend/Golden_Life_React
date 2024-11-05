@@ -104,18 +104,18 @@ export default function LiveChat() {
             <div className="fixed top-[87%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2 shadow-lg hover:bg-gray-100 border-2 border-primary-light">
                 <button
                     onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
-                    className="px-4 py-1 text-black-500"
+                    className="px-4  text-black-500"
                 >
                     Chat with us
                 </button>
                 <div className="flex justify-center  space-x-2">
                     <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
-                        <FontAwesomeIcon icon={faWhatsapp} className="h-5 w-5 text-green-600 hover:text-green-700" />
+                        <FontAwesomeIcon icon={faWhatsapp} className="h-7 w-7 text-green-600 hover:text-green-700" />
                     </Link>
                     <div className="border-l border-gray-300 h-8 mx-2" />
 
                     <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer">
-                        <FontAwesomeIcon icon={faTelegram} className="h-5 w-5 text-blue-600 hover:text-blue-700" />
+                        <FontAwesomeIcon icon={faTelegram} className="h-7 w-7 text-blue-600 hover:text-blue-700" />
                     </Link>
                 </div>
             </div>
