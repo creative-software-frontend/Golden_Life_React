@@ -25,7 +25,7 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant
     </button>
 )
 
-export default function CartModal() {
+export default function Cart() {
     const [isOpen, setIsOpen] = React.useState(false)
     const [showCode, setShowCode] = React.useState(false)
     const [items, setItems] = React.useState<CartItem[]>([

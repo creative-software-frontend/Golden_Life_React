@@ -70,7 +70,7 @@ export default function Categories() {
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
-                    to='all-categories'
+                    to='allcategories'
                     className="text-white text-sm font-medium flex items-center hover:underline"
                 >
                     All Categories
@@ -82,7 +82,8 @@ export default function Categories() {
                 {categories.map((category) => (
                     <Link
                         key={category.id}
-                        to=''
+                        to={`/productpage/${category.id}`}
+                      
                         className="flex flex-col items-center p-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow"
                     >
                         <div className="w-12 h-12 mb-3">

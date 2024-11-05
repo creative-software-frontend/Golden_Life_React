@@ -1,101 +1,77 @@
-"use client"
-import { Link } from 'react-router-dom';
+import { ChevronRight } from "lucide-react"
+import { Link } from "react-router-dom"
+
+export default function Categories() {
+    const categories = [
+        { id: 1, name: "Beauty & Personal Care", icon: "../../../../public/image/c1.jpg" },
+        { id: 2, name: "Women's Apparels", icon: "../../../../public/image/c2.jpg" },
+        { id: 3, name: "Men's Wear", icon: "../../../../public/image/c4.jpg" },
+        { id: 4, name: "Mobile & Gadgets", icon: "../../../../public/image/c1.jpg" },
+        { id: 5, name: "Home Decoration", icon: "../../../../public/image/c3.jpg" },
+        { id: 6, name: "Home Appliances", icon: "../../../../public/image/c2.jpg" },
+        { id: 7, name: "Toy, Kids & Babies", icon: "../../../../public/image/c4.jpg" },
+        { id: 8, name: "Kids Fashion", icon: "../../../../public/image/c1.jpg" },
+        { id: 9, name: "Jewellery & Accessories", icon: "../../../../public/image/c2.jpg" },
+        { id: 10, name: "Women's Bag", icon: "../../../../public/image/c3.jpg" },
+        { id: 11, name: "Men's Bag", icon: "../../../../public/image/c1.jpg" },
+        { id: 12, name: "Watches & Accessories", icon: "../../../../public/image/c4.jpg" },
+        { id: 13, name: "Footwear", icon: "../../../../public/image/c2.jpg" },
+        { id: 14, name: "Books & Stationery", icon: "../../../../public/image/c3.jpg" },
+        { id: 15, name: "Groceries", icon: "../../../../public/image/c1.jpg" },
+        { id: 16, name: "Health & Wellness", icon: "../../../../public/image/c2.jpg" },
+        { id: 17, name: "Pet Supplies", icon: "../../../../public/image/c3.jpg" },
+        { id: 18, name: "Sports Equipment", icon: "../../../../public/image/c4.jpg" },
+        { id: 19, name: "Furniture", icon: "../../../../public/image/c1.jpg" },
+        { id: 20, name: "Garden Supplies", icon: "../../../../public/image/c2.jpg" },
+        { id: 21, name: "Automotive Accessories", icon: "../../../../public/image/c3.jpg" },
+        { id: 22, name: "Beverages", icon: "../../../../public/image/c4.jpg" },
+        { id: 23, name: "Musical Instruments", icon: "../../../../public/image/c1.jpg" },
+        { id: 24, name: "Office Supplies", icon: "../../../../public/image/c2.jpg" },
+        { id: 25, name: "Luggage & Travel", icon: "../../../../public/image/c3.jpg" },
+        { id: 26, name: "Cleaning Supplies", icon: "../../../../public/image/c4.jpg" },
+        { id: 27, name: "Party Supplies", icon: "../../../../public/image/c1.jpg" },
+        { id: 28, name: "Crafts & Hobbies", icon: "../../../../public/image/c2.jpg" },
+        { id: 29, name: "Eyewear", icon: "../../../../public/image/c3.jpg" },
+        { id: 30, name: "Personal Safety", icon: "../../../../public/image/c4.jpg" }
+    ];
 
 
-interface Category {
-    id: string
-    name: string
-    image: string
-    href: string
-}
-
-const categories: Category[] = [
-    {
-        id: "eggs",
-        name: "Eggs",
-        image: "../../../../public/image/bread.jpg",
-        href: "/food/breakfast/eggs"
-    },
-    {
-        id: "breads",
-        name: "Breads",
-        image: "../../../../public/image/egg.jpg",
-        href: "/food/breakfast/breads"
-    },
-    {
-        id: "tea-coffee",
-        name: "Tea & Coffee",
-        image: "../../../../public/image/bread.jpg",
-        href: "/food/breakfast/tea-coffee"
-    },
-    {
-        id: "local-breakfast",
-        name: "Local Breakfast",
-        image: "../../../../public/image/bread.jpg",
-        href: "/food/breakfast/local-breakfast"
-    },
-    {
-        id: "cereals",
-        name: "Cereals",
-        image: "../../../../public/image/egg.jpg",
-        href: "/food/breakfast/cereals"
-    },
-    {
-        id: "honey",
-        name: "Honey",
-        image: "../../../../public/image/egg.jpg",
-        href: "/food/breakfast/honey"
-    },
-    {
-        id: "dips-spreads",
-        name: "Dips, Spreads & Syrups",
-        image: "../../../../public/image/bread.jpg",
-        href: "/food/breakfast/dips-spreads"
-    },
-    {
-        id: "energy-boosters",
-        name: "Energy Boosters",
-        image: "../../../../public/image/bread.jpg",
-        href: "/food/breakfast/energy-boosters"
-    },
-    {
-        id: "jams-jellies",
-        name: "Jams & Jellies",
-        image: "../../../../public/image/honey.jpg",
-        href: "/food/breakfast/jams-jellies"
-    }
-]
-
-export default function AllCategories() {
     return (
-        <div className="container mx-auto px-4 py-8">
-            <nav className="flex items-center gap-2 text-sm text-gray-600 mb-8">
-                <Link to="/food" className="hover:text-gray-900">
-                    Food
+        <div className="py-10  -mt-8 md:max-w-[1040px]  " >
+            {/* <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
+                <h2 className="text-lg text-white font-medium">Categories</h2>
+                <Link
+                    to='allcategories'
+                    className="text-white text-sm font-medium flex items-center hover:underline"
+                >
+                    All Categories
+                    <ChevronRight className="h-6 w-6" />
                 </Link>
-                <span>/</span>
-                <span className="font-medium text-gray-900">Breakfast</span>
-            </nav>
+            </div> */}
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:max-w-[1240px]">
                 {categories.map((category) => (
                     <Link
-                        to='/'
                         key={category.id}
-                        className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                        to={`/productpage/${category.id}`}
+                       
+                        className="flex flex-col items-center p-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow"
                     >
-                        <img
-                            src={category.image}
-                            alt={category.name}
-                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h2 className="text-white font-medium text-lg">{category.name}</h2>
+                        <div className="w-12 h-12 mb-3">
+                            <img
+                                src={category.icon}
+                                alt=""
+                                className="w-full h-full object-contain"
+                            />
                         </div>
+                        <span className="text-sm text-center text-gray-900">
+                            {category.name}
+                        </span>
                     </Link>
                 ))}
             </div>
+
         </div>
+
     )
 }

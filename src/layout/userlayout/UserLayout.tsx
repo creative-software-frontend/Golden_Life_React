@@ -39,15 +39,16 @@ import {
     SidebarProvider,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import Header from "@/pages/common/Footer/Header/Header"
-import HeroSection from "@/pages/Home/HeroSection/HeroSection"
-import BannerSection from '@/pages/Home/BannerSection/BannerSection'
-import Categories from "@/pages/Home/Categories/Categories"
-import ProductCategories from "@/pages/Home/ProductCategories/ProductCategories"
-import FreshSell from "@/pages/Home/FreshSell/FreshSell"
 import Footer from "@/pages/common/Footer/Footer"
-import Cart from "@/pages/Home/Cart/Cart"
-import LiveChat from "@/pages/LiveChat/Livechat"
+// import Header from "@/pages/common/Footer/Header/Header"
+// import HeroSection from "@/pages/Home/HeroSection/HeroSection"
+// import BannerSection from '@/pages/Home/BannerSection/BannerSection'
+// import Categories from "@/pages/Home/Categories/Categories"
+// import ProductCategories from "@/pages/Home/ProductCategories/ProductCategories"
+// import FreshSell from "@/pages/Home/FreshSell/FreshSell"
+// import Footer from "@/pages/common/Footer/Footer"
+// import Cart from "@/pages/Home/Cart/Cart"
+// import LiveChat from "@/pages/LiveChat/Livechat"
 
 // This is sample data.
 const data = {
@@ -229,14 +230,7 @@ export default function UserLayout() {
                 <main className="pt-6 -ms-20">
                     
                         
-                                <Header />
-                                <HeroSection />
-                                <BannerSection />
-                                <Categories />
-                                <Cart />
-                                <LiveChat />
-                                <ProductCategories />
-                                <FreshSell />
+                                
                           
                        
                         

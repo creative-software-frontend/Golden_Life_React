@@ -10,6 +10,8 @@ import HelpLayout from "@/layout/HelpLayout/HelpLayout";
 import Faq from "@/pages/Home/Faq/Faq";
 import TermsOfUse from "@/pages/Home/Home/TermsOfUse/TermsOfUse";
 import AllCategories from "@/pages/Home/AllCategories/AllCategories";
+import ProductPage from "@/pages/ProductPage/ProductPage";
+import Home from "@/pages/Home/Home/Home";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
@@ -25,7 +27,15 @@ export const routes = createBrowserRouter([
 
             {
                 path: '/',
+                element: <Home />
+            },
+            {
+                path: 'allcategories',
                 element: <AllCategories />
+            },
+            {
+                path: 'productpage',  // Separate route for Help page
+                element: <ProductPage />,
             },
 
 
@@ -76,6 +86,7 @@ export const routes = createBrowserRouter([
         path: '/orderdetails',  // Separate route for Help page
         element: <OrderDetails />,
     },
+    
 
 
     // {
