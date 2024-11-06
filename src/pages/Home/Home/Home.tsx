@@ -1,4 +1,4 @@
-import Header from "@/pages/common/Footer/Header/Header"
+// import Header from "@/pages/common/Footer/Header/Header"
 import HeroSection from "../HeroSection/HeroSection"
 import  BannerSection from '@/pages/Home/BannerSection/BannerSection';
 import Categories from "../Categories/Categories";
@@ -10,7 +10,7 @@ import FreshSell from "../FreshSell/FreshSell";
 const Home = () => {
   return (
     <div>
-          <Header />
+         
           <HeroSection />
           <BannerSection />
           <Categories />

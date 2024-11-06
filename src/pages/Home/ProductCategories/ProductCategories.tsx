@@ -45,7 +45,7 @@ export default function ProductCategories() {
           <div className="bg-primary-light text-white px-4 py-1 rounded-full text-sm font-medium">
             Special Products
           </div>
-          <Link to="#" className="text-white text-sm font-medium flex items-center hover:underline">
+          <Link to="/allProducts" className="text-white text-sm font-medium flex items-center hover:underline">
             All Products
             <ChevronRight className="h-4 w-4" />
           </Link>

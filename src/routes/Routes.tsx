@@ -12,6 +12,8 @@ import TermsOfUse from "@/pages/Home/Home/TermsOfUse/TermsOfUse";
 import AllCategories from "@/pages/Home/AllCategories/AllCategories";
 import ProductPage from "@/pages/ProductPage/ProductPage";
 import Home from "@/pages/Home/Home/Home";
+import AllProduct from "@/pages/AllProducts/AllProducts";
+import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
@@ -36,6 +38,10 @@ export const routes = createBrowserRouter([
             {
                 path: 'productpage',  // Separate route for Help page
                 element: <ProductPage />,
+            },
+            {
+                path: 'allProducts',  // Separate route for Help page
+                element: <AllProduct />,
             },
 
 
@@ -73,20 +79,25 @@ export const routes = createBrowserRouter([
                 path: 'terms',  // Separate route for Help page
                 element: <TermsOfUse />,
             },
-            {
-                path: 'orderdetails',  // Separate route for Help page
-                element: <OrderDetails />,
-            },
+
 
 
         ]
 
     },
     {
+        path: '/checkout',  // Separate route for Help page
+        element: <CheckoutModal />,
+    },
+    {
         path: '/orderdetails',  // Separate route for Help page
         element: <OrderDetails />,
     },
-    
+    {
+        path: '/orderdetails',  // Separate route for Help page
+        element: <OrderDetails />,
+    },
+
 
 
     // {

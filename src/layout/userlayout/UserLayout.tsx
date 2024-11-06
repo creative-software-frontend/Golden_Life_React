@@ -40,6 +40,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import Footer from "@/pages/common/Footer/Footer"
+import Header from "@/pages/common/Footer/Header/Header"
 // import Header from "@/pages/common/Footer/Header/Header"
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection"
 // import BannerSection from '@/pages/Home/BannerSection/BannerSection'
@@ -232,7 +233,7 @@ export default function UserLayout() {
                         
                                 
                           
-                       
+                    <Header />
                         
                     <Outlet />
                     <Footer />
