@@ -4,6 +4,7 @@ import * as React from "react"
 import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from "lucide-react"
 import { Link } from "react-router-dom"
 
+
 interface CartItem {
     id: number
     name: string
@@ -79,8 +80,8 @@ export default function Cart() {
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50">
-                    <div className="bg-white w-full max-w-md h-full overflow-auto">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
+                    <div className="bg-white w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
                         <div className="sticky top-0 bg-white border-b z-10">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">
@@ -119,6 +120,8 @@ export default function Cart() {
                                             alt={item.name}
                                             className="w-full h-auto object-cover"
                                             src="../../../../public/image/maggi.webp"
+                                            width={100}
+                                            height={100}
                                         />
                                     </div>
                                     <div className="flex-1 flex flex-col">
@@ -167,22 +170,15 @@ export default function Cart() {
                                     <Button variant="outline" onClick={() => setShowCode(false)}>Close</Button>
                                 </div>
                             )}
-                            {/* <div className="grid grid-cols-2 gap-2">
-                                <Button className="w-full bg-primary-default ">Place Order</Button>
-                                <Button variant="outline" className="w-full">
-                                    ৳ {total}
-                                </Button>
-                            </div> */}
 
                             <Link
                                 to="/checkout"
-                                className="w-full flex justify-center bg-primary-default text-white py-2 rounded text-center"
+                                className="w-full flex justify-center bg-primary-default text-white text-xl py-2 rounded text-center gap-6"
                             >
-                                <span>Place Order</span>
-                                <span>৳ {total}</span>
+                                <span>Place Order </span>
+                                <div className="border-2 border-primary-light h-8 mx-2" />
+                                <span className="text-nowrap space-x-3 text-xl">   ৳  {total}</span>
                             </Link>
-
-
                         </div>
                     </div>
                 </div>

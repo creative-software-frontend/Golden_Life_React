@@ -46,7 +46,7 @@ const Footer = () => {
                     </div>
                     <div className="flex justify-between gap-3 p-2">
                         <Link to="#">
-                            <img src={playstore} alt='Play Store' className="object-cover h-10 w-auto" />
+                            <img src={playstore} alt='Play Store' className="object-cover h-15 w-auto" />
                         </Link>
                     </div>
                     <div className="text-start">
