@@ -12,6 +12,7 @@ import {
     ChefHat,
     HelpCircleIcon,
     LogInIcon,
+    ShoppingBag,
 } from "lucide-react"
 import {
     Collapsible,
@@ -41,6 +42,7 @@ import {
 } from "@/components/ui/sidebar"
 import Footer from "@/pages/common/Footer/Footer"
 import Header from "@/pages/common/Footer/Header/Header"
+import useModalStore from "@/store/Store"
 // import Header from "@/pages/common/Footer/Header/Header"
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection"
 // import BannerSection from '@/pages/Home/BannerSection/BannerSection'
@@ -127,6 +129,8 @@ const data = {
 }
 
 export default function UserLayout() {
+    const { changeCheckoutModal } = useModalStore();
+
     const [activeCategory, setActiveCategory] = React.useState("shopping")
 
     return (
@@ -231,7 +235,19 @@ export default function UserLayout() {
                 <main className="pt-6 -ms-20">
                     
                         
-                                
+                    <button
+                        onClick={changeCheckoutModal}
+                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
+                    >
+                        <div className="flex items-center">
+                            <ShoppingBag className="h-6 w-6 text-red-500" />
+                            <div className="border-l border-gray-300 h-8 mx-2" />
+                            <div>
+                                <div className="font-semibold">{} ITEMS</div>
+                                <div className="text-sm">৳ {}</div>
+                            </div>
+                        </div>
+                    </button>       
                           
                     <Header />
                         

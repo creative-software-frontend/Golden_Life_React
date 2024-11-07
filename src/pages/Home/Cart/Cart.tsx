@@ -1,16 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from "lucide-react"
-import { Link } from "react-router-dom"
-
+import * as React from "react";
+import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from "lucide-react";
+import CheckoutModal from "../CheckoutModal/CheckoutModal";
+import useModalStore from "@/store/Store";
+// import useModalStore from "@/store/useModalStore";
 
 interface CartItem {
-    id: number
-    name: string
-    price: number
-    quantity: number
-    pack: string
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    pack: string;
+    // onClose:boolean;
+    // onClose: () => void;
+
 }
 
 const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'outline' }> = ({
@@ -25,43 +29,25 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant
     >
         {children}
     </button>
-)
+);
 
 export default function Cart() {
-    const [isOpen, setIsOpen] = React.useState(false)
-    const [showCode, setShowCode] = React.useState(false)
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [showCode, setShowCode] = React.useState(false);
+    const { isCheckoutModalOpen, changeCheckoutModal} = useModalStore();
+    console.log(isCheckoutModalOpen);
     const [items, setItems] = React.useState<CartItem[]>([
-        {
-            id: 1,
-            name: "Nestle Maggi 2 Minute Masala Instant Noodles",
-            price: 340,
-            quantity: 1,
-            pack: "16 pack"
-        },
-        {
-            id: 2,
-            name: "Chopstick Instant Noodles Masala Delight 496 gm",
-            price: 155,
-            quantity: 1,
-            pack: "8 pack"
-        },
-        {
-            id: 3,
-            name: "Dekko Egg Masala Noodles 250 gm Combo",
-            price: 80,
-            quantity: 1,
-            pack: "2 pcs"
-        }
-    ])
+        { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
+        { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
+        { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
+    ]);
 
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
     const updateQuantity = (id: number, delta: number) => {
-        setItems(items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-        ))
-    }
+        setItems(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
+    };
 
     return (
         <>
@@ -80,8 +66,9 @@ export default function Cart() {
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
-                    <div className="bg-white w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end  z-50 pt-16">
+                    <div className="bg-white rounded-md w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
+                        {/* Header */}
                         <div className="sticky top-0 bg-white border-b z-10">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">
@@ -94,24 +81,7 @@ export default function Cart() {
                             </div>
                         </div>
 
-                        <div className="p-4 bg-gray-100 border-b">
-                            <div className="flex items-center justify-between">
-                                <span>Delivery charge not needed</span>
-                                <div className="flex items-center gap-1">
-                                    <span>৳ 0</span>
-                                    <button className="h-4 w-4 text-xs border rounded-full">i</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-4 border-b">
-                            <div className="flex items-center gap-2">
-                                <Plus className="h-4 w-4" />
-                                <span className="font-medium">Express Delivery</span>
-                                <span className="text-gray-600">Today, 12:00PM - 2:00PM</span>
-                            </div>
-                        </div>
-
+                        {/* Item List */}
                         <div className="divide-y">
                             {items.map((item) => (
                                 <div key={item.id} className="p-4 flex gap-4">
@@ -138,9 +108,7 @@ export default function Cart() {
                                                     <ChevronUp className="h-3 w-3" />
                                                 </button>
                                             </div>
-                                            <p className="text-sm font-medium">
-                                                ৳{item.price * item.quantity}
-                                            </p>
+                                            <p className="text-sm font-medium">৳{item.price * item.quantity}</p>
                                         </div>
                                     </div>
                                     <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
@@ -150,6 +118,7 @@ export default function Cart() {
                             ))}
                         </div>
 
+                        {/* Footer */}
                         <div className="sticky bottom-0 bg-white border-t p-4 space-y-4">
                             <div className="flex items-center gap-2">
                                 <Button
@@ -170,19 +139,27 @@ export default function Cart() {
                                     <Button variant="outline" onClick={() => setShowCode(false)}>Close</Button>
                                 </div>
                             )}
-
-                            <Link
-                                to="/checkout"
-                                className="w-full flex justify-center bg-primary-default text-white text-xl py-2 rounded text-center gap-6"
-                            >
-                                <span>Place Order </span>
-                                <div className="border-2 border-primary-light h-8 mx-2" />
-                                <span className="text-nowrap space-x-3 text-xl">   ৳  {total}</span>
-                            </Link>
+                            {
+                                isCheckoutModalOpen == true && 'Checkout Modal is Open'
+                            }
+                            {/* Place Order Button */}
+                            <div>
+                                <button
+                                    onClick={changeCheckoutModal}
+                                    className="w-full flex justify-center bg-primary-default text-white text-xl py-2 rounded text-center gap-6"
+                                >
+                                    <span>Place Order</span>
+                                    <div className="border-2 border-primary-light h-8 mx-2" />
+                                    <span className="text-nowrap space-x-3 text-xl">৳ {total}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
+           
+            {/* Conditionally Render Checkout Modal */}
+            {isCheckoutModalOpen == true && <CheckoutModal />}
         </>
-    )
+    );
 }
