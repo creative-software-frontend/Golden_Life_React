@@ -137,6 +137,9 @@ export default function CheckoutModal() {
         { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
         { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
     ]);
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = totalPrice; // Customize if you need other calculations
 
     // const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     // const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -144,16 +147,16 @@ export default function CheckoutModal() {
         setItems(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
     };
     const CheckoutContent = () => {
-        const handleCancel = () => {
-            // Handle the cancellation logic here, like navigating back or clearing the form
-            console.log("Cancelled the checkout process");
-        };
-
         const handleSubmit = () => {
             // Handle the submit logic here, like submitting the order
             console.log("Submitting the checkout");
             // Perform further actions like calling an API or navigating to a confirmation page
         };
+
+        // Example data, replace with your actual data calculation logic
+        const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const subtotal = totalPrice; // Customize if you need other calculations
 
         return (
             <div className="max-w-md mx-auto space-y-4 bg-white p-4 rounded-lg shadow-lg">
@@ -177,49 +180,56 @@ export default function CheckoutModal() {
                     <div className="divide-y">
                         {items.map((item) => (
                             <div key={item.id} className="p-4 flex gap-4">
-                                <div className="w-[400px] bg-red-500">
+                                <div className="w-16 h-16 bg-red-500">
                                     <img
                                         alt={item.name}
-                                        className="h-auto object-cover w-[1000px]"
+                                        className="h-full w-full object-cover"
                                         src="../../../../public/image/maggi.webp"
                                     />
                                 </div>
                                 <div className="flex-1 flex flex-col">
-                                    <h3 className="font-medium text-sm mb-2 text-nowrap">
+                                    <h3 className="font-medium text-sm mb-2">
                                         {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
                                     </h3>
-                                    <div className="flex items-center justify-around mt-auto">
-                                        <div className="flex items-center border rounded text-xs">
-                                            <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
-                                                <ChevronDown className="h-3 w-3" />
-                                            </button>
-                                            <span className="w-6 text-center">{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, 1)} className="px-1 py-0.5">
-                                                <ChevronUp className="h-3 w-3" />
-                                            </button>
-                                        </div>
-                                        <p className="text-sm font-medium">৳{item.price * item.quantity}</p>
-                                    </div>
+                                    <p className="text-sm font-medium">৳{item.price * item.quantity}</p>
                                 </div>
-                                <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
-                                    ×
-                                </button>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-between mt-4">
-                    <button
-                        onClick={handleCancel}
-                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                    >
-                        Cancel
-                    </button>
+                {/* Summary Section */}
+                <div className="border-t pt-4 space-y-2">
+                    <div className="flex justify-between">
+                        <span>Total Items:</span>
+                        <span>{totalItems}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>৳{subtotal}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-lg">
+                        <span>Total Price:</span>
+                        <span>৳{totalPrice}</span>
+                    </div>
+                </div>
+
+                {/* Payment Option Section */}
+                <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-2">Payment Option</h4>
+                    {/* Placeholder for payment options, replace with actual UI components */}
+                    <select className="w-full border rounded p-2">
+                        <option value="credit-card">Credit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="cash-on-delivery">Cash on Delivery</option>
+                    </select>
+                </div>
+
+                {/* Submit Button */}
+                <div className="mt-4">
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-primary-default text-white rounded hover:bg-primary-dark"
+                        className="w-full px-4 py-2 bg-primary-default text-white rounded hover:bg-primary-dark"
                     >
                         Continue
                     </button>
