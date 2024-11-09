@@ -62,7 +62,7 @@ const Footer = () => {
                 <div className="flex flex-wrap justify-between items-center mb-4 px-4">
                     <div className='flex items-center'>
                         <h3 className="font-bold text-lg mb-2 text-gray-500">Payment Methods</h3>
-                        <img src={paywith} alt="paywith" className="h-10 w-auto object-cover" />
+                        <img src={paywith} alt="paywith" className="h-15 w-auto object-cover" />
                     </div>
                 </div>
                 <div className="border-0 -mb-8 border-gray-300 bg-white py-2">
