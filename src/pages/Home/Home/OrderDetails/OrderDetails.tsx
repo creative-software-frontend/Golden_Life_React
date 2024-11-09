@@ -11,26 +11,34 @@ const OrderDetails: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-4 space-y-6 bg-gray-100 relative">
-            {/* Print Button */}
-            <button
-                onClick={handlePrint}
-                className="absolute top-4 right-4 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Print order details"
-            >
-                <FontAwesomeIcon icon={faPrint} className="w-5 h-5" />
-                <span className="sr-only">Print</span>
-            </button>
+            {/* Print Button and Image */}
+            <div className="absolute top-4 right-4 flex items-center space-x-2">
+                <img
+                    src="../../../../.../../../public/image/logo/logo.jpg" // replace with the actual path to your image
+                    alt="Logo"
+                    className="w-100 mx-2 h-8 object-cover rounded-full"
+                />
+                <button
+                    onClick={handlePrint}
+                    className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="Print order details"
+                >
+                    <FontAwesomeIcon icon={faPrint} className="w-5 h-5" />
+                    <span className="sr-only">Print</span>
+                </button>
+            </div>
 
             <h2 className="text-lg font-medium text-start">Order Details</h2>
+
             {/* Order Header */}
             <div className="flex justify-between items-start p-4 bg-white rounded-md">
                 <div className="flex gap-4 item-center">
                     <div className="text-sm text-muted-foreground">
                         Order #18769
-
                     </div>
                     <div>
-                        Placed on 31 Dec 2024 20:16:02</div>
+                        Placed on 31 Dec 2024 20:16:02
+                    </div>
                 </div>
                 <div className="text-right flex gap-4 item-center">
                     <div className="text-sm text-muted-foreground">Total:</div>
@@ -41,10 +49,7 @@ const OrderDetails: React.FC = () => {
             {/* Order Progress */}
             <div className="relative bg-white p-4 rounded-md">
                 <div className="flex justify-between items-center relative">
-                    {/* Progress connectors */}
                     <div className="absolute top-[55%] transform -translate-y-1/2 w-full h-[2px] bg-muted -z-10"></div>
-
-                    {/* Progress indicators */}
                     {["order placed", "order confirmed", "ready for shipment", "ship to courier", "order on the way", "order delivered"].map((step, index, array) => (
                         <div key={index} className="flex-1 flex flex-col items-center relative">
                             <div className={`w-10 h-10 rounded-full ${index === 0 ? 'bg-primary' : 'bg-muted'} flex items-center justify-center text-primary-foreground`}>
@@ -52,8 +57,6 @@ const OrderDetails: React.FC = () => {
                             </div>
                             <div className="text-xs mt-2 text-center">{step}</div>
                             {index === 0 && <div className="text-[10px] text-muted-foreground">31/10/2024</div>}
-
-                            {/* Connector between circles */}
                             {index < array.length - 1 && (
                                 <div className={`absolute top-1/2 right-0 transform translate-x-1/2 h-[2px] ${index < 1 ? 'bg-primary' : 'bg-muted'}`} style={{ width: '100%' }}></div>
                             )}
@@ -76,7 +79,7 @@ const OrderDetails: React.FC = () => {
                 <div className="text-sm text-muted-foreground">sold by PICKY MALL</div>
                 <div className="flex gap-4 border rounded-lg p-4">
                     <img
-                        src="/placeholder.svg?height=80&width=80"
+                        src="../../../../.../../../public/image/bread.jpg"
                         alt="Product"
                         className="w-20 h-20 object-cover rounded"
                     />
@@ -122,6 +125,16 @@ const OrderDetails: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Footer Section */}
+            <div className="flex justify-between items-center mt-6">
+                <span className="text-sm font-semibold text-muted-foreground">Creative Software</span>
+                <img
+                    src="../../../../.../../../public/image/logo/logo.jpg" // replace with the actual path to your logo
+                    alt="Logo"
+                    className="w-100 h-8 mx-2 object-cover"
+                />
             </div>
         </div>
     );
