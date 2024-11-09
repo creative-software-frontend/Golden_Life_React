@@ -40,20 +40,20 @@ const Header: React.FC = () => {
                     </div>
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
-                            <UserIcon className="h-6 w-4 mr-1" />
+                            <UserIcon className="h-6 w-4 mr-1" onClick={() => setIsModalOpen(true)} />
                         </button>
                         {/* Dropdown Menu */}
-                        {dropdownOpen && (
+                        {/* {dropdownOpen && (
                             <div className="z-20 absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded shadow-lg">
                                 <ul className='z-20'>
-                                    {/* <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Profile</li>
-                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Settings</li> */}
+                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Profile</li>
+                                    <li className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">Settings</li>
                                     <li onClick={() => setIsModalOpen(true)} className="hover:bg-gray-100 px-4 py-2 cursor-pointer text-black">
                                         Login
                                     </li>
                                 </ul>
                             </div>
-                        )}
+                        )} */}
                     </div>
 
 
