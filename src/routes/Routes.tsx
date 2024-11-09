@@ -14,6 +14,7 @@ import ProductPage from "@/pages/ProductPage/ProductPage";
 import Home from "@/pages/Home/Home/Home";
 import AllProduct from "@/pages/AllProducts/AllProducts";
 import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
+// import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
@@ -112,4 +113,8 @@ export const routes = createBrowserRouter([
         path: '*',
         element: <ErrorPage />, // Error page for undefined routes
     },
+    // {
+    //     path: '/check',
+    //     element: <PhoneNumberInput />, // Error page for undefined routes
+    // },
 ])

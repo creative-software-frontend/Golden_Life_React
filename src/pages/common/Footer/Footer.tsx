@@ -3,8 +3,13 @@ import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin } from 'lucide-r
 
 import playstore from '../../../../public/Play Store.png';
 import paywith from '../../../../public/Pay-With.png';
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+import { useState } from 'react';
 
 const Footer = () => {
+    const [value, setValue] = useState()
+
     return (
         <footer className="bg-gray-300 pt-4 md:max-w-[1040px] ">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
@@ -33,13 +38,13 @@ const Footer = () => {
                 </div>
                 <div className="space-y-3 px-2">
                     <div className="flex items-center">
-                        <div className="flex w-full py-1 border border-gray-400 rounded-lg bg-white">
-                            <input
-                                type="text"
-                                placeholder="+88"
-                                className="px-3 py-2 w-full focus:outline-none"
-                            />
-                            <button className="bg-primary-default text-white px-2 text-nowrap m-1 rounded-lg">
+                        <div className="flex w-[500px] py-2 border border-gray-400 rounded-lg bg-white">
+                            <PhoneInput
+                                placeholder=""
+                                value={value}
+                                onChange={setValue}
+                                className=' w-[150px] px-2' />
+                            <button className="bg-primary-default  w-[75px] text-white px-3 py-1 text-nowrap m-1 rounded-lg">
                                 Get app
                             </button>
                         </div>
