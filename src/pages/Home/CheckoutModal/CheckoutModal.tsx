@@ -1,6 +1,7 @@
 'use client'
 
 import useModalStore from "@/store/Store"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import * as React from "react"
 
 interface Address {
@@ -12,6 +13,16 @@ interface Address {
     name: string
     phone: string
     notes?: string
+}
+interface CartItem {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    pack: string;
+    // onClose:boolean;
+    // onClose: () => void;
+
 }
 
 const Icon: React.FC<{ name: string }> = ({ name }) => {
@@ -106,8 +117,6 @@ export default function CheckoutModal() {
     const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
 
     const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
-    const [selectedDate, setSelectedDate] = React.useState("TODAY")
-    const [selectedTime, setSelectedTime] = React.useState("12:00 PM - 2:00 PM")
     const [useReusableBags, setUseReusableBags] = React.useState(false)
     const [currentAddress, setCurrentAddress] = React.useState<Address>({
         flatNo: "12",
@@ -123,7 +132,17 @@ export default function CheckoutModal() {
         e.preventDefault()
         setCurrentStep("delivery")
     }
+    const [items, setItems] = React.useState<CartItem[]>([
+        { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
+        { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
+        { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
+    ]);
 
+    // const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const updateQuantity = (id: number, delta: number) => {
+        setItems(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
+    };
     const CheckoutContent = () => (
         <div className="max-w-md mx-auto space-y-4 bg-white p-4 rounded-lg shadow-lg">
             {/* Delivery Address Section */}
@@ -141,47 +160,45 @@ export default function CheckoutModal() {
                         Change
                     </button>
                 </div>
-            </div>
 
-            {/* Delivery Time Section */}
-            <div className="border rounded-lg">
-                <div className="p-3 flex items-start gap-2">
-                    <Icon name="clock" />
-                    <div className="flex-1">
-                        <Label htmlFor="delivery-date">Delivery Date</Label>
-                        <Select
-                            id="delivery-date"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                        >
-                            <option value="TODAY">Today</option>
-                            <option value="TOMORROW">Tomorrow</option>
-                            <option value="DAY_AFTER_TOMORROW">Day After Tomorrow</option>
-                        </Select>
-                    </div>
-                    <div className="flex-1">
-                        <Label htmlFor="delivery-time">Delivery Time</Label>
-                        <Select
-                            id="delivery-time"
-                            value={selectedTime}
-                            onChange={(e) => setSelectedTime(e.target.value)}
-                        >
-                            <option>12:00 PM - 2:00 PM</option>
-                            <option>3:00 PM - 5:00 PM</option>
-                            <option>6:00 PM - 8:00 PM</option>
-                        </Select>
-                    </div>
+                {/* Item List */}
+                <div className="divide-y">
+                    {items.map((item) => (
+                        <div key={item.id} className="p-4 flex gap-4">
+                            <div className="w-[400px] bg-red-500">
+                                <img
+                                    alt={item.name}
+                                    className=" h-auto object-cover w-[1000px]"
+                                    src="../../../../public/image/maggi.webp"
+
+                                />
+                            </div>
+                            <div className="flex-1 flex flex-col">
+                                <h3 className="font-medium text-sm mb-2 text-nowrap">
+                                    {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
+                                </h3>
+                                <div className="flex items-center justify-around mt-auto ">
+                                    <div className="flex items-center border rounded text-xs ">
+                                        <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
+                                            <ChevronDown className="h-3 w-3" />
+                                        </button>
+                                        <span className="w-6 text-center">{item.quantity}</span>
+                                        <button onClick={() => updateQuantity(item.id, 1)} className="px-1 py-0.5">
+                                            <ChevronUp className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                    <p className="text-sm font-medium">৳{item.price * item.quantity}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
+                                ×
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Reusable Bag Option */}
-            <div className="border rounded-lg p-3">
-                <Switch
-                    checked={useReusableBags}
-                    onChange={setUseReusableBags}
-                    label="Use Reusable Bags"
-                />
-            </div>
+
         </div>
     )
 
@@ -215,14 +232,55 @@ export default function CheckoutModal() {
     const AddressForm = () => (
         <div className=" max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
             <form onSubmit={handleSaveAddress} className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                        id="phone"
-                        type="tel"
-                        defaultValue={currentAddress.phone}
-                        required
-                    />
+                <div className=" grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">Name</Label>
+                        <Input
+                            id="name"
+                            type="text"
+                            // defaultValue={currentAddress.phone}
+                            required
+                            placeholder="Name"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">Address</Label>
+                        <Input
+                            id="phone"
+                            type="text"
+                            placeholder="Address"
+                            // defaultValue={currentAddress.phone}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="district">District</Label>
+                        <Select
+                            id="district"
+                            value={currentAddress.area} // Set the value to the selected district
+                            onChange={(e) => setCurrentAddress({ ...currentAddress, area: e.target.value })} // Update the district when changed
+                            required
+                        >
+                            <option value="">Select a district</option>
+                            <option value="Uttar Badda">Uttar Badda</option>
+                            <option value="Banani">Banani</option>
+                            <option value="Gulshan">Gulshan</option>
+                            <option value="Mirpur">Mirpur</option>
+                            <option value="Dhanmondi">Dhanmondi</option>
+                            {/* Add more districts as needed */}
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input
+                            id="phone"
+                            type="tel"
+                            // defaultValue={currentAddress.phone}
+                            required
+                            placeholder="Phone"
+                        />
+                    </div>
                 </div>
 
                 <div className="space-y-2">
@@ -231,6 +289,13 @@ export default function CheckoutModal() {
                         id="notes"
                         placeholder="Add any specific delivery instructions"
                         defaultValue={currentAddress.notes}
+                    />
+                </div>
+                <div className="border rounded-lg p-3">
+                    <Switch
+                        checked={useReusableBags}
+                        onChange={setUseReusableBags}
+                        label=" Save As Default"
                     />
                 </div>
 
@@ -249,7 +314,7 @@ export default function CheckoutModal() {
         <div className={`fixed inset-0 z-50 flex items-start justify-end bg-black bg-opacity-50 ${isCheckoutModalOpen ? '' : 'hidden'}`}>
             <div className="max-w-md  w-full h-[555px] mt-16 mb-2 bg-white p-6 rounded-md shadow-lg overflow-y-auto">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">Checkout</h2>
+                    {/* <h2 className="text-lg font-semibold">Checkou</h2> */}
                     <button onClick={closeCheckoutModal}>
                         <Icon name="x" />
                     </button>

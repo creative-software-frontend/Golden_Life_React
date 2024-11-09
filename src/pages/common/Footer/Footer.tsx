@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin } from 'lucide-react';
-
 import playstore from '../../../../public/Play Store.png';
 import paywith from '../../../../public/Pay-With.png';
+import 'react-phone-number-input/style.css';
+import PhoneInput from 'react-phone-number-input';
+import { useState } from 'react';
 
 const Footer = () => {
+    const [value, setValue] = useState();
+    const currentYear = new Date().getFullYear(); // Get the current year dynamically
+
     return (
         <footer className="bg-gray-300 pt-4 md:max-w-[1040px] ">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
@@ -33,13 +38,13 @@ const Footer = () => {
                 </div>
                 <div className="space-y-3 px-2">
                     <div className="flex items-center">
-                        <div className="flex w-full py-1 border border-gray-400 rounded-lg bg-white">
-                            <input
-                                type="text"
-                                placeholder="+88"
-                                className="px-3 py-2 w-full focus:outline-none"
-                            />
-                            <button className="bg-primary-default text-white px-2 text-nowrap m-1 rounded-lg">
+                        <div className="flex w-[500px] py-2 border border-gray-400 rounded-lg bg-white">
+                            <PhoneInput
+                                placeholder=""
+                                value={value}
+                                onChange={setValue}
+                                className=' w-[150px] px-2' />
+                            <button className="bg-primary-default w-[75px] text-white px-3 py-1 text-nowrap m-1 rounded-lg">
                                 Get app
                             </button>
                         </div>
@@ -58,7 +63,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-            <div >
+            <div>
                 <div className="flex flex-wrap justify-between items-center mb-4 px-4">
                     <div className='flex items-center'>
                         <h3 className="font-bold text-lg mb-2 text-gray-500">Payment Methods</h3>
@@ -67,7 +72,7 @@ const Footer = () => {
                 </div>
                 <div className="border-0 -mb-8 border-gray-300 bg-white py-2">
                     <div className="flex flex-wrap justify-between items-center mx-2 px-4">
-                        <p className="text-gray-600 text-start">&copy; 2024 Golden Life Shopping.</p>
+                        <p className="text-gray-600 text-start">&copy; {currentYear} Golden Life Shopping.</p>
                         <div className="flex space-x-4">
                             <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
                                 <Linkedin size={20} className="text-gray-600" />

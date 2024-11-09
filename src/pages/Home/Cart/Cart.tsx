@@ -34,7 +34,7 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant
 export default function Cart() {
     const [isOpen, setIsOpen] = React.useState(false);
     const [showCode, setShowCode] = React.useState(false);
-    const { isCheckoutModalOpen, changeCheckoutModal} = useModalStore();
+    const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
     console.log(isCheckoutModalOpen);
     const [items, setItems] = React.useState<CartItem[]>([
         { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
@@ -98,8 +98,8 @@ export default function Cart() {
                                         <h3 className="font-medium text-sm mb-2 text-nowrap">
                                             {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
                                         </h3>
-                                        <div className="flex items-center justify-around mt-auto">
-                                            <div className="flex items-center border rounded text-xs">
+                                        <div className="flex items-center justify-around mt-auto ">
+                                            <div className="flex items-center border rounded text-xs ">
                                                 <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
                                                     <ChevronDown className="h-3 w-3" />
                                                 </button>
@@ -157,7 +157,7 @@ export default function Cart() {
                     </div>
                 </div>
             )}
-           
+
             {/* Conditionally Render Checkout Modal */}
             {isCheckoutModalOpen == true && <CheckoutModal />}
         </>
