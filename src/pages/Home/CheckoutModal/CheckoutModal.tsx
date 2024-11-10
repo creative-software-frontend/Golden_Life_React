@@ -3,6 +3,7 @@
 import useModalStore from "@/store/Store"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import * as React from "react"
+import { Link } from "react-router-dom"
 
 interface Address {
     flatNo: string
@@ -253,7 +254,27 @@ export default function CheckoutModal() {
                     </div>
 
                     {/* Terms and Conditions */}
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-4">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            checked={termsAccepted}
+                            onChange={(e) => setTermsAccepted(e.target.checked)}
+                            className="mr-2"
+                        />
+                        <label htmlFor="terms" className="text-sm">
+                            I accept the{" "}
+                            <Link
+                                to="/help/terms" // Replace with your actual terms route
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary underline"
+                            >
+                                terms and conditions
+                            </Link>
+                        </label>
+                    </div>{/* Terms and Conditions */}
+                    {/* <div className="flex items-center">
                         <input
                             type="checkbox"
                             id="terms"
@@ -264,7 +285,7 @@ export default function CheckoutModal() {
                         <label htmlFor="terms" className="text-sm">
                             I accept the terms and conditions
                         </label>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Fixed Submit Button */}
