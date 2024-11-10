@@ -1,5 +1,3 @@
-
-
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -46,4 +44,19 @@
   overflow-x: hidden;
   height: 100vh;
   scrollbar-width: none;
+}
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
 }
