@@ -43,7 +43,9 @@ const Footer = () => {
                                 placeholder=""
                                 value={value}
                                 onChange={setValue}
-                                className=' w-[150px] px-2' />
+                                defaultCountry="US"
+                                international
+                                className='w-[150px] px-2' />
                             <button className="bg-primary-default w-[75px] text-white px-3 py-1 text-nowrap m-1 rounded-lg">
                                 Get app
                             </button>

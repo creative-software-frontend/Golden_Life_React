@@ -1,17 +1,14 @@
 'use client'
 
 import useModalStore from "@/store/Store"
-import { ChevronDown, ChevronUp } from "lucide-react"
 import * as React from "react"
 import { Link } from "react-router-dom"
 
 interface Address {
-    flatNo: string
-    floorNo: string
-    street: string
-    area: string
     label: "home" | "work" | "partner" | "other"
     name: string
+    district: string
+    address: string
     phone: string
     notes?: string
 }
@@ -115,24 +112,62 @@ const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ children
 )
 
 export default function CheckoutModal() {
-    const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
 
+    const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
     const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
     const [useReusableBags, setUseReusableBags] = React.useState(false)
     const [currentAddress, setCurrentAddress] = React.useState<Address>({
-        flatNo: "12",
-        floorNo: "12",
-        street: "House Cha 71/2, Matabbar",
-        area: "Uttar Badda, Badda",
         label: "home",
-        name: "01747335232",
-        phone: "+88 01747335232"
-    })
+        name: "",
+        district: "",
+        address: "",
+        phone: "",
+        notes: ""
+    });
+
+    React.useEffect(() => {
+        const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
+        if (savedAddresses[currentAddress.label]) {
+            setCurrentAddress(savedAddresses[currentAddress.label]);
+        }
+    }, [currentAddress.label]);
 
     const handleSaveAddress = (e: React.FormEvent) => {
-        e.preventDefault()
-        setCurrentStep("delivery")
-    }
+        e.preventDefault();
+
+        const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
+        savedAddresses[currentAddress.label] = currentAddress;
+        localStorage.setItem('addresses', JSON.stringify(savedAddresses));
+
+        setCurrentStep("delivery");
+    };
+
+
+
+    // const handleSaveAddress = (e: React.FormEvent) => {
+    //     e.preventDefault();
+
+    //     // Get existing addresses from local storage or set as an empty array if none exist
+    //     const storedAddresses = JSON.parse(localStorage.getItem("addresses") || "[]");
+
+    //     // Save current address to local storage
+    //     localStorage.setItem("addresses", JSON.stringify([...storedAddresses, currentAddress]));
+
+    //     // Set the first saved address as the default (if it's the only one in the array)
+    //     if (storedAddresses.length === 0) {
+    //         setCurrentAddress({ ...currentAddress });
+    //     }
+
+    //     // Reset form after save
+    //     setCurrentAddress({
+    //         name: "",
+    //         district: "",
+    //         address: "",
+    //         phone: "",
+    //         note: ""
+    //     });
+    
+    // };
     const [items, setItems] = React.useState<CartItem[]>([
         { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
         { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
@@ -170,8 +205,8 @@ export default function CheckoutModal() {
                 <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
                     <Icon name="mapPin" />
                     <div className="flex-1">
-                        <h4 className="font-semibold">{currentAddress.street}</h4>
-                        <p>{currentAddress.area}</p>
+                        <h4 className="font-semibold">{currentAddress.name}</h4>
+                        <p>{currentAddress.address}, {currentAddress.district}</p>
                     </div>
                     <button
                         onClick={() => setCurrentStep("address")}
@@ -273,19 +308,7 @@ export default function CheckoutModal() {
                                 terms and conditions
                             </Link>
                         </label>
-                    </div>{/* Terms and Conditions */}
-                    {/* <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            checked={termsAccepted}
-                            onChange={(e) => setTermsAccepted(e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label htmlFor="terms" className="text-sm">
-                            I accept the terms and conditions
-                        </label>
-                    </div> */}
+                    </div>
                 </div>
 
                 {/* Fixed Submit Button */}
@@ -300,13 +323,6 @@ export default function CheckoutModal() {
             </div>
         );
     };
-
-
-
-
-
-
-
     const LabelOptions = () => (
         <div className="grid grid-cols-4 gap-4 mt-2">
             {[
@@ -335,36 +351,38 @@ export default function CheckoutModal() {
     )
 
     const AddressForm = () => (
-        <div className=" max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
+        <div className="max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
             <form onSubmit={handleSaveAddress} className="space-y-4">
-                <div className=" grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Name</Label>
+                        <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
                             type="text"
-                            // defaultValue={currentAddress.phone}
-                            // required
+                            value={currentAddress.name}
+                            onChange={(e) => setCurrentAddress({ ...currentAddress, name: e.target.value })}
+                            required
                             placeholder="Name"
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="phone">Address</Label>
+                        <Label htmlFor="address">Address</Label>
                         <Input
-                            id="phone"
+                            id="address"
                             type="text"
+                            value={currentAddress.address}
+                            onChange={(e) => setCurrentAddress({ ...currentAddress, address: e.target.value })}
                             placeholder="Address"
-                            // defaultValue={currentAddress.phone}
-                            // required
+                            required
                         />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="district">District</Label>
                         <Select
                             id="district"
-                            value={currentAddress.area} // Set the value to the selected district
-                            onChange={(e) => setCurrentAddress({ ...currentAddress, area: e.target.value })} // Update the district when changed
-                            // required
+                            value={currentAddress.district}
+                            onChange={(e) => setCurrentAddress({ ...currentAddress, district: e.target.value })}
+                            required
                         >
                             <option value="">Select a district</option>
                             <option value="Uttar Badda">Uttar Badda</option>
@@ -372,17 +390,16 @@ export default function CheckoutModal() {
                             <option value="Gulshan">Gulshan</option>
                             <option value="Mirpur">Mirpur</option>
                             <option value="Dhanmondi">Dhanmondi</option>
-                            {/* Add more districts as needed */}
                         </Select>
                     </div>
-
                     <div className="space-y-2">
                         <Label htmlFor="phone">Phone</Label>
                         <Input
                             id="phone"
                             type="tel"
-                            // defaultValue={currentAddress.phone}
-                            // required
+                            value={currentAddress.phone}
+                            onChange={(e) => setCurrentAddress({ ...currentAddress, phone: e.target.value })}
+                            required
                             placeholder="Phone"
                         />
                     </div>
@@ -393,14 +410,8 @@ export default function CheckoutModal() {
                     <Textarea
                         id="notes"
                         placeholder="Add any specific delivery instructions"
-                        defaultValue={currentAddress.notes}
-                    />
-                </div>
-                <div className="border rounded-lg p-3">
-                    <Switch
-                        checked={useReusableBags}
-                        onChange={setUseReusableBags}
-                        label=" Save As Default"
+                        value={currentAddress.notes}
+                        onChange={(e) => setCurrentAddress({ ...currentAddress, notes: e.target.value })}
                     />
                 </div>
 
