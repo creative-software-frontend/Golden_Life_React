@@ -274,7 +274,7 @@ export default function CheckoutModal() {
                             id="name"
                             type="text"
                             // defaultValue={currentAddress.phone}
-                            required
+                            // required
                             placeholder="Name"
                         />
                     </div>
@@ -285,7 +285,7 @@ export default function CheckoutModal() {
                             type="text"
                             placeholder="Address"
                             // defaultValue={currentAddress.phone}
-                            required
+                            // required
                         />
                     </div>
                     <div className="space-y-2">
@@ -294,7 +294,7 @@ export default function CheckoutModal() {
                             id="district"
                             value={currentAddress.area} // Set the value to the selected district
                             onChange={(e) => setCurrentAddress({ ...currentAddress, area: e.target.value })} // Update the district when changed
-                            required
+                            // required
                         >
                             <option value="">Select a district</option>
                             <option value="Uttar Badda">Uttar Badda</option>
@@ -312,7 +312,7 @@ export default function CheckoutModal() {
                             id="phone"
                             type="tel"
                             // defaultValue={currentAddress.phone}
-                            required
+                            // required
                             placeholder="Phone"
                         />
                     </div>
