@@ -119,16 +119,7 @@ const Header: React.FC = () => {
 
                                         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                                             <form className="space-y-6" action="#" method="POST">
-                                                {step > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleBack}
-                                                        className="flex items-center text-gray-500 mb-4"
-                                                    >
-                                                        <ArrowLeft className="h-5 w-5 mr-2" />
-                                                        Back
-                                                    </button>
-                                                )}
+
 
                                                 {step === 1 && (
                                                     <div>
@@ -159,24 +150,26 @@ const Header: React.FC = () => {
 
                                                 {step === 2 && (
                                                     <div>
-                                                        <label htmlFor="otp" className="block text-sm font-medium leading-6 text-primary-light">
-                                                            OTP
-                                                        </label>
-                                                        <div className="mt-2 grid grid-cols-4 gap-2">
-                                                            {otp.map((value, index) => (
-                                                                <input
-                                                                    key={index}
-                                                                    type="text"
-                                                                    maxLength={1}
-                                                                    value={value}
-                                                                    onChange={(e) => handleOtpChange(e, index)}
-                                                                    className="w-full p-4 text-center rounded-md border-0 py-1.5 text-primary-light shadow-sm ring-1 ring-inset ring-primary-light placeholder:text-primary-light focus:ring-2 focus:ring-inset focus:ring-primary-light sm:text-sm sm:leading-6 mb-4"
-                                                                />
-                                                            ))}
+
+                                                        <div className="mt-2 flex justify-center">
+                                                            <div className="grid grid-cols-4 gap-4 mb-3">
+                                                                {otp.map((value, index) => (
+                                                                    <input
+                                                                        key={index}
+                                                                        type="text"
+                                                                        maxLength={1}
+                                                                        value={value}
+                                                                        onChange={(e) => handleOtpChange(e, index)}
+                                                                        className="w-10 aspect-square text-center rounded-md border-0 text-primary-light shadow-sm ring-1 ring-inset ring-primary-light placeholder:text-primary-light focus:ring-2 focus:ring-inset focus:ring-primary-light sm:text-sm sm:leading-6"
+                                                                    />
+                                                                ))}
+                                                            </div>
                                                         </div>
+
+
                                                         <button
                                                             type="button"
-                                                            onClick={handleVerify}
+                                                            onClick={handleSubmit}
                                                             className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-light"
                                                         >
                                                             Verify
@@ -184,7 +177,7 @@ const Header: React.FC = () => {
                                                     </div>
                                                 )}
 
-                                                {step === 3 && (
+                                                {/* {step === 3 && (
                                                     <div>
                                                         <button
                                                             type="button"
@@ -194,6 +187,16 @@ const Header: React.FC = () => {
                                                             Complete Login
                                                         </button>
                                                     </div>
+                                                )} */}
+                                                {step > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleBack}
+                                                        className="flex items-center text-gray-500 mb-4"
+                                                    >
+                                                        <ArrowLeft className="h-5 w-5 mr-2" />
+                                                        Back
+                                                    </button>
                                                 )}
                                             </form>
                                         </div>

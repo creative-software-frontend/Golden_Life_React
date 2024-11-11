@@ -288,15 +288,23 @@ export default function CheckoutModal() {
                             onChange={(e) => setTermsAccepted(e.target.checked)}
                             className="mr-2"
                         />
-                        <label htmlFor="terms" className="text-sm">
+                        <label htmlFor="terms" className="text-sm space-x-2">
                             I accept the{" "}
+                            <Link
+                                to="/help/privacy-policy" // Replace with your actual terms route
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary underline"
+                            >
+                                Privacy Policy, 
+                            </Link>
                             <Link
                                 to="/help/terms" // Replace with your actual terms route
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-primary underline"
                             >
-                                terms and conditions
+                                Terms and Conditions.
                             </Link>
                         </label>
                     </div>
