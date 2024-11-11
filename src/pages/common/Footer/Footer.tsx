@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const Footer = () => {
     const [value, setValue] = useState();
-    const currentYear = new Date().getFullYear(); // Get the current year dynamically
+    const currentYear = new Date().getFullYear();
 
     return (
         <footer className="bg-gray-300 pt-4 md:max-w-[1040px] ">
@@ -37,23 +37,22 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div className="space-y-3 px-2">
-                    <div className="flex items-center">
-                        <div className="flex w-[500px] py-2 border border-gray-400 rounded-lg bg-white">
-                            <PhoneInput
-                                placeholder=""
-                                value={value}
-                                onChange={setValue}
-                                defaultCountry="US"
-                                international
-                                className='w-[150px] px-2' />
-                            <button className="bg-primary-default w-[75px] text-white px-3 py-1 text-nowrap m-1 rounded-lg">
-                                Get app
-                            </button>
-                        </div>
+                    <div className="flex flex-col items-start w-full">
+                        <PhoneInput
+                            placeholder=" Phone Number"
+                            value={value}
+                            onChange={setValue}
+                            defaultCountry="US"
+                            international
+                            className="w-full px-2 py-2 border border-gray-400 rounded-lg bg-white PhoneInputInput:focus"
+                        />
+                        <button className="bg-primary-default w-full text-white px-3 py-2 mt-2 rounded-lg">
+                            Get app
+                        </button>
                     </div>
                     <div className="flex justify-between gap-3 p-2">
                         <Link to="#">
-                            <img src={playstore} alt='Play Store' className="object-cover h-15 w-auto" />
+                            <img src={playstore} alt="Play Store" className="object-cover h-15 w-auto" />
                         </Link>
                     </div>
                     <div className="text-start">

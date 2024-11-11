@@ -60,3 +60,8 @@
   background: #f1f1f1;
   border-radius: 10px;
 }
+.PhoneInputInput:focus {
+    outline: none;
+    box-shadow: none;
+}
+

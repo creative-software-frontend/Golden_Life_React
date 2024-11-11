@@ -124,10 +124,15 @@ export default function CheckoutModal() {
         phone: "",
         notes: ""
     });
+    const [isDefaultAddress, setIsDefaultAddress] = React.useState(false);
 
     React.useEffect(() => {
         const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
-        if (savedAddresses[currentAddress.label]) {
+        const defaultAddress = localStorage.getItem('defaultAddress');
+        if (defaultAddress) {
+            setCurrentAddress(savedAddresses[defaultAddress]);
+            setIsDefaultAddress(true);
+        } else if (savedAddresses[currentAddress.label]) {
             setCurrentAddress(savedAddresses[currentAddress.label]);
         }
     }, [currentAddress.label]);
@@ -139,39 +144,25 @@ export default function CheckoutModal() {
         savedAddresses[currentAddress.label] = currentAddress;
         localStorage.setItem('addresses', JSON.stringify(savedAddresses));
 
+        if (isDefaultAddress) {
+            localStorage.setItem('defaultAddress', currentAddress.label);
+        } else {
+            const currentDefault = localStorage.getItem('defaultAddress');
+            if (currentDefault === currentAddress.label) {
+                localStorage.removeItem('defaultAddress');
+            }
+        }
+
         setCurrentStep("delivery");
     };
 
 
-
-    // const handleSaveAddress = (e: React.FormEvent) => {
-    //     e.preventDefault();
-
-    //     // Get existing addresses from local storage or set as an empty array if none exist
-    //     const storedAddresses = JSON.parse(localStorage.getItem("addresses") || "[]");
-
-    //     // Save current address to local storage
-    //     localStorage.setItem("addresses", JSON.stringify([...storedAddresses, currentAddress]));
-
-    //     // Set the first saved address as the default (if it's the only one in the array)
-    //     if (storedAddresses.length === 0) {
-    //         setCurrentAddress({ ...currentAddress });
-    //     }
-
-    //     // Reset form after save
-    //     setCurrentAddress({
-    //         name: "",
-    //         district: "",
-    //         address: "",
-    //         phone: "",
-    //         note: ""
-    //     });
-    
-    // };
     const [items, setItems] = React.useState<CartItem[]>([
         { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
         { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
-        { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
+        { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" },
+        { id: 4, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" },
+        { id: 5, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
     ]);
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -210,29 +201,29 @@ export default function CheckoutModal() {
                     </div>
                     <button
                         onClick={() => setCurrentStep("address")}
-                        className="text-primary hover:text-primary-dark"
+                        className="text-primary hover:text-primary-light"
                     >
                         Change
                     </button>
                 </div>
 
                 {/* Scrollable Items List Section with Custom Scrollbar */}
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-1  custom-scrollbar">
                     <div className="divide-y space-y-4">
                         {items.map((item) => (
-                            <div key={item.id} className="p-4 flex gap-4">
-                                <div className="w-16 h-16 bg-red-500">
+                            <div key={item.id} className="m-2 flex gap-6">
+                                <div className="w-8 h-8 bg-red-500">
                                     <img
                                         alt={item.name}
-                                        className="h-full w-full object-cover"
+                                        className="h-10 w-10 object-cover "
                                         src="../../../../public/image/maggi.webp"
                                     />
                                 </div>
                                 <div className="flex-1 flex flex-col">
-                                    <h3 className="font-medium text-sm mb-2">
-                                        {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
+                                    <h3 className="font-medium text-sm  text-start">
+                                        {item.name.length > 40 ? `${item.name.slice(0, 30)}...` : item.name}
                                     </h3>
-                                    <p className="text-sm font-medium">
+                                    <p className="text-sm font-medium text-start">
                                         ৳{item.price} x 1 = ৳{item.price}
                                     </p>
                                 </div>
@@ -418,6 +409,15 @@ export default function CheckoutModal() {
                 <Label>Add a label</Label>
                 <LabelOptions />
 
+
+                <div className="space-y-2">
+                    <Switch
+                        checked={isDefaultAddress}
+                        onChange={setIsDefaultAddress}
+                        label="Save as default address"
+                    />
+                </div>
+
                 <div className="flex justify-end">
                     <Button type="submit" className="bg-primary text-white">
                         Save Address
@@ -428,7 +428,7 @@ export default function CheckoutModal() {
     )
     return (
         <div className={`fixed inset-0 z-50 flex items-start justify-end bg-black bg-opacity-50 ${isCheckoutModalOpen ? '' : 'hidden'}`}>
-            <div className="max-w-md  w-full h-[680px] mt-2  bg-white p-4 rounded-md shadow-lg overflow-y-auto">
+            <div className="max-w-md  w-full h-[680px] mt-2  bg-white p-4 rounded-md shadow-lg ">
                 <div className="flex justify-between items-center">
                     {/* <h2 className="text-lg font-semibold">Checkou</h2> */}
                     <button onClick={closeCheckoutModal}>
