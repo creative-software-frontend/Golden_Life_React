@@ -4,6 +4,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import logo from '../../../../../public/image/logo/logo.jpg';
 
 const Header: React.FC = () => {
+    const [image, setImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -37,17 +39,42 @@ const Header: React.FC = () => {
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
     };
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type.startsWith("image/")) {
+            setImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        } else {
+            alert("Please select a valid image file");
+        }
+    };
 
+    const handleSearch = () => {
+        if (image) {
+            // Implement search functionality with the selected image
+            alert("Image search triggered!");
+        } else {
+            alert("Please select an image to search");
+        }
+    };
     return (
         <div>
             <header className="shadow md:w-[1040px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
-                        type="text"
-                        placeholder="Search..."
-                        className="w-full pr-10 py-1 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                        id="imageInput"
                     />
-                    <CameraIcon className="absolute right-3 h-7 w-7 m-2 text-gray-500" />
+                    <label htmlFor="imageInput" className="flex items-center cursor-pointer w-full pr-10 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border">
+                        {image ? "Image Selected" : "Select an Image"}
+                    </label>
+                    {imagePreview && (
+                        <img src={imagePreview} alt="Preview" className="w-full h-auto mt-4 rounded" />
+                    )}
+                    <CameraIcon className="absolute right-3 h-7 w-7 m-2 text-gray-500" onClick={handleSearch} />
                 </div>
 
                 <div className="flex items-center">

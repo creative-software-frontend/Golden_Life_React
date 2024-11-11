@@ -115,7 +115,7 @@ export default function CheckoutModal() {
 
     const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
     const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
-    const [useReusableBags, setUseReusableBags] = React.useState(false)
+    // const [useReusableBags, setUseReusableBags] = React.useState(false)
     const [currentAddress, setCurrentAddress] = React.useState<Address>({
         label: "home",
         name: "",
