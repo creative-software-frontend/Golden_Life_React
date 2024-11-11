@@ -157,7 +157,7 @@ const Header: React.FC = () => {
                                                     </div>
                                                 )}
 
-                                                {/* {step === 2 && (
+                                                {step === 2 && (
                                                     <div>
                                                         <label htmlFor="otp" className="block text-sm font-medium leading-6 text-primary-light">
                                                             OTP
@@ -194,7 +194,7 @@ const Header: React.FC = () => {
                                                             Complete Login
                                                         </button>
                                                     </div>
-                                                )} */}
+                                                )}
                                             </form>
                                         </div>
                                     </div>
