@@ -6,6 +6,7 @@ import Cart from "../Cart/Cart";
 import LiveChat from "@/pages/LiveChat/Livechat";
 import ProductCategories from "../ProductCategories/ProductCategories";
 import FreshSell from "../FreshSell/FreshSell";
+import TrendingCategory from "@/pages/TrendingCategory/TrendingCategory";
 
 const Home = () => {
   return (
@@ -18,6 +19,7 @@ const Home = () => {
           <LiveChat />
           <ProductCategories />
           <FreshSell />
+          <TrendingCategory />
     </div>
   )
 }

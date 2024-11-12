@@ -14,6 +14,10 @@ import ProductPage from "@/pages/ProductPage/ProductPage";
 import Home from "@/pages/Home/Home/Home";
 import AllProduct from "@/pages/AllProducts/AllProducts";
 import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
+import TrendingCategory from "@/pages/TrendingCategory/TrendingCategory";
+import Trending from "@/pages/TrendingCategory/Trending";
+import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
+import Overview from "@/pages/Dashboard/Overview/Overview";
 // import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
@@ -44,6 +48,10 @@ export const routes = createBrowserRouter([
                 path: 'allProducts',  // Separate route for Help page
                 element: <AllProduct />,
             },
+            // {
+            //     path: 'allProducts',  // Separate route for Help page
+            //     element: <TrendingCategory />,
+            // },
 
 
         ]
@@ -87,6 +95,33 @@ export const routes = createBrowserRouter([
 
     },
     {
+        path: '/admin',
+        element: <AdminLayout />, // Layout for admin panel
+        children: [
+            {
+                path: '/admin',
+                element: <Overview />,
+            },
+            // {
+            //     path: 'merchants',
+            //     element: <MerchantList />,
+            // },
+            // {
+            //     path: 'riders',
+            //     element: <RiderList />,
+            // },
+            // {
+            //     path: 'districts',
+            //     element: <Districts />,
+            // },
+            // {
+            //     path: 'setting',
+            //     element: <Setting />,
+            // },
+            
+        ],
+    },
+    {
         path: '/checkout',  // Separate route for Help page
         element: <CheckoutModal />,
     },
@@ -95,26 +130,18 @@ export const routes = createBrowserRouter([
         element: <OrderDetails />,
     },
     {
-        path: '/orderdetails',  // Separate route for Help page
-        element: <OrderDetails />,
+        path: '/trending',  // Separate route for Help page
+        element: <Trending />,
     },
-
-
-
     // {
-    //     path: '/checkout',
-    //     element: <CheckoutModal />, // Error page for undefined routes
+    //     path: '/trending',  // Separate route for Help page
+    //     element: <TrendingCategory />,
     // },
-    // {
-    //     path: '/all-categories',
-    //     element: <AllCategories />, // Error page for undefined routes
-    // },
+
+
     {
         path: '*',
         element: <ErrorPage />, // Error page for undefined routes
     },
-    // {
-    //     path: '/check',
-    //     element: <PhoneNumberInput />, // Error page for undefined routes
-    // },
+    
 ])

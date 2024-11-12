@@ -2,6 +2,7 @@ import { CameraIcon, MapPin, UserIcon, ArrowLeft } from 'lucide-react';
 import { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import logo from '../../../../../public/image/logo/logo.jpg';
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
     const [image, setImage] = useState<File | null>(null);
@@ -39,6 +40,7 @@ const Header: React.FC = () => {
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
     };
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && file.type.startsWith("image/")) {
@@ -51,12 +53,12 @@ const Header: React.FC = () => {
 
     const handleSearch = () => {
         if (image) {
-            // Implement search functionality with the selected image
             alert("Image search triggered!");
         } else {
             alert("Please select an image to search");
         }
     };
+
     return (
         <div>
             <header className="shadow md:w-[1040px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
@@ -86,10 +88,20 @@ const Header: React.FC = () => {
                             <option value="Khulna">Khulna</option>
                         </select>
                     </div>
+
+                    {/* User Icon with Dropdown */}
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
-                            <UserIcon className="h-6 w-4 mr-1" onClick={() => setIsModalOpen(true)} />
+                            <UserIcon className="h-6 w-4 mr-1"  />
                         </button>
+                        {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
+                                <button onClick={() => setIsModalOpen(true)  }className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
+                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
@@ -145,9 +157,7 @@ const Header: React.FC = () => {
                                         </div>
 
                                         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                                            <form className="space-y-6" action="#" method="POST">
-
-
+                                            <form className="space-y-6">
                                                 {step === 1 && (
                                                     <div>
                                                         <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
@@ -177,54 +187,52 @@ const Header: React.FC = () => {
 
                                                 {step === 2 && (
                                                     <div>
-
                                                         <div className="mt-2 flex justify-center">
-                                                            <div className="grid grid-cols-4 gap-4 mb-3">
+                                                            <div className="grid grid-cols-4 gap-2">
                                                                 {otp.map((value, index) => (
                                                                     <input
                                                                         key={index}
                                                                         type="text"
-                                                                        maxLength={1}
                                                                         value={value}
                                                                         onChange={(e) => handleOtpChange(e, index)}
-                                                                        className="w-10 aspect-square text-center rounded-md border-0 text-primary-light shadow-sm ring-1 ring-inset ring-primary-light placeholder:text-primary-light focus:ring-2 focus:ring-inset focus:ring-primary-light sm:text-sm sm:leading-6"
+                                                                        maxLength={1}
+                                                                        className="text-center border p-2 rounded-md"
                                                                     />
                                                                 ))}
                                                             </div>
                                                         </div>
-
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleSubmit}
-                                                            className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-light"
-                                                        >
-                                                            Verify
-                                                        </button>
+                                                        <div className="flex justify-center mt-4 gap-4">
+                                                            <button
+                                                                type="button"
+                                                                className="text-gray-500 hover:underline"
+                                                                onClick={handleBack}
+                                                            >
+                                                                <ArrowLeft className="h-5 w-5 inline" /> Back
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleSubmit}
+                                                                className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
+                                                            >
+                                                                Verify
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
 
                                                 {/* {step === 3 && (
                                                     <div>
+                                                        <h3 className="text-center text-lg font-semibold text-gray-700">Verification Complete!</h3>
+                                                        <p className="text-center text-gray-600 mt-4">You are now logged in.</p>
                                                         <button
                                                             type="button"
                                                             onClick={handleSubmit}
-                                                            className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-light"
+                                                            className="mt-4 w-full flex justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
-                                                            Complete Login
+                                                            Finish
                                                         </button>
                                                     </div>
                                                 )} */}
-                                                {step > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleBack}
-                                                        className="flex items-center text-gray-500 mb-4"
-                                                    >
-                                                        <ArrowLeft className="h-5 w-5 mr-2" />
-                                                        Back
-                                                    </button>
-                                                )}
                                             </form>
                                         </div>
                                     </div>
