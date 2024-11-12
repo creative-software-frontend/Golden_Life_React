@@ -1,215 +1,192 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
-import Logo from '../../../public/image/logo/logo.jpg'
-import { Bike, LayoutDashboard, UserIcon, Users, Settings } from 'lucide-react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Calendar, Truck, ChevronRight, Info } from 'lucide-react'
+import { useState } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css' // Import the date picker styles
+// import axios from 'axios'
+// import { Link } from 'react-router-dom'
 
-function classNames(...classes: string[]): string {
-    return classes.filter(Boolean).join(' ')
-}
+export default function AdminLayout() {
+  const [selectedDate, setSelectedDate] = useState(null)
+  // const [ setMerchants] = useState([])
 
-const AdminLayout: React.FC = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [current] = useState(true)
+  // const jwt = localStorage.getItem('token')
 
-    return (
-        <div className="flex min-h-screen  max-w-7xl bg-slate-100 text-primaryWhite ">
-            {/* Sidebar */}
-            <Transition.Root show={sidebarOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="transition-opacity ease-linear duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="transition-opacity ease-linear duration-300"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-gray-900/80" />
-                    </Transition.Child>
+  // const fetchMerchantData = async () => {
+  //   try {
+  //     const response = await axios.get('http://localhost:1337/api/merchants', {
+  //       headers: {
+  //         Authorization: `Bearer ${jwt}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+  //     const merchantsData = response.data.data // Strapi usually wraps data under 'data' object
+  //     setMerchants(merchantsData) // Set the fetched merchants in state
+  //     console.log('Merchant data:', merchantsData)
+  //   } catch (error) {
+  //     console.error('Error fetching merchant data:', error)
+  //   }
+  // }
 
-                    <div className="fixed inset-0 flex">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="transition ease-in-out duration-300 transform"
-                            enterFrom="-translate-x-full"
-                            enterTo="translate-x-0"
-                            leave="transition ease-in-out duration-300 transform"
-                            leaveFrom="translate-x-0"
-                            leaveTo="-translate-x-full"
-                        >
-                            <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-in-out duration-300"
-                                    enterFrom="opacity-0"
-                                    enterTo="opacity-100"
-                                    leave="ease-in-out duration-300"
-                                    leaveFrom="opacity-100"
-                                    leaveTo="opacity-0"
-                                >
-                                    <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                                        <button
-                                            type="button"
-                                            className="-m-2.5 p-2.5"
-                                            onClick={() => setSidebarOpen(false)}
-                                        >
-                                            <span className="sr-only">Close sidebar</span>
-                                            <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                </Transition.Child>
+  // Use useEffect to fetch data when the component mounts
+  // useEffect(() => {
+  //   fetchMerchantData()
+  // }, [])
 
-                                {/* Small Screen Sidebar */}
-                                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-100 px-6 pb-4 ring-1 ring-gray-200/10">
-                                    <div className="flex h-16 shrink-0 items-center">
-                                        <img className="h-8 w-auto" src={Logo} alt="Your Company" />
-                                    </div>
-                                    <nav className="flex flex-1 flex-col">
-                                        <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                                            <li>
-                                                <ul role="list" className="-mx-2 space-y-1">
-                                                    <Link
-                                                        to="/admin/overview"
-                                                        className={classNames(
-                                                            current
-                                                                ? 'bg-gray-200 text-gray-900'
-                                                                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors duration-200 ease-in-out',
-                                                            'group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold',
-                                                        )}
-                                                    >
-                                                        <LayoutDashboard
-                                                            className="h-6 w-6 shrink-0 text-gray-500 group-hover:text-blue-600 transition-colors duration-200 ease-in-out"
-                                                            aria-hidden="true"
-                                                        />
-                                                        <span className="text-gray-700 group-hover:text-blue-600 transition-colors duration-200 ease-in-out">
-                                                            Overview
-                                                        </span>
-                                                    </Link>
-                                                    <Link
-                                                        to="/admin/merchants"
-                                                        className={classNames(
-                                                            current
-                                                                ? 'bg-gray-200 text-gray-900'
-                                                                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors duration-200 ease-in-out',
-                                                            'group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold',
-                                                        )}
-                                                    >
-                                                        <Users
-                                                            className="h-6 w-6 shrink-0 text-gray-500 group-hover:text-green-600 transition-colors duration-200 ease-in-out"
-                                                            aria-hidden="true"
-                                                        />
-                                                        <span className="text-gray-700 group-hover:text-green-600 transition-colors duration-200 ease-in-out">
-                                                            Merchants
-                                                        </span>
-                                                    </Link>
-                                                </ul>
-                                            </li>
-                                            <li className="-mx-6 mt-auto">
-                                                <a
-                                                    href="#"
-                                                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-200"
-                                                >
-                                                    <UserIcon className="h-5 w-5 text-blue-500" aria-hidden="true" />
-                                                    <span className="sr-only">Your profile</span>
-                                                    <span aria-hidden="true">Dilaur Hos</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
-                    </div>
-                </Dialog>
-            </Transition.Root>
-
-            {/* For large screens */}
-            <div className="hidden lg:flex lg:flex-col lg:w-[25%] lg:bg-white border-r border-gray-200">
-                <div className="flex h-16 shrink-0 items-center p-2">
-                    <img className="h-12 w-full  ovject-cover" src={Logo} alt="Your Company" />
-                </div>
-                <nav className="flex flex-1 flex-col  ">
-                    <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                        <li>
-                            <ul role="list">
-                                <NavLink
-                                    to="/admin/overview"
-                                    className={({ isActive }) =>
-                                        classNames(
-                                            isActive
-                                                ? 'bg-gray-200 text-gray-900'
-                                                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors duration-200 ease-in-out',
-                                            'group flex items-center gap-x-3 rounded-md p-2  text-sm font-semibold',
-                                        )
-                                    }
-                                >
-                                    <LayoutDashboard
-                                        className="h-6 w-6 shrink-0 text-gray-500 group-hover:text-blue-600 transition-colors duration-200 ease-in-out "
-                                        aria-hidden="true"
-                                    />
-                                    <span className="text-gray-700 group-hover:text-blue-600 transition-colors duration-200 ease-in-out">
-                                        Overview
-                                    </span>
-                                </NavLink>
-                                <NavLink
-                                    to="/admin/merchants"
-                                    className={({ isActive }) =>
-                                        classNames(
-                                            isActive
-                                                ? 'bg-gray-200 text-gray-900'
-                                                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors duration-200 ease-in-out',
-                                            'group flex items-center gap-x-3 rounded-md p-2 pl-2 text-sm font-semibold',
-                                        )
-                                    }
-                                >
-                                    <Users
-                                        className="h-6 w-6 shrink-0 text-gray-500 group-hover:text-green-600 transition-colors duration-200 ease-in-out"
-                                        aria-hidden="true"
-                                    />
-                                    <span className="text-gray-700 group-hover:text-green-600 transition-colors duration-200 ease-in-out">
-                                        Merchants
-                                    </span>
-                                </NavLink>
-                            </ul>
-                        </li>
-
-                        <li className="-mx-6 mt-auto">
-                            <a
-                                href="#"
-                                className="pl-12 flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-200"
-                            >
-                                <UserIcon className="h-5 w-5 text-blue-500" />
-                                <span className="sr-only">Your profile</span>
-                                <span aria-hidden="true">Dilaur Hos</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+  return (
+    <div className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-8 bg-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
+          <div className="flex space-x-4">
+            {/* First Div - 1/3 of Width */}
+            <div className="shadow rounded-lg w-1/3 pt-8 ps-5 bg-white">
+              <h2 className="text-lg font-medium text-start item-center">
+                Brief Stats
+              </h2>
             </div>
 
-            {/* Main Content */}
-            <div className=" w-screen">
-                <div className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
-                    <button
-                        type="button"
-                        className="-m-2.5 p-2.5 lg:hidden"
-                        onClick={() => setSidebarOpen(true)}
-                    >
-                        <span className="sr-only">Open sidebar</span>
-                        <Bars3Icon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+            {/* Second Div - 2/3 of Width */}
+            <div className="shadow rounded-lg p-6 w-2/3 bg-white">
+              <div className="mt-4">
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)} // Set the selected date
+                  customInput={
+                    <button className="  flex justify-end items-center w-full px-5 py-2 border-gray-300 rounded-md text-sm text-gray-700 bg-gray-100">
+                      <span className="mr-auto">
+                        {selectedDate
+                          ? selectedDate.toLocaleDateString()
+                          : 'Select Date'}
+                      </span>
+                      <Calendar className="h-4 w-4 text-gray-600" />
                     </button>
-                </div>
-
-                {/* Outlet for rendering nested routes */}
-                <main className="flex flex-1 overflow-y-auto ">
-                    <Outlet />
-                </main>
+                  }
+                  dateFormat="MMMM d, yyyy"
+                />
+              </div>
             </div>
-        </div>
-    )
-}
+          </div>
 
-export default AdminLayout
+          {/* Other content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="pb-4">
+                <h2 className="text-lg font-medium text-start">
+                  Total Delivered
+                </h2>
+              </div>
+              <div className="text-4xl font-bold text-start">0</div>
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground text-gray-400">
+                    Pending Delivery
+                  </span>
+                  <span>0</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground text-gray-400">
+                    Total Returned
+                  </span>
+                  <span>0</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="flex flex-row items-center justify-between pb-4">
+                <h2 className="text-lg font-medium text-start">
+                  Payment Invoiced
+                </h2>
+                <div className="flex items-center justify-center ">
+                  <button className="bg-red-500 text-white px-4 py-2 rounded-md mr-4 flex items-left">
+                    Details
+                  </button>
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-start"> ৳ 0</div>
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <a href="#" className="flex items-center text-gray-400">
+                    Payment Due
+                    <div className="flex items-center justify-center w-4 h-4 bg-gray-500 rounded-full ml-2">
+                      <Info className="h-4 w-4 text-white" />
+                    </div>
+                  </a>
+                  <span>৳ 0</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <a href="#" className="flex items-center text-gray-400">
+                    Parcel In Process
+                    <div className="flex items-center justify-center w-4 h-4 bg-gray-500 rounded-full ml-2">
+                      <Info className="h-4 w-4 text-white" />
+                    </div>
+                  </a>
+                  <span> ৳ 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="pb-4">
+                <h2 className="text-lg font-medium text-start">
+                  Out for Delivery
+                </h2>
+              </div>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="pb-4 px-4 py-4">
+                <h2 className=" font-medium text-start text-2xl">
+                  Pick up Pending
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg p-6">
+            <div className="pt-6">
+              <h2 className="text-2xl font-bold mb-2">Deliver Products</h2>
+              <p className="mb-4">Hello, PROMISEDELIVERY MERCHANT</p>
+              <p className="mb-4">
+                Our team of professionals is here to deliver your products
+                nationwide.
+              </p>
+              <div className="flex items-center justify-center px-2 py-2 w-1/2 bg-white text-red-600 font-bold rounded-md cursor-pointer hover:bg-gray-100">
+                Create Order
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="pb-4">
+              <h2 className="text-lg font-medium text-start">Quick Links</h2>
+            </div>
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100">
+                <a href="#" className="flex items-center py-4">
+                  <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
+                  <span className="font-bold text-lg">
+                    Create Bulk Delivery
+                  </span>
+                  <ChevronRight className="ml-2 h-4 w-4 text-red-500" />
+                </a>
+              </div>
+              <div className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100">
+                <a href="#" className="flex items-center py-4">
+                  <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
+                  <span className="font-bold text-lg">
+                    Create Single Delivery
+                  </span>
+                  <ChevronRight className="ml-2 h-4 w-4 text-red-500" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
