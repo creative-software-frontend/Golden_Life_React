@@ -80,13 +80,13 @@ export default function AutoScrollIcons() {
                             key={index}
                             className="flex flex-col items-center flex-shrink-0"
                         >
-                            <div className="p-1 border-2 border-gray-100 bg-white rounded-full shadow-sm">
+                            <div className="p-2 border-2 border-gray-100 bg-white rounded-full shadow-sm">
                                 <button
-                                    className="h-12 w-12 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+                                    className="p-2 h-15 w-15 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                                     aria-label={item.label}
                                     style={{ backgroundColor: getColor(item.label) }}
                                 >
-                                    <item.icon className="h-6 w-6" strokeWidth={1.5} />
+                                    <item.icon className="h-10 w-10" strokeWidth={1.5} />
                                 </button>
                             </div>
                             <span className="mt-2 text-xs text-gray-600 whitespace-nowrap">{item.label}</span>
