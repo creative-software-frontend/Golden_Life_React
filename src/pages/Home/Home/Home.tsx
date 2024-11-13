@@ -7,6 +7,7 @@ import LiveChat from "@/pages/LiveChat/Livechat";
 import ProductCategories from "../ProductCategories/ProductCategories";
 import FreshSell from "../FreshSell/FreshSell";
 import TrendingCategory from "@/pages/TrendingCategory/TrendingCategory";
+import AutoScrollIcons from "../ScrollCategories/ScrollCategories";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
          
           <HeroSection />
           <BannerSection />
+          <AutoScrollIcons />
           <Categories />
           <Cart />
           <LiveChat />

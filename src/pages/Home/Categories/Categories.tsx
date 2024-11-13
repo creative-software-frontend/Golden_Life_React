@@ -66,7 +66,7 @@ export default function Categories() {
     ]
 
     return (
-        <div className="py-10  -mt-8 md:max-w-[1040px]  " >
+        <div className="py-10  -mt-6 md:max-w-[1040px]  " >
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
@@ -83,7 +83,7 @@ export default function Categories() {
                     <Link
                         key={category.id}
                         to={`/productpage/${category.id}`}
-                      
+
                         className="flex flex-col items-center p-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow"
                     >
                         <div className="w-12 h-12 mb-3">

@@ -64,3 +64,17 @@
   outline: none;
   box-shadow: none;
 }
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-1 * var(--scroll-width)));
+  }
+}
+
+.auto-scroll {
+  display: flex;
+  animation: scroll-left var(--animation-duration) linear infinite;
+}
+

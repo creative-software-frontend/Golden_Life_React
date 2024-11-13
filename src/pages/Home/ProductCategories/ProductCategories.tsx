@@ -39,7 +39,7 @@ export default function ProductCategories() {
   };
 
   return (
-    <div className="py-10   shadow mb-5  bg-primary-default md:max-w-[1040px]" >
+    <div className="py-2   shadow mb-5  bg-primary-default md:max-w-[1040px]" >
       <div className="container mx-auto max-w-5xl px-4">
         <div className="flex items-center justify-between mb-4">
           <div className="bg-primary-light text-white px-4 py-1 rounded-full text-sm font-medium">
