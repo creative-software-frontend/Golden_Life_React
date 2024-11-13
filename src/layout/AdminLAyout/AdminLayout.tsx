@@ -97,7 +97,7 @@ export default function AdminLayout() {
                   Payment Invoiced
                 </h2>
                 <div className="flex items-center justify-center ">
-                  <button className="bg-red-500 text-white px-4 py-2 rounded-md mr-4 flex items-left">
+                  <button className="bg-primary-default text-white px-4 py-2 rounded-md mr-4 flex items-left">
                     Details
                   </button>
                 </div>
@@ -146,7 +146,7 @@ export default function AdminLayout() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg p-6">
+          <div className="bg-gradient-to-r from-primary-default to-primary-light text-white rounded-lg p-6">
             <div className="pt-6">
               <h2 className="text-2xl font-bold mb-2">Deliver Products</h2>
               <p className="mb-4">Hello, PROMISEDELIVERY MERCHANT</p>
@@ -154,7 +154,7 @@ export default function AdminLayout() {
                 Our team of professionals is here to deliver your products
                 nationwide.
               </p>
-              <div className="flex items-center justify-center px-2 py-2 w-1/2 bg-white text-red-600 font-bold rounded-md cursor-pointer hover:bg-gray-100">
+              <div className="flex items-center justify-center px-2 py-2 w-1/2 bg-white text-primary-light font-bold rounded-md cursor-pointer hover:bg-gray-100">
                 Create Order
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function AdminLayout() {
                   <span className="font-bold text-lg">
                     Create Bulk Delivery
                   </span>
-                  <ChevronRight className="ml-2 h-4 w-4 text-red-500" />
+                  <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
                 </a>
               </div>
               <div className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100">
@@ -180,7 +180,7 @@ export default function AdminLayout() {
                   <span className="font-bold text-lg">
                     Create Single Delivery
                   </span>
-                  <ChevronRight className="ml-2 h-4 w-4 text-red-500" />
+                  <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
                 </a>
               </div>
             </div>

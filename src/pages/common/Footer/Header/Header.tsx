@@ -1,4 +1,4 @@
-import { CameraIcon, MapPin, UserIcon, ArrowLeft } from 'lucide-react';
+import { CameraIcon, MapPin, UserIcon, ArrowLeft, Search } from 'lucide-react';
 import { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import logo from '../../../../../public/image/logo/logo.jpg';
@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 const Header: React.FC = () => {
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -46,16 +47,18 @@ const Header: React.FC = () => {
         if (file && file.type.startsWith("image/")) {
             setImage(file);
             setImagePreview(URL.createObjectURL(file));
+            console.log("Image selected:", file.name);
         } else {
             alert("Please select a valid image file");
         }
     };
 
     const handleSearch = () => {
-        if (image) {
-            alert("Image search triggered!");
+        if (searchText || image) {
+            console.log("Searching with:", { text: searchText, image: image?.name });
+            // Implement your search logic here
         } else {
-            alert("Please select an image to search");
+            alert("Please enter text or select an image to search");
         }
     };
 
@@ -64,20 +67,34 @@ const Header: React.FC = () => {
             <header className="shadow md:w-[1040px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-full pr-20 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                    <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
                         className="hidden"
                         id="imageInput"
                     />
-                    <label htmlFor="imageInput" className="flex items-center cursor-pointer w-full pr-10 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border">
-                        {image ? "Image Selected" : "Select an Image"}
+                    <label htmlFor="imageInput" className="absolute right-12 top-1/2 -translate-y-1/2 cursor-pointer">
+                        <CameraIcon className="h-6 w-6 text-gray-500" />
                     </label>
-                    {imagePreview && (
-                        <img src={imagePreview} alt="Preview" className="w-full h-auto mt-4 rounded" />
-                    )}
-                    <CameraIcon className="absolute right-3 h-7 w-7 m-2 text-gray-500" onClick={handleSearch} />
+                    <button
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                        onClick={handleSearch}
+                    >
+                        <Search className="h-6 w-6 text-gray-500" />
+                    </button>
                 </div>
+                {imagePreview && (
+                    <div className="absolute top-full left-0 mt-2">
+                        <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded" />
+                    </div>
+                )}
 
                 <div className="flex items-center">
                     <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
@@ -92,11 +109,11 @@ const Header: React.FC = () => {
                     {/* User Icon with Dropdown */}
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
-                            <UserIcon className="h-6 w-4 mr-1"  />
+                            <UserIcon className="h-6 w-4 mr-1" />
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={() => setIsModalOpen(true)  }className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
+                                <button onClick={() => setIsModalOpen(true)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
                                 <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
@@ -220,7 +237,7 @@ const Header: React.FC = () => {
                                                     </div>
                                                 )}
 
-                                                {/* {step === 3 && (
+                                                {step === 3 && (
                                                     <div>
                                                         <h3 className="text-center text-lg font-semibold text-gray-700">Verification Complete!</h3>
                                                         <p className="text-center text-gray-600 mt-4">You are now logged in.</p>
@@ -232,7 +249,7 @@ const Header: React.FC = () => {
                                                             Finish
                                                         </button>
                                                     </div>
-                                                )} */}
+                                                )}
                                             </form>
                                         </div>
                                     </div>

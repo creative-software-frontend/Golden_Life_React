@@ -27,6 +27,30 @@ export default function AutoScrollIcons() {
         { icon: StoreIcon, label: "Local Outlet" },
     ]
 
+    const getColor = (label: string) => {
+        const colorMap: { [key: string]: string } = {
+            "Shopping": "#38bdf8",
+            "Food": "#f97316",
+            "Grocery": "#84cc16",
+            "Pharmacy": "#ef4444",
+            "Gift": "#a855f7",
+            "Ride Share": "#10b981",
+            "Top Up": "#f59e0b",
+            "Parcel": "#4b5563",
+            "Mobile": "#3b82f6",
+            "Drive Offer": "#8b5cf6",
+            "Air Ticket": "#ec4899",
+            "News Paper": "#10b981",
+            "Live TV": "#0ea5e9",
+            "Blood Bank": "#e11d48",
+            "STU Product": "#14b8a6",
+            "Online Shop": "#d97706",
+            "Covid Business": "#db2777",
+            "Local Outlet": "#2563eb",
+        }
+        return colorMap[label] || "#000"; // Default to black if no match
+    }
+
     useEffect(() => {
         const scrollContainer = scrollRef.current
         if (scrollContainer) {
@@ -34,10 +58,10 @@ export default function AutoScrollIcons() {
             const clientWidth = scrollContainer.clientWidth
 
             if (scrollWidth > clientWidth) {
-                const animationDuration = scrollWidth / 28 // Reduced speed (increased duration)
+                const animationDuration = scrollWidth / 28
 
                 scrollContainer.style.setProperty('--scroll-width', `${scrollWidth}px`)
-                scrollContainer.style.setProperty('--animation-duration', `${animationDuration}s`)
+                scrollContainer.style.setProperty('--animation-duration', `${animationDuration * 2}s`) // Increase time here
                 scrollContainer.classList.add('auto-scroll')
             }
         }
@@ -56,10 +80,11 @@ export default function AutoScrollIcons() {
                             key={index}
                             className="flex flex-col items-center flex-shrink-0"
                         >
-                            <div className="p-1 border-2 border-gray-100 bg-white rounded-full shadow-sm ">
+                            <div className="p-1 border-2 border-gray-100 bg-white rounded-full shadow-sm">
                                 <button
-                                    className="h-12 w-12 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity color-changing-icon"
+                                    className="h-12 w-12 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                                     aria-label={item.label}
+                                    style={{ backgroundColor: getColor(item.label) }}
                                 >
                                     <item.icon className="h-6 w-6" strokeWidth={1.5} />
                                 </button>
@@ -70,17 +95,6 @@ export default function AutoScrollIcons() {
                 </div>
             </div>
             <style jsx>{`
-                @keyframes colorChange {
-                    0% { background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 0%, #0284c7 0%); }
-                    33% { background: linear-gradient(90deg, #38bdf8 100%, #0ea5e9 0%, #0284c7 0%); }
-                    66% { background: linear-gradient(90deg, #38bdf8 100%, #0ea5e9 100%, #0284c7 0%); }
-                    100% { background: linear-gradient(90deg, #38bdf8 100%, #0ea5e9 100%, #0284c7 100%); }
-                }
-                .color-changing-icon {
-                    animation: colorChange 12s infinite; /* Increased duration to 12 seconds */
-                    background-size: 300% 100%;
-                    background-position: 0% 0%;
-                }
                 .auto-scroll {
                     --scroll-width: 0px;
                     --animation-duration: 0s;
