@@ -1,14 +1,16 @@
-import * as React from "react";
-import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from "lucide-react";
-import CheckoutModal from "../CheckoutModal/CheckoutModal";
-import useModalStore from "@/store/Store";
+'use client'
+
+import { useState, useEffect } from "react"
+import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from 'lucide-react'
 
 interface CartItem {
-    id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    pack: string;
+    id: number
+    name: string
+    image: string
+    weight: string
+    price: number
+    mrp: number
+    quantity: number
 }
 
 const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'outline' }> = ({
@@ -23,32 +25,30 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant
     >
         {children}
     </button>
-);
+)
 
-export default function Cart() {
-    const [isOpen, setIsOpen] = React.useState(false);
-    const [showCode, setShowCode] = React.useState(false);
-    const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
-    const [items, setItems] = React.useState<CartItem[]>([]);
+export default function Cart2() {
+    const [isOpen, setIsOpen] = useState(false)
+    const [showCode, setShowCode] = useState(false)
+    const [items, setItems] = useState<CartItem[]>([])
 
-    // Load cart items from local storage on component mount
-    React.useEffect(() => {
-        const storedItems = localStorage.getItem("cart");
-        if (storedItems) {
-            setItems(JSON.parse(storedItems));
+    useEffect(() => {
+        const savedCart = localStorage.getItem('cart')
+        if (savedCart) {
+            setItems(JSON.parse(savedCart))
         }
-    }, []);
+    }, [])
 
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
     const updateQuantity = (id: number, delta: number) => {
-        const updatedItems = items.map(item =>
+        const newItems = items.map(item =>
             item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-        );
-        setItems(updatedItems);
-        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
-    };
+        )
+        setItems(newItems)
+        localStorage.setItem('cart', JSON.stringify(newItems))
+    }
 
     return (
         <>
@@ -61,15 +61,14 @@ export default function Cart() {
                     <div className="border-l border-gray-300 h-8 mx-2" />
                     <div>
                         <div className="font-semibold">{totalItems} ITEMS</div>
-                        <div className="text-sm">৳ {total}</div>
+                        <div className="text-sm">₹ {total}</div>
                     </div>
                 </div>
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end  z-50 pt-16">
                     <div className="bg-white rounded-md w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
-                        {/* Header */}
                         <div className="sticky top-0 bg-white border-b z-10">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">
@@ -82,7 +81,6 @@ export default function Cart() {
                             </div>
                         </div>
 
-                        {/* Item List */}
                         <div className="divide-y">
                             {items.map((item) => (
                                 <div key={item.id} className="p-4 flex gap-4">
@@ -90,7 +88,7 @@ export default function Cart() {
                                         <img
                                             alt={item.name}
                                             className="w-full h-auto object-cover"
-                                            src="../../../../public/image/maggi.webp"
+                                            src={item.image}
                                             width={100}
                                             height={100}
                                         />
@@ -99,8 +97,8 @@ export default function Cart() {
                                         <h3 className="font-medium text-sm mb-2 text-nowrap">
                                             {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
                                         </h3>
-                                        <div className="flex items-center justify-around mt-auto">
-                                            <div className="flex items-center border rounded text-xs">
+                                        <div className="flex items-center justify-around mt-auto ">
+                                            <div className="flex items-center border rounded text-xs ">
                                                 <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
                                                     <ChevronDown className="h-3 w-3" />
                                                 </button>
@@ -109,9 +107,7 @@ export default function Cart() {
                                                     <ChevronUp className="h-3 w-3" />
                                                 </button>
                                             </div>
-                                            <p className="text-sm font-medium">
-                                                ৳ {item.price} × {item.quantity} = ৳ {item.price * item.quantity}
-                                            </p>
+                                            <p className="text-sm font-medium">₹{item.price * item.quantity}</p>
                                         </div>
                                     </div>
                                     <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
@@ -121,14 +117,13 @@ export default function Cart() {
                             ))}
                         </div>
 
-                        {/* Footer */}
                         <div className="sticky bottom-0 bg-white border-t p-4 space-y-4">
                             <div className="flex items-center gap-2">
                                 <Button
                                     className="w-full bg-primary-default hover:bg-gray-300 text-gray-800 flex items-center justify-center gap-2"
                                     onClick={() => setShowCode(!showCode)}
                                 >
-                                    <Gift className="h-6 w-6" />
+                                    <Gift className="h-6 w-6 " />
                                     Have a special code?
                                 </Button>
                             </div>
@@ -142,25 +137,19 @@ export default function Cart() {
                                     <Button variant="outline" onClick={() => setShowCode(false)}>Close</Button>
                                 </div>
                             )}
-
-                            {/* Place Order Button */}
                             <div>
                                 <button
-                                    onClick={changeCheckoutModal}
                                     className="w-full flex justify-center bg-primary-default text-white text-xl py-2 rounded text-center gap-6"
                                 >
                                     <span>Place Order</span>
                                     <div className="border-2 border-primary-light h-8 mx-2" />
-                                    <span className="text-nowrap space-x-3 text-xl">৳ {total}</span>
+                                    <span className="text-nowrap space-x-3 text-xl">₹ {total}</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-
-            {/* Conditionally Render Checkout Modal */}
-            {isCheckoutModalOpen && <CheckoutModal />}
         </>
-    );
+    )
 }

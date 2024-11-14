@@ -194,10 +194,9 @@ const products: Product[] = [
         description: "Fresh brinjal, perfect for curries and stir-fries."
     }
 ]
-
 export default function AllProduct() {
-    const { id } = useParams<{ id: string }>(); // Retrieve the id from the URL
-    const productId = Number(id); // Convert id to a number if needed
+    const { id } = useParams<{ id: string }>();
+    const productId = Number(id);
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         products.find((product) => product.id === productId) || null
@@ -218,6 +217,12 @@ export default function AllProduct() {
         return Math.round(((mrp - price) / mrp) * 100);
     };
 
+    const addToCart = (product: Product) => {
+        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const updatedCart = [...existingCart, product];
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+    };
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-6">Fresh Vegetables</h1>
@@ -235,18 +240,13 @@ export default function AllProduct() {
                         <img
                             src={product.image}
                             alt={product.name}
-                            className="w-full h-48 object-cover rounded-t-lg p-4" // Image spans full width and fills container
+                            className="w-full h-48 object-cover rounded-t-lg p-4"
                         />
-                        {/* <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-48 object-contain mb-4"
-                        /> */}
 
                         <div className="p-4">
                             <div className="flex justify-between items-center mb-2">
                                 <h3 className="font-semibold">{product.name}</h3>
-                                <p className="text-sm text-gray-600">{product.weight}</p> {/* Title and weight in one line */}
+                                <p className="text-sm text-gray-600">{product.weight}</p>
                             </div>
 
                             <div className="flex items-center gap-2 mb-4">
@@ -262,7 +262,10 @@ export default function AllProduct() {
                                 >
                                     Show
                                 </button>
-                                <button className="flex-1 px-4 py-2 bg-primary-default text-white rounded-md ">
+                                <button
+                                    className="flex-1 px-4 py-2 bg-primary-default text-white rounded-md"
+                                    onClick={() => addToCart(product)}
+                                >
                                     Add to cart
                                 </button>
                             </div>
@@ -270,7 +273,6 @@ export default function AllProduct() {
                     </div>
                 ))}
             </div>
-
 
             {selectedProduct && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -316,7 +318,7 @@ export default function AllProduct() {
 
                                     <p className="text-gray-600">{selectedProduct.description}</p>
 
-                                    <button className="w-full px-4 py-2 bg-primary-default text-white rounded-md ">
+                                    <button className="w-full px-4 py-2 bg-primary-default text-white rounded-md">
                                         Buy Now
                                     </button>
 
@@ -345,5 +347,5 @@ export default function AllProduct() {
                 </div>
             )}
         </div>
-    )
+    );
 }

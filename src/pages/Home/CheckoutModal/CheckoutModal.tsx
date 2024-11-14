@@ -132,23 +132,23 @@ export default function CheckoutModal() {
         if (defaultAddress) {
             setCurrentAddress(savedAddresses[defaultAddress]);
             setIsDefaultAddress(true);
-        } else if (savedAddresses[currentAddress.label]) {
-            setCurrentAddress(savedAddresses[currentAddress.label]);
+        } else if (savedAddresses[currentAddress?.label]) {
+            setCurrentAddress(savedAddresses[currentAddress?.label]);
         }
-    }, [currentAddress.label]);
+    }, [currentAddress?.label]);
 
     const handleSaveAddress = (e: React.FormEvent) => {
         e.preventDefault();
 
         const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
-        savedAddresses[currentAddress.label] = currentAddress;
+        savedAddresses[currentAddress?.label] = currentAddress;
         localStorage.setItem('addresses', JSON.stringify(savedAddresses));
 
         if (isDefaultAddress) {
-            localStorage.setItem('defaultAddress', currentAddress.label);
+            localStorage.setItem('defaultAddress', currentAddress?.label);
         } else {
             const currentDefault = localStorage.getItem('defaultAddress');
-            if (currentDefault === currentAddress.label) {
+            if (currentDefault === currentAddress?.label) {
                 localStorage.removeItem('defaultAddress');
             }
         }
@@ -196,8 +196,8 @@ export default function CheckoutModal() {
                 <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
                     <Icon name="mapPin" />
                     <div className="flex-1">
-                        <h4 className="font-semibold">{currentAddress.name}</h4>
-                        <p>{currentAddress.address}, {currentAddress.district}</p>
+                        <h4 className="font-semibold">{currentAddress?.name}</h4>
+                        <p>{currentAddress?.address}, {currentAddress?.district}</p>
                     </div>
                     <button
                         onClick={() => setCurrentStep("address")}
@@ -214,14 +214,14 @@ export default function CheckoutModal() {
                             <div key={item.id} className="m-2 flex gap-6">
                                 <div className="w-8 h-8 bg-red-500">
                                     <img
-                                        alt={item.name}
+                                        alt={item?.name}
                                         className="h-10 w-10 object-cover "
                                         src="../../../../public/image/maggi.webp"
                                     />
                                 </div>
                                 <div className="flex-1 flex flex-col">
                                     <h3 className="font-medium text-sm  text-start">
-                                        {item.name.length > 40 ? `${item.name.slice(0, 30)}...` : item.name}
+                                        {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
                                     </h3>
                                     <p className="text-sm font-medium text-start">
                                         ৳{item.price} x 1 = ৳{item.price}
@@ -333,7 +333,7 @@ export default function CheckoutModal() {
                 <Button
                     key={label}
                     type="button"
-                    variant={currentAddress.label === label ? "default" : "outline"}
+                    variant={currentAddress?.label === label ? "default" : "outline"}
                     className="flex flex-col items-center gap-2 py-4"
                     onClick={() =>
                         setCurrentAddress((prev) => ({
@@ -358,7 +358,7 @@ export default function CheckoutModal() {
                         <Input
                             id="name"
                             type="text"
-                            value={currentAddress.name}
+                            value={currentAddress?.name}
                             onChange={(e) => setCurrentAddress({ ...currentAddress, name: e.target.value })}
                             required
                             placeholder="Name"
@@ -369,7 +369,7 @@ export default function CheckoutModal() {
                         <Input
                             id="address"
                             type="text"
-                            value={currentAddress.address}
+                            value={currentAddress?.address}
                             onChange={(e) => setCurrentAddress({ ...currentAddress, address: e.target.value })}
                             placeholder="Address"
                             required
@@ -379,7 +379,7 @@ export default function CheckoutModal() {
                         <Label htmlFor="district">District</Label>
                         <Select
                             id="district"
-                            value={currentAddress.district}
+                            value={currentAddress?.district}
                             onChange={(e) => setCurrentAddress({ ...currentAddress, district: e.target.value })}
                             required
                         >
@@ -396,7 +396,7 @@ export default function CheckoutModal() {
                         <Input
                             id="phone"
                             type="tel"
-                            value={currentAddress.phone}
+                            value={currentAddress?.phone}
                             onChange={(e) => setCurrentAddress({ ...currentAddress, phone: e.target.value })}
                             required
                             placeholder="Phone"
@@ -409,7 +409,7 @@ export default function CheckoutModal() {
                     <Textarea
                         id="notes"
                         placeholder="Add any specific delivery instructions"
-                        value={currentAddress.notes}
+                        value={currentAddress?.notes}
                         onChange={(e) => setCurrentAddress({ ...currentAddress, notes: e.target.value })}
                     />
                 </div>

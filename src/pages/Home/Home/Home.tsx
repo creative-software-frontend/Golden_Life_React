@@ -8,6 +8,7 @@ import ProductCategories from "../ProductCategories/ProductCategories";
 import FreshSell from "../FreshSell/FreshSell";
 import TrendingCategory from "@/pages/TrendingCategory/TrendingCategory";
 import AutoScrollIcons from "../ScrollCategories/ScrollCategories";
+import Cart2 from "../Cart/Cart2";
 
 const Home = () => {
   return (
@@ -18,6 +19,7 @@ const Home = () => {
           <AutoScrollIcons />
           <Categories />
           <Cart />
+          {/* <Cart2/> */}
           <LiveChat />
           <ProductCategories />
           <FreshSell />

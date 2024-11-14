@@ -123,8 +123,8 @@ export const routes = createBrowserRouter([
         ],
     },
     {
-        path: '/scrollcategories',  // Separate route for Help page
-        element: <AutoScrollIcons />,
+        path: '/checkoutmodal',  // Separate route for Help page
+        element: <CheckoutModal />,
     },
     {
         path: '/orderdetails',  // Separate route for Help page
