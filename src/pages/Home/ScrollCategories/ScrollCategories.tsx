@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { ShoppingBag, Bike, Store, Building2, Gift, Car, Smartphone, Package, Newspaper, Plane, Tv, Activity, Globe, Store as StoreIcon } from "lucide-react"
 
-export default function AutoScrollIcons() {
+export default function RightToLeftIconScroll() {
     const scrollRef = useRef<HTMLDivElement>(null)
+    const [itemWidth, setItemWidth] = useState(80) // Default width, will be updated
 
     const items = [
         { icon: ShoppingBag, label: "Shopping" },
@@ -48,61 +49,76 @@ export default function AutoScrollIcons() {
             "Covid Business": "#db2777",
             "Local Outlet": "#2563eb",
         }
-        return colorMap[label] || "#000"; // Default to black if no match
+        return colorMap[label] || "#000"
     }
 
     useEffect(() => {
         const scrollContainer = scrollRef.current
         if (scrollContainer) {
-            const scrollWidth = scrollContainer.scrollWidth
-            const clientWidth = scrollContainer.clientWidth
+            const updateDimensions = () => {
+                const containerWidth = scrollContainer.offsetWidth
+                const newItemWidth = Math.floor(containerWidth / Math.floor(containerWidth / 80))
+                setItemWidth(newItemWidth)
 
-            if (scrollWidth > clientWidth) {
-                const animationDuration = scrollWidth / 28
+                const totalWidth = items.length * newItemWidth
+                scrollContainer.style.setProperty('--total-width', `${totalWidth}px`)
+                scrollContainer.style.setProperty('--item-width', `${newItemWidth}px`)
 
-                scrollContainer.style.setProperty('--scroll-width', `${scrollWidth}px`)
-                scrollContainer.style.setProperty('--animation-duration', `${animationDuration * 2}s`) // Increase time here
-                scrollContainer.classList.add('auto-scroll')
+                // Adjust animation duration based on the number of items
+                const animationDuration = items.length * 2 // 2 seconds per item
+                scrollContainer.style.setProperty('--animation-duration', `${animationDuration}s`)
             }
+
+            updateDimensions()
+            window.addEventListener('resize', updateDimensions)
+
+            return () => window.removeEventListener('resize', updateDimensions)
         }
-    }, [])
+    }, [items])
 
     return (
-        <div className="w-full md:max-w-[1040px] bg-white ">
-            <div className="border border-gray-200 rounded-lg overflow-hidden w-full md:max-w-[1040px]">
+        <div className="w-full md:max-w-[1040px] bg-white overflow-hidden">
+            <div className="border border-gray-200 rounded-lg w-full md:max-w-[1040px] relative py-2 ">
                 <div
                     ref={scrollRef}
-                    className="flex gap-4 p-4 overflow-x-hidden auto-scroll"
-                    style={{ width: '100%', whiteSpace: 'nowrap' }}
+                    className="flex overflow-hidden right-to-left-scroll "
+                    style={{ direction: 'rtl' }} // This makes the content flow from right to left
                 >
-                    {items.map((item, index) => (
+                    {items.concat(items).map((item, index) => (
                         <div
                             key={index}
-                            className="flex flex-col items-center flex-shrink-0"
+                            className="flex flex-col items-center justify-start flex-shrink-0"
+                            style={{ width: `${itemWidth}px`, direction: 'ltr' }} // Reset direction for icon and text
                         >
-                            <div className="p-2 border-2 border-gray-100 bg-white rounded-full shadow-sm">
+                            <div className="p-1 border-2 rounded-full bg-white">
                                 <button
-                                    className="p-2 h-15 w-15 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+                                    className="h-16 w-16 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
                                     aria-label={item.label}
                                     style={{ backgroundColor: getColor(item.label) }}
                                 >
-                                    <item.icon className="h-10 w-10" strokeWidth={1.5} />
+                                    <item.icon className="h-8 w-8" strokeWidth={1.5} />
                                 </button>
                             </div>
-                            <span className="mt-2 text-xs text-gray-600 whitespace-nowrap">{item.label}</span>
+                            <span className="mt-1 text-xs text-gray-600 whitespace-nowrap">{item.label}</span>
                         </div>
                     ))}
                 </div>
             </div>
             <style jsx>{`
-                .auto-scroll {
-                    --scroll-width: 0px;
+                .right-to-left-scroll {
+                    --total-width: 0px;
+                    --item-width: 0px;
                     --animation-duration: 0s;
-                    animation: scroll var(--animation-duration) linear infinite;
+                    width: calc(var(--total-width) * 2);
+                    animation: rightToLeftScroll var(--animation-duration) linear infinite;
                 }
-                @keyframes scroll {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(calc(var(--scroll-width) + 100%)); }
+                @keyframes rightToLeftScroll {
+                    0% {
+                        transform: translateX(calc(-1 * var(--total-width)));
+                    }
+                    100% {
+                        transform: translateX(0);
+                    }
                 }
             `}</style>
         </div>
