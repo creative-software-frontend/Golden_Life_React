@@ -414,8 +414,8 @@ export default function HelpLayout() {
             {/* </div> */}
             {/* <div className="flex-1 overflow-hidden"> Main content area */}
             <SidebarInset >
-                <main className="pt-6 -ms-20" >
-                    <section className="bg-primary-default py-16 m-4">
+                <main className="" >
+                    <section className="bg-primary-default py-20 ">
                         <div className="text-center text-white">
                             <h2 className="text-3xl font-bold mb-4">{getBannerForPage()}</h2>
                             <div className="relative max-w-md mx-auto">
@@ -435,17 +435,17 @@ export default function HelpLayout() {
                                     </button>
                                 )}
                             </div>
-                            <button className="mt-4 px-4 py-2 bg-white text-primary-default rounded-full font-semibold hover:bg-gray-100">
+                            {/* <button className="mt-4 px-4 py-2 bg-white text-primary-default rounded-full font-semibold hover:bg-gray-100">
                                 Your faq here
-                            </button>
+                            </button> */}
                         </div>
                     </section>
 
                     {/* <Header /> */}
-                    <div className='m-4'>
+                    <div className="">
                         <div className="hidden sm:block">
                             <div className="border-b border-gray-200">
-                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                <nav className="-mb-px flex space-x-8 justify-center" aria-label="Tabs">
                                     <Link to="/help/our-story" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
                                         Our Story
                                     </Link>
@@ -468,6 +468,7 @@ export default function HelpLayout() {
                             </div>
                         </div>
                     </div>
+
                    
                     <Outlet />
                     {/* <Footer /> */}
