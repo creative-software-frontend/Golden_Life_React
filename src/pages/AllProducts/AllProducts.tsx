@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
+import useModalStore from "@/store/Store";
 
 interface Product {
     id: number;
@@ -197,6 +198,8 @@ const products: Product[] = [
 export default function AllProduct() {
     const { id } = useParams<{ id: string }>();
     const productId = Number(id);
+    const { isCheckoutModalOpen, changeCheckoutModal, clicked } = useModalStore();
+
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         products.find((product) => product.id === productId) || null
@@ -219,12 +222,15 @@ export default function AllProduct() {
 
     const addToCart = (product: Product) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const updatedCart = [...existingCart, product];
+        const updatedCart = [...existingCart, {
+            ...product,
+            quantity: 1
+        }];
         localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container   w-full md:max-w-[1040px]">
             <h1 className="text-2xl font-bold mb-6">Fresh Vegetables</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
@@ -264,7 +270,12 @@ export default function AllProduct() {
                                 </button>
                                 <button
                                     className="flex-1 px-4 py-2 bg-primary-default text-white rounded-md"
-                                    onClick={() => addToCart(product)}
+                                    onClick={() => {
+
+
+                                        addToCart(product);
+                                        // toggleClicked()
+                                    }}
                                 >
                                     Add to cart
                                 </button>

@@ -31,24 +31,31 @@ export default function Cart() {
     const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
     const [items, setItems] = React.useState<CartItem[]>([]);
 
+    // console.log(clicked);
+    
+
     // Load cart items from local storage on component mount
     React.useEffect(() => {
         const storedItems = localStorage.getItem("cart");
         if (storedItems) {
             setItems(JSON.parse(storedItems));
         }
-    }, []);
+    },);
 
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
-    const updateQuantity = (id: number, delta: number) => {
+    const updateQuantity = (id: number, quantity: number) => {
         const updatedItems = items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
         );
         setItems(updatedItems);
+
         localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
     };
+    
+
+    // Calculate total items and total price
+    const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+    const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
 
     return (
         <>
@@ -60,7 +67,7 @@ export default function Cart() {
                     <ShoppingBag className="h-6 w-6 text-red-500" />
                     <div className="border-l border-gray-300 h-8 mx-2" />
                     <div>
-                        <div className="font-semibold">{totalItems} ITEMS</div>
+                        <div className="font-semibold">{items.length} ITEMS</div>
                         <div className="text-sm">৳ {total}</div>
                     </div>
                 </div>

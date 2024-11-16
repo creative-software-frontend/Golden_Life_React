@@ -43,6 +43,8 @@ import {
 import Footer from "@/pages/common/Footer/Footer"
 import Header from "@/pages/common/Footer/Header/Header"
 import useModalStore from "@/store/Store"
+import Cart from "@/pages/Home/Cart/Cart"
+import LiveChat from "@/pages/LiveChat/Livechat"
 // import Header from "@/pages/common/Footer/Header/Header"
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection"
 // import BannerSection from '@/pages/Home/BannerSection/BannerSection'
@@ -253,6 +255,8 @@ export default function UserLayout() {
                     </button>       
                           
                     <Header />
+                    <Cart />
+                    <LiveChat />
                         
                     <Outlet />
                     <Footer />

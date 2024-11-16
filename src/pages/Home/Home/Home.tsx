@@ -18,9 +18,9 @@ const Home = () => {
           <BannerSection />
           <AutoScrollIcons />
           <Categories />
-          <Cart />
+          {/* <Cart /> */}
           {/* <Cart2/> */}
-          <LiveChat />
+          {/* <LiveChat /> */}
           <ProductCategories />
           <FreshSell />
           <TrendingCategory />
