@@ -198,7 +198,7 @@ const products: Product[] = [
 export default function AllProduct() {
     const { id } = useParams<{ id: string }>();
     const productId = Number(id);
-    const { isCheckoutModalOpen, changeCheckoutModal, clicked } = useModalStore();
+    const { isCheckoutModalOpen, changeCheckoutModal, clicked ,toggleClicked} = useModalStore();
 
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
@@ -231,7 +231,7 @@ export default function AllProduct() {
 
     return (
         <div className="container   w-full md:max-w-[1040px]">
-            <h1 className="text-2xl font-bold mb-6">Fresh Vegetables</h1>
+            <h1 className="text-2xl font-bold mb-6 mt-4">Fresh Vegetables</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 {products.map((product) => (
@@ -274,7 +274,7 @@ export default function AllProduct() {
 
 
                                         addToCart(product);
-                                        // toggleClicked()
+                                        toggleClicked()
                                     }}
                                 >
                                     Add to cart
@@ -316,7 +316,7 @@ export default function AllProduct() {
                                         >
                                             -
                                         </button>
-                                        <span className="w-12 text-center">
+                                        <span className="w-12 text-center text-nowrap">
                                             {quantities[selectedProduct.id]} in bag
                                         </span>
                                         <button
@@ -329,7 +329,9 @@ export default function AllProduct() {
 
                                     <p className="text-gray-600">{selectedProduct.description}</p>
 
-                                    <button className="w-full px-4 py-2 bg-primary-default text-white rounded-md">
+                                    <button 
+                                        onClick={changeCheckoutModal}
+                                    className="w-full px-4 py-2 bg-primary-default text-white rounded-md">
                                         Buy Now
                                     </button>
 

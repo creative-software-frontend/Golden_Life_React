@@ -12,15 +12,13 @@ interface Address {
     phone: string
     notes?: string
 }
+
 interface CartItem {
     id: number;
     name: string;
     price: number;
     quantity: number;
     pack: string;
-    // onClose:boolean;
-    // onClose: () => void;
-
 }
 
 const Icon: React.FC<{ name: string }> = ({ name }) => {
@@ -112,10 +110,8 @@ const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ children
 )
 
 export default function CheckoutModal() {
-
     const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
     const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
-    // const [useReusableBags, setUseReusableBags] = React.useState(false)
     const [currentAddress, setCurrentAddress] = React.useState<Address>({
         label: "home",
         name: "",
@@ -156,25 +152,36 @@ export default function CheckoutModal() {
         setCurrentStep("delivery");
     };
 
+    const [items, setItems] = React.useState<CartItem[]>([]);
 
-    const [items, setItems] = React.useState<CartItem[]>([
-        { id: 1, name: "Nestle Maggi 2 Minute Masala Instant Noodles", price: 340, quantity: 1, pack: "16 pack" },
-        { id: 2, name: "Chopstick Instant Noodles Masala Delight 496 gm", price: 155, quantity: 1, pack: "8 pack" },
-        { id: 3, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" },
-        { id: 4, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" },
-        { id: 5, name: "Dekko Egg Masala Noodles 250 gm Combo", price: 80, quantity: 1, pack: "2 pcs" }
-    ]);
+    // Load cart items from local storage on component mount
+    React.useEffect(() => {
+        const storedItems = localStorage.getItem("cart");
+        if (storedItems) {
+            setItems(JSON.parse(storedItems));
+        }
+    }, []);
+
+  
+
+
+    const updateQuantity = (id: number, quantity: number) => {
+        const updatedItems = items.map(item =>
+            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
+        );
+        setItems(updatedItems);
+
+        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
+    };
+
+    console.log(items);
+    // calculate total items and total price
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const subtotal = totalPrice; // Customize if you need other calculations
+    const subtotal = totalPrice;
 
-    // const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    // const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const updateQuantity = (id: number, delta: number) => {
-        setItems(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
-    };
     const CheckoutContent = () => {
-        const [selectedPayment, setSelectedPayment] = React.useState("wallet"); // Default to wallet
+        const [selectedPayment, setSelectedPayment] = React.useState("wallet");
         const [termsAccepted, setTermsAccepted] = React.useState(false);
 
         const handleSubmit = () => {
@@ -186,13 +193,12 @@ export default function CheckoutModal() {
         };
 
         const deliveryCharge = 50;
-        const totalItems = items.length;
-        const subtotal = items.reduce((sum, item) => sum + item.price, 0);
+        const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const totalPrice = subtotal + deliveryCharge;
 
         return (
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
-                {/* Fixed Delivery Address Section */}
                 <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
                     <Icon name="mapPin" />
                     <div className="flex-1">
@@ -207,34 +213,35 @@ export default function CheckoutModal() {
                     </button>
                 </div>
 
-                {/* Scrollable Items List Section with Custom Scrollbar */}
-                <div className="flex-1 overflow-y-auto p-1  custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-1 custom-scrollbar">
                     <div className="divide-y space-y-4">
-                        {items.map((item) => (
-                            <div key={item.id} className="m-2 flex gap-6">
-                                <div className="w-8 h-8 bg-red-500">
-                                    <img
-                                        alt={item?.name}
-                                        className="h-10 w-10 object-cover "
-                                        src="../../../../public/image/maggi.webp"
-                                    />
+                        {items.map((item,i) => {
+                            // const index = item.id; // Assigning item.id to a variable called index
+                            return (
+                                <div key={i} className="m-2 flex gap-6">
+                                    <div className="w-8 h-8 bg-red-500">
+                                        <img
+                                            alt={item?.name}
+                                            className="h-10 w-10 object-cover"
+                                            src="/image/maggi.webp"
+                                        />
+                                    </div>
+                                    <div className="flex-1 flex flex-col">
+                                        <h3 className="font-medium text-sm text-start">
+                                            {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
+                                        </h3>
+                                        <p className="text-sm font-medium text-start">
+                                            ৳{item.price} x {item.quantity} = ৳{item.price * item.quantity}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="flex-1 flex flex-col">
-                                    <h3 className="font-medium text-sm  text-start">
-                                        {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
-                                    </h3>
-                                    <p className="text-sm font-medium text-start">
-                                        ৳{item.price} x 1 = ৳{item.price}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
+
                     </div>
                 </div>
 
-                {/* Summary, Payment Options, and Terms and Conditions Section */}
                 <div className="p-4 space-y-4 bg-white border-t">
-                    {/* Summary Section */}
                     <div className="space-y-2">
                         <div className="flex justify-between">
                             <span>Total Items:</span>
@@ -254,7 +261,6 @@ export default function CheckoutModal() {
                         </div>
                     </div>
 
-                    {/* Payment Option Section */}
                     <div className="space-y-2">
                         <h4 className="font-semibold">Payment Option</h4>
                         <div className="flex gap-2">
@@ -279,7 +285,6 @@ export default function CheckoutModal() {
                         </div>
                     </div>
 
-                    {/* Terms and Conditions */}
                     <div className="flex items-center mt-4">
                         <input
                             type="checkbox"
@@ -291,15 +296,15 @@ export default function CheckoutModal() {
                         <label htmlFor="terms" className="text-sm space-x-2">
                             I accept the{" "}
                             <Link
-                                to="/help/privacy-policy" // Replace with your actual terms route
+                                to="/help/privacy-policy"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-primary underline"
                             >
-                                Privacy Policy, 
+                                Privacy Policy,
                             </Link>
                             <Link
-                                to="/help/terms" // Replace with your actual terms route
+                                to="/help/terms"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-primary underline"
@@ -310,7 +315,6 @@ export default function CheckoutModal() {
                     </div>
                 </div>
 
-                {/* Fixed Submit Button */}
                 <div className="p-4 border-t bg-white z-10">
                     <button
                         onClick={handleSubmit}
@@ -322,6 +326,7 @@ export default function CheckoutModal() {
             </div>
         );
     };
+
     const LabelOptions = () => (
         <div className="grid grid-cols-4 gap-4 mt-2">
             {[
@@ -417,7 +422,6 @@ export default function CheckoutModal() {
                 <Label>Add a label</Label>
                 <LabelOptions />
 
-
                 <div className="space-y-2">
                     <Switch
                         checked={isDefaultAddress}
@@ -434,11 +438,11 @@ export default function CheckoutModal() {
             </form>
         </div>
     )
+
     return (
         <div className={`fixed inset-0 z-50 flex items-start justify-end bg-black bg-opacity-50 ${isCheckoutModalOpen ? '' : 'hidden'}`}>
-            <div className="max-w-md  w-full h-[680px] mt-2  bg-white p-4 rounded-md shadow-lg ">
+            <div className="max-w-md w-full h-[680px] mt-2 bg-white p-4 rounded-md shadow-lg">
                 <div className="flex justify-between items-center">
-                    {/* <h2 className="text-lg font-semibold">Checkou</h2> */}
                     <button onClick={closeCheckoutModal}>
                         <Icon name="x" />
                     </button>
@@ -447,5 +451,4 @@ export default function CheckoutModal() {
             </div>
         </div>
     );
-
 }

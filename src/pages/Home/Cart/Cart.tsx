@@ -1,5 +1,8 @@
+'use client'
+
 import * as React from "react";
-import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, Gift, Plus, ShoppingBag, X } from 'lucide-react';
 import CheckoutModal from "../CheckoutModal/CheckoutModal";
 import useModalStore from "@/store/Store";
 
@@ -26,36 +29,30 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant
 );
 
 export default function Cart() {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [isOpen, setIsOpen] = React.useState(location.state?.isOpen || false);
     const [showCode, setShowCode] = React.useState(false);
-    const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
+    const { isCheckoutModalOpen, changeCheckoutModal, clicked } = useModalStore();
     const [items, setItems] = React.useState<CartItem[]>([]);
 
-    // console.log(clicked);
-    
-
-    // Load cart items from local storage on component mount
     React.useEffect(() => {
         const storedItems = localStorage.getItem("cart");
         if (storedItems) {
             setItems(JSON.parse(storedItems));
         }
-    },);
+    }, [clicked]);
 
     const updateQuantity = (id: number, quantity: number) => {
         const updatedItems = items.map(item =>
             item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
         );
         setItems(updatedItems);
-
-        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
+        localStorage.setItem("cart", JSON.stringify(updatedItems));
     };
-    
 
-    // Calculate total items and total price
     const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
 
     return (
         <>
@@ -76,20 +73,21 @@ export default function Cart() {
             {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
                     <div className="bg-white rounded-md w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
-                        {/* Header */}
                         <div className="sticky top-0 bg-white border-b z-10">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">
                                     <Plus className="h-5 w-5" />
                                     <span className="font-medium">{items.length} ITEMS</span>
                                 </div>
-                                <Button variant="outline" className="text-sm" onClick={() => setIsOpen(false)}>
+                                <Button variant="outline" className="text-sm" onClick={() => {
+                                    setIsOpen(false);
+                                    navigate(-1);
+                                }}>
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
                         </div>
 
-                        {/* Item List */}
                         <div className="divide-y">
                             {items.map((item) => (
                                 <div key={item.id} className="p-4 flex gap-4">
@@ -97,7 +95,7 @@ export default function Cart() {
                                         <img
                                             alt={item.name}
                                             className="w-full h-auto object-cover"
-                                            src="../../../../public/image/maggi.webp"
+                                            src="/image/maggi.webp"
                                             width={100}
                                             height={100}
                                         />
@@ -128,7 +126,6 @@ export default function Cart() {
                             ))}
                         </div>
 
-                        {/* Footer */}
                         <div className="sticky bottom-0 bg-white border-t p-4 space-y-4">
                             <div className="flex items-center gap-2">
                                 <Button
@@ -150,7 +147,6 @@ export default function Cart() {
                                 </div>
                             )}
 
-                            {/* Place Order Button */}
                             <div>
                                 <button
                                     onClick={changeCheckoutModal}
@@ -166,7 +162,6 @@ export default function Cart() {
                 </div>
             )}
 
-            {/* Conditionally Render Checkout Modal */}
             {isCheckoutModalOpen && <CheckoutModal />}
         </>
     );
