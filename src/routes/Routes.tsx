@@ -19,6 +19,7 @@ import Trending from "@/pages/TrendingCategory/Trending";
 import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 import Overview from "@/pages/Dashboard/Overview/Overview";
 import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
+import AllCourses from "@/pages/Home/Home/AllCourses/AllCourses";
 // import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
@@ -49,10 +50,10 @@ export const routes = createBrowserRouter([
                 path: 'allProducts',  // Separate route for Help page
                 element: <AllProduct />,
             },
-            // {
-            //     path: 'allProducts',  // Separate route for Help page
-            //     element: <TrendingCategory />,
-            // },
+            {
+                path: 'allcourses',  // Separate route for Help page
+                element: <AllCourses />,
+            },
 
 
         ]

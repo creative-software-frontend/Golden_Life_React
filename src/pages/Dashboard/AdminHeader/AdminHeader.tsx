@@ -77,10 +77,10 @@ export default function AdminHeader() {
     //     localStorage.setItem('darkMode', JSON.stringify(darkMode))
     // }, [darkMode])
 
-    // const toggleDarkMode = () => {
-    //     setDarkMode(!darkMode)
-    // }
-    // // Logout function
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode)
+    }
+    // Logout function
     // const handleLogout = () => {
     //   // Clear authentication state
     //   localStorage.removeItem('isAuthenticated') // Clear any authentication data
@@ -106,7 +106,7 @@ export default function AdminHeader() {
                                     : 'text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                             }
                         >
-                            MDashboard
+                            Dashboard
                         </NavLink>
                         <NavLink
                             to="/merchant/deliveries"
@@ -162,7 +162,7 @@ export default function AdminHeader() {
 
                     {/* Theme Toggle Button */}
                     <button
-                        // onClick={toggleDarkMode}
+                        onClick={toggleDarkMode}
                         className="bg-gray-300 dark:bg-gray-600 rounded-full p-2 text-black-500 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
                     >
                         {darkMode ? (
