@@ -223,7 +223,7 @@ export default function CheckoutModal() {
                                         <img
                                             alt={item?.name}
                                             className="h-10 w-10 object-cover"
-                                            src="/image/maggi.webp"
+                                            src="../../../../public/image/products/maggi.webp"
                                         />
                                     </div>
                                     <div className="flex-1 flex flex-col">

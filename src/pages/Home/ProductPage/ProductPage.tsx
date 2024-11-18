@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Heart } from "lucide-react";
-import useModalStore from "@/store/Store";
 
 interface Product {
     id: number;
@@ -17,7 +16,7 @@ const products: Product[] = [
     {
         id: 1,
         name: "Potato Regular",
-        image: "../../../public/image/maggi.webp",
+        image: "../../../../public/image/products/sharee3.jpg",
         weight: "600 gm",
         price: 39,
         mrp: 45,
@@ -195,11 +194,10 @@ const products: Product[] = [
         description: "Fresh brinjal, perfect for curries and stir-fries."
     }
 ]
-export default function AllProduct() {
-    const { id } = useParams<{ id: string }>();
-    const productId = Number(id);
-    const { isCheckoutModalOpen, changeCheckoutModal, clicked ,toggleClicked} = useModalStore();
 
+export default function ProductPage() {
+    const { id } = useParams<{ id: string }>(); // Retrieve the id from the URL
+    const productId = Number(id); // Convert id to a number if needed
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         products.find((product) => product.id === productId) || null
@@ -220,18 +218,9 @@ export default function AllProduct() {
         return Math.round(((mrp - price) / mrp) * 100);
     };
 
-    const addToCart = (product: Product) => {
-        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const updatedCart = [...existingCart, {
-            ...product,
-            quantity: 1
-        }];
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-    };
-
     return (
-        <div className="container   w-full md:max-w-[1040px]">
-            <h1 className="text-2xl font-bold mb-6 mt-4">Fresh Vegetables</h1>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-6">Fresh Vegetables</h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 {products.map((product) => (
@@ -246,13 +235,18 @@ export default function AllProduct() {
                         <img
                             src={product.image}
                             alt={product.name}
-                            className="w-full h-48 object-cover rounded-t-lg p-4"
+                            className="w-full h-48 object-cover rounded-t-lg p-4" // Image spans full width and fills container
                         />
+                        {/* <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-48 object-contain mb-4"
+                        /> */}
 
                         <div className="p-4">
                             <div className="flex justify-between items-center mb-2">
                                 <h3 className="font-semibold">{product.name}</h3>
-                                <p className="text-sm text-gray-600">{product.weight}</p>
+                                <p className="text-sm text-gray-600">{product.weight}</p> {/* Title and weight in one line */}
                             </div>
 
                             <div className="flex items-center gap-2 mb-4">
@@ -268,15 +262,7 @@ export default function AllProduct() {
                                 >
                                     Show
                                 </button>
-                                <button
-                                    className="flex-1 px-4 py-2 bg-primary-default text-white rounded-md"
-                                    onClick={() => {
-
-
-                                        addToCart(product);
-                                        toggleClicked()
-                                    }}
-                                >
+                                <button className="flex-1 px-4 py-2 bg-primary-default text-white rounded-md ">
                                     Add to cart
                                 </button>
                             </div>
@@ -284,6 +270,7 @@ export default function AllProduct() {
                     </div>
                 ))}
             </div>
+
 
             {selectedProduct && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -316,7 +303,7 @@ export default function AllProduct() {
                                         >
                                             -
                                         </button>
-                                        <span className="w-12 text-center text-nowrap">
+                                        <span className="w-12 text-center">
                                             {quantities[selectedProduct.id]} in bag
                                         </span>
                                         <button
@@ -329,9 +316,7 @@ export default function AllProduct() {
 
                                     <p className="text-gray-600">{selectedProduct.description}</p>
 
-                                    <button 
-                                        onClick={changeCheckoutModal}
-                                    className="w-full px-4 py-2 bg-primary-default text-white rounded-md">
+                                    <button className="w-full px-4 py-2 bg-primary-default text-white rounded-md ">
                                         Buy Now
                                     </button>
 
@@ -360,5 +345,5 @@ export default function AllProduct() {
                 </div>
             )}
         </div>
-    );
+    )
 }

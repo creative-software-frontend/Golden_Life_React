@@ -41,7 +41,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
-import Footer from "../common/Footer/Footer"
+import Footer from "../../common/Footer/Footer"
 
 // This is sample data.
 const data = {

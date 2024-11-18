@@ -6,62 +6,62 @@ export default function Categories() {
         {
             id: 1,
             name: "Beauty & Personal Care",
-            icon: "../../../../public/image/c1.jpg",
+            icon: "../../../../public/image/products/bread.jpg",
         },
         {
             id: 2,
             name: "Women's Apparels",
-            icon: "../../../../public/image/c2.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 3,
             name: "Men's Wear",
-            icon: "../../../../public/image/c4.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 4,
             name: "Mobile & Gadgets",
-            icon: "../../../../public/image/c1.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 5,
             name: "Home Decoration",
-            icon: "../../../../public/image/c3.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 6,
             name: "Home Appliances",
-            icon: "../../../../public/image/c2.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 7,
             name: "Toy, Kids & Babies",
-            icon: "../../../../public/image/c4.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 8,
             name: "Kids Fashion",
-            icon: "../../../../public/image/c1.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 9,
             name: "Jewellery & Accessories",
-            icon: "../../../../public/image/c2.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 10,
             name: "Women's Bag",
-            icon: "../../../../public/image/c3.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 11,
             name: "Men's Bag",
-            icon: "../../../../public/image/c1.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
         {
             id: 12,
             name: "Watches & Accessories",
-            icon: "../../../../public/image/c4.jpg",
+            icon: "../../../../public/image/products/sharee3.jpg",
         },
     ]
 

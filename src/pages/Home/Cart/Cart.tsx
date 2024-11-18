@@ -95,7 +95,7 @@ export default function Cart() {
                                         <img
                                             alt={item.name}
                                             className="w-full h-auto object-cover"
-                                            src="/image/maggi.webp"
+                                            src="../../../../public/image/products/maggi.webp"
                                             width={100}
                                             height={100}
                                         />

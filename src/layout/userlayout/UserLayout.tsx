@@ -1,10 +1,10 @@
 'use client'
 
 import * as React from "react"
-import { Link, Outlet} from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
 import {
-  
+
     ChevronRight,
     SquareTerminal,
     ShoppingCart,
@@ -41,10 +41,10 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import Footer from "@/pages/common/Footer/Footer"
-import Header from "@/pages/common/Footer/Header/Header"
+import Header from "@/pages/common/Header/Header"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
-import LiveChat from "@/pages/LiveChat/Livechat"
+import LiveChat from "@/pages/Home/LiveChat/Livechat"
 // import Header from "@/pages/common/Footer/Header/Header"
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection"
 // import BannerSection from '@/pages/Home/BannerSection/BannerSection'
@@ -238,8 +238,8 @@ export default function UserLayout() {
             </Sidebar>
             <SidebarInset>
                 <main className="pt-6 ">
-                    
-                        
+
+
                     <button
                         onClick={changeCheckoutModal}
                         className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
@@ -248,16 +248,16 @@ export default function UserLayout() {
                             <ShoppingBag className="h-6 w-6 text-red-500" />
                             <div className="border-l border-gray-300 h-8 mx-2" />
                             <div>
-                                <div className="font-semibold">{} ITEMS</div>
-                                <div className="text-sm">৳ {}</div>
+                                <div className="font-semibold">{ } ITEMS</div>
+                                <div className="text-sm">৳ { }</div>
                             </div>
                         </div>
-                    </button>       
-                          
+                    </button>
+
                     <Header />
                     <Cart />
                     <LiveChat />
-                        
+
                     <Outlet />
                     <Footer />
                 </main>

@@ -8,12 +8,12 @@ import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 
 const products = [
-    { name: "Koss KPH7 Portable", price: "£60.00", discount: "-10%", oldPrice: "£86.00", image: "../../../public/image/tea.jpg" },
-    { name: "Beats Solo2 Solo 2", price: "£60.00", image: "../../../public/image/tea.jpg" },
-    { name: "Beats EP Wired", price: "£60.00", oldPrice: "£86.00", discount: "-7%", image: "../../../public/image/tea.jpg" },
-    { name: "Bose SoundLink Bluetooth", price: "£60.00", image: "../../../public/image/tea.jpg" },
-    { name: "Sony WH-1000XM4", price: "£299.00", image: "../../../public/image/tea.jpg" },
-    { name: "AirPods Pro", price: "£249.00", discount: "-5%", oldPrice: "£262.00", image: "../../../public/image/tea.jpg" }
+    { name: "Koss KPH7 Portable", price: "£60.00", discount: "-10%", oldPrice: "£86.00", image: "../../../../public/image/products/sharee3.jpg" },
+    { name: "Beats Solo2 Solo 2", price: "£60.00", image: "../../../../public/image/products/sharee3.jpg" },
+    { name: "Beats EP Wired", price: "£60.00", oldPrice: "£86.00", discount: "-7%", image: "../../../../public/image/products/sharee3.jpg" },
+    { name: "Bose SoundLink Bluetooth", price: "£60.00", image: "../../../../public/image/products/sharee3.jpg" },
+    { name: "Sony WH-1000XM4", price: "£299.00", image: "../../../../public/image/products/sharee3.jpg" },
+    { name: "AirPods Pro", price: "£249.00", discount: "-5%", oldPrice: "£262.00", image: "../../../../public/image/products/sharee3.jpg" }
 ]
 
 export default function TrendingCategory() {

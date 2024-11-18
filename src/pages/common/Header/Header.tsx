@@ -1,7 +1,7 @@
 import { CameraIcon, MapPin, UserIcon, ArrowLeft, Search } from 'lucide-react';
 import { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import logo from '../../../../../public/image/logo/logo.jpg';
+import logo from '../../../../public/image/logo/logo.jpg';
 import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {

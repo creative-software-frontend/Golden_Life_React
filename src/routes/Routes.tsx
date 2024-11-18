@@ -1,25 +1,25 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "../pages/errorpage/Errorpage";
-import OrderDetails from "@/pages/Home/Home/OrderDetails/OrderDetails";
-import Story from "@/pages/Home/Story/Story";
-import Career from "@/pages/Home/Home/Career/Career";
-import Contact from "@/pages/Home/Home/Contact/Contact";
-import PrivacyPolicy from "@/pages/Home/Home/PrivacyPolicy/PrivacyPolicy";
+import OrderDetails from "@/pages/Home/OrderDetails/OrderDetails";
+import Story from "@/pages/Help/Story/Story";
+import Career from "@/pages/Help/Career/Career";
+import Contact from "@/pages/Help/Contact/Contact";
+import PrivacyPolicy from "@/pages/Help/PrivacyPolicy/PrivacyPolicy";
 import UserLayout from "@/layout/userlayout/UserLayout";
 import HelpLayout from "@/layout/HelpLayout/HelpLayout";
 import Faq from "@/pages/Home/Faq/Faq";
-import TermsOfUse from "@/pages/Home/Home/TermsOfUse/TermsOfUse";
+import TermsOfUse from "@/pages/Help/TermsOfUse/TermsOfUse";
 import AllCategories from "@/pages/Home/AllCategories/AllCategories";
-import ProductPage from "@/pages/ProductPage/ProductPage";
+import ProductPage from "@/pages/Home/ProductPage/ProductPage";
 import Home from "@/pages/Home/Home/Home";
-import AllProduct from "@/pages/AllProducts/AllProducts";
+import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
-import TrendingCategory from "@/pages/TrendingCategory/TrendingCategory";
-import Trending from "@/pages/TrendingCategory/Trending";
+import TrendingCategory from "@/pages/Home/TrendingCategory/TrendingCategory";
+import Trending from "@/pages/Home/TrendingCategory/Trending";
 import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 import Overview from "@/pages/Dashboard/Overview/Overview";
 import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
-import AllCourses from "@/pages/Home/Home/AllCourses/AllCourses";
+import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 // import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
@@ -120,7 +120,7 @@ export const routes = createBrowserRouter([
             //     path: 'setting',
             //     element: <Setting />,
             // },
-            
+
         ],
     },
     {
@@ -145,5 +145,5 @@ export const routes = createBrowserRouter([
         path: '*',
         element: <ErrorPage />, // Error page for undefined routes
     },
-    
+
 ])

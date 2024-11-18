@@ -41,7 +41,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import { Link, Outlet } from "react-router-dom"
-import Header from "@/pages/common/Footer/Header/Header"
+import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
 
 
@@ -322,7 +322,7 @@ export default function ShoppingLayout() {
             <SidebarInset >
                 <main className="pt-6 -ms-20" >
                     <Header />
-                    
+
                     <Outlet />
                     <Footer />
                 </main>

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin } from 'lucide-react';
-import playstore from '../../../../public/Play Store.png';
-import paywith from '../../../../public/Pay-With.png';
+import playstore from '../../../../public/image/footer/Play Store.png';
+import paywith from '../../../../public/image/footer/Pay-With.png';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { useState } from 'react';

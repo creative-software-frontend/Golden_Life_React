@@ -37,7 +37,7 @@ export default function FreshSell() {
         {
             id: 1,
             name: "সিল্ক কাতান শাড়ি",
-            image: "../../../../public/image/sharee.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 829,
             discountedPrice: 813,
             progress: 75,
@@ -45,7 +45,7 @@ export default function FreshSell() {
         {
             id: 2,
             name: "Pulse Oximeter A",
-            image: "../../../../public/image/c3.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 1165,
             discountedPrice: 981,
             progress: 60,
@@ -53,7 +53,7 @@ export default function FreshSell() {
         {
             id: 3,
             name: "Skating Shoe",
-            image: "../../../../public/image/shoe.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 2820,
             discountedPrice: 2120,
             progress: 85,
@@ -61,7 +61,7 @@ export default function FreshSell() {
         {
             id: 4,
             name: "D166 Smart Watch",
-            image: "../../../../public/image/c1.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 460,
             discountedPrice: 348,
             progress: 45,
@@ -69,7 +69,7 @@ export default function FreshSell() {
         {
             id: 5,
             name: "Ladis Watch with",
-            image: "../../../../public/image/shoe.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 480,
             discountedPrice: 435,
             progress: 90,
@@ -77,7 +77,7 @@ export default function FreshSell() {
         {
             id: 6,
             name: "Eid Collection",
-            image: "../../../../public/image/sharee3.jpg",
+            image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 1180,
             discountedPrice: 1157,
             progress: 30,

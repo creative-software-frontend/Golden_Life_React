@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Calendar, Truck, ChevronRight, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import AdminHeader from '@/pages/Dashboard/AdminHeader/AdminHeader'
+import AdminHeader from '@/pages/Dashboard/UserPanelHeader/UserPanelHeader'
 
 export default function AdminLayout() {
   const [dateRange, setDateRange] = useState<string>("This Month")
