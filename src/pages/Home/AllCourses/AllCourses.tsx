@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from "react"
+// import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Play } from 'lucide-react'
@@ -12,6 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Link } from "react-router-dom"
 
 interface Lesson {
   type: string
@@ -20,6 +22,7 @@ interface Lesson {
   thumbnail: string
   color: string
   badge: string
+  link: string
 }
 
 const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
@@ -31,6 +34,7 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-purple-500",
       badge: "HSC",
+      link: "/courses/hsc/math/2.1",
     },
     {
       type: "HSC জীববিজ্ঞান ২য় পত্র",
@@ -39,6 +43,7 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-emerald-500",
       badge: "HSC",
+      link: "/courses/hsc/biology/2.8",
     },
   ],
   ssc: [
@@ -49,6 +54,7 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-blue-500",
       badge: "SSC",
+      link: "/courses/ssc/physics/8.1",
     },
     {
       type: "SSC রসায়ন",
@@ -57,6 +63,7 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-sky-500",
       badge: "SSC",
+      link: "/courses/ssc/chemistry/1.1",
     },
   ],
 }
@@ -76,27 +83,29 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
       <CarouselContent>
         {courses.map((lesson, index) => (
           <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 pl-4">
-            <Card className="border-0 shadow-lg overflow-hidden">
-              <CardContent className="p-0">
-                <div className="relative aspect-[2/1] bg-teal-100">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Button size="icon" className="h-16 w-16 rounded-full bg-white/90 hover:bg-white shadow-lg">
-                      <Play className="h-8 w-8 text-slate-600 ml-1" />
-                    </Button>
+            <Link to="productviewpage" className="block">
+              <Card className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
+                <CardContent className="p-0">
+                  <div className="relative aspect-[2/1] bg-teal-100">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Button size="icon" className="h-16 w-16 rounded-full bg-white/90 hover:bg-white shadow-lg">
+                        <Play className="h-8 w-8 text-slate-600 ml-1" />
+                      </Button>
+                    </div>
+                    <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
+                      {lesson.badge}
+                    </div>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
-                    {lesson.badge}
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
+                      <span className="text-sm text-slate-600">{lesson.type}</span>
+                    </div>
+                    <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
                   </div>
-                </div>
-                <div className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
-                    <span className="text-sm text-slate-600">{lesson.type}</span>
-                  </div>
-                  <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </CarouselItem>
         ))}
       </CarouselContent>

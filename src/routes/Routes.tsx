@@ -20,6 +20,7 @@ import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 import Overview from "@/pages/Dashboard/Overview/Overview";
 import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
+import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 // import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
@@ -54,6 +55,7 @@ export const routes = createBrowserRouter([
                 path: 'allcourses',  // Separate route for Help page
                 element: <AllCourses />,
             },
+     
 
 
         ]
@@ -134,6 +136,10 @@ export const routes = createBrowserRouter([
     {
         path: '/trending',  // Separate route for Help page
         element: <Trending />,
+    },
+    {
+        path: '/productviewpage',  // Separate route for Help page
+        element: <CourseViewPage />,
     },
     // {
     //     path: '/trending',  // Separate route for Help page
