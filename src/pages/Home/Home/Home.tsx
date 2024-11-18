@@ -18,8 +18,9 @@ const Home = () => {
       <HeroSection />
       <BannerSection />
       <AutoScrollIcons />
-      <Categories />
+   
       <CourseCategories />
+      <Categories />
       {/* <Cart /> */}
       {/* <Cart2/> */}
       {/* <LiveChat /> */}
