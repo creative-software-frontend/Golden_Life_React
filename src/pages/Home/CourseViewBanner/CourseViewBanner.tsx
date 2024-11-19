@@ -1,17 +1,17 @@
-import React from 'react'badge
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/"
-import { Star, Clock, Users, PlayCircle } from 'lucide-react'
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge"; // Ensure the correct path to Badge
+import { Star, Clock, Users, PlayCircle } from 'lucide-react';
 
 interface CourseBannerProps {
-    title: string
-    instructor: string
-    rating: number
-    studentsEnrolled: number
-    duration: string
-    level: string
-    category: string
-    backgroundImage?: string
+    title: string;
+    instructor: string;
+    rating: number;
+    studentsEnrolled: number;
+    duration: string;
+    level: string;
+    category: string;
+    backgroundImage?: string;
 }
 
 export default function CourseViewBanner({
@@ -71,5 +71,5 @@ export default function CourseViewBanner({
                 </div>
             </div>
         </div>
-    )
+    );
 }
