@@ -22,7 +22,7 @@ interface Lesson {
   thumbnail: string
   color: string
   badge: string
-  link: string
+  image: string
 }
 
 const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
@@ -34,7 +34,25 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-purple-500",
       badge: "HSC",
-      link: "/courses/hsc/math/2.1",
+      image: "../../../../public/image/Banner/Screenshot_3.png",
+    },
+    {
+      type: "HSC জীববিজ্ঞান ২য় পত্র",
+      number: "2.8",
+      title: "ঘাস ফড়িং এর মুখোপাঙ্গ, বক্ষ...",
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-emerald-500",
+      badge: "HSC",
+      link: "/courses/hsc/biology/2.8",
+    },
+    {
+      type: "HSC জীববিজ্ঞান ২য় পত্র",
+      number: "2.8",
+      title: "ঘাস ফড়িং এর মুখোপাঙ্গ, বক্ষ...",
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-emerald-500",
+      badge: "HSC",
+      link: "/courses/hsc/biology/2.8",
     },
     {
       type: "HSC জীববিজ্ঞান ২য় পত্র",
@@ -55,6 +73,24 @@ const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
       color: "bg-blue-500",
       badge: "SSC",
       link: "/courses/ssc/physics/8.1",
+    },
+    {
+      type: "SSC রসায়ন",
+      number: "1.1",
+      title: "জীবাশ্ম জ্বালানি",
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-sky-500",
+      badge: "SSC",
+      link: "/courses/ssc/chemistry/1.1",
+    },
+    {
+      type: "SSC রসায়ন",
+      number: "1.1",
+      title: "জীবাশ্ম জ্বালানি",
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-sky-500",
+      badge: "SSC",
+      link: "/courses/ssc/chemistry/1.1",
     },
     {
       type: "SSC রসায়ন",
@@ -117,17 +153,17 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function AllCourses() {
   return (
-    <div className="w-full md:max-w-[1040px] mt-8 mb-4 bg-gradient-to-br from-pink-50 to-purple-50 p-8">
+    <div className="w-full  md:max-w-[1040px] mt-8 mb-4">
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="flex justify-center gap-4 mb-8">
+        <TabsList className="flex justify-end text-end gap-4 mb-8  bg-gradient-to-br from-pink-50 to-purple-50 p-8">
           <TabsTrigger value="all">All Courses</TabsTrigger>
           <TabsTrigger value="hsc">HSC Courses</TabsTrigger>
           <TabsTrigger value="ssc">SSC Courses</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
           <div className="space-y-12">
-            <CourseCarousel courses={allCourses.slice(0, 2)} title="Featured Courses" />
-            <CourseCarousel courses={allCourses.slice(2, 4)} title="Popular Courses" />
+            <CourseCarousel courses={allCourses.slice(0, 4)} title="Featured Courses" />
+            <CourseCarousel courses={allCourses.slice(4, 8)} title="Popular Courses" />
             <CourseCarousel courses={allCourses} title="All Courses" />
           </div>
         </TabsContent>

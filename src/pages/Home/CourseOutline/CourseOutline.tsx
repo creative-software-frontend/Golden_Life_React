@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
+// import Image from "next/image"; // Correct import for handling images in Next.js
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import Image from "next/image";
-import course1 from "../../assets/course1.png"; // Ensure this path is correct
+import course1 from "../../../../public/image/Banner/Screenshot_3.png"; // Ensure this path is correct
+// import  Image  from 'react-router-dom';
 
-const page = () => {
+const CourseOutline = () => {
     const sliderRef = React.useRef<HTMLDivElement>(null);
     const [currentSlide, setCurrentSlide] = React.useState(0);
 
@@ -69,7 +70,7 @@ const page = () => {
                 <div className="max-w-2xl">
                     <h2 className="text-2xl font-bold mb-2">Our popular courses</h2>
                     <p className="text-muted-foreground">
-                        By taking proactive steps to nurture mental health, we can enhance our quality of life, build resilience, and foster a sense of inner peace and balance
+                        By taking proactive steps to nurture mental health, we can enhance our quality of life, build resilience, and foster a sense of inner peace and balance.
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -85,7 +86,7 @@ const page = () => {
                 {courses.map((course) => (
                     <Card key={course.id} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/4 p-4 mr-6">
                         <div className="relative">
-                            <Image
+                            <img
                                 src={course.image}
                                 alt={course.title}
                                 width={400}
@@ -114,9 +115,7 @@ const page = () => {
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
-                                            className={`h-4 w-4 ${i < Math.floor(course.rating)
-                                                ? "text-yellow-400 fill-yellow-400"
-                                                : "text-gray-300"
+                                            className={`h-4 w-4 ${i < Math.floor(course.rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                                                 }`}
                                         />
                                     ))}
@@ -135,7 +134,7 @@ const page = () => {
                             </div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Image
+                                    <img
                                         src={course.instructor.image}
                                         alt={course.instructor.name}
                                         width={32}
@@ -154,4 +153,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default CourseOutline;
