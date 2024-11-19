@@ -29,7 +29,7 @@ export default function CourseViewBanner({
             <div className="absolute inset-0 bg-black opacity-60"></div>
             <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                    <div className="space-y-6">
+                    <div className="space-y-6 text-start">
                         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
                             {title}
                         </h1>
