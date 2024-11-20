@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, Users, PlayCircle, X } from "lucide-react";
+import { Star, Clock, Users, X } from "lucide-react";
 
 // Assuming CourseOutline, CoursePlan, and CourseDetails components are imported.
 import CourseInstructor from "../Courseinstructor/CourseInstructor";
@@ -20,7 +20,7 @@ interface CourseBannerProps {
     backgroundImage?: string;
 }
 
-const CourseBanner: React.FC<CourseBannerProps> = ({
+const CourseViewBanner: React.FC<CourseBannerProps> = ({
     title = "Advanced Machine Learning and AI",
     instructor = "Dr. Jane Smith",
     rating = 4.8,
@@ -162,4 +162,4 @@ const CourseBanner: React.FC<CourseBannerProps> = ({
     );
 };
 
-export default CourseBanner;
+export default CourseViewBanner;
