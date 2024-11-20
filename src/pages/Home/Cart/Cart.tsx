@@ -53,6 +53,7 @@ export default function Cart() {
 
     const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    console.log(isCheckoutModalOpen)
 
     return (
         <>

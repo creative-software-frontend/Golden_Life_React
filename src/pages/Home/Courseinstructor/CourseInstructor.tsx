@@ -5,7 +5,7 @@ const CourseInstructor: React.FC = () => (
     <div className="p-6 border rounded-lg">
         <div className="flex items-start gap-4">
             <img
-                src="/placeholder.svg"
+                src="../../../../public/image/courses/instructor.jpeg"
                 alt="Instructor profile picture"
                 width={64}
                 height={64}

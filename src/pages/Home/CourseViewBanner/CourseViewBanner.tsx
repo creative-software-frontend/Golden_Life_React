@@ -2,25 +2,23 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Users, X } from "lucide-react";
-
-// Assuming CourseOutline, CoursePlan, and CourseDetails components are imported.
 import CourseInstructor from "../Courseinstructor/CourseInstructor";
 import CoursePlan from "../CoursePlan/CoursePlan";
 import CourseDetails from "../CourseDetails/CourseDetails";
 import CourseFeatures from "../CourseFeature/CourseFeature";
 
 interface CourseBannerProps {
-    title: string;
-    instructor: string;
-    rating: number;
-    studentsEnrolled: number;
-    duration: string;
-    level: string;
-    category: string;
+    title?: string;
+    instructor?: string;
+    rating?: number;
+    studentsEnrolled?: number;
+    duration?: string;
+    level?: string;
+    category?: string;
     backgroundImage?: string;
 }
 
-const CourseViewBanner: React.FC<CourseBannerProps> = ({
+const CourseBanner: React.FC<CourseBannerProps> = ({
     title = "Advanced Machine Learning and AI",
     instructor = "Dr. Jane Smith",
     rating = 4.8,
@@ -31,7 +29,7 @@ const CourseViewBanner: React.FC<CourseBannerProps> = ({
     backgroundImage = "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
 }) => {
     const [isModalOpen, setModalOpen] = useState(false);
-    const [selectedTab, setSelectedTab] = useState<"instructor" | "structure" | "details"| "feature">("instructor");
+    const [selectedTab, setSelectedTab] = useState<"instructor" | "structure" | "details" | "feature">("instructor");
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
@@ -51,6 +49,7 @@ const CourseViewBanner: React.FC<CourseBannerProps> = ({
                         <button
                             onClick={closeModal}
                             className="absolute top-4 right-4 bg-gray-200 rounded-full p-2"
+                            aria-label="Close modal"
                         >
                             <X className="w-5 h-5 text-gray-600" />
                         </button>
@@ -82,23 +81,14 @@ const CourseViewBanner: React.FC<CourseBannerProps> = ({
                                         </div>
                                     </div>
                                     <div className="flex flex-wrap gap-4">
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-sm py-1 px-2 bg-white/20 text-white"
-                                        >
+                                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white flex items-center">
                                             <Clock className="w-4 h-4 mr-1" />
                                             {duration}
                                         </Badge>
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-sm py-1 px-2 bg-white/20 text-white"
-                                        >
+                                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
                                             {level}
                                         </Badge>
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-sm py-1 px-2 bg-white/20 text-white"
-                                        >
+                                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
                                             {category}
                                         </Badge>
                                     </div>
@@ -109,42 +99,17 @@ const CourseViewBanner: React.FC<CourseBannerProps> = ({
                         {/* Tab Navigation */}
                         <div className="p-6">
                             <div className="flex justify-center mb-4 space-x-4">
-                                <button
-                                    onClick={() => setSelectedTab("instructor")}
-                                    className={`px-4 py-2 rounded ${selectedTab === "instructor"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200"
-                                        }`}
-                                >
-                                    Instructor
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab("structure")}
-                                    className={`px-4 py-2 rounded ${selectedTab === "structure"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200"
-                                        }`}
-                                >
-                                    Course Structure
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab("details")}
-                                    className={`px-4 py-2 rounded ${selectedTab === "details"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200"
-                                        }`}
-                                >
-                                    Course Details
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTab("feature")}
-                                    className={`px-4 py-2 rounded ${selectedTab === "feature"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200"
-                                        }`}
-                                >
-                                    Course Feature
-                                </button>
+                                {["instructor", "structure", "details", "feature"].map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setSelectedTab(tab as any)}
+                                        aria-selected={selectedTab === tab}
+                                        className={`px-4 py-2 rounded ${selectedTab === tab ? "bg-blue-500 text-white" : "bg-gray-200"
+                                            }`}
+                                    >
+                                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                    </button>
+                                ))}
                             </div>
 
                             {/* Tab Content */}
@@ -162,4 +127,4 @@ const CourseViewBanner: React.FC<CourseBannerProps> = ({
     );
 };
 
-export default CourseViewBanner;
+export default CourseBanner;

@@ -11,7 +11,8 @@ export default function CourseFeature() {
     ]
 
     return (
-        <div className="p-6 border rounded-lg">
+        <div className="p-6">
+            <h2 className="text-xl font-bold mb-4">Course Features</h2>
             <div className="grid md:grid-cols-2 gap-4">
                 {features.map((feature, index) => (
                     <div key={index} className="flex items-start gap-2">

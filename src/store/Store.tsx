@@ -10,10 +10,13 @@ interface ModalStore {
     closeAnotherModal: () => void;
     changeCheckoutModal: () => void;
     toggleClicked: () => void;
+    isCourseModalOpen: boolean;
+    changeCourseModal: () => void;
 }
 
 const useModalStore = create<ModalStore>((set) => ({
     isCheckoutModalOpen: false,
+    isCourseModalOpen: false,
     isAnotherModalOpen: false,
     clicked: false,  // Initialize clicked state
 
@@ -23,7 +26,7 @@ const useModalStore = create<ModalStore>((set) => ({
     closeAnotherModal: () => set({ isAnotherModalOpen: false }),
 
     changeCheckoutModal: () => set((state) => ({ isCheckoutModalOpen: !state.isCheckoutModalOpen })),
-
+    changeCourseModal: () => set((state) => ({ isCourseModalOpen: !state.isCourseModalOpen })),
     // Toggle clicked state
     toggleClicked: () => set((state) => ({ clicked: !state.clicked })),
 }));
