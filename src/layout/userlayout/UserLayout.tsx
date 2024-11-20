@@ -66,7 +66,7 @@ const data = {
     },
     categories: [
         { id: "shopping", name: "shopping", icon: ShoppingCart },
-        { id: "pharmacy", name: "Pharmacy", icon: Pill },
+        { id: "course", name: "course", icon: Pill },
         { id: "cookups", name: "Cookups", icon: ChefHat },
         { id: "cookups2", name: "Cookups", icon: ChefHat },
         { id: "cookups3", name: "Cookups", icon: ChefHat },
@@ -91,24 +91,34 @@ const data = {
             },
             // ... other shopping categories
         ],
-        pharmacy: [
+        course: [
             {
-                title: "Medicines",
-                url: "/pharmacy/medicines",
-                icon: Pill,
-                isActive: true,
-                items: [
-                    { title: "Prescription Drugs", url: "/pharmacy/medicines/prescription-drugs" },
-                    { title: "Over-the-Counter", url: "/pharmacy/medicines/over-the-counter" },
-                    { title: "Vitamins & Supplements", url: "/pharmacy/medicines/vitamins-supplements" },
-                    { title: "Pain Relief", url: "/pharmacy/medicines/pain-relief" },
-                    { title: "Cold & Flu", url: "/pharmacy/medicines/cold-flu" },
-                    { title: "Antibiotics", url: "/pharmacy/medicines/antibiotics" },
-                    { title: "Allergy Medication", url: "/pharmacy/medicines/allergy-medication" },
-                    { title: "Digestive Health", url: "/pharmacy/medicines/digestive-health" },
-                ],
+                title: "Course",
+                
+                url: "/course/medicines",
+                // icon: Pill,
+                // isActive: true,
+                // items: [
+                //     { title: "SSC", url: "/course/medicines/prescription-drugs" },
+                //     { title: "HSC", url: "/course/medicines/over-the-counter" },
+                //     { title: "All", url: "/course/medicines/vitamins-supplements" },
+                //     { title: "Popular", url: "/course/medicines/pain-relief" },
+                   
+                // ],
             },
-            // ... other pharmacy categories
+            {
+                title: "SSC",
+            },
+            {
+                title: "SSC",
+            },
+            {
+                title: "SSC",
+            },
+            {
+                title: "SSC",
+            },
+            // ... other course categories
         ],
         cookups: [
             {
