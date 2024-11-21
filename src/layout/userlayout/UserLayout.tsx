@@ -69,8 +69,10 @@ const data = {
         { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
 
-        { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
-        { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
+        { id: "pharmacy", name: "Percel", icon: Pill, path: "/Percel" },
+        { id: "pharmacy", name: "Topup", icon: Pill, path: "/Percel" },
+        { id: "pharmacy", name: "Drive", icon: Pill, path: "/Percel" },
+        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/cookups" },
     ],
     navMain: {
         shopping: [
@@ -173,7 +175,7 @@ export default function UserLayout() {
                                     key={item.title}
                                     asChild
                                     defaultOpen={item.isActive}
-                                    className="group/collapsible"
+                                    className="group/collapsible "
                                 >
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>

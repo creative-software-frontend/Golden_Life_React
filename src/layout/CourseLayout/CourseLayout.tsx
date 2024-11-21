@@ -35,7 +35,7 @@ import Footer from "@/pages/common/Footer/Footer"
 
 const data = {
     categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
+        { id: "shoppingg", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
         { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
         { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },

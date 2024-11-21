@@ -163,8 +163,8 @@ export const routes = createBrowserRouter([
         ],
     },
     {
-        path: '/checkoutmodal',  // Separate route for Help page
-        element: <CheckoutModal />,
+        path: '/allcourses',  // Separate route for Help page
+        element: <AllCourses />,
     },
     {
         path: '/orderdetails',  // Separate route for Help page
