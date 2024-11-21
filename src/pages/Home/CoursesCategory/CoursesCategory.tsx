@@ -70,7 +70,7 @@ export default function Courses() {
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Courses</h2>
                 <Link
-                    to="/allcourses"
+                    to="/courses/allcourses"
                     className="text-white text-sm font-medium flex items-center hover:underline"
                 >
                     All Courses

@@ -103,8 +103,8 @@ export default function CourseLayout() {
                                 to={category.path}
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-primary-default border border-primary-default text-white"
-                                    : "border border-primary-default text-gray-700"
+                                        ? "bg-primary-default border border-primary-default text-white"
+                                        : "border border-primary-default text-gray-700"
                                     }`}
                                 aria-label={category.name}
                             >
@@ -116,9 +116,9 @@ export default function CourseLayout() {
                 </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>Courses</SidebarGroupLabel>
+                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
                         <SidebarMenu>
-                            {data.navMain.courses.map((item) => (
+                            {activeCategory === "courses" && data.navMain.courses.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild

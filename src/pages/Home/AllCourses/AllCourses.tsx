@@ -3,7 +3,8 @@
 import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Play } from 'lucide-react'
+import { Badge } from "@/components/ui/badge"
+import { Star, Clock, Users, X, Play } from 'lucide-react'
 import {
   Carousel,
   CarouselContent,
@@ -11,11 +12,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { image } from "react-router-dom"
-import useModalStore from "@/store/Store"
-import CourseViewBanner from "../CourseViewBanner/CourseViewBanner"
 import Coursecatagory2 from "../Coursecatagory2/Coursecatagory2"
+import CourseInstructor from "../Courseinstructor/CourseInstructor"
+import CoursePlan from "../CoursePlan/CoursePlan"
+import CourseDetails from "../CourseDetails/CourseDetails"
+import CourseFeatures from "../CourseFeature/CourseFeature"
 
 interface Lesson {
   type: string
@@ -25,135 +26,49 @@ interface Lesson {
   color: string
   badge: string
   image: string
-}
-interface CourseBannerProps {
-  title: string;
-  instructor: string;
-  rating: number;
-  studentsEnrolled: number;
-  duration: string;
-  level: string;
-  category: string;
-  backgroundImage?: string;
+  instructor: string
+  rating: number
+  studentsEnrolled: number
+  duration: string
+  level: string
+  category: string
 }
 
-
-const lessons: { hsc: Lesson[], ssc: Lesson[] } = {
-  hsc: [
-    {
-      type: "HSC উচ্চতর গণিত ১ম পত্র",
-      number: "2.1",
-      title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-purple-500",
-      badge: "HSC",
-      image: "../../../../public/image/Banner/Screenshot_3.png",
-    },
-    {
-      type: "HSC জীববিজ্ঞান ২য় পত্র",
-      number: "2.8",
-      title: "ঘাস ফড়িং এর মুখোপাঙ্গ, বক্ষ...",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-emerald-500",
-      badge: "HSC",
-      image: "/courses/hsc/biology/2.8",
-    },
-    {
-      type: "HSC জীববিজ্ঞান ২য় পত্র",
-      number: "2.8",
-      title: "ঘাস ফড়িং এর মুখোপাঙ্গ, বক্ষ...",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-emerald-500",
-      badge: "HSC",
-      image: "/courses/hsc/biology/2.8",
-    },
-    {
-      type: "HSC জীববিজ্ঞান ২য় পত্র",
-      number: "2.8",
-      title: "ঘাস ফড়িং এর মুখোপাঙ্গ, বক্ষ...",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-emerald-500",
-      badge: "HSC",
-      image: "/courses/hsc/biology/2.8",
-    },
-  ],
-  ssc: [
-    {
-      type: "SSC পদার্থবিজ্ঞান",
-      number: "8.1",
-      title: "আলোর প্রকৃতি",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-blue-500",
-      badge: "SSC",
-      image: "/courses/ssc/physics/8.1",
-    },
-    {
-      type: "SSC রসায়ন",
-      number: "1.1",
-      title: "জীবাশ্ম জ্বালানি",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-sky-500",
-      badge: "SSC",
-      image: "/courses/ssc/chemistry/1.1",
-    },
-    {
-      type: "SSC রসায়ন",
-      number: "1.1",
-      title: "জীবাশ্ম জ্বালানি",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-sky-500",
-      badge: "SSC",
-      image: "/courses/ssc/chemistry/1.1",
-    },
-    {
-      type: "SSC রসায়ন",
-      number: "1.1",
-      title: "জীবাশ্ম জ্বালানি",
-      thumbnail: "/placeholder.svg?height=200&width=400",
-      color: "bg-sky-500",
-      badge: "SSC",
-      image: "/courses/ssc/chemistry/1.1",
-    },
-  ],
-}
-
-
-const allCourses = [...lessons.hsc, ...lessons.ssc]
-
-// Modal Component
-// const Modal: React.FC<{ lesson: Lesson | null; onClose: () => void }> = ({
-//   lesson,
-//   onClose,
-// }) => {
-//   if (!lesson) return null
-
-//   return (
-//     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-//       <div className="bg-white p-6 rounded-md shadow-md max-w-lg w-full">
-//         <button
-//           onClick={onClose}
-//           className="absolute top-4 right-4 text-xl"
-//         >
-//           &times;
-//         </button>
-//         <h3 className="text-xl font-bold mb-4">{lesson.title}</h3>
-//         <img
-//           src={lesson.image}
-//           alt={lesson.title}
-//           className="w-full rounded-md mb-4"
-//         />
-//         <p className="text-sm text-gray-700 mb-4">{lesson.type}</p>
-//         <Button onClick={onClose}>Close</Button>
-//       </div>
-//     </div>
-//   )
-// }
+const lessons: Lesson[] = [
+  {
+    type: "HSC উচ্চতর গণিত ১ম পত্র",
+    number: "2.1",
+    title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
+    thumbnail: "/placeholder.svg?height=200&width=400",
+    color: "bg-purple-500",
+    badge: "HSC",
+    image: "../../../../public/image/Banner/Screenshot_3.png",
+    instructor: "Dr. Rahim Khan",
+    rating: 4.8,
+    studentsEnrolled: 1500,
+    duration: "8 weeks",
+    level: "Intermediate",
+    category: "Mathematics",
+  },
+  {
+    type: "SSC পদার্থবিজ্ঞান",
+    number: "8.1",
+    title: "আলোর প্রকৃতি",
+    thumbnail: "/placeholder.svg?height=200&width=400",
+    color: "bg-blue-500",
+    badge: "SSC",
+    image: "/courses/ssc/physics/8.1",
+    instructor: "Prof. Salma Begum",
+    rating: 4.7,
+    studentsEnrolled: 2000,
+    duration: "6 weeks",
+    level: "Beginner",
+    category: "Physics",
+  },
+  // Add more courses here...
+]
 
 const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (lesson: Lesson) => void }> = ({ courses, title, onSelect }) => {
-  const { isCourseModalOpen, changeCourseModal, changeCheckoutModal, clicked } = useModalStore();
-  console.log(isCourseModalOpen)
-
-
   return (
     <div className="mb-12">
       <h3 className="text-xl font-semibold mb-4">{title}</h3>
@@ -163,7 +78,6 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
           loop: true,
         }}
         className="w-full max-w-6xl mx-auto"
-      // onSelect={handleCourseSelect}
       >
         <CarouselContent>
           {courses.map((lesson, index) => (
@@ -172,7 +86,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
                 onClick={() => onSelect(lesson)}
                 className="cursor-pointer block"
               >
-                <Card onClick={changeCourseModal} className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
+                <Card className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
                   <CardContent className="p-0">
                     <div className="relative aspect-[2/1] bg-teal-100">
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -206,62 +120,114 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
 
 export default function AllCourses() {
   const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(null)
-  const { isCourseModalOpen, setIsCourseModalOpen, changeCourseModal, changeCheckoutModal, clicked } = useModalStore();
-  console.log(isCourseModalOpen, 'heta')
-  const [selectedCourse, setSelectedCourse] = React.useState<CourseBannerProps | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")
 
-  const handleCourseSelect = (course: CourseBannerProps) => {
-    setSelectedCourse(course);
-    setIsCourseModalOpen(true); // Assuming this controls the modal
-  };
+  const handleCourseSelect = (lesson: Lesson) => {
+    setSelectedLesson(lesson)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedLesson(null)
+  }
+
   return (
-   <>
+    <>
       <Coursecatagory2 />
       <div className="w-full md:max-w-[1040px] mt-8 mb-4">
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="flex justify-end text-end gap-4 mb-8 bg-gradient-to-br from-pink-50 to-purple-50 p-8">
-            <TabsTrigger value="all">All Courses</TabsTrigger>
-            <TabsTrigger value="hsc">HSC Courses</TabsTrigger>
-            <TabsTrigger value="ssc">SSC Courses</TabsTrigger>
-          </TabsList>
-          <TabsContent value="all">
-            <div className="space-y-12">
-              {/* <CourseCarousel courses={allCourses.slice(0, 4)} title="Featured Courses" onSelect={setSelectedLesson} /> */}
-              <CourseCarousel courses={allCourses.slice(4, 8)} title="Popular Courses" onSelect={setSelectedLesson} />
-              <CourseCarousel courses={allCourses} title="All Courses" onSelect={setSelectedLesson} />
+        <div className="space-y-12">
+          <CourseCarousel courses={lessons.slice(0, 4)} title="Featured Courses" onSelect={handleCourseSelect} />
+          <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} />
+          <CourseCarousel courses={lessons} title="All Courses" onSelect={handleCourseSelect} />
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && selectedLesson && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 bg-gray-200 rounded-full p-2 z-10"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+
+              {/* Banner Content */}
+              <div
+                className="relative mt-20 w-full h-[260px] bg-cover bg-center text-white"
+                style={{ backgroundImage: `url(${selectedLesson.image})` }}
+              >
+                <div className="absolute inset-0 bg-black opacity-60"></div>
+                <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
+                  <div className="space-y-6 text-start">
+                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+                      {selectedLesson.title}
+                    </h1>
+                    <p className="text-xl">
+                      Taught by <span className="font-semibold">{selectedLesson.instructor}</span>
+                    </p>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center">
+                        <Star className="w-5 h-5 text-yellow-400" />
+                        <span className="ml-1 font-medium">{selectedLesson.rating}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Users className="w-5 h-5" />
+                        <span className="ml-1">
+                          {selectedLesson.studentsEnrolled.toLocaleString()} students
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {selectedLesson.duration}
+                      </Badge>
+                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
+                        {selectedLesson.level}
+                      </Badge>
+                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
+                        {selectedLesson.category}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="p-2">
+                <div className="flex justify-center mb-4">
+                  <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
+                    {["instructor", "structure", "details", "feature"].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setSelectedTab(tab as any)}
+                        aria-selected={selectedTab === tab}
+                        className={`px-2 py-1 rounded-md transition-all duration-300 ${selectedTab === tab ? "bg-primary-default text-white" : "bg-gray-200 hover:bg-gray-300"
+                          }`}
+                      >
+                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tab Content */}
+                <div>
+                  {selectedTab === "instructor" && <CourseInstructor />}
+                  {selectedTab === "structure" && <CoursePlan />}
+                  {selectedTab === "details" && <CourseDetails />}
+                  {selectedTab === "feature" && <CourseFeatures />}
+                </div>
+              </div>
             </div>
-          </TabsContent>
-          <TabsContent value="hsc">
-            <div className="space-y-12">
-              <CourseCarousel courses={lessons.hsc} title="HSC Math" onSelect={setSelectedLesson} />
-            </div>
-          </TabsContent>
-          <TabsContent value="ssc">
-            <div className="space-y-12">
-              <CourseCarousel courses={lessons.ssc} title="SSC Math" onSelect={setSelectedLesson} />
-            </div>
-          </TabsContent>
-        </Tabs>
-        {/* {selectedLesson && (
-        <Modal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
-      )} */}
-        {/* // Pass props dynamically */}
-        {isCourseModalOpen && (
-          <CourseViewBanner
-          // title={selectedCourse?.title}
-          // instructor={selectedCourse?.instructor}
-          // rating={selectedCourse?.rating}
-          // studentsEnrolled={selectedCourse?.studentsEnrolled}
-          // duration={selectedCourse?.duration}
-          // level={selectedCourse?.level}
-          // category={selectedCourse?.category}
-          // backgroundImage={selectedCourse?.backgroundImage}
-          />
+          </div>
         )}
-        {
-          isCourseModalOpen && 'Selected Course Modal'
-        }
       </div>
-   </>
+    </>
   )
 }

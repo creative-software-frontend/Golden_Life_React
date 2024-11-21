@@ -31,6 +31,8 @@ import Courses from "@/pages/Home/CoursesCategory/CoursesCategory";
 import Coursecatagory2 from "@/pages/Home/Coursecatagory2/Coursecatagory2";
 // import Courses from './../pages/Home/CoursesCategory/CoursesCategory';
 import CourseCategories from "../pages/Home/CoursesCategory/CoursesCategory";
+import Hsc from "@/pages/Home/HSC/Hsc";
+import Ssc from "@/pages/Home/SSC/Ssc";
 
 
 
@@ -58,10 +60,7 @@ export const routes = createBrowserRouter([
                 path: 'allProducts',  // Separate route for Help page
                 element: <AllProduct />,
             },
-            {
-                path: 'allcourses',  // Separate route for Help page
-                element: <AllCourses />,
-            },
+            
      
 
 
@@ -78,6 +77,19 @@ export const routes = createBrowserRouter([
             {
                 path: '/courses',
                 element: < CourseCategories />
+            },
+            {
+                path: 'allcourses',  // Separate route for Help page
+                element: <AllCourses />,
+            },
+            {
+                path: 'hsc',
+                element: < Hsc />
+            },
+            
+            {
+                path: 'ssc',
+                element: < Ssc />
             },
             
 

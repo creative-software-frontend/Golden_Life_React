@@ -1,18 +1,14 @@
-"use client"
+'use client'
 
 import * as React from "react"
 import { useNavigate, Outlet, Link } from "react-router-dom"
-import logo from '../../../../public/image/logo/logo.jpg'
-import { BookOpen, Bot, ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, GraduationCap } from 'lucide-react'
+import logo from "/image/logo/logo.jpg" // Corrected path
+import { ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, GraduationCap, type LucideIcon } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
     Sidebar,
     SidebarContent,
@@ -33,11 +29,37 @@ import {
 import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
 
-const data = {
+interface Category {
+    id: string
+    name: string
+    icon: LucideIcon
+    path: string
+}
+
+interface SubItem {
+    title: string
+    url: string
+}
+
+interface NavItem {
+    title: string
+    url: string
+    icon: LucideIcon
+    isActive: boolean
+    items: SubItem[]
+}
+
+interface NavMain {
+    [key: string]: NavItem[]
+}
+
+const data: {
+    categories: Category[]
+    navMain: NavMain
+} = {
     categories: [
         { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-
         { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
         { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
     ],
@@ -54,62 +76,21 @@ const data = {
                     { title: "Herbs & Seasonings", url: "#" },
                 ],
             },
-            // ... other shopping categories
         ],
-        pharmacy: [
-            {
-                title: "Medicines",
-                url: "#",
-                icon: Pill,
-                isActive: true,
-                items: [
-                    { title: "Prescription Drugs", url: "#" },
-                    { title: "Over-the-Counter", url: "#" },
-                    { title: "Vitamins & Supplements", url: "#" },
-                ],
-            },
-            // ... other pharmacy categories
-        ],
-        cookups: [
-            {
-                title: "Ready Meals",
-                url: "#",
-                icon: ChefHat,
-                isActive: true,
-                items: [
-                    { title: "Breakfast", url: "#" },
-                    { title: "Lunch", url: "#" },
-                    { title: "Dinner", url: "#" },
-                ],
-            },
-            // ... other cookups categories
-        ],
-        courses: [
-            {
-                title: "Programming",
-                url: "#",
-                icon: Bot,
-                isActive: true,
-                items: [
-                    { title: "Web Development", url: "#" },
-                    { title: "Mobile App Development", url: "#" },
-                    { title: "Data Science", url: "#" },
-                ],
-            },
-            // ... other course categories
-        ],
-    }
+    },
 }
 
 export default function ShoppingLayout() {
-    const [activeCategory, setActiveCategory] = React.useState("shopping")
+    const [activeCategory, setActiveCategory] = React.useState<string>("shopping")
     const navigate = useNavigate()
 
     const handleCategoryChange = (categoryId: string) => {
         setActiveCategory(categoryId)
-        const category = data.categories.find(c => c.id === categoryId)
-        if (category) {
+        const category = data.categories.find((c) => c.id === categoryId)
+        if (category?.path) {
             navigate(category.path)
+        } else {
+            console.warn("Invalid category path.")
         }
     }
 
@@ -126,7 +107,7 @@ export default function ShoppingLayout() {
                         {data.categories.map((category) => (
                             <Link
                                 key={category.id}
-                                to={category.path} // Use the dynamic path from category
+                                to={category.path}
                                 onClick={() => handleCategoryChange(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                     ? "bg-primary-default border border-primary-default text-white"
@@ -139,12 +120,12 @@ export default function ShoppingLayout() {
                             </Link>
                         ))}
                     </div>
-                </div>;
+                </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                        <SidebarGroupLabel>{data.categories.find((c) => c.id === activeCategory)?.name}</SidebarGroupLabel>
                         <SidebarMenu>
-                            {data.navMain[activeCategory].map((item) => (
+                            {data.navMain[activeCategory]?.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild
@@ -181,32 +162,10 @@ export default function ShoppingLayout() {
                 <SidebarFooter>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton
-                                        size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
-                                                <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-teal-600">Help</span>
-                                            </Link>
-                                        </div>
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
-                                        <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2">
-                                                <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-blue-400">Login</span>
-                                            </button>
-                                        </div>
-                                    </SidebarMenuButton>
-                                </DropdownMenuTrigger>
-                            </DropdownMenu>
+                            <button className="flex items-center gap-2 px-4 py-2">
+                                <HelpCircleIcon />
+                                <span>Help</span>
+                            </button>
                         </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarFooter>

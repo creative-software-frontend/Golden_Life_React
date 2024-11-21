@@ -13,6 +13,7 @@ import {
     HelpCircleIcon,
     LogInIcon,
     ShoppingBag,
+    GraduationCap
 } from "lucide-react"
 import {
     Collapsible,
@@ -65,11 +66,11 @@ const data = {
         avatar: "/avatars/shadcn.jpg",
     },
     categories: [
-        { id: "shopping", name: "shopping", icon: ShoppingCart },
-        { id: "course", name: "course", icon: Pill },
-        { id: "cookups", name: "Cookups", icon: ChefHat },
-        { id: "cookups2", name: "Cookups", icon: ChefHat },
-        { id: "cookups3", name: "Cookups", icon: ChefHat },
+        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
+        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
+
+        { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
+        { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
     ],
     navMain: {
         shopping: [
@@ -106,18 +107,7 @@ const data = {
                    
                 // ],
             },
-            {
-                title: "SSC",
-            },
-            {
-                title: "SSC",
-            },
-            {
-                title: "SSC",
-            },
-            {
-                title: "SSC",
-            },
+         
             // ... other course categories
         ],
         cookups: [
