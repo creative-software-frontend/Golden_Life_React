@@ -10,8 +10,8 @@ const CourseStructure: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto my-8">
-            <div className="p-4 bg-gray-100 rounded shadow-md">
+        <div className="container mx-auto  h-[450px]">
+            <div className="p-2 bg-gray-100 rounded shadow-md">
                 <h2 className="text-lg font-bold mt-20">কোর্সটি কিভাবে সাজানো হয়েছে</h2>
                 <div className="grid grid-cols-2 gap-4 mt-4 mx-auto">
                     <div className="flex items-center">
@@ -41,15 +41,15 @@ const CourseStructure: React.FC = () => {
                 </div>
 
                 {/* Open Course Outline Button */}
-                <button
+                {/* <button
                     onClick={openCourseOutline}
                     className="mt-4 px-6 py-2 bg-primary-default text-white rounded-lg transition-all"
                 >
                     Open Course Outline
-                </button>
+                </button> */}
 
                 {/* Conditionally render CourseOutline */}
-                {showCourseOutline && <CourseOutline />}
+                {/* {showCourseOutline && <CourseOutline />} */}
             </div>
         </div>
     );

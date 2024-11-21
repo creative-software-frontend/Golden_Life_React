@@ -11,7 +11,7 @@ export default function CourseFeature() {
     ]
 
     return (
-        <div className="p-6">
+        <div className="p-6 h-[450px]">
             <h2 className="text-xl font-bold mb-4">Course Features</h2>
             <div className="grid md:grid-cols-2 gap-4">
                 {features.map((feature, index) => (

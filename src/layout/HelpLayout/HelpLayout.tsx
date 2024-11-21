@@ -14,6 +14,7 @@ import {
     HelpCircleIcon,
     LogInIcon,
     XCircle,
+    GraduationCap
 } from "lucide-react"
 import {
     Collapsible,
@@ -53,11 +54,11 @@ const data = {
         avatar: "/avatars/shadcn.jpg",
     },
     categories: [
-        { id: "shopping", name: "shopping", icon: ShoppingCart },
-        { id: "pharmacy", name: "Pharmacy", icon: Pill },
-        { id: "cookups", name: "Cookups", icon: ChefHat },
-        { id: "cookups2", name: "Cookups", icon: ChefHat },
-        { id: "cookups3", name: "Cookups", icon: ChefHat },
+        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
+        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
+
+        { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
+        { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
     ],
     navMain: {
         shopping: [
@@ -319,8 +320,9 @@ export default function HelpLayout() {
                 <div className="px-4 py-3 border-b ">
                     <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
                         {data.categories.map((category) => (
-                            <button
+                            <Link
                                 key={category.id}
+                                to={category.path}
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                     ? "bg-primary-default border border-primary-default text-white"
@@ -330,7 +332,7 @@ export default function HelpLayout() {
                             >
                                 <category.icon className="h-6 w-6 mb-1" />
                                 <span className="text-xs">{category.name}</span>
-                            </button>
+                            </Link>
                         ))}
                     </div>
                 </div>

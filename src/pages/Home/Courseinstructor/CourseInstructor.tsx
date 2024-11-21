@@ -2,7 +2,7 @@ import React from 'react';
 
 // Instructor Component
 const CourseInstructor: React.FC = () => (
-    <div className="p-6 border rounded-lg">
+    <div className="p-6 border rounded-lg h-[450px]">
         <div className="flex items-start gap-4">
             <img
                 src="../../../../public/image/courses/instructor.jpeg"

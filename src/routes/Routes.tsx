@@ -21,11 +21,18 @@ import Overview from "@/pages/Dashboard/Overview/Overview";
 import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
+import CourseLayout from "@/layout/CourseLayout/CourseLayout";
 // import PhoneNumberInput from "@/pages/phonenumberinput/phonenumberinput";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
 // import BannerSection from "@/pages/Home/BannerSection/BannerSection";
+import Courses from "@/pages/Home/CoursesCategory/CoursesCategory";
+import Coursecatagory2 from "@/pages/Home/Coursecatagory2/Coursecatagory2";
+// import Courses from './../pages/Home/CoursesCategory/CoursesCategory';
+import CourseCategories from "../pages/Home/CoursesCategory/CoursesCategory";
+
+
 
 export const routes = createBrowserRouter([
     {
@@ -56,6 +63,24 @@ export const routes = createBrowserRouter([
                 element: <AllCourses />,
             },
      
+
+
+        ]
+
+    },
+    {
+        path: '/courses',
+        element: <CourseLayout />,
+
+
+        children: [
+
+            {
+                path: '/courses',
+                element: < CourseCategories />
+            },
+            
+
 
 
         ]

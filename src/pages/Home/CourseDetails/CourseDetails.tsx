@@ -34,7 +34,7 @@ export default function CourseDetails() {
     ]
 
     return (
-        <div className="p-6 border rounded-lg">
+        <div className="p-6 border rounded-lg h-[450px]">
             <Accordion type="single" collapsible className="space-y-2">
                 {faqItems.map((item, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>

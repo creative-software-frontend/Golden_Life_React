@@ -43,7 +43,7 @@ const CourseBanner: React.FC<CourseBannerProps> = ({
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ">
                     <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
                         {/* Close Button */}
                         <button
@@ -56,7 +56,7 @@ const CourseBanner: React.FC<CourseBannerProps> = ({
 
                         {/* Banner Content */}
                         <div
-                            className="relative w-full h-[400px] bg-cover bg-center text-white"
+                            className="relative mt-20 w-full h-[260px] bg-cover bg-center text-white"
                             style={{ backgroundImage: `url(${backgroundImage})` }}
                         >
                             <div className="absolute inset-0 bg-black opacity-60"></div>
@@ -97,19 +97,21 @@ const CourseBanner: React.FC<CourseBannerProps> = ({
                         </div>
 
                         {/* Tab Navigation */}
-                        <div className="p-6">
-                            <div className="flex justify-center mb-4 space-x-4">
-                                {["instructor", "structure", "details", "feature"].map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setSelectedTab(tab as any)}
-                                        aria-selected={selectedTab === tab}
-                                        className={`px-4 py-2 rounded ${selectedTab === tab ? "bg-blue-500 text-white" : "bg-gray-200"
-                                            }`}
-                                    >
-                                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                                    </button>
-                                ))}
+                        <div className="p-2">
+                            <div className="flex justify-center mb-4">
+                                <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
+                                    {["instructor", "structure", "details", "feature"].map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setSelectedTab(tab as any)}
+                                            aria-selected={selectedTab === tab}
+                                            className={`px-2 py-1 rounded-md transition-all duration-300 ${selectedTab === tab ? "bg-primary-default text-white" : "bg-gray-200 hover:bg-gray-300"
+                                                }`}
+                                        >
+                                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Tab Content */}
@@ -120,6 +122,7 @@ const CourseBanner: React.FC<CourseBannerProps> = ({
                                 {selectedTab === "feature" && <CourseFeatures />}
                             </div>
                         </div>
+
                     </div>
                 </div>
             )}

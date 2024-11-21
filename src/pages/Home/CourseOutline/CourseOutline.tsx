@@ -79,7 +79,7 @@ const CourseOutline = () => {
             </button>
 
             {/* Course Content */}
-            <div className="p-4 bg-gray-100 rounded shadow-md">
+            <div className="p-4 bg-gray-100 rounded shadow-md h-[450px]">
                 <h2 className="text-2xl font-bold mb-4">Our popular courses</h2>
                 <div className="flex items-center justify-between mb-6">
                     <div className="max-w-2xl">

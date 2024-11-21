@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
 import * as React from "react"
-import { useNavigate, Outlet, Link } from "react-router-dom"
-import logo from '../../../../public/image/logo/logo.jpg'
+import { Link, Outlet } from "react-router-dom"
+import logo from '../../../public/image/logo/logo.jpg'
 import { BookOpen, Bot, ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, GraduationCap } from 'lucide-react'
 import {
     Collapsible,
@@ -37,81 +37,55 @@ const data = {
     categories: [
         { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-
         { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
         { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
     ],
     navMain: {
-        shopping: [
-            {
-                title: "Fruits & Vegetables",
-                url: "#",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    { title: "Fresh Fruits", url: "#" },
-                    { title: "Fresh Vegetables", url: "#" },
-                    { title: "Herbs & Seasonings", url: "#" },
-                ],
-            },
-            // ... other shopping categories
-        ],
-        pharmacy: [
-            {
-                title: "Medicines",
-                url: "#",
-                icon: Pill,
-                isActive: true,
-                items: [
-                    { title: "Prescription Drugs", url: "#" },
-                    { title: "Over-the-Counter", url: "#" },
-                    { title: "Vitamins & Supplements", url: "#" },
-                ],
-            },
-            // ... other pharmacy categories
-        ],
-        cookups: [
-            {
-                title: "Ready Meals",
-                url: "#",
-                icon: ChefHat,
-                isActive: true,
-                items: [
-                    { title: "Breakfast", url: "#" },
-                    { title: "Lunch", url: "#" },
-                    { title: "Dinner", url: "#" },
-                ],
-            },
-            // ... other cookups categories
-        ],
         courses: [
             {
                 title: "Programming",
-                url: "#",
-                icon: Bot,
+                url: "/courses/programming",
+                icon: SquareTerminal,
                 isActive: true,
                 items: [
-                    { title: "Web Development", url: "#" },
-                    { title: "Mobile App Development", url: "#" },
-                    { title: "Data Science", url: "#" },
+                    { title: "Web Development", url: "/courses/programming/web-development" },
+                    { title: "Mobile App Development", url: "/courses/programming/mobile-development" },
+                    { title: "Data Science", url: "/courses/programming/data-science" },
+                    { title: "Machine Learning", url: "/courses/programming/machine-learning" },
+                    { title: "Game Development", url: "/courses/programming/game-development" },
+                    { title: "Cloud Computing", url: "/courses/programming/cloud-computing" },
                 ],
             },
-            // ... other course categories
+            {
+                title: "Business",
+                url: "/courses/business",
+                icon: BookOpen,
+                items: [
+                    { title: "Entrepreneurship", url: "/courses/business/entrepreneurship" },
+                    { title: "Marketing", url: "/courses/business/marketing" },
+                    { title: "Finance", url: "/courses/business/finance" },
+                    { title: "Project Management", url: "/courses/business/project-management" },
+                    { title: "Leadership", url: "/courses/business/leadership" },
+                ],
+            },
+            {
+                title: "Design",
+                url: "/courses/design",
+                icon: Bot,
+                items: [
+                    { title: "Graphic Design", url: "/courses/design/graphic-design" },
+                    { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
+                    { title: "3D Modeling", url: "/courses/design/3d-modeling" },
+                    { title: "Animation", url: "/courses/design/animation" },
+                    { title: "Illustration", url: "/courses/design/illustration" },
+                ],
+            },
         ],
     }
 }
 
-export default function ShoppingLayout() {
-    const [activeCategory, setActiveCategory] = React.useState("shopping")
-    const navigate = useNavigate()
-
-    const handleCategoryChange = (categoryId: string) => {
-        setActiveCategory(categoryId)
-        const category = data.categories.find(c => c.id === categoryId)
-        if (category) {
-            navigate(category.path)
-        }
-    }
+export default function CourseLayout() {
+    const [activeCategory, setActiveCategory] = React.useState("courses")
 
     return (
         <SidebarProvider>
@@ -126,8 +100,8 @@ export default function ShoppingLayout() {
                         {data.categories.map((category) => (
                             <Link
                                 key={category.id}
-                                to={category.path} // Use the dynamic path from category
-                                onClick={() => handleCategoryChange(category.id)}
+                                to={category.path}
+                                onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                     ? "bg-primary-default border border-primary-default text-white"
                                     : "border border-primary-default text-gray-700"
@@ -139,12 +113,12 @@ export default function ShoppingLayout() {
                             </Link>
                         ))}
                     </div>
-                </div>;
+                </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                        <SidebarGroupLabel>Courses</SidebarGroupLabel>
                         <SidebarMenu>
-                            {data.navMain[activeCategory].map((item) => (
+                            {data.navMain.courses.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild
@@ -154,7 +128,7 @@ export default function ShoppingLayout() {
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
                                             <SidebarMenuButton tooltip={item.title}>
-                                                {item.icon && <item.icon />}
+                                                {item.icon && <item.icon className="mr-2" />}
                                                 <span>{item.title}</span>
                                                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                             </SidebarMenuButton>
@@ -213,7 +187,7 @@ export default function ShoppingLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <main className="pt-6 -ms-20">
+                <main className="pt-8 -ms-2">
                     <Header />
                     <Outlet />
                     <Footer />
