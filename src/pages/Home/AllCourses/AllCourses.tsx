@@ -138,8 +138,8 @@ export default function AllCourses() {
       <Coursecatagory2 />
       <div className="w-full md:max-w-[1040px] mt-8 mb-4">
         <div className="space-y-12">
-          <CourseCarousel courses={lessons.slice(0, 4)} title="Featured Courses" onSelect={handleCourseSelect} />
-          <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} />
+          <CourseCarousel courses={lessons.slice(0, 4)} title="Popular Courses" onSelect={handleCourseSelect} />
+          {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} /> */}
           <CourseCarousel courses={lessons} title="All Courses" onSelect={handleCourseSelect} />
         </div>
 

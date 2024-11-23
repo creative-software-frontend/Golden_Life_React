@@ -43,6 +43,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import { Link, Outlet, useLocation } from "react-router-dom"
+import useModalStore from "@/store/Store"
 
 
 
@@ -256,6 +257,8 @@ function classNames(...classes) {
 export default function HelpLayout() {
     const [activeCategory, setActiveCategory] = React.useState("shopping")
     const location = useLocation();
+    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+
 
     // Function to render the banner based on the current path
     const getBannerForPage = () => {
@@ -398,7 +401,7 @@ export default function HelpLayout() {
 
                                         {/* Right Side: Login Button */}
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2">
+                                            <button className="flex items-center gap-2" onClick={openLoginModal}>
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
                                                 </div>

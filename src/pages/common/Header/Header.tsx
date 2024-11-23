@@ -3,13 +3,17 @@ import { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import logo from '../../../../public/image/logo/logo.jpg';
 import { Link } from 'react-router-dom';
+import useModalStore from '@/store/Store';
 
 const Header: React.FC = () => {
+    const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    console.log(isModalOpen)
     const [step, setStep] = useState(1);
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", ""]);
@@ -32,12 +36,16 @@ const Header: React.FC = () => {
     const handleVerify = () => {
         setStep(3);
     };
+    console.log(handleVerify)
 
+    // const handleSubmit = () => {
+    //     alert("Successfully logged in");
+    //     setIsModalOpen(false);
+    // };
     const handleSubmit = () => {
         alert("Successfully logged in");
-        setIsModalOpen(false);
+        closeLoginModal(); // Use Zustand store to close the modal
     };
-
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
     };
@@ -113,7 +121,7 @@ const Header: React.FC = () => {
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={() => setIsModalOpen(true)} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
+                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
                                 <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
@@ -129,7 +137,7 @@ const Header: React.FC = () => {
                 </div>
             </header>
 
-            <Transition.Root show={isModalOpen} as={Fragment}>
+            <Transition.Root show={isLoginModalOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setIsModalOpen}>
                     <Transition.Child
                         as={Fragment}
@@ -158,7 +166,7 @@ const Header: React.FC = () => {
                                     <button
                                         type="button"
                                         className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
-                                        onClick={() => setIsModalOpen(false)}
+                                        onClick={closeLoginModal}
                                     >
                                         Close
                                     </button>

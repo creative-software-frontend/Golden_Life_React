@@ -3,18 +3,7 @@
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import {
-
-    ChevronRight,
-    SquareTerminal,
-    ShoppingCart,
-    Pill,
-    ChefHat,
-    HelpCircleIcon,
-    LogInIcon,
-    ShoppingBag,
-    GraduationCap
-} from "lucide-react"
+import { ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, GraduationCap } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -46,18 +35,6 @@ import Header from "@/pages/common/Header/Header"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
-// import Header from "@/pages/common/Footer/Header/Header"
-// import HeroSection from "@/pages/Home/HeroSection/HeroSection"
-// import BannerSection from '@/pages/Home/BannerSection/BannerSection'
-// import Categories from "@/pages/Home/Categories/Categories"
-// import ProductCategories from "@/pages/Home/ProductCategories/ProductCategories"
-// import FreshSell from "@/pages/Home/FreshSell/FreshSell"
-// import Footer from "@/pages/common/Footer/Footer"
-// import Cart from "@/pages/Home/Cart/Cart"
-// import LiveChat from "@/pages/LiveChat/Livechat"
-
-// This is sample data.
-
 
 const data = {
     user: {
@@ -68,11 +45,10 @@ const data = {
     categories: [
         { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-
-        { id: "pharmacy", name: "Percel", icon: Pill, path: "/Percel" },
-        { id: "pharmacy", name: "Topup", icon: Pill, path: "/Percel" },
-        { id: "pharmacy", name: "Drive", icon: Pill, path: "/Percel" },
-        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/cookups" },
+        { id: "percel", name: "Percel", icon: Pill, path: "/percel" },
+        { id: "topup", name: "Topup", icon: Pill, path: "/topup" },
+        { id: "drive", name: "Drive", icon: Pill, path: "/drive" },
+        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
     ],
     navMain: {
         shopping: [
@@ -92,26 +68,16 @@ const data = {
                     { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
                 ],
             },
-            // ... other shopping categories
         ],
         course: [
             {
                 title: "Course",
-                
                 url: "/course/medicines",
-                // icon: Pill,
-                // isActive: true,
-                // items: [
-                //     { title: "SSC", url: "/course/medicines/prescription-drugs" },
-                //     { title: "HSC", url: "/course/medicines/over-the-counter" },
-                //     { title: "All", url: "/course/medicines/vitamins-supplements" },
-                //     { title: "Popular", url: "/course/medicines/pain-relief" },
-                   
-                // ],
             },
-         
-            // ... other course categories
         ],
+        percel: [],
+        topup: [],
+        drive: [],
         cookups: [
             {
                 title: "Ready Meals",
@@ -129,15 +95,13 @@ const data = {
                     { title: "Snacks", url: "/cookups/ready-meals/snacks" },
                 ],
             },
-            // ... other cookups categories
         ],
+        outlet: [],
     }
 }
 
-
 export default function UserLayout() {
-    const { changeCheckoutModal } = useModalStore();
-
+    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("shopping")
 
     return (
@@ -151,8 +115,10 @@ export default function UserLayout() {
                 <div className="px-4 py-3 border-b ">
                     <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
                         {data.categories.map((category) => (
-                            <button
+                            <Link
                                 key={category.id}
+                                to={category.path}
+
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                     ? "bg-primary-default border border-primary-default text-white"
@@ -162,15 +128,15 @@ export default function UserLayout() {
                             >
                                 <category.icon className="h-6 w-6 mb-1" />
                                 <span className="text-xs">{category.name}</span>
-                            </button>
+                            </Link>
                         ))}
                     </div>
                 </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                        {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
-                            {data.navMain[activeCategory].map((item) => (
+                            {data.navMain[activeCategory as keyof typeof data.navMain]?.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild
@@ -223,7 +189,7 @@ export default function UserLayout() {
                                         </div>
                                         <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
                                         <div className="flex items-center gap-2">
-                                            <Link to="/login" className="flex items-center gap-2">
+                                            <Link to='' onClick={openLoginModal} className="flex items-center gap-2">
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" />
                                                 </div>
@@ -240,8 +206,6 @@ export default function UserLayout() {
             </Sidebar>
             <SidebarInset>
                 <main className="pt-6 ">
-
-
                     <button
                         onClick={changeCheckoutModal}
                         className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
@@ -267,3 +231,4 @@ export default function UserLayout() {
         </SidebarProvider>
     )
 }
+

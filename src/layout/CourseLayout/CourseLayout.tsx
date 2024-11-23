@@ -32,13 +32,16 @@ import {
 } from "@/components/ui/sidebar"
 import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
+import useModalStore from "@/store/Store"
 
 const data = {
     categories: [
         { id: "shoppingg", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
-        { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
+        { id: "percel", name: "Percel", icon: Pill, path: "/percel" },
+        { id: "topup", name: "Topup", icon: Pill, path: "/topup" },
+        { id: "drive", name: "Drive", icon: Pill, path: "/drive" },
+        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
     ],
     navMain: {
         courses: [
@@ -86,6 +89,7 @@ const data = {
 
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
+    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
 
     return (
         <SidebarProvider>
@@ -103,8 +107,8 @@ export default function CourseLayout() {
                                 to={category.path}
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                        ? "bg-primary-default border border-primary-default text-white"
-                                        : "border border-primary-default text-gray-700"
+                                    ? "bg-primary-default border border-primary-default text-white"
+                                    : "border border-primary-default text-gray-700"
                                     }`}
                                 aria-label={category.name}
                             >
@@ -171,7 +175,7 @@ export default function CourseLayout() {
                                         </div>
                                         <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2">
+                                            <button className="flex items-center gap-2" onClick={openLoginModal}>
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" />
                                                 </div>

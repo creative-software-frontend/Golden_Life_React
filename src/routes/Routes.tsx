@@ -13,12 +13,12 @@ import AllCategories from "@/pages/Home/AllCategories/AllCategories";
 import ProductPage from "@/pages/Home/ProductPage/ProductPage";
 import Home from "@/pages/Home/Home/Home";
 import AllProduct from "@/pages/Home/AllProducts/AllProducts";
-import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
-import TrendingCategory from "@/pages/Home/TrendingCategory/TrendingCategory";
+// import CheckoutModal from "@/pages/Home/CheckoutModal/CheckoutModal";
+// import TrendingCategory from "@/pages/Home/TrendingCategory/TrendingCategory";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
 import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 import Overview from "@/pages/Dashboard/Overview/Overview";
-import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
+// import AutoScrollIcons from "@/pages/Home/ScrollCategories/ScrollCategories";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 import CourseLayout from "@/layout/CourseLayout/CourseLayout";
@@ -28,11 +28,12 @@ import CourseLayout from "@/layout/CourseLayout/CourseLayout";
 // import HeroSection from "@/pages/Home/HeroSection/HeroSection";
 // import BannerSection from "@/pages/Home/BannerSection/BannerSection";
 import Courses from "@/pages/Home/CoursesCategory/CoursesCategory";
-import Coursecatagory2 from "@/pages/Home/Coursecatagory2/Coursecatagory2";
+// import Coursecatagory2 from "@/pages/Home/Coursecatagory2/Coursecatagory2";
 // import Courses from './../pages/Home/CoursesCategory/CoursesCategory';
-import CourseCategories from "../pages/Home/CoursesCategory/CoursesCategory";
+// import CourseCategories from "../pages/Home/CoursesCategory/CoursesCategory";
 import Hsc from "@/pages/Home/HSC/Hsc";
 import Ssc from "@/pages/Home/SSC/Ssc";
+import Course from "@/pages/Home/Course/Course";
 
 
 
@@ -76,12 +77,12 @@ export const routes = createBrowserRouter([
 
             {
                 path: '/courses',
-                element: < CourseCategories />
+                element: < Course/>
             },
-            {
-                path: 'allcourses',  // Separate route for Help page
-                element: <AllCourses />,
-            },
+            // {
+            //     path: 'allcourses',  // Separate route for Help page
+            //     element: <AllCourses />,
+            // },
             {
                 path: 'hsc',
                 element: < Hsc />

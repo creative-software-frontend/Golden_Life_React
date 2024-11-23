@@ -42,7 +42,7 @@ const Footer = () => {
                             placeholder=" Phone Number"
                             value={value}
                             onChange={setValue}
-                            defaultCountry="US"
+                            defaultCountry="BD"
                             international
                             className="w-full px-2 py-2 border border-gray-400 rounded-lg bg-white PhoneInputInput:focus"
                         />

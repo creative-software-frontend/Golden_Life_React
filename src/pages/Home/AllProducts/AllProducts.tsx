@@ -198,7 +198,7 @@ const products: Product[] = [
 export default function AllProduct() {
     const { id } = useParams<{ id: string }>();
     const productId = Number(id);
-    const { isCheckoutModalOpen, changeCheckoutModal, clicked ,toggleClicked} = useModalStore();
+    const { isCheckoutModalOpen, changeCheckoutModal, openBuyNow, toggleBuyNow,toggleClicked} = useModalStore();
 
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
