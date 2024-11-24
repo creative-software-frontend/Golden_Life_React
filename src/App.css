@@ -41,7 +41,7 @@
   color: #888;
 }
 .scrool {
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   height: 100vh;
   scrollbar-width: none;
 }

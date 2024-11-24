@@ -257,7 +257,7 @@ function classNames(...classes) {
 export default function HelpLayout() {
     const [activeCategory, setActiveCategory] = React.useState("shopping")
     const location = useLocation();
-    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+    const { openLoginModal } = useModalStore();
 
 
     // Function to render the banner based on the current path
@@ -310,6 +310,7 @@ export default function HelpLayout() {
     const filteredFaqs = faqs.filter(faq =>
         faq.question.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    console.log(filteredFaqs);
     return (
         // <div className="flex h-screen">
         <SidebarProvider className=''>

@@ -17,7 +17,7 @@ import CourseInstructor from "../Courseinstructor/CourseInstructor"
 import CoursePlan from "../CoursePlan/CoursePlan"
 import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
-import useModalStore from "@/store/Store"
+// import useModalStore from "@/store/Store"
 
 interface Lesson {
   type: string
@@ -120,7 +120,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
 }
 
 export default function AllCourses() {
-  const { closeLoginModal } = useModalStore()
+  // const { closeLoginModal } = useModalStore()
   const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")

@@ -79,10 +79,7 @@ export const routes = createBrowserRouter([
                 path: '/courses',
                 element: < Course/>
             },
-            // {
-            //     path: 'allcourses',  // Separate route for Help page
-            //     element: <AllCourses />,
-            // },
+            
             {
                 path: 'hsc',
                 element: < Hsc />

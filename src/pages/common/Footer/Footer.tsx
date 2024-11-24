@@ -16,18 +16,18 @@ const Footer = () => {
                 <div>
                     <h3 className="font-bold text-xl mb-4 text-gray-600">About Golden Life</h3>
                     <ul className="space-y-2">
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">Our Story</Link></li>
+                        <li><Link to="/help/our-story" className="text-gray-600 hover:text-gray-900">Our Story</Link></li>
                         <li><Link to="#" className="text-gray-600 hover:text-gray-900">Team</Link></li>
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link></li>
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">Terms of Use</Link></li>
+                        <li><Link to="/help/privacy-policy" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link></li>
+                        <li><Link to="/help/terms" className="text-gray-600 hover:text-gray-900">Terms of Use</Link></li>
                     </ul>
                 </div>
                 <div>
                     <h3 className="font-bold text-xl mb-4 text-gray-600">Customer Service</h3>
                     <ul className="space-y-2">
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">Contact Us</Link></li>
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">FAQ</Link></li>
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">Help</Link></li>
+                        <li><Link to="/help/contact" className="text-gray-600 hover:text-gray-900">Contact Us</Link></li>
+                        <li><Link to="/help" className="text-gray-600 hover:text-gray-900">FAQ</Link></li>
+                        <li><Link to="/help" className="text-gray-600 hover:text-gray-900">Help</Link></li>
                     </ul>
                 </div>
                 <div>

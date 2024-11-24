@@ -18,7 +18,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
@@ -89,7 +88,7 @@ const data = {
 
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
-    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+    const { openLoginModal} = useModalStore();
 
     return (
         <SidebarProvider>
@@ -120,7 +119,7 @@ export default function CourseLayout() {
                 </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                        {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
                             {activeCategory === "courses" && data.navMain.courses.map((item) => (
                                 <Collapsible

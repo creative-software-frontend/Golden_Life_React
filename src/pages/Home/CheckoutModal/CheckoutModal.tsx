@@ -161,10 +161,6 @@ export default function CheckoutModal() {
             setItems(JSON.parse(storedItems));
         }
     }, []);
-
-  
-
-
     const updateQuantity = (id: number, quantity: number) => {
         const updatedItems = items.map(item =>
             item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
@@ -297,7 +293,7 @@ export default function CheckoutModal() {
                             I accept the{" "}
                             <Link
                                 to="/help/privacy-policy"
-                                target="_blank"
+                                target=""
                                 rel="noopener noreferrer"
                                 className="text-primary underline"
                             >
@@ -305,7 +301,7 @@ export default function CheckoutModal() {
                             </Link>
                             <Link
                                 to="/help/terms"
-                                target="_blank"
+                                target=""
                                 rel="noopener noreferrer"
                                 className="text-primary underline"
                             >
@@ -355,9 +351,12 @@ export default function CheckoutModal() {
     )
 
     const AddressForm = () => (
+
+        
         <div className="max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
             <form onSubmit={handleSaveAddress} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
+                 
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input

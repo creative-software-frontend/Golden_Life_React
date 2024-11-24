@@ -19,9 +19,9 @@ interface Course {
 const courses: Course[] = [
     {
         id: '1',
-        title: 'স্পোকেন ইংলিশ',
+        title: 'Spoken English',
         instructor: 'Sarah Rahman',
-        price: '১,৬৯০',
+        price: '1,690',
         promoCode: 'SE1690',
         image: '../../../../public/image/Banner/Screenshot_3.png',
 
@@ -30,39 +30,39 @@ const courses: Course[] = [
         id: '2',
         title: 'IELTS',
         instructor: 'Munzereen Shahid',
-        price: '৩,৮৫০',
+        price: '3,850',
         promoCode: 'IELTS3850',
         image: '../../../../public/image/Banner/Screenshot_3.png',
     },
     {
         id: '3',
-        title: 'ইমেইল মার্কেটিং',
+        title: 'Email Marketing',
         instructor: 'Faria Ahmed',
-        price: '১,৬৯০',
+        price: '1,690',
         promoCode: 'EMKF1690',
         image: '../../../../public/image/Banner/Screenshot_3.png',
     },
     {
         id: '4',
-        title: 'ফেসবুক মার্কেটিং',
+        title: 'Facebook Marketing',
         instructor: 'Ayman Sadiq & Sadman Sadiq',
-        price: '৮৯০',
+        price: '890',
         promoCode: 'FBM890',
         image: '../../../../public/image/Banner/Screenshot_3.png',
     },
     {
         id: '5',
-        title: 'গ্রাফিক ডিজাইন',
+        title: 'Graphic Design',
         instructor: 'Rafiq Islam',
-        price: '১,৯৫০',
+        price: '1,950',
         promoCode: 'GDF1950',
         image: '../../../../public/image/Banner/Screenshot_3.png',
     },
     {
         id: '6',
-        title: 'ইউটিউব মার্কেটিং',
+        title: 'YouTube Marketing',
         instructor: 'Karim Hassan',
-        price: '১,৯৫০',
+        price: '1,950',
         promoCode: 'YT1950',
         image: '../../../../public/image/Banner/Screenshot_3.png',
     },
@@ -80,46 +80,46 @@ export default function FeaturedCourse() {
     }, [emblaApi])
 
     return (
-        <div className="w-full md:max-w-[1040px] bg-primary-default min-h-screen py-12 mb-4">
+        <div className="w-full md:max-w-[1040px] min-h-screen py-12 mb-4">
             <div className="container mx-auto px-4">
-                <h1 className="text-4xl font-bold text-white mb-4">
-                    স্কিল ডেভেলপমেন্টের নির্দিষ্ট কোর্সে দারুণ ছাড়!
+                <h1 className="text-4xl font-bold text-black mb-4">
+                    Amazing Discounts on Skill Development Courses!
                 </h1>
-                <p className="text-gray-300 mb-8">
-                    পুরো মাস জুড়ে চেন মিনিট স্কুলের নির্দিষ্ট কোর্সসমূহ পেয়ে যান বিশেষ মূল্যে। এবার শেখার শুরু হোক চেন মিনিট স্কুলের সাথে!
+                <p className="text-black mb-8">
+                    Enjoy special prices on selected 10 Minute School courses throughout the month. Start learning now with Creative Software!
                 </p>
 
                 <div className="relative">
                     <div className="overflow-hidden" ref={emblaRef}>
                         <div className="flex">
                             {courses.map((course) => (
-                                <div key={course.id} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] px-4">
-                                    <Card className="bg-gradient-to-br from-gray-500 to-black border-0">
+                                <div key={course.id} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_33.33%] px-4">
+                                    <Card className=" border-0 shadow mb-4">
                                         <CardContent className="p-0 relative">
                                             <div className="relative aspect-[3/4]">
                                                 <img
                                                     src={course.image}
                                                     alt={course.title}
-                                                    className="w-full h-full object-cover rounded-t-lg"
+                                                    className="w-[500px] h-[300px] object-cover rounded-t-lg"
                                                 />
-                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                                                    <h3 className="text-xl font-bold text-white mb-2">{course.title}</h3>
-                                                    <p className="text-gray-300 text-sm">{course.instructor}</p>
+                                                <div className="absolute bottom-0 left-0 right-0  p-4">
+                                                    <h3 className="text-xl font-bold text-black mb-2">{course.title}</h3>
+                                                    <p className="text-gray-600 text-sm">{course.instructor}</p>
                                                 </div>
                                             </div>
                                             <div className="p-4 space-y-4">
                                                 <div className="flex justify-between items-center">
-                                                    <div className="text-white">
-                                                        <span className="text-sm">মূল্য</span>
+                                                    <div className="text-black">
+                                                        <span className="text-sm">Price</span>
                                                         <div className="text-2xl font-bold">৳{course.price}</div>
                                                     </div>
-                                                    <div className="bg-white/10 rounded px-3 py-1">
+                                                    <div className="rounded px-3 py-1">
                                                         <span className="text-white text-sm">PROMO CODE</span>
                                                         <div className="text-green-400 font-mono font-bold">{course.promoCode}</div>
                                                     </div>
                                                 </div>
                                                 <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                                                    কোর্সে ভর্তি হন
+                                                    Enroll in Course
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -147,4 +147,3 @@ export default function FeaturedCourse() {
         </div>
     )
 }
-

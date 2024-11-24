@@ -54,6 +54,7 @@ export default function Cart() {
     const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
     const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     console.log(isCheckoutModalOpen)
+    console.log(totalItems)
 
     return (
         <>
@@ -82,9 +83,9 @@ export default function Cart() {
                                 </div>
                                 <Button variant="outline" className="text-sm" onClick={() => {
                                     setIsOpen(false);
-                                    navigate(-1);
+                                   
                                 }}>
-                                    <X className="h-4 w-4" />
+                                    <X className="h-4 w-4"  />
                                 </Button>
                             </div>
                         </div>
