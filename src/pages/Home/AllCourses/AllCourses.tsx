@@ -17,6 +17,7 @@ import CourseInstructor from "../Courseinstructor/CourseInstructor"
 import CoursePlan from "../CoursePlan/CoursePlan"
 import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
+import useModalStore from "@/store/Store"
 
 interface Lesson {
   type: string
@@ -119,6 +120,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
 }
 
 export default function AllCourses() {
+  const { closeLoginModal } = useModalStore()
   const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")
@@ -129,9 +131,10 @@ export default function AllCourses() {
   }
 
   const closeModal = () => {
-    setIsModalOpen(false)
-    setSelectedLesson(null)
-  }
+    console.log("Close button clicked");
+    setIsModalOpen(false);
+    setSelectedLesson(null);
+  };
 
   return (
     <>
@@ -147,14 +150,8 @@ export default function AllCourses() {
         {isModalOpen && selectedLesson && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
-              {/* Close Button */}
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 bg-gray-200 rounded-full p-2 z-10"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
+             
+
 
               {/* Banner Content */}
               <div
@@ -164,12 +161,20 @@ export default function AllCourses() {
                 <div className="absolute inset-0 bg-black opacity-60"></div>
                 <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
                   <div className="space-y-6 text-start">
+                    <button
+                      onClick={closeModal} // Use your `closeModal` function here
+                      className="absolute  right-4 bg-black rounded-full p-2 z-10"
+                      aria-label="Close modal"
+                    >
+                      <X className="w-5 h-5 text-gray-600" />
+                    </button>
                     <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
                       {selectedLesson.title}
                     </h1>
                     <p className="text-xl">
                       Taught by <span className="font-semibold">{selectedLesson.instructor}</span>
                     </p>
+                   
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center">
                         <Star className="w-5 h-5 text-yellow-400" />
