@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import AdminHeader from '@/pages/Dashboard/UserPanelHeader/UserPanelHeader'
 
 export default function AdminLayout() {
-  const [dateRange, setDateRange] = useState<string>("This Month")
+  const [dateRange, setDateRange] = useState<string>("This week")
 
   const handleDateRangeChange = (range: string) => {
     setDateRange(range)
@@ -27,24 +27,27 @@ export default function AdminLayout() {
               </div>
 
               {/* Second Div - 2/3 of Width */}
-              <div className="shadow rounded-lg p-6 w-2/3 bg-white">
-                <div className="mt-4 flex  space-x-2">
+              <div className="shadow rounded-lg p-6 w-full max-w-3xl bg-white">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   {/* Date Range Buttons */}
-                  <div className="flex space-x-2">
+                  <div className="inline-flex rounded-md shadow-sm" role="group">
                     <Button
-                      variant={dateRange === "This Month" ? "primary" : "outline"}
-                      onClick={() => handleDateRangeChange("This Month")}
-                    >
-                      This Month
-                    </Button>
-                    <Button
-                      variant={dateRange === "This Week" ? "primary" : "outline"}
+                      variant="outline"
+                      className={`rounded-r-none ${dateRange === "This Week" ? "bg-primary-default text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"}`}
                       onClick={() => handleDateRangeChange("This Week")}
                     >
                       This Week
                     </Button>
                     <Button
-                      variant={dateRange === "This Year" ? "primary" : "outline"}
+                      variant="outline"
+                      className={`rounded-none border-x-0 ${dateRange === "This Month" ? "bg-primary-default text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"}`}
+                      onClick={() => handleDateRangeChange("This Month")}
+                    >
+                      This Month
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className={`rounded-l-none ${dateRange === "This Year" ? "bg-primary-default text-primary-foreground" : " hover:text-accent-foreground"}`}
                       onClick={() => handleDateRangeChange("This Year")}
                     >
                       This Year
@@ -52,8 +55,8 @@ export default function AdminLayout() {
                   </div>
 
                   {/* Date Range Display */}
-                  <Button className="flex items-center bg-primary-default">
-                    <Calendar className="mr-2 h-4 w-4" />
+                  <Button className="flex items-center bg-primary-default text-primary-foreground">
+                    {/* <Calendar className="mr-2 h-4 w-4" /> */}
                     {dateRange}
                   </Button>
                 </div>
