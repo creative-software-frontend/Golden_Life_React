@@ -109,9 +109,7 @@ const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ children
     </label>
 )
 
-export default function CheckoutModal() {
-    const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
-    const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
+const AddressManager: React.FC<{ onSaveAddress: (address: Address, isDefault: boolean) => void }> = ({ onSaveAddress }) => {
     const [currentAddress, setCurrentAddress] = React.useState<Address>({
         label: "home",
         name: "",
@@ -149,178 +147,7 @@ export default function CheckoutModal() {
             }
         }
 
-        setCurrentStep("delivery");
-    };
-
-    const [items, setItems] = React.useState<CartItem[]>([]);
-
-    // Load cart items from local storage on component mount
-    React.useEffect(() => {
-        const storedItems = localStorage.getItem("cart");
-        if (storedItems) {
-            setItems(JSON.parse(storedItems));
-        }
-    }, []);
-    const updateQuantity = (id: number, quantity: number) => {
-        const updatedItems = items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
-        );
-        setItems(updatedItems);
-
-        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
-    };
-
-    console.log(items);
-    // calculate total items and total price
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const subtotal = totalPrice;
-
-    const CheckoutContent = () => {
-        const [selectedPayment, setSelectedPayment] = React.useState("wallet");
-        const [termsAccepted, setTermsAccepted] = React.useState(false);
-
-        const handleSubmit = () => {
-            if (!termsAccepted) {
-                alert("Please accept the terms and conditions before proceeding.");
-                return;
-            }
-            console.log("Submitting the checkout with payment method:", selectedPayment);
-        };
-
-        const deliveryCharge = 50;
-        const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const totalPrice = subtotal + deliveryCharge;
-
-        return (
-            <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
-                <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
-                    <Icon name="mapPin" />
-                    <div className="flex-1">
-                        <h4 className="font-semibold">{currentAddress?.name}</h4>
-                        <p>{currentAddress?.address}, {currentAddress?.district}</p>
-                    </div>
-                    <button
-                        onClick={() => setCurrentStep("address")}
-                        className="text-primary hover:text-primary-light"
-                    >
-                        Change
-                    </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-1 custom-scrollbar">
-                    <div className="divide-y space-y-4">
-                        {items.map((item,i) => {
-                            // const index = item.id; // Assigning item.id to a variable called index
-                            return (
-                                <div key={i} className="m-2 flex gap-6">
-                                    <div className="w-8 h-8 bg-red-500">
-                                        <img
-                                            alt={item?.name}
-                                            className="h-10 w-10 object-cover"
-                                            src="../../../../public/image/products/maggi.webp"
-                                        />
-                                    </div>
-                                    <div className="flex-1 flex flex-col">
-                                        <h3 className="font-medium text-sm text-start">
-                                            {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
-                                        </h3>
-                                        <p className="text-sm font-medium text-start">
-                                            ৳{item.price} x {item.quantity} = ৳{item.price * item.quantity}
-                                        </p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-
-                    </div>
-                </div>
-
-                <div className="p-4 space-y-4 bg-white border-t">
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <span>Total Items:</span>
-                            <span>{totalItems}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Subtotal:</span>
-                            <span>৳{subtotal}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Delivery Charge:</span>
-                            <span>৳{deliveryCharge}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold text-lg">
-                            <span>Total Price:</span>
-                            <span>৳{totalPrice}</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <h4 className="font-semibold">Payment Option</h4>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setSelectedPayment("wallet")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "wallet" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Wallet
-                            </button>
-                            <button
-                                onClick={() => setSelectedPayment("bkash")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "bkash" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Bkash
-                            </button>
-                            <button
-                                onClick={() => setSelectedPayment("nogod")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "nogod" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Nogod
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center mt-4">
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            checked={termsAccepted}
-                            onChange={(e) => setTermsAccepted(e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label htmlFor="terms" className="text-sm space-x-2">
-                            I accept the{" "}
-                            <Link
-                                to="/help/privacy-policy"
-                                target=""
-                                rel="noopener noreferrer"
-                                className="text-primary underline"
-                            >
-                                Privacy Policy,
-                            </Link>
-                            <Link
-                                to="/help/terms"
-                                target=""
-                                rel="noopener noreferrer"
-                                className="text-primary underline"
-                            >
-                                Terms and Conditions.
-                            </Link>
-                        </label>
-                    </div>
-                </div>
-
-                <div className="p-4 border-t bg-white z-10">
-                    <button
-                        onClick={handleSubmit}
-                        className="w-full px-4 py-2 bg-primary-default text-white rounded"
-                    >
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        );
+        onSaveAddress(currentAddress, isDefaultAddress);
     };
 
     const LabelOptions = () => (
@@ -350,13 +177,10 @@ export default function CheckoutModal() {
         </div>
     )
 
-    const AddressForm = () => (
-
-        
+    return (
         <div className="max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
             <form onSubmit={handleSaveAddress} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                 
                     <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
@@ -436,7 +260,186 @@ export default function CheckoutModal() {
                 </div>
             </form>
         </div>
-    )
+    );
+}
+
+export default function CheckoutModal() {
+    const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
+    const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
+    const [currentAddress, setCurrentAddress] = React.useState<Address | null>(null);
+    const [items, setItems] = React.useState<CartItem[]>([]);
+
+    // Load cart items from local storage on component mount
+    React.useEffect(() => {
+        const storedItems = localStorage.getItem("cart");
+        if (storedItems) {
+            setItems(JSON.parse(storedItems));
+        }
+    }, []);
+
+    const updateQuantity = (id: number, quantity: number) => {
+        const updatedItems = items.map(item =>
+            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
+        );
+        setItems(updatedItems);
+
+        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
+    };
+
+    console.log(items);
+    // calculate total items and total price
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = totalPrice;
+
+    const CheckoutContent = () => {
+        const [selectedPayment, setSelectedPayment] = React.useState("wallet");
+        const [termsAccepted, setTermsAccepted] = React.useState(false);
+
+        const handleSubmit = () => {
+            if (!termsAccepted) {
+                alert("Please accept the terms and conditions before proceeding.");
+                return;
+            }
+            console.log("Submitting the checkout with payment method:", selectedPayment);
+        };
+
+        const deliveryCharge = 50;
+        const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const total
+            = subtotal + deliveryCharge;
+
+        return (
+            <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
+                <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
+                    <Icon name="mapPin" />
+                    <div className="flex-1">
+                        <h4 className="font-semibold">{currentAddress?.name}</h4>
+                        <p>{currentAddress?.address}, {currentAddress?.district}</p>
+                    </div>
+                    <button
+                        onClick={() => setCurrentStep("address")}
+                        className="text-primary hover:text-primary-light"
+                    >
+                        Change
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-1 custom-scrollbar">
+                    <div className="divide-y space-y-4">
+                        {items.map((item, i) => (
+                            <div key={i} className="m-2 flex gap-6">
+                                <div className="w-8 h-8 bg-red-500">
+                                    <img
+                                        alt={item?.name}
+                                        className="h-10 w-10 object-cover"
+                                        src="../../../../public/image/products/maggi.webp"
+                                    />
+                                </div>
+                                <div className="flex-1 flex flex-col">
+                                    <h3 className="font-medium text-sm text-start">
+                                        {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
+                                    </h3>
+                                    <p className="text-sm font-medium text-start">
+                                        ৳{item.price} x {item.quantity} = ৳{item.price * item.quantity}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="p-4 space-y-4 bg-white border-t">
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span>Total Items:</span>
+                            <span>{totalItems}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span>Subtotal:</span>
+                            <span>৳{subtotal}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span>Delivery Charge:</span>
+                            <span>৳{deliveryCharge}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold text-lg">
+                            <span>Total Price:</span>
+                            <span>৳{total}</span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <h4 className="font-semibold">Payment Option</h4>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setSelectedPayment("wallet")}
+                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "wallet" ? "bg-primary-default text-white" : "bg-gray-200"}`}
+                            >
+                                Wallet
+                            </button>
+                            <button
+                                onClick={() => setSelectedPayment("bkash")}
+                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "bkash" ? "bg-primary-default text-white" : "bg-gray-200"}`}
+                            >
+                                Bkash
+                            </button>
+                            <button
+                                onClick={() => setSelectedPayment("nogod")}
+                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "nogod" ? "bg-primary-default text-white" : "bg-gray-200"}`}
+                            >
+                                Nogod
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center mt-4">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            checked={termsAccepted}
+                            onChange={(e) => setTermsAccepted(e.target.checked)}
+                            className="mr-2"
+                        />
+                        <label htmlFor="terms" className="text-sm space-x-2">
+                            I accept the{" "}
+                            <Link
+                                to="/help/privacy-policy"
+                                target=""
+                                rel="noopener noreferrer"
+                                className="text-primary underline"
+                            >
+                                Privacy Policy,
+                            </Link>
+                            <Link
+                                to="/help/terms"
+                                target=""
+                                rel="noopener noreferrer"
+                                className="text-primary underline"
+                            >
+                                Terms and Conditions.
+                            </Link>
+                        </label>
+                    </div>
+                </div>
+
+                <div className="p-4 border-t bg-white z-10">
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full px-4 py-2 bg-primary-default text-white rounded"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    const handleSaveAddress = (address: Address, isDefault: boolean) => {
+        setCurrentAddress(address);
+        setCurrentStep("delivery");
+    };
 
     return (
         <div className={`fixed inset-0 z-50 flex items-start justify-end bg-black bg-opacity-50 ${isCheckoutModalOpen ? '' : 'hidden'}`}>
@@ -446,8 +449,13 @@ export default function CheckoutModal() {
                         <Icon name="x" />
                     </button>
                 </div>
-                {currentStep === "address" ? <AddressForm /> : <CheckoutContent />}
+                {currentStep === "address" ? (
+                    <AddressManager onSaveAddress={handleSaveAddress} />
+                ) : (
+                    <CheckoutContent />
+                )}
             </div>
         </div>
     );
 }
+
