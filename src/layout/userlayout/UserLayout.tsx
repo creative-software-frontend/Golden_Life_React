@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, GraduationCap } from 'lucide-react'
+import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -45,9 +45,9 @@ const data = {
     categories: [
         { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
         { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "percel", name: "Percel", icon: Pill, path: "/percel" },
-        { id: "topup", name: "Topup", icon: Pill, path: "/topup" },
-        { id: "drive", name: "Drive", icon: Pill, path: "/drive" },
+        { id: "percel", name: "Percel", icon: Package, path: "/percel" },
+        { id: "topup", name: "Topup", icon: Package, path: "/topup" },
+        { id: "drive", name: "Drive", icon: Truck, path: "/drive" },
         { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
     ],
     navMain: {
@@ -58,14 +58,14 @@ const data = {
                 icon: SquareTerminal,
                 isActive: true,
                 items: [
-                    { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-                    { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-                    { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-                    { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-                    { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-                    { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-                    { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-                    { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
+                    // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
+                    // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
+                    // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
+                    // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
+                    // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
+                    // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
+                    // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
+                    // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
                 ],
             },
         ],
@@ -85,14 +85,14 @@ const data = {
                 icon: ChefHat,
                 isActive: true,
                 items: [
-                    { title: "Breakfast", url: "/cookups/ready-meals/breakfast" },
-                    { title: "Lunch", url: "/cookups/ready-meals/lunch" },
-                    { title: "Dinner", url: "/cookups/ready-meals/dinner" },
-                    { title: "Appetizers", url: "/cookups/ready-meals/appetizers" },
-                    { title: "Soups", url: "/cookups/ready-meals/soups" },
-                    { title: "Salads", url: "/cookups/ready-meals/salads" },
-                    { title: "Desserts", url: "/cookups/ready-meals/desserts" },
-                    { title: "Snacks", url: "/cookups/ready-meals/snacks" },
+                    // { title: "Breakfast", url: "/cookups/ready-meals/breakfast" },
+                    // { title: "Lunch", url: "/cookups/ready-meals/lunch" },
+                    // { title: "Dinner", url: "/cookups/ready-meals/dinner" },
+                    // { title: "Appetizers", url: "/cookups/ready-meals/appetizers" },
+                    // { title: "Soups", url: "/cookups/ready-meals/soups" },
+                    // { title: "Salads", url: "/cookups/ready-meals/salads" },
+                    // { title: "Desserts", url: "/cookups/ready-meals/desserts" },
+                    // { title: "Snacks", url: "/cookups/ready-meals/snacks" },
                 ],
             },
         ],

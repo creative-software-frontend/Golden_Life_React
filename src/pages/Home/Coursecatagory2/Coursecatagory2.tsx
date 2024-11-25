@@ -6,10 +6,10 @@ const Coursecatagory2 = () => {
     const grades = [
         { id: 1, label: 'HSC 24, 25, 26', color: 'bg-red-400', textColor: 'text-red-600', path: '/courses/hsc' },
         { id: 2, label: '১০ম শ্রেণি', color: 'bg-yellow-400', textColor: 'text-yellow-600', path: '/courses/ssc' },
-        { id: 3, label: '৯ম শ্রেণি', color: 'bg-teal-400', textColor: 'text-teal-600', path: '/class-9' },
-        { id: 4, label: '৮ম শ্রেণি', color: 'bg-orange-400', textColor: 'text-orange-600', path: '/class-8' },
-        { id: 5, label: '৭ম শ্রেণি', color: 'bg-yellow-300', textColor: 'text-yellow-500', path: '/class-7' },
-        { id: 6, label: '৬ষ্ঠ শ্রেণি', color: 'bg-blue-300', textColor: 'text-blue-500', path: '/class-6' },
+        { id: 3, label: '৯ম শ্রেণি', color: 'bg-teal-400', textColor: 'text-teal-600', path: '/courses/ssc' },
+        { id: 4, label: '৮ম শ্রেণি', color: 'bg-orange-400', textColor: 'text-orange-600', path: '/courses/ssc' },
+        { id: 5, label: '৭ম শ্রেণি', color: 'bg-yellow-300', textColor: 'text-yellow-500', path: '/courses/ssc' },
+        { id: 6, label: '৬ষ্ঠ শ্রেণি', color: 'bg-blue-300', textColor: 'text-blue-500', path: '/courses/ssc' },
     ];
 
     return (

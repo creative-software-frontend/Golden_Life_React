@@ -82,8 +82,8 @@ export default function Categories() {
                 {categories.map((category) => (
                     <Link
                         key={category.id}
-                        to={`/productpage/${category.id}`}
-
+                        // to={`/productpage/${category.id}`}
+                        to=''
                         className="flex flex-col items-center p-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow"
                     >
                         <div className="w-12 h-12 mb-3">
