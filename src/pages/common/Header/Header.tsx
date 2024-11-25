@@ -4,6 +4,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import logo from '../../../../public/image/logo/logo.jpg';
 import { Link } from 'react-router-dom';
 import useModalStore from '@/store/Store';
+import 'react-phone-number-input/style.css';
+import PhoneInput from 'react-phone-number-input';
 
 const Header: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
@@ -18,14 +20,17 @@ const Header: React.FC = () => {
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", ""]);
     const cancelButtonRef = useRef(null);
+    const [value, setValue] = useState();
+
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev);
     };
 
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPhone(e.target.value);
+    const handlePhoneChange = (value: string | undefined) => {
+        setPhone(value || ""); // Handle undefined case if needed
     };
+
 
     const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const newOtp = [...otp];
@@ -188,7 +193,7 @@ const Header: React.FC = () => {
                                                         <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
                                                             Phone Number
                                                         </label>
-                                                        <div className="mt-2 mb-4">
+                                                        {/* <div className="mt-2 mb-4">
                                                             <input
                                                                 id="phone"
                                                                 name="phone"
@@ -199,6 +204,23 @@ const Header: React.FC = () => {
                                                                 placeholder="Enter your phone number"
                                                                 className="p-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
+                                                        </div> */}
+                                                        <div className="flex flex-col items-start w-full">
+                                                            <PhoneInput
+                                                                id="phone"
+                                                                name="phone"
+                                                                value={value} // Pass the state variable
+                                                                onChange={handlePhoneChange} // Updated function to handle the value
+                                                                required
+                                                                defaultCountry="BD"
+
+                                                                placeholder="Enter your phone number"
+                                                                className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                            />
+
+                                                            {/* <button className="bg-primary-default w-full text-white px-3 py-2 mt-2 rounded-lg">
+                                                                Get app
+                                                            </button> */}
                                                         </div>
                                                         <button
                                                             type="button"

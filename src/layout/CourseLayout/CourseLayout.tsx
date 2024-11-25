@@ -50,8 +50,8 @@ const data = {
                 icon: SquareTerminal,
                 isActive: true,
                 items: [
-                    // { title: "Web Development", url: "/courses/programming/web-development" },
-                    // { title: "Mobile App Development", url: "/courses/programming/mobile-development" },
+                    { title: "Web Development", url: "" },
+                    { title: "Mobile App Development", url: "" },
                     // { title: "Data Science", url: "/courses/programming/data-science" },
                     // { title: "Machine Learning", url: "/courses/programming/machine-learning" },
                     // { title: "Game Development", url: "/courses/programming/game-development" },
@@ -88,7 +88,7 @@ const data = {
 
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
-    const { openLoginModal} = useModalStore();
+    const { openLoginModal } = useModalStore();
 
     return (
         <SidebarProvider>

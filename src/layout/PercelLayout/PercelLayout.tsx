@@ -58,6 +58,8 @@ const data = {
                 icon: SquareTerminal,
                 isActive: true,
                 items: [
+                    { title: "Web Development", url: "" },
+                    { title: "Mobile App Development", url: "" },
                     // { title: "Local Delivery", url: "/percel/services/local-delivery" },
                     // { title: "International Shipping", url: "/percel/services/international-shipping" },
                     // { title: "Express Services", url: "/percel/services/express" },

@@ -66,7 +66,8 @@ const data = {
                 url: "/",
                 icon: SquareTerminal,
                 isActive: true,
-                items: [],
+                items: [{ title: "Web Development", url: "" },
+                    { title: "Mobile App Development", url: "" },],
             },
         ],
         course: [
