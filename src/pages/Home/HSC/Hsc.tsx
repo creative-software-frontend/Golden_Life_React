@@ -76,7 +76,7 @@ const lessons: Lesson[] = [
 
 const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ courses, title }) => {
     return (
-        <div className="mb-12">
+        <div className="mb-12 sm:w-full md:max-w-[1040px] w-[370px]">
             <h3 className="text-xl font-semibold mb-4">{title}</h3>
             <Carousel
                 opts={{

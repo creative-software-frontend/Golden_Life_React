@@ -199,7 +199,7 @@ export default function AllCourses() {
   return (
     <>
       <Coursecatagory2 />
-      <div className="w-full md:max-w-[1040px] mt-8 mb-4">
+      <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4">
         <div className="space-y-12">
           <CourseCarousel courses={lessons.slice(0, 4)} title="Popular Courses" onSelect={handleCourseSelect} />
           {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} /> */}
@@ -215,7 +215,7 @@ export default function AllCourses() {
 
               {/* Banner Content */}
               <div
-                className="relative mt-20 w-full h-[260px] bg-cover bg-center text-white"
+                className="relative mt-20 w-full  bg-cover bg-center text-white"
                 style={{ backgroundImage: `url(${selectedLesson.image})` }}
               >
                 <div className="absolute inset-0 bg-black opacity-60"></div>

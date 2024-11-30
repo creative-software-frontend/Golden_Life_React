@@ -13,12 +13,12 @@ const Coursecatagory2 = () => {
     ];
 
     return (
-        <div className="flex justify-between gap-2 p-2 mt-6 w-full md:max-w-[1040px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4  mt-6 sm:w-full md:max-w-[1040px] w-[370px]">
             {grades.map((grade) => (
                 <Link
                     key={grade.id}
                     to={grade.path} // Dynamic path
-                    className="flex flex-col items-center justify-between bg-[#ccfbf1] text-black p-4 rounded-md shadow-md w-40 h-35"
+                    className="flex flex-col items-center justify-between bg-[#ccfbf1] text-black p-4 rounded-md shadow-md"
                 >
                     {/* Icon Section */}
                     <div className={`p-3 rounded-full ${grade.color}`}>
@@ -31,6 +31,7 @@ const Coursecatagory2 = () => {
                 </Link>
             ))}
         </div>
+
     );
 };
 

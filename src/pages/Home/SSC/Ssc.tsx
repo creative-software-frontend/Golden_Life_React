@@ -121,7 +121,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function Ssc() {
     return (
-        <div className="w-full md:max-w-[1040px] mt-8 mb-4">
+        <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4 items-center">
             <CourseCarousel courses={lessons.slice(0, 4)} title="SSC Courses" />
             {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" /> */}
         </div>

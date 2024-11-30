@@ -10,9 +10,9 @@ const CourseStructure: React.FC = () => {
     };
 
     return (
-        <div className="container mx-auto  h-[450px]">
-            <div className="p-2 bg-gray-100 rounded shadow-md">
-                <h2 className="text-lg font-bold mt-20">কোর্সটি কিভাবে সাজানো হয়েছে</h2>
+        <div className="container mx-auto  h-auto">
+            <div className="p-2  rounded ">
+                <h2 className="text-lg font-bold mt-2">কোর্সটি কিভাবে সাজানো হয়েছে</h2>
                 <div className="grid grid-cols-2 gap-4 mt-4 mx-auto">
                     <div className="flex items-center">
                         <div className="p-3 bg-red-500 rounded-full">
