@@ -5,8 +5,8 @@ const CommingSoon: React.FC = () => {
     return (
         <div className="w-full md:max-w-[1040px] mt-8 mb-4 flex flex-col items-center justify-center min-h-screen bg-gray-50 px-6">
             <div className="text-center">
-                <Clock className="w-16 h-16 text-primary-default mb-4" />
-                <h1 className="text-4xl font-bold text-gray-800">Coming Soon</h1>
+                {/* <Clock className="w-16 h-16 text-primary-default mb-4" /> */}
+                <h1 className="text-6xl font-bold text-gray-800">Coming Soon</h1>
                 <p className="mt-4 text-lg text-gray-600">
                     We're working on something exciting! Stay tuned for updates.
                 </p>

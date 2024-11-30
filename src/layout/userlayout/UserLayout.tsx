@@ -223,7 +223,7 @@ export default function UserLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <main className="pt-6 ">
+                <main className="pt-6">
                     <button
                         onClick={changeCheckoutModal}
                         className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
@@ -239,7 +239,8 @@ export default function UserLayout() {
                     </button>
 
                     <Header />
-                    <Cart />
+                    <Cart className="hidden lg:block" />
+
                     <LiveChat />
 
                     <Outlet />

@@ -49,7 +49,7 @@ export default function TrendingCategory() {
     }
 
     return (
-        <section className="py-4 px-4 overflow-hidden w-full md:max-w-[1040px]">
+        <section className="py-4 px-4 overflow-hidden  md:max-w-[1040px] w-[370px] sm:w-full">
             <div className="container mx-auto">
                 <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold mb-4">Trending Products</h2>

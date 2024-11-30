@@ -14,18 +14,12 @@ import CourseCategories from "../CoursesCategory/CoursesCategory";
 const Home = () => {
   return (
     <div>
-
       <HeroSection />
       <BannerSection />
       <AutoScrollIcons />
-
       <CourseCategories />
       <Categories />
-      {/* <Cart /> */}
-      {/* <Cart2/> */}
-      {/* <LiveChat /> */}
       <ProductCategories />
-
       <FreshSell />
       <TrendingCategory />
     </div>

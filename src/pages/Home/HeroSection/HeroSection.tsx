@@ -16,7 +16,7 @@ const HeroSection = () => {
     ];
 
     return (
-        <div className="flex justify-start py-8 max-w-[1040px] ">
+        <div className="flex justify-start py-8 md:max-w-[1040px] w-[370px]   sm:w-full">
             <Swiper
                 modules={[Pagination, Autoplay]} // Removed Navigation
                 spaceBetween={30}
@@ -30,8 +30,9 @@ const HeroSection = () => {
                         <img
                             src={banner.image}
                             alt={banner.title}
-                            className="w-full h-[400px]  rounded-lg"
+                            className="w-full h-auto sm:h-[400px] md:h-[400px] lg:h-[400px] rounded-lg"
                         />
+
                     </SwiperSlide>
                 ))}
             </Swiper>

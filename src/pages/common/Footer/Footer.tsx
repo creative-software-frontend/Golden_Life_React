@@ -11,7 +11,7 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-300 pt-4 md:max-w-[1040px] ">
+        <footer className="bg-gray-300 pt-4 md:max-w-[1040px] sm:w-full w-[370px]">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
                 <div>
                     <h3 className="font-bold text-xl mb-4 text-gray-600">About Golden Life</h3>
@@ -68,7 +68,7 @@ const Footer = () => {
                 <div className="flex flex-wrap justify-between items-center mb-4 px-4">
                     <div className='flex items-center'>
                         <h3 className="font-bold text-lg mb-2 text-gray-500">Payment Methods</h3>
-                        <img src={paywith} alt="paywith" className="h-15 w-auto object-cover" />
+                        <img src={paywith} alt="paywith" className="h-auto w-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[500px] object-cover" />
                     </div>
                 </div>
                 <div className="border-0 -mb-8 border-gray-300 bg-white py-2">

@@ -66,7 +66,7 @@ export default function Categories() {
     ]
 
     return (
-        <div className="py-10  -mt-6 md:max-w-[1040px]  " >
+        <div className="py-10  -mt-6 md:max-w-[1040px] w-[370px]   sm:w-full" >
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Categories</h2>
                 <Link
@@ -78,7 +78,7 @@ export default function Categories() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:max-w-[1240px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 ">
                 {categories.map((category) => (
                     <Link
                         key={category.id}

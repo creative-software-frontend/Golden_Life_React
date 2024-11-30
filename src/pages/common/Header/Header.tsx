@@ -1,36 +1,31 @@
-import { CameraIcon, MapPin, UserIcon, ArrowLeft, Search } from 'lucide-react';
-import { Fragment, useRef, useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import logo from '../../../../public/image/logo/logo.jpg';
+import React, { Fragment, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useModalStore from '@/store/Store';
-import 'react-phone-number-input/style.css';
+import { Dialog, Transition } from '@headlessui/react';
+import { CameraIcon, MapPin, UserIcon, ArrowLeft, Search } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import useModalStore from '@/store/Store';
+import logo from '../../../../public/image/logo/logo.jpg';
 
 const Header: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
-
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    console.log(isModalOpen)
     const [step, setStep] = useState(1);
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", ""]);
     const cancelButtonRef = useRef(null);
-    const [value, setValue] = useState();
-
+    const [value, setValue] = useState<string | undefined>();
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev);
     };
 
     const handlePhoneChange = (value: string | undefined) => {
-        setPhone(value || ""); // Handle undefined case if needed
+        setPhone(value || "");
     };
-
 
     const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const newOtp = [...otp];
@@ -41,16 +36,12 @@ const Header: React.FC = () => {
     const handleVerify = () => {
         setStep(3);
     };
-    console.log(handleVerify)
 
-    // const handleSubmit = () => {
-    //     alert("Successfully logged in");
-    //     setIsModalOpen(false);
-    // };
     const handleSubmit = () => {
         alert("Successfully logged in");
-        closeLoginModal(); // Use Zustand store to close the modal
+        closeLoginModal();
     };
+
     const handleBack = () => {
         if (step > 1) setStep(step - 1);
     };
@@ -77,7 +68,7 @@ const Header: React.FC = () => {
 
     return (
         <div>
-            <header className="shadow md:w-[1040px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
+            <header className="shadow md:w-[1040px] sm:w-full w-[370px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
                         type="text"
@@ -112,21 +103,21 @@ const Header: React.FC = () => {
                 <div className="flex items-center">
                     <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
                         <MapPin size={20} className="text-white" />
-                        <select className="bg-primary-default transition outline-none text-white">
+                        <select className="bg-primary-default transition outline-none text-white hidden sm:inline">
                             <option value="Dhaka">Dhaka</option>
                             <option value="Chittagong">Chittagong</option>
                             <option value="Khulna">Khulna</option>
                         </select>
                     </div>
 
-                    {/* User Icon with Dropdown */}
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
-                            <UserIcon className="h-6 w-4 mr-1" />
+                            <UserIcon className="h-6 w-4" />
+                            <span className="ml-1 hidden sm:inline">Login</span>
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">login</button>
+                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Login</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
                                 <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
@@ -143,7 +134,7 @@ const Header: React.FC = () => {
             </header>
 
             <Transition.Root show={isLoginModalOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setIsModalOpen}>
+                <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={closeLoginModal}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -193,34 +184,17 @@ const Header: React.FC = () => {
                                                         <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
                                                             Phone Number
                                                         </label>
-                                                        {/* <div className="mt-2 mb-4">
-                                                            <input
-                                                                id="phone"
-                                                                name="phone"
-                                                                type="tel"
-                                                                value={phone}
-                                                                onChange={handlePhoneChange}
-                                                                required
-                                                                placeholder="Enter your phone number"
-                                                                className="p-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                            />
-                                                        </div> */}
                                                         <div className="flex flex-col items-start w-full">
                                                             <PhoneInput
                                                                 id="phone"
                                                                 name="phone"
-                                                                value={value} // Pass the state variable
-                                                                onChange={handlePhoneChange} // Updated function to handle the value
+                                                                value={value}
+                                                                onChange={handlePhoneChange}
                                                                 required
                                                                 defaultCountry="BD"
-
                                                                 placeholder="Enter your phone number"
                                                                 className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
-
-                                                            {/* <button className="bg-primary-default w-full text-white px-3 py-2 mt-2 rounded-lg">
-                                                                Get app
-                                                            </button> */}
                                                         </div>
                                                         <button
                                                             type="button"
@@ -258,7 +232,7 @@ const Header: React.FC = () => {
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={handleSubmit}
+                                                                onClick={handleVerify}
                                                                 className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
                                                             >
                                                                 Verify
@@ -294,3 +268,4 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+

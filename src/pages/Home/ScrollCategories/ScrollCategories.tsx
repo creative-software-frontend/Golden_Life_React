@@ -77,7 +77,7 @@ export default function RightToLeftIconScroll() {
     }, [items])
 
     return (
-        <div className="w-full md:max-w-[1040px] bg-white overflow-hidden">
+        <div className="  md:max-w-[1040px] w-[370px] sm:w-full bg-white overflow-hidden">
             <div className="border border-gray-200 rounded-lg w-full md:max-w-[1040px] relative py-2 ">
                 <div
                     ref={scrollRef}

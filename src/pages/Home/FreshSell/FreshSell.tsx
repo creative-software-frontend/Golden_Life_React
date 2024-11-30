@@ -117,7 +117,7 @@ export default function FreshSell() {
     };
 
     return (
-        <div className="w-full md:max-w-[1040px]">
+        <div className="  md:max-w-[1040px]  w-[370px]   sm:w-full">
             <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-between">
                 <span className="font-medium">Fresh Sell</span>
                 <div className="flex gap-1">
@@ -143,7 +143,7 @@ export default function FreshSell() {
                     <Link
                         key={product.id}
                         to="#"
-                        className="flex-none w-[200px] bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                        className="flex-none  w-[200px] md:w-[200px] bg-white  overflow-hidden hover:shadow-lg transition-shadow"
                     >
                         <div className="aspect-square">
                             <img
@@ -160,7 +160,7 @@ export default function FreshSell() {
                                 <span className="text-lg font-bold">৳ {product.discountedPrice}</span>
                                 <span className="text-sm text-gray-500 line-through">৳ {product.originalPrice}</span>
                             </div>
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-2 bg-gray-200 rounded-ful overflow-hidden">
                                 <div
                                     className="h-full bg-orange-500 rounded-full"
                                     style={{ width: `${product.progress}%` }}
