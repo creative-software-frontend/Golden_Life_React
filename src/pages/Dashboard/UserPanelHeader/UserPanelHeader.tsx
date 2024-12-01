@@ -93,7 +93,7 @@ export default function AdminHeader() {
                     <img
                         src={promise}
                         alt="Courier Delivery Limited"
-                        className="h-16 w-auto bg-cover"
+                        className="h-9 w-full object-cover"
                     />
 
                     {/* Navigation links */}
@@ -267,7 +267,7 @@ export default function AdminHeader() {
                                 <a href="#" className="-m-1.5 p-1.5">
                                     <span className="sr-only">Your Company</span>
                                     <img
-                                        className="h-8 w-auto"
+                                        className="h-8 w-auto object-cover"
                                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                                         alt=""
                                     />

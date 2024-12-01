@@ -18,50 +18,62 @@ export default function AdminLayout() {
       <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-8 bg-slate-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
-            <div className="flex space-x-4">
+            <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
               {/* First Div - 1/3 of Width */}
-              <div className="shadow rounded-lg w-1/3 pt-8 ps-5 bg-white">
-                <h2 className="text-lg font-medium text-start item-center">
-                  Brief Stats
-                </h2>
+              <div className="shadow rounded-lg w-full lg:w-1/3 bg-white flex items-center justify-center py-8">
+                <h2 className="text-lg font-medium text-center">Brief Stats</h2>
               </div>
 
+
               {/* Second Div - 2/3 of Width */}
-              <div className="shadow rounded-lg p-6 w-full max-w-3xl bg-white">
+              <div className="shadow rounded-lg p-6 w-full lg:w-2/3 bg-white">
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   {/* Date Range Buttons */}
-                  <div className="inline-flex rounded-md shadow-sm" role="group">
+                  <div
+                    className="flex flex-col sm:flex-row rounded-md shadow-sm space-y-2 sm:space-y-0 sm:space-x-2"
+                    role="group"
+                  >
                     <Button
                       variant="outline"
-                      className={`rounded-r-none ${dateRange === "This Week" ? "bg-primary-default text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"}`}
+                      className={`w-full sm:w-auto rounded-r-none ${dateRange === "This Week"
+                          ? "bg-primary-default text-primary-foreground"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                        }`}
                       onClick={() => handleDateRangeChange("This Week")}
                     >
                       This Week
                     </Button>
                     <Button
                       variant="outline"
-                      className={`rounded-none border-x-0 ${dateRange === "This Month" ? "bg-primary-default text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"}`}
+                      className={`w-full sm:w-auto rounded-none border-x-0 ${dateRange === "This Month"
+                          ? "bg-primary-default text-primary-foreground"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                        }`}
                       onClick={() => handleDateRangeChange("This Month")}
                     >
                       This Month
                     </Button>
                     <Button
                       variant="outline"
-                      className={`rounded-l-none ${dateRange === "This Year" ? "bg-primary-default text-primary-foreground" : " hover:text-accent-foreground"}`}
+                      className={`w-full sm:w-auto rounded-l-none ${dateRange === "This Year"
+                          ? "bg-primary-default text-primary-foreground"
+                          : "hover:text-accent-foreground"
+                        }`}
                       onClick={() => handleDateRangeChange("This Year")}
                     >
                       This Year
                     </Button>
                   </div>
 
+
                   {/* Date Range Display */}
                   <Button className="flex items-center bg-primary-default text-primary-foreground">
-                    {/* <Calendar className="mr-2 h-4 w-4" /> */}
                     {dateRange}
                   </Button>
                 </div>
               </div>
             </div>
+
 
             {/* Other content */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
