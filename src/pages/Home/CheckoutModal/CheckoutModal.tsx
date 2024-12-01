@@ -295,20 +295,21 @@ export default function CheckoutModal() {
     const CheckoutContent = () => {
         const [selectedPayment, setSelectedPayment] = React.useState("wallet");
         const [termsAccepted, setTermsAccepted] = React.useState(false);
+        const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
         const handleSubmit = () => {
             if (!termsAccepted) {
-                alert("Please accept the terms and conditions before proceeding.");
+                setErrorMessage("Please accept the terms and conditions before proceeding.");
                 return;
             }
+            setErrorMessage(null);
             console.log("Submitting the checkout with payment method:", selectedPayment);
         };
 
         const deliveryCharge = 50;
         const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
         const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const total
-            = subtotal + deliveryCharge;
+        const total = subtotal + deliveryCharge;
 
         return (
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
@@ -422,6 +423,12 @@ export default function CheckoutModal() {
                             </Link>
                         </label>
                     </div>
+
+                    {errorMessage && (
+                        <div className="text-red-500 text-sm">
+                            {errorMessage}
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4 border-t bg-white z-10">

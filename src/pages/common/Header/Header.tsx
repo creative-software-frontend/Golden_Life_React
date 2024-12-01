@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Fragment, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
@@ -18,6 +20,7 @@ const Header: React.FC = () => {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const cancelButtonRef = useRef(null);
     const [value, setValue] = useState<string | undefined>();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev);
@@ -25,16 +28,23 @@ const Header: React.FC = () => {
 
     const handlePhoneChange = (value: string | undefined) => {
         setPhone(value || "");
+        setErrorMessage(null);
     };
 
     const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const newOtp = [...otp];
         newOtp[index] = e.target.value;
         setOtp(newOtp);
+        setErrorMessage(null);
     };
 
     const handleVerify = () => {
-        setStep(3);
+        if (otp.join("").length !== 4) {
+            setErrorMessage("Please enter a valid 4-digit OTP");
+        } else {
+            setErrorMessage(null);
+            setStep(3);
+        }
     };
 
     const handleSubmit = () => {
@@ -43,7 +53,10 @@ const Header: React.FC = () => {
     };
 
     const handleBack = () => {
-        if (step > 1) setStep(step - 1);
+        if (step > 1) {
+            setStep(step - 1);
+            setErrorMessage(null);
+        }
     };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,9 +114,9 @@ const Header: React.FC = () => {
                 )}
 
                 <div className="flex items-center">
-                    <div className="flex items-center border bg-primary-default rounded-full p-2 shadow">
+                    <div className="flex items-center border bg-primary-default rounded-full p-2 shadow hidden sm:hidden">
                         <MapPin size={20} className="text-white" />
-                        <select className="bg-primary-default transition outline-none text-white hidden sm:inline">
+                        <select className="bg-primary-default transition outline-none text-white hidden sm:hidden">
                             <option value="Dhaka">Dhaka</option>
                             <option value="Chittagong">Chittagong</option>
                             <option value="Khulna">Khulna</option>
@@ -198,7 +211,14 @@ const Header: React.FC = () => {
                                                         </div>
                                                         <button
                                                             type="button"
-                                                            onClick={() => setStep(2)}
+                                                            onClick={() => {
+                                                                if (phone.length < 10) {
+                                                                    setErrorMessage("Please enter a valid phone number");
+                                                                } else {
+                                                                    setErrorMessage(null);
+                                                                    setStep(2);
+                                                                }
+                                                            }}
                                                             className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
                                                             Next
@@ -252,6 +272,12 @@ const Header: React.FC = () => {
                                                         >
                                                             Finish
                                                         </button>
+                                                    </div>
+                                                )}
+
+                                                {errorMessage && (
+                                                    <div className="mt-2 text-red-600 text-sm text-center">
+                                                        {errorMessage}
                                                     </div>
                                                 )}
                                             </form>
