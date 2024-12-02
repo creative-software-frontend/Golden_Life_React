@@ -2,7 +2,7 @@
 
 import useModalStore from "@/store/Store"
 import * as React from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 interface Address {
     label: "home" | "work" | "partner" | "other"
@@ -268,6 +268,9 @@ export default function CheckoutModal() {
     const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
     const [currentAddress, setCurrentAddress] = React.useState<Address | null>(null);
     const [items, setItems] = React.useState<CartItem[]>([]);
+    const navigate = useNavigate();
+
+    
 
     // Load cart items from local storage on component mount
     React.useEffect(() => {
@@ -297,13 +300,20 @@ export default function CheckoutModal() {
         const [termsAccepted, setTermsAccepted] = React.useState(false);
         const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
+
         const handleSubmit = () => {
             if (!termsAccepted) {
                 setErrorMessage("Please accept the terms and conditions before proceeding.");
                 return;
             }
+
             setErrorMessage(null);
+
+            // Log the selected payment method
             console.log("Submitting the checkout with payment method:", selectedPayment);
+
+            // Navigate to the OrderDetails page
+            navigate("/orderdetails"); // Adjust the path based on your routing setup
         };
 
         const deliveryCharge = 50;
