@@ -159,12 +159,15 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
                         {lesson.badge}
                       </div>
                     </div>
-                    <div className="p-4 space-y-2">
+                    <div className="p-4 space-y-2 mb-4">
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
                         <span className="text-sm text-slate-600">{lesson.type}</span>
                       </div>
                       <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
+                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+                        Enroll in Course
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -199,99 +202,101 @@ export default function AllCourses() {
   return (
     <>
       <Coursecatagory2 />
-      <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4">
+      <div className="sm:w-full md:max-w-[1040px] w-[385px] mt-8 mb-4  ">
         <div className="space-y-12">
           <CourseCarousel courses={lessons.slice(0, 4)} title="Popular Courses" onSelect={handleCourseSelect} />
           {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} /> */}
           <CourseCarousel courses={lessons} title="All Courses" onSelect={handleCourseSelect} />
         </div>
-
-        {/* Modal */}
+{/* modal */}
         {isModalOpen && selectedLesson && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
-             
-
-
-              {/* Banner Content */}
-              <div
-                className="relative mt-20 w-full  bg-cover bg-center text-white"
-                style={{ backgroundImage: `url(${selectedLesson.image})` }}
-              >
-                <div className="absolute inset-0 bg-black opacity-60"></div>
-                <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
-                  <div className="space-y-6 text-start">
-                    <button
-                      onClick={closeModal} // Use your `closeModal` function here
-                      className="absolute  right-4 bg-black rounded-full p-2 z-10"
-                      aria-label="Close modal"
-                    >
-                      <X className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                      {selectedLesson.title}
-                    </h1>
-                    <p className="text-xl">
-                      Taught by <span className="font-semibold">{selectedLesson.instructor}</span>
-                    </p>
-                   
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-400" />
-                        <span className="ml-1 font-medium">{selectedLesson.rating}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-5 h-5" />
-                        <span className="ml-1">
-                          {selectedLesson.studentsEnrolled.toLocaleString()} students
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {selectedLesson.duration}
-                      </Badge>
-                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
-                        {selectedLesson.level}
-                      </Badge>
-                      <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
-                        {selectedLesson.category}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tab Navigation */}
-              <div className="p-2">
-                <div className="flex justify-center mb-4">
-                  <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
-                    {["instructor", "structure", "details", "feature"].map((tab) => (
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto max-h-screen">
+                {/* Banner Content */}
+                <div
+                  className="relative  w-full bg-cover bg-center text-white"
+                  style={{ backgroundImage: `url(${selectedLesson.image})` }}
+                >
+                  <div className="absolute inset-0 bg-black opacity-60"></div>
+                  <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
+                    <div className="space-y-6 text-start">
                       <button
-                        key={tab}
-                        onClick={() => setSelectedTab(tab as any)}
-                        aria-selected={selectedTab === tab}
-                        className={`px-2 py-1 rounded-md transition-all duration-300 ${selectedTab === tab ? "bg-primary-default text-white" : "bg-gray-200 hover:bg-gray-300"
-                          }`}
+                        onClick={closeModal}
+                        className="absolute right-4 bg-black rounded-full p-2 z-10"
+                        aria-label="Close modal"
                       >
-                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        <X className="w-5 h-5 text-gray-600" />
                       </button>
-                    ))}
+                      <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+                        {selectedLesson.title}
+                      </h1>
+                      <p className="text-xl">
+                        Taught by <span className="font-semibold">{selectedLesson.instructor}</span>
+                      </p>
+
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center">
+                          <Star className="w-5 h-5 text-yellow-400" />
+                          <span className="ml-1 font-medium">{selectedLesson.rating}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="w-5 h-5" />
+                          <span className="ml-1">
+                            {selectedLesson.studentsEnrolled.toLocaleString()} students
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-4">
+                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {selectedLesson.duration}
+                        </Badge>
+                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
+                          {selectedLesson.level}
+                        </Badge>
+                        <Badge className="text-sm py-1 px-2 bg-white/20 text-white">
+                          {selectedLesson.category}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Tab Content */}
-                <div>
-                  {selectedTab === "instructor" && <CourseInstructor />}
-                  {selectedTab === "structure" && <CoursePlan />}
-                  {selectedTab === "details" && <CourseDetails />}
-                  {selectedTab === "feature" && <CourseFeatures />}
+                {/* Tab Navigation */}
+                <div className="p-2">
+                  <div className="flex justify-center mb-4">
+                    <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
+                      {["instructor", "structure", "details", "feature"].map((tab) => (
+                        <button
+                          key={tab}
+                          onClick={() => setSelectedTab(tab as any)}
+                          aria-selected={selectedTab === tab}
+                          className={`px-2 py-1 rounded-md transition-all duration-300 ${selectedTab === tab
+                              ? "bg-primary-default text-white"
+                              : "bg-gray-200 hover:bg-gray-300"
+                            }`}
+                        >
+                          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tab Content */}
+                  <div>
+                    {selectedTab === "instructor" && <CourseInstructor />}
+                    {selectedTab === "structure" && <CoursePlan />}
+                    {selectedTab === "details" && <CourseDetails />}
+                    {selectedTab === "feature" && <CourseFeatures />}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
+
       </div>
     </>
   )

@@ -80,7 +80,7 @@ export default function FeaturedCourse() {
     }, [emblaApi])
 
     return (
-        <div className="w-full md:max-w-[1040px] min-h-screen py-12 mb-4">
+        <div className=" md:max-w-[1040px]  w-[370px]   sm:w-full min-h-[400px] py-12">
             <div className="container mx-auto px-4">
                 <h1 className="text-4xl font-bold text-black mb-4">
                     Amazing Discounts on Skill Development Courses!
@@ -96,12 +96,12 @@ export default function FeaturedCourse() {
                                 <div key={course.id} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_33.33%] px-4">
                                     <Card className=" border-0 shadow mb-4">
                                         <CardContent className="p-0 relative">
-                                            <div className="relative aspect-[3/4]">
+                                            <div className="relative pb-[30%]">
+
                                                 <img
                                                     src={course.image}
                                                     alt={course.title}
-                                                    className="w-[500px] h-[300px] object-cover rounded-t-lg"
-                                                />
+                                                    className="w-[500px] h-[170px] object-cover rounded-t-lg"                                                />
                                                 <div className="absolute bottom-0 left-0 right-0  p-4">
                                                     <h3 className="text-xl font-bold text-black mb-2">{course.title}</h3>
                                                     <p className="text-gray-600 text-sm">{course.instructor}</p>

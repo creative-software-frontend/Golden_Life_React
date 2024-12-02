@@ -239,7 +239,7 @@ export default function UserLayout() {
                     </button>
 
                     <Header />
-                    <Cart className="hidden lg:block" />
+                    <Cart />
 
                     <LiveChat />
 

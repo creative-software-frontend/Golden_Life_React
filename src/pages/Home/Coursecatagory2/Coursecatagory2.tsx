@@ -13,7 +13,7 @@ const Coursecatagory2 = () => {
     ];
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4  mt-6 sm:w-full md:max-w-[1040px] w-[370px]">
+        <div className="  mt-6 lg:mt-12  grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4  mt-6 sm:w-full md:max-w-[1040px] w-[377px]">
             {grades.map((grade) => (
                 <Link
                     key={grade.id}

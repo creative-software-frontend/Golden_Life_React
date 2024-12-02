@@ -91,10 +91,11 @@ const Footer = () => {
                                 <Instagram size={20} className="text-gray-600" />
                             </Link>
                             <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
-                                <button className="text-gray-500 px-3 py-1">EN</button>
+                                <button className="text-gray-500 px-3 py-1 text-sm sm:text-base lg:text-lg">EN</button>
                                 <div className="h-6 w-[1px] bg-white mx-2"></div>
-                                <button className="text-white px-3 py-1">BN</button>
+                                <button className="text-white px-3 py-1 text-sm sm:text-base lg:text-lg">BN</button>
                             </div>
+
                         </div>
                     </div>
                 </div>

@@ -18,6 +18,7 @@ const Header: React.FC = () => {
     const [step, setStep] = useState(1);
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", ""]);
+    const [language, setLanguage] = useState<'en' | 'bn'>('en');
     const cancelButtonRef = useRef(null);
     const [value, setValue] = useState<string | undefined>();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -79,13 +80,56 @@ const Header: React.FC = () => {
         }
     };
 
+    const toggleLanguage = () => {
+        setLanguage(prev => prev === 'en' ? 'bn' : 'en');
+    };
+
+    const translations = {
+        en: {
+            search: "Search...",
+            login: "Login",
+            profile: "Profile",
+            settings: "Settings",
+            dashboard: "Dashboard",
+            close: "Close",
+            enterPhoneNumber: "Enter your phone number",
+            enterOTP: "Enter OTP",
+            verifyDetails: "Verify your details",
+            phoneNumber: "Phone Number",
+            next: "Next",
+            back: "Back",
+            verify: "Verify",
+            verificationComplete: "Verification Complete!",
+            loggedIn: "You are now logged in.",
+            finish: "Finish"
+        },
+        bn: {
+            search: "অনুসন্ধান...",
+            login: "লগইন",
+            profile: "প্রোফাইল",
+            settings: "সেটিংস",
+            dashboard: "ড্যাশবোর্ড",
+            close: "বন্ধ করুন",
+            enterPhoneNumber: "আপনার ফোন নম্বর লিখুন",
+            enterOTP: "ওটিপি লিখুন",
+            verifyDetails: "আপনার বিবরণ যাচাই করুন",
+            phoneNumber: "ফোন নম্বর",
+            next: "পরবর্তী",
+            back: "পিছনে",
+            verify: "যাচাই করুন",
+            verificationComplete: "যাচাইকরণ সম্পূর্ণ!",
+            loggedIn: "আপনি এখন লগ ইন করেছেন।",
+            finish: "শেষ করুন"
+        }
+    };
+
     return (
-        <div>
-            <header className="shadow md:w-[1040px] sm:w-full w-[370px] fixed top-6 -mt-7 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
+        <div className='sm:-mt-4'>
+            <header className=" shadow md:w-[1040px] sm:w-full w-[370px] fixed top-6  -mt-7 sm:-mt-4 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder={translations[language].search}
                         className="w-full pr-20 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -126,22 +170,32 @@ const Header: React.FC = () => {
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4" />
-                            <span className="ml-1 hidden sm:inline">Login</span>
+                            <span className="ml-1 hidden sm:inline">{translations[language].login}</span>
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Login</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</button>
-                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
+                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].login}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].profile}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].settings}</button>
+                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].dashboard}</Link>
                             </div>
                         )}
                     </div>
 
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
-                        <button className="text-gray-500 px-3 py-1">EN</button>
+                        <button
+                            className={`px-3 py-1 ${language === 'en' ? 'text-white' : 'text-gray-500'}`}
+                            onClick={() => setLanguage('en')}
+                        >
+                            EN
+                        </button>
                         <div className="h-6 w-[1px] bg-white mx-2"></div>
-                        <button className="text-white px-3 py-1">BN</button>
+                        <button
+                            className={`px-3 py-1 ${language === 'bn' ? 'text-white' : 'text-gray-500'}`}
+                            onClick={() => setLanguage('bn')}
+                        >
+                            BN
+                        </button>
                     </div>
                 </div>
             </header>
@@ -177,16 +231,16 @@ const Header: React.FC = () => {
                                         className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
                                         onClick={closeLoginModal}
                                     >
-                                        Close
+                                        {translations[language].close}
                                     </button>
 
                                     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
                                         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                                             <img className="mx-auto h-15 w-auto" src={logo} alt="Your Company" />
                                             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                                                {step === 1 && "Enter your phone number"}
-                                                {step === 2 && "Enter OTP"}
-                                                {step === 3 && "Verify your details"}
+                                                {step === 1 && translations[language].enterPhoneNumber}
+                                                {step === 2 && translations[language].enterOTP}
+                                                {step === 3 && translations[language].verifyDetails}
                                             </h2>
                                         </div>
 
@@ -195,7 +249,7 @@ const Header: React.FC = () => {
                                                 {step === 1 && (
                                                     <div>
                                                         <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
-                                                            Phone Number
+                                                            {translations[language].phoneNumber}
                                                         </label>
                                                         <div className="flex flex-col items-start w-full">
                                                             <PhoneInput
@@ -205,7 +259,7 @@ const Header: React.FC = () => {
                                                                 onChange={handlePhoneChange}
                                                                 required
                                                                 defaultCountry="BD"
-                                                                placeholder="Enter your phone number"
+                                                                placeholder={translations[language].enterPhoneNumber}
                                                                 className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
                                                         </div>
@@ -221,7 +275,7 @@ const Header: React.FC = () => {
                                                             }}
                                                             className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
-                                                            Next
+                                                            {translations[language].next}
                                                         </button>
                                                     </div>
                                                 )}
@@ -248,14 +302,14 @@ const Header: React.FC = () => {
                                                                 className="text-gray-500 hover:underline"
                                                                 onClick={handleBack}
                                                             >
-                                                                <ArrowLeft className="h-5 w-5 inline" /> Back
+                                                                <ArrowLeft className="h-5 w-5 inline" /> {translations[language].back}
                                                             </button>
                                                             <button
                                                                 type="button"
                                                                 onClick={handleVerify}
                                                                 className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
                                                             >
-                                                                Verify
+                                                                {translations[language].verify}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -263,14 +317,14 @@ const Header: React.FC = () => {
 
                                                 {step === 3 && (
                                                     <div>
-                                                        <h3 className="text-center text-lg font-semibold text-gray-700">Verification Complete!</h3>
-                                                        <p className="text-center text-gray-600 mt-4">You are now logged in.</p>
+                                                        <h3 className="text-center text-lg font-semibold text-gray-700">{translations[language].verificationComplete}</h3>
+                                                        <p className="text-center text-gray-600 mt-4">{translations[language].loggedIn}</p>
                                                         <button
                                                             type="button"
                                                             onClick={handleSubmit}
                                                             className="mt-4 w-full flex justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
-                                                            Finish
+                                                            {translations[language].finish}
                                                         </button>
                                                     </div>
                                                 )}

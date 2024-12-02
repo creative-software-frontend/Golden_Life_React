@@ -32,6 +32,8 @@ import {
 import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
 import useModalStore from "@/store/Store"
+import Cart from "@/pages/Home/Cart/Cart"
+import LiveChat from "@/pages/Home/LiveChat/Livechat"
 
 const data = {
     categories: [
@@ -88,7 +90,7 @@ const data = {
 
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
-    const { openLoginModal } = useModalStore();
+    const { openLoginModal, toggleClicked, changeCheckoutModal } = useModalStore();
 
     return (
         <SidebarProvider>
@@ -190,8 +192,23 @@ export default function CourseLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <main className="pt-8 -ms-2">
+                <main className="pt-8 ms-4">
+                    <button
+                        onClick={changeCheckoutModal}
+                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
+                    >
+                        <div className="flex items-center">
+                            <ShoppingBag className="h-6 w-6 text-red-500" />
+                            <div className="border-l border-gray-300 h-8 mx-2" />
+                            <div>
+                                <div className="font-semibold">{ } ITEMS</div>
+                                <div className="text-sm">৳ { }</div>
+                            </div>
+                        </div>
+                    </button>
                     <Header />
+                    <Cart />
+                    <LiveChat />
                     <Outlet />
                     <Footer />
                 </main>
