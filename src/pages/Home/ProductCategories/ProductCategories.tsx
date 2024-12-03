@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useRef } from 'react';
 
 const products = [
-  { id: 1, title: 'One piece gown', image: "../../../../public/image/products/sharee3.jpg" },
-  { id: 2, title: 'Smart Watch & Device', image: "../../../../public/image/products/sharee3.jpg" },
-  { id: 3, title: 'Snap and Grip', image: "../../../../public/image/products/sharee3.jpg" },
-  { id: 4, title: 'Ladies Winter Overcoat', image: "../../../../public/image/products/sharee3.jpg" },
-  { id: 5, title: 'Attractive Stylish Shirt', image: "../../../../public/image/products/maggi.webp" },
-  { id: 6, title: 'M19 100% Original', image: "../../../../public/image/products/sharee3.jpg" },
-  { id: 7, title: 'M19 100% Original', image: "../../../../public/image/products/egg.jpg" },
+  { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg" },
+  { id: 2, title: 'Smart Watch & Device', image: "../../../../public/image/categories/c1.jpg" },
+  { id: 3, title: 'Snap and Grip', image: "../../../../public/image/categories/c12.png" },
+  { id: 4, title: 'Ladies Winter Overcoat', image: "../../../../public/image/categories/c3.jpg" },
+  { id: 5, title: 'Attractive Stylish Shirt', image: "../../../../public/image/categories/c13.png" },
+  { id: 6, title: 'M19 100% Original', image: "../../../../public/image/categories/c4.jpg" },
+  { id: 7, title: 'M19 100% Original', image: "../../../../public/image/categories/c15png.jpg" },
   { id: 8, title: 'M19 100% Original', image: "../../../../public/image/products/sharee3.jpg" },
 ];
 

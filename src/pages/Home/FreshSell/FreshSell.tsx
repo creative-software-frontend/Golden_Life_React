@@ -37,15 +37,15 @@ export default function FreshSell() {
         {
             id: 1,
             name: "সিল্ক কাতান শাড়ি",
-            image: "../../../../public/image/products/sharee3.jpg",
+            image: "../../../../public/image/products/sharee2.jpg",
             originalPrice: 829,
             discountedPrice: 813,
             progress: 75,
         },
         {
             id: 2,
-            name: "Pulse Oximeter A",
-            image: "../../../../public/image/products/sharee3.jpg",
+            name: "Eid Collection",
+            image: "../../../../public/image/products/watch.jpg",
             originalPrice: 1165,
             discountedPrice: 981,
             progress: 60,
@@ -53,7 +53,7 @@ export default function FreshSell() {
         {
             id: 3,
             name: "Skating Shoe",
-            image: "../../../../public/image/products/sharee3.jpg",
+            image: "../../../../public/image/products/shoe.jpg",
             originalPrice: 2820,
             discountedPrice: 2120,
             progress: 85,
@@ -69,15 +69,16 @@ export default function FreshSell() {
         {
             id: 5,
             name: "Ladis Watch with",
-            image: "../../../../public/image/products/sharee3.jpg",
+            image: "../../../../public/image/categories/c1.jpg",
             originalPrice: 480,
             discountedPrice: 435,
             progress: 90,
         },
         {
             id: 6,
-            name: "Eid Collection",
-            image: "../../../../public/image/products/sharee3.jpg",
+            name: "Pulse Oximeter A",
+            image: "../../../../public/image/products/pulseoximeter.jpg",
+
             originalPrice: 1180,
             discountedPrice: 1157,
             progress: 30,

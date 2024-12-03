@@ -23,7 +23,7 @@ const courses: Course[] = [
         instructor: 'Sarah Rahman',
         price: '1,690',
         promoCode: 'SE1690',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
+        image: '../../../../public/image/featiredcourse/f4.jpg',
 
     },
     {
@@ -32,7 +32,7 @@ const courses: Course[] = [
         instructor: 'Munzereen Shahid',
         price: '3,850',
         promoCode: 'IELTS3850',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
+        image: '../../../../public/image/featiredcourse/f3.jpg',
     },
     {
         id: '3',
@@ -40,7 +40,7 @@ const courses: Course[] = [
         instructor: 'Faria Ahmed',
         price: '1,690',
         promoCode: 'EMKF1690',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
+        image: '../../../../public/image/featiredcourse/f2.jpg',
     },
     {
         id: '4',
@@ -48,24 +48,24 @@ const courses: Course[] = [
         instructor: 'Ayman Sadiq & Sadman Sadiq',
         price: '890',
         promoCode: 'FBM890',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
+        image: '../../../../public/image/featiredcourse/f1.jpg',
     },
-    {
-        id: '5',
-        title: 'Graphic Design',
-        instructor: 'Rafiq Islam',
-        price: '1,950',
-        promoCode: 'GDF1950',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
-    },
-    {
-        id: '6',
-        title: 'YouTube Marketing',
-        instructor: 'Karim Hassan',
-        price: '1,950',
-        promoCode: 'YT1950',
-        image: '../../../../public/image/Banner/Screenshot_3.png',
-    },
+    // {
+    //     id: '5',
+    //     title: 'Graphic Design',
+    //     instructor: 'Rafiq Islam',
+    //     price: '1,950',
+    //     promoCode: 'GDF1950',
+    //     image: '../../../../public/image/Banner/Screenshot_3.png',
+    // },
+    // {
+    //     id: '6',
+    //     title: 'YouTube Marketing',
+    //     instructor: 'Karim Hassan',
+    //     price: '1,950',
+    //     promoCode: 'YT1950',
+    //     image: '../../../../public/image/Banner/Screenshot_3.png',
+    // },
 ]
 
 export default function FeaturedCourse() {
