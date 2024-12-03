@@ -6,7 +6,7 @@ export default function Categories() {
         {
             id: 1,
             name: "Beauty & Personal Care",
-            icon: "../../../../public/image/categories/c11.png",
+            icon: "../../../../public/image/categories/c1.jpg",
         },
         {
             id: 2,

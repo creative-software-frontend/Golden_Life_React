@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
+import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck, Lightbulb, Book, Zap, Users, DollarSign, Leaf, Microscope, Heart, Calculator, Globe, Camera, Briefcase, Palette, Code } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -82,6 +82,167 @@ const data = {
                     // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
                     // { title: "Animation", url: "/courses/design/animation" },
                     // { title: "Illustration", url: "/courses/design/illustration" },
+                ],
+            },
+            {
+                title: "Technology",
+                url: "",
+                icon: Code,
+                isActive: true,
+                items: [
+                    { title: "Web Development", url: "" },
+                    { title: "Mobile App Development", url: "" },
+                    { title: "Data Science", url: "" },
+                    { title: "Machine Learning", url: "" },
+                    { title: "Cloud Computing", url: "" },
+                    { title: "Cybersecurity", url: "" },
+                ],
+            },
+            {
+                title: "Design",
+                url: "",
+                icon: Palette,
+                items: [
+                    { title: "Graphic Design", url: "" },
+                    { title: "UX/UI Design", url: "" },
+                    { title: "3D Modeling", url: "" },
+                    { title: "Animation", url: "" },
+                    { title: "Illustration", url: "" },
+                ],
+            },
+            {
+                title: "Business",
+                url: "",
+                icon: Briefcase,
+                items: [
+                    { title: "Entrepreneurship", url: "" },
+                    { title: "Marketing", url: "" },
+                    { title: "Finance", url: "" },
+                    { title: "Project Management", url: "" },
+                    { title: "Leadership", url: "" },
+                ],
+            },
+            {
+                title: "Photography",
+                url: "",
+                icon: Camera,
+                items: [
+                    { title: "Digital Photography", url: "" },
+                    { title: "Portrait Photography", url: "" },
+                    { title: "Landscape Photography", url: "" },
+                    { title: "Photo Editing", url: "" },
+                ],
+            },
+            
+            {
+                title: "Language",
+                url: "",
+                icon: Globe,
+                items: [
+                    { title: "English", url: "" },
+                    { title: "Spanish", url: "" },
+                    { title: "Mandarin", url: "" },
+                    { title: "French", url: "" },
+                    { title: "German", url: "" },
+                ],
+            },
+            {
+                title: "Mathematics",
+                url: "",
+                icon: Calculator,
+                items: [
+                    { title: "Algebra", url: "" },
+                    { title: "Calculus", url: "" },
+                    { title: "Statistics", url: "" },
+                    { title: "Geometry", url: "" },
+                ],
+            },
+            {
+                title: "Health & Fitness",
+                url: "",
+                icon: Heart,
+                items: [
+                    { title: "Nutrition", url: "" },
+                    { title: "Yoga", url: "" },
+                    { title: "Personal Training", url: "" },
+                    { title: "Mental Health", url: "" },
+                ],
+            },
+            {
+                title: "Science",
+                url: "",
+                icon: Microscope,
+                items: [
+                    { title: "Physics", url: "" },
+                    { title: "Chemistry", url: "" },
+                    { title: "Biology", url: "" },
+                    { title: "Astronomy", url: "" },
+                ],
+            },
+            {
+                title: "Environmental Studies",
+                url: "",
+                icon: Leaf,
+                items: [
+                    { title: "Climate Change", url: "" },
+                    { title: "Sustainability", url: "" },
+                    { title: "Conservation", url: "" },
+                    { title: "Renewable Energy", url: "" },
+                ],
+            },
+            {
+                title: "Personal Finance",
+                url: "",
+                icon: DollarSign,
+                items: [
+                    { title: "Investing", url: "" },
+                    { title: "Budgeting", url: "" },
+                    { title: "Retirement Planning", url: "" },
+                    { title: "Tax Planning", url: "" },
+                ],
+            },
+            {
+                title: "Social Sciences",
+                url: "",
+                icon: Users,
+                items: [
+                    { title: "Psychology", url: "" },
+                    { title: "Sociology", url: "" },
+                    { title: "Anthropology", url: "" },
+                    { title: "Political Science", url: "" },
+                ],
+            },
+            {
+                title: "Engineering",
+                url: "",
+                icon: Zap,
+                items: [
+                    { title: "Electrical Engineering", url: "" },
+                    { title: "Mechanical Engineering", url: "" },
+                    { title: "Civil Engineering", url: "" },
+                    { title: "Chemical Engineering", url: "" },
+                ],
+            },
+            {
+                title: "Writing",
+                url: "",
+                icon: Book,
+                items: [
+                    { title: "Creative Writing", url: "" },
+                    { title: "Technical Writing", url: "" },
+                    { title: "Journalism", url: "" },
+                    { title: "Copywriting", url: "" },
+                ],
+            },
+            {
+                title: "Personal Development",
+                url: "",
+                icon: Lightbulb,
+                items: [
+                    { title: "Time Management", url: "" },
+                    { title: "Public Speaking", url: "" },
+                    { title: "Critical Thinking", url: "" },
+                    { title: "Emotional Intelligence", url: "" },
                 ],
             },
         ],
