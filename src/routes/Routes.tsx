@@ -27,6 +27,7 @@ import TopupLayout from "@/layout/TopUplayout/TopUplayout";
 import CommingSoon from "./../pages/commingSoon";
 import OutletLayout from "@/layout/OutletLayout/OutletLayout";
 import DriveLayout from "@/layout/DriveLayout/DriveLayout";
+import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
 
 
 
@@ -45,6 +46,10 @@ export const routes = createBrowserRouter([
             {
                 path: 'allcategories',
                 element: <AllCategories />
+            },
+            {
+                path: 'allcourses2',
+                element: < AllCourses2 />
             },
             {
                 path: 'productpage',  // Separate route for Help page
@@ -73,6 +78,7 @@ export const routes = createBrowserRouter([
                 element: < Course />
             },
 
+
             {
                 path: 'hsc',
                 element: < Hsc />
@@ -89,6 +95,7 @@ export const routes = createBrowserRouter([
         ]
 
     },
+
 
     {
         path: '/percel',

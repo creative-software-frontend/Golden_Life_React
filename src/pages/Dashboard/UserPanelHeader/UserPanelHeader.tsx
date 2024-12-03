@@ -99,7 +99,7 @@ export default function AdminHeader() {
                     {/* Navigation links */}
                     <nav className="ml-10 hidden md:flex space-x-8">
                         <NavLink
-                            to="/merchant"
+                            // to="/merchant"
                             className={({ isActive }) =>
                                 isActive
                                     ? 'text-gray-900 dark:text-white font-medium border-b-4 border-red-500 pb-2'
@@ -109,7 +109,8 @@ export default function AdminHeader() {
                             Dashboard
                         </NavLink>
                         <NavLink
-                            to="/merchant/deliveries"
+                            // to="/merchant/deliveries"
+                            to=""
                             className={({ isActive }) =>
                                 isActive
                                     ? 'text-gray-900 dark:text-white font-medium border-b-4 border-red-500 pb-2'
@@ -119,7 +120,7 @@ export default function AdminHeader() {
                             Deliveries
                         </NavLink>
                         <NavLink
-                            to="/merchant/invoices"
+                            to=""
                             className={({ isActive }) =>
                                 isActive
                                     ? 'text-gray-900 dark:text-white font-medium border-b-4 border-red-500 pb-2'
@@ -128,8 +129,8 @@ export default function AdminHeader() {
                         >
                             Invoices
                         </NavLink>
-                        <NavLink
-                            to="/merchant/store"
+                        <NavLink 
+                        to=""
                             className={({ isActive }) =>
                                 isActive
                                     ? 'text-gray-900 dark:text-white font-medium border-b-4 border-red-500 pb-2'
@@ -154,7 +155,7 @@ export default function AdminHeader() {
                     </div>
                     {/* New Delivery Button  */}
                     <button
-                        onClick={() => navigate('/neworder')}
+                        onClick={() => navigate('')}
                         className="bg-primary-default hidden lg:block text-white px-4 py-2 rounded-md md:flex items-center"
                     >
                         New order
