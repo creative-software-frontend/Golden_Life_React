@@ -48,7 +48,7 @@ export const routes = createBrowserRouter([
                 element: <AllCategories />
             },
             {
-                path: 'allcourses2',
+                path: 'all-courses',
                 element: < AllCourses2 />
             },
             {

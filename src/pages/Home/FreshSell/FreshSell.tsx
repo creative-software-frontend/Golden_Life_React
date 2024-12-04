@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export default function FreshSell() {
     const [timeLeft, setTimeLeft] = useState({
@@ -128,7 +129,7 @@ export default function FreshSell() {
                     <span>:</span>
                     <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
                 </div>
-                <Link to="#" className="flex items-center hover:underline">
+                <Link to="/allProducts" className="flex items-center hover:underline">
                     All Products
                     <ChevronRight className="h-4 w-4" />
                 </Link>
@@ -167,6 +168,10 @@ export default function FreshSell() {
                                     style={{ width: `${product.progress}%` }}
                                 />
                             </div>
+                            <Button size="sm" variant="outline" className="w-full mt-4">
+                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                Add
+                            </Button>
                         </div>
                     </Link>
                 ))}

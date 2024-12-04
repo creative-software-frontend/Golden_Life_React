@@ -125,7 +125,7 @@ const Header: React.FC = () => {
 
     return (
         <div className=''>
-            <header className=" shadow md:w-[1040px] sm:w-full w-[370px] fixed top-6  -mt-7 sm:-mt-4 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
+            <header className=" shadow md:w-[1040px] sm:w-full w-[370px] fixed top-3  -mt-7 sm:-mt-4 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
                         type="text"

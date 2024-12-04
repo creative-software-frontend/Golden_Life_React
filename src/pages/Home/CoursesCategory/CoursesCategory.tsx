@@ -1,66 +1,67 @@
-import { ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Courses() {
     const courses = [
         {
             id: 1,
-            name: "Web Development Bootcamp",
+            name: "Web Development ",
             icon: "../../../../public/image/courses/c1.avif",
         },
         {
             id: 2,
-            name: "Data Science Essentials",
+            name: "Data Science ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 3,
-            name: "Graphic Design Mastery",
+            name: "Graphic Design ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 4,
-            name: "Digital Marketing Pro",
+            name: "Digital Marketing ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 5,
-            name: "Mobile App Development",
+            name: " App Development",
             icon: "../../../../public/image/courses/c2.jpg",
         },
         {
             id: 6,
-            name: "AI and Machine Learning",
+            name: " Machine Learning",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 7,
-            name: "Cybersecurity Basics",
+            name: "Cybersecurity ",
             icon: "../../../../public/image/courses/c4.jpg",
         },
         {
             id: 8,
-            name: "UI/UX Design Principles",
+            name: "UI/UX Design ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 9,
-            name: "Cloud Computing Foundations",
+            name: "Cloud Computing ",
             icon: "../../../../public/image/courses/c2.jpg",
         },
         {
             id: 10,
-            name: "Blockchain Basics",
+            name: "Blockchain ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 11,
-            name: "Software Testing Fundamentals",
+            name: "Software Testing ",
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 12,
-            name: "Big Data Analytics",
+            name: "Big Data ",
             icon: "../../../../public/image/courses/c3.png",
         },
     ];
@@ -70,7 +71,7 @@ export default function Courses() {
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">Courses</h2>
                 <Link
-                    to="/allcourses2"
+                    to="/all-courses"
                     className="text-white text-sm font-medium flex items-center hover:underline"
                 >
                     All Courses
@@ -93,9 +94,13 @@ export default function Courses() {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        <span className="text-sm text-center text-gray-900">
+                        <span className="text-sm text-center text-gray-900 text-nowrap">
                             {course.name}
                         </span>
+                        <Button size="sm" variant="outline" className="w-full mt-2">
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Add
+                        </Button>
                     </Link>
                 ))}
             </div>

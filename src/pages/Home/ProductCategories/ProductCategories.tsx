@@ -1,6 +1,7 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
+import { Button } from '@/components/ui/button';
 
 const products = [
   { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg" },
@@ -59,7 +60,7 @@ export default function ProductCategories() {
         >
           <div className="flex gap-4">
             {products.map((product) => (
-              <Link key={product.id} to="#" className="flex-none w-[160px] group border border-gray-300 rounded-lg p-2">
+              <Link key={product.id} to="#" className="flex-none w-[140px] group border border-gray-300 rounded-lg p-2">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   <img
                     src={product.image}
@@ -67,9 +68,13 @@ export default function ProductCategories() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                 </div>
-                <h3 className="mt-2 text-lg font-medium text-white line-clamp-2">
+                <h3 className="mt-2 text-lg font-medium text-white line-clamp-2 text-nowrap">
                   {product.title}
                 </h3>
+                <Button size="sm" variant="outline" className='w-full mt-2'>
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
               </Link>
             ))}
           </div>

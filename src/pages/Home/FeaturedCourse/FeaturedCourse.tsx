@@ -118,9 +118,14 @@ export default function FeaturedCourse() {
                                                         <div className="text-green-400 font-mono font-bold">{course.promoCode}</div>
                                                     </div>
                                                 </div>
-                                                <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                                                    Enroll in Course
-                                                </Button>
+                                                <div className="flex justify-between gap-4">
+                                                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+                                                        Show
+                                                    </Button>
+                                                    <Button className="w-full bg-gray-400 hover:bg-green-600 text-white">
+                                                        Enroll in Course
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </CardContent>
                                     </Card>

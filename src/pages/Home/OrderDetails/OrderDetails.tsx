@@ -1,4 +1,5 @@
-import { Package } from "lucide-react";
+import React from 'react';
+import { Package } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint } from '@fortawesome/free-solid-svg-icons';
@@ -13,8 +14,13 @@ const OrderDetails: React.FC = () => {
         <div className="max-w-7xl mx-auto p-4 space-y-6 bg-gray-100 relative">
             {/* Print Button and Image */}
             <div className="absolute top-4 right-4 flex items-center space-x-2">
+                <div className="text-right mr-2">
+                    <p className="text-sm font-semibold">Creative Software</p>
+                    <p className="text-xs">123 Tech Street, Digital City</p>
+                    <p className="text-xs">+1 (555) 123-4567</p>
+                </div>
                 <img
-                    src="../../../../.../../../public/image/logo/logo.jpg" // replace with the actual path to your image
+                    src="../../../../.../../../public/image/logo/logo.jpg"
                     alt="Logo"
                     className="w-100 mx-2 h-8 object-cover rounded-full"
                 />
@@ -32,7 +38,7 @@ const OrderDetails: React.FC = () => {
 
             {/* Order Header */}
             <div className="flex justify-between items-start p-4 bg-white rounded-md">
-                <div className="flex gap-4 item-center">
+                <div className=" gap-4 item-center text-start ">
                     <div className="text-sm text-muted-foreground">
                         Order #18769
                     </div>
@@ -129,9 +135,13 @@ const OrderDetails: React.FC = () => {
 
             {/* Footer Section */}
             <div className="flex justify-between items-center mt-6">
-                <span className="text-sm font-semibold text-muted-foreground">Creative Software</span>
+                <div>
+                    <span className="text-sm font-semibold text-muted-foreground">Creative Software</span>
+                    <p className="text-xs text-muted-foreground">123 Tech Street, Digital City</p>
+                    <p className="text-xs text-muted-foreground">+1 (555) 123-4567</p>
+                </div>
                 <img
-                    src="../../../../.../../../public/image/logo/logo.jpg" // replace with the actual path to your logo
+                    src="../../../../.../../../public/image/logo/logo.jpg"
                     alt="Logo"
                     className="w-100 h-8 mx-2 object-cover"
                 />
@@ -141,3 +151,4 @@ const OrderDetails: React.FC = () => {
 };
 
 export default OrderDetails;
+

@@ -1,11 +1,11 @@
 'use client'
 
-import { ChevronLeft, ChevronRight } from "lucide-react"
-// import Image from "next/image"
+import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
 import { useRef } from "react"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import { Button } from "@/components/ui/button"
 
 const products = [
     { name: "Koss KPH7 Portable", price: "£60.00", discount: "-10%", oldPrice: "£86.00", image: "../../../../public/image/products/airpods.jpg" },
@@ -49,7 +49,7 @@ export default function TrendingCategory() {
     }
 
     return (
-        <section className="py-4 px-4 overflow-hidden  md:max-w-[1040px] w-[370px] sm:w-full">
+        <section className="py-4 px-4 overflow-hidden md:max-w-[1040px] w-full">
             <div className="container mx-auto">
                 <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold mb-4">Trending Products</h2>
@@ -68,9 +68,7 @@ export default function TrendingCategory() {
                                             <img
                                                 src={product.image}
                                                 alt={product.name}
-                                                layout="fill"
-                                                objectFit="cover"
-                                                className="rounded-md"
+                                                className="rounded-md object-cover w-full h-full"
                                             />
                                             {product.discount && (
                                                 <span className="absolute top-2 right-2 bg-orange-500 text-white text-sm px-2 py-1 rounded">
@@ -79,11 +77,17 @@ export default function TrendingCategory() {
                                             )}
                                         </div>
                                         <h3 className="font-medium mb-2 text-start">{product.name}</h3>
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-semibold">{product.price}</p>
-                                            {product.oldPrice && (
-                                                <p className="text-sm text-muted-foreground line-through">{product.oldPrice}</p>
-                                            )}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-semibold">{product.price}</p>
+                                                {product.oldPrice && (
+                                                    <p className="text-sm text-muted-foreground line-through">{product.oldPrice}</p>
+                                                )}
+                                            </div>
+                                            <Button size="sm" variant="outline">
+                                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                                Add
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -110,3 +114,4 @@ export default function TrendingCategory() {
         </section>
     )
 }
+

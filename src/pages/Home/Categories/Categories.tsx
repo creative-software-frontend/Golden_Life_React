@@ -1,4 +1,5 @@
-import { ChevronRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ChevronRight, ShoppingCart } from "lucide-react"
 import { Link } from "react-router-dom"
 
 export default function Categories() {
@@ -93,9 +94,13 @@ export default function Categories() {
                                 className="w-full h-full object-contain"
                             />
                         </div>
-                        <span className="text-sm text-center text-gray-900">
+                        <span className="text-sm text-center text-gray-900 text-nowrap">
                             {category.name}
                         </span>
+                        <Button size="sm" variant="outline" className="w-full mt-2">
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Add
+                        </Button>
                     </Link>
                 ))}
             </div>

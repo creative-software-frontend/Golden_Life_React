@@ -165,9 +165,14 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
                         <span className="text-sm text-slate-600">{lesson.type}</span>
                       </div>
                       <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
-                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                        Enroll in Course
-                      </Button>
+                      <div className="flex justify-between gap-4">
+                        <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+                        Show
+                        </Button>
+                        <Button className="w-full bg-gray-400 hover:bg-green-600 text-white">
+                          Enroll in Course
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
