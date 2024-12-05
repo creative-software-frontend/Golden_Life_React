@@ -1,8 +1,19 @@
 import { Button } from "@/components/ui/button";
+import useModalStore from "@/store/Store";
 import { ChevronRight, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Courses() {
+    const [cart, setCart] = useState<any[]>([])
+    const { toggleClicked } = useModalStore();
+
+    const addToCart = (product: any) => {
+        const updatedCart = [...cart, product];
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        toggleClicked(); // trigger to update cart on other components
+    }
     const courses = [
         {
             id: 1,
@@ -97,7 +108,14 @@ export default function Courses() {
                         <span className="text-sm text-center text-gray-900 text-nowrap">
                             {course.name}
                         </span>
-                        <Button size="sm" variant="outline" className="w-full mt-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                                addToCart(courses); // Add product to the cart
+                            }}
+                            className="w-full mt-2"
+                        >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Add
                         </Button>

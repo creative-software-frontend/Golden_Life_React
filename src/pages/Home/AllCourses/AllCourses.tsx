@@ -4,7 +4,7 @@ import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, Clock, Users, X, Play } from 'lucide-react'
+import { Star, Clock, Users, X, Play, ShoppingCart } from 'lucide-react'
 import {
   Carousel,
   CarouselContent,
@@ -12,14 +12,21 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import Coursecatagory2 from "../Coursecatagory2/Coursecatagory2"
 import CourseInstructor from "../Courseinstructor/CourseInstructor"
 import CoursePlan from "../CoursePlan/CoursePlan"
 import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
-// import useModalStore from "@/store/Store"
+import useModalStore from "@/store/Store"
 
 interface Lesson {
+  id: string
   type: string
   number: string
   title: string
@@ -37,13 +44,14 @@ interface Lesson {
 
 const lessons: Lesson[] = [
   {
+    id: "1",
     type: "HSC উচ্চতর গণিত ১ম পত্র",
     number: "2.1",
     title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
     thumbnail: "/placeholder.svg?height=200&width=400",
     color: "bg-purple-500",
     badge: "HSC",
-    image: "../../../../public/image/Banner/Screenshot_3.png",
+    image: "/placeholder.svg?height=400&width=800",
     instructor: "Dr. Rahim Khan",
     rating: 4.8,
     studentsEnrolled: 1500,
@@ -52,13 +60,14 @@ const lessons: Lesson[] = [
     category: "Mathematics",
   },
   {
+    id: "2",
     type: "SSC পদার্থবিজ্ঞান",
     number: "8.1",
     title: "আলোর প্রকৃতি",
     thumbnail: "/placeholder.svg?height=200&width=400",
     color: "bg-blue-500",
     badge: "SSC",
-    image: "/courses/ssc/physics/8.1",
+    image: "/placeholder.svg?height=400&width=800",
     instructor: "Prof. Salma Begum",
     rating: 4.7,
     studentsEnrolled: 2000,
@@ -66,70 +75,15 @@ const lessons: Lesson[] = [
     level: "Beginner",
     category: "Physics",
   },
-  {
-    type: "HSC উচ্চতর গণিত ১ম পত্র",
-    number: "2.1",
-    title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-purple-500",
-    badge: "HSC",
-    image: "../../../../public/image/Banner/Screenshot_3.png",
-    instructor: "Dr. Rahim Khan",
-    rating: 4.8,
-    studentsEnrolled: 1500,
-    duration: "8 weeks",
-    level: "Intermediate",
-    category: "Mathematics",
-  },
-  {
-    type: "SSC পদার্থবিজ্ঞান",
-    number: "8.1",
-    title: "আলোর প্রকৃতি",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-blue-500",
-    badge: "SSC",
-    image: "/courses/ssc/physics/8.1",
-    instructor: "Prof. Salma Begum",
-    rating: 4.7,
-    studentsEnrolled: 2000,
-    duration: "6 weeks",
-    level: "Beginner",
-    category: "Physics",
-  },
-  {
-    type: "HSC উচ্চতর গণিত ১ম পত্র",
-    number: "2.1",
-    title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-purple-500",
-    badge: "HSC",
-    image: "../../../../public/image/Banner/Screenshot_3.png",
-    instructor: "Dr. Rahim Khan",
-    rating: 4.8,
-    studentsEnrolled: 1500,
-    duration: "8 weeks",
-    level: "Intermediate",
-    category: "Mathematics",
-  },
-  {
-    type: "SSC পদার্থবিজ্ঞান",
-    number: "8.1",
-    title: "আলোর প্রকৃতি",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-blue-500",
-    badge: "SSC",
-    image: "/courses/ssc/physics/8.1",
-    instructor: "Prof. Salma Begum",
-    rating: 4.7,
-    studentsEnrolled: 2000,
-    duration: "6 weeks",
-    level: "Beginner",
-    category: "Physics",
-  },
-  // Add more courses here...
+  // Add more lessons here...
 ]
 
-const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (lesson: Lesson) => void }> = ({ courses, title, onSelect }) => {
+const CourseCarousel: React.FC<{
+  courses: Lesson[],
+  title: string,
+  onSelect: (lesson: Lesson) => void,
+  onAddToCart: (lesson: Lesson) => void
+}> = ({ courses, title, onSelect, onAddToCart }) => {
   return (
     <div className="mb-12">
       <h3 className="text-xl font-semibold mb-4">{title}</h3>
@@ -143,40 +97,42 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
         <CarouselContent>
           {courses.map((lesson, index) => (
             <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 pl-4">
-              <div
-                onClick={() => onSelect(lesson)}
-                className="cursor-pointer block"
-              >
-                <Card className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
-                  <CardContent className="p-0">
-                    <div className="relative aspect-[2/1] bg-teal-100">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Button size="icon" className="h-16 w-16 rounded-full bg-white/90 hover:bg-white shadow-lg">
-                          <Play className="h-8 w-8 text-slate-600 ml-1" />
-                        </Button>
-                      </div>
-                      <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
-                        {lesson.badge}
-                      </div>
+              <Card className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
+                <CardContent className="p-0">
+                  <div className="relative aspect-[2/1] bg-teal-100">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Button size="icon" className="h-16 w-16 rounded-full bg-white/90 hover:bg-white shadow-lg">
+                        <Play className="h-8 w-8 text-slate-600 ml-1" />
+                      </Button>
                     </div>
-                    <div className="p-4 space-y-2 mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
-                        <span className="text-sm text-slate-600">{lesson.type}</span>
-                      </div>
-                      <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
-                      <div className="flex justify-between gap-4">
-                        <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+                    <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
+                      {lesson.badge}
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
+                      <span className="text-sm text-slate-600">{lesson.type}</span>
+                    </div>
+                    <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
+                    <div className="flex justify-between gap-4">
+                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white" onClick={() => onSelect(lesson)}>
                         Show
-                        </Button>
-                        <Button className="w-full bg-gray-400 hover:bg-green-600 text-white">
-                          Enroll in Course
-                        </Button>
-                      </div>
+                      </Button>
+                      <Button 
+                      // onClick={() => {
+
+
+                      //   addToCart(product);
+                      //   toggleClicked()
+                      // }} 
+                      className="w-full bg-gray-400 hover:bg-green-600 text-white" onClick={() => onAddToCart(lesson)}>
+                        Add to Cart
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -187,60 +143,83 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string, onSelect: (le
   )
 }
 
+
 export default function AllCourses() {
-  // const { closeLoginModal } = useModalStore()
+
+  // const { changeCheckoutModal, toggleClicked } = useModalStore();
   const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(null)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")
+  const [cart, setCart] = React.useState<Lesson[]>([])
+  const [isCartModalOpen, setIsCartModalOpen] = React.useState(false)
 
+
+  // const addToCart = (product: Product) => {
+  //   const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  //   const updatedCart = [...existingCart, {
+  //     ...product,
+  //     quantity: 1
+  //   }];
+  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
+  // };
   const handleCourseSelect = (lesson: Lesson) => {
     setSelectedLesson(lesson)
     setIsModalOpen(true)
   }
 
   const closeModal = () => {
-    console.log("Close button clicked");
-    setIsModalOpen(false);
-    setSelectedLesson(null);
-  };
+    setIsModalOpen(false)
+    setSelectedLesson(null)
+  }
+
+  const addToCart = (lesson: Lesson) => {
+    setCart((prevCart) => [...prevCart, lesson])
+    setIsCartModalOpen(true)
+  }
+
+  const closeCartModal = () => {
+    setIsCartModalOpen(false)
+  }
 
   return (
     <>
       <Coursecatagory2 />
-      <div className="sm:w-full md:max-w-[1040px] w-[385px] mt-8 mb-4  ">
+      <div className="sm:w-full md:max-w-[1040px] w-[385px] mt-8 mb-4">
         <div className="space-y-12">
-          <CourseCarousel courses={lessons.slice(0, 4)} title="Popular Courses" onSelect={handleCourseSelect} />
-          {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" onSelect={handleCourseSelect} /> */}
-          <CourseCarousel courses={lessons} title="All Courses" onSelect={handleCourseSelect} />
+          <CourseCarousel
+            courses={lessons.slice(0, 4)}
+            title="Popular Courses"
+            onSelect={handleCourseSelect}
+            onAddToCart={addToCart}
+          />
+          <CourseCarousel
+            courses={lessons}
+            title="All Courses"
+            onSelect={handleCourseSelect}
+            onAddToCart={addToCart}
+          />
         </div>
-{/* modal */}
+
         {isModalOpen && selectedLesson && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
-              {/* Scrollable Content */}
-              <div className="overflow-y-auto max-h-screen">
-                {/* Banner Content */}
+          <Dialog open={isModalOpen} onOpenChange={closeModal}>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>{selectedLesson.title}</DialogTitle>
+              </DialogHeader>
+              <div className="overflow-y-auto max-h-[80vh]">
                 <div
-                  className="relative  w-full bg-cover bg-center text-white"
+                  className="relative w-full bg-cover bg-center text-white"
                   style={{ backgroundImage: `url(${selectedLesson.image})` }}
                 >
                   <div className="absolute inset-0 bg-black opacity-60"></div>
                   <div className="relative z-10 h-full max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 flex flex-col justify-center">
                     <div className="space-y-6 text-start">
-                      <button
-                        onClick={closeModal}
-                        className="absolute right-4 bg-black rounded-full p-2 z-10"
-                        aria-label="Close modal"
-                      >
-                        <X className="w-5 h-5 text-gray-600" />
-                      </button>
                       <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
                         {selectedLesson.title}
                       </h1>
                       <p className="text-xl">
                         Taught by <span className="font-semibold">{selectedLesson.instructor}</span>
                       </p>
-
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center">
                           <Star className="w-5 h-5 text-yellow-400" />
@@ -269,7 +248,6 @@ export default function AllCourses() {
                   </div>
                 </div>
 
-                {/* Tab Navigation */}
                 <div className="p-2">
                   <div className="flex justify-center mb-4">
                     <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
@@ -279,8 +257,8 @@ export default function AllCourses() {
                           onClick={() => setSelectedTab(tab as any)}
                           aria-selected={selectedTab === tab}
                           className={`px-2 py-1 rounded-md transition-all duration-300 ${selectedTab === tab
-                              ? "bg-primary-default text-white"
-                              : "bg-gray-200 hover:bg-gray-300"
+                            ? "bg-primary-default text-white"
+                            : "bg-gray-200 hover:bg-gray-300"
                             }`}
                         >
                           {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -289,7 +267,6 @@ export default function AllCourses() {
                     </div>
                   </div>
 
-                  {/* Tab Content */}
                   <div>
                     {selectedTab === "instructor" && <CourseInstructor />}
                     {selectedTab === "structure" && <CoursePlan />}
@@ -298,11 +275,28 @@ export default function AllCourses() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </DialogContent>
+          </Dialog>
         )}
 
+        <Dialog open={isCartModalOpen} onOpenChange={closeCartModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Your Cart</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {cart.map((item, index) => (
+                <div key={index} className="flex justify-between items-center mb-2">
+                  <span>{item.title}</span>
+                  <Badge>{item.badge}</Badge>
+                </div>
+              ))}
+            </div>
+            <Button onClick={closeCartModal} className="mt-4">Close</Button>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   )
 }
+

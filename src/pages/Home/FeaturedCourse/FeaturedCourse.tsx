@@ -101,7 +101,7 @@ export default function FeaturedCourse() {
                                                 <img
                                                     src={course.image}
                                                     alt={course.title}
-                                                    className="w-[500px] h-[170px] object-cover rounded-t-lg"                                                />
+                                                    className="w-[500px] h-[170px] object-cover rounded-t-lg" />
                                                 <div className="absolute bottom-0 left-0 right-0  p-4">
                                                     <h3 className="text-xl font-bold text-black mb-2">{course.title}</h3>
                                                     <p className="text-gray-600 text-sm">{course.instructor}</p>

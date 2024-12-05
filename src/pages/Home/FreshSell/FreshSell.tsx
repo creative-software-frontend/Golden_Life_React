@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { ChevronRight, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import useModalStore from "@/store/Store";
 
 export default function FreshSell() {
     const [timeLeft, setTimeLeft] = useState({
@@ -16,6 +17,8 @@ export default function FreshSell() {
     const isDraggingRef = useRef(false);
     const startXRef = useRef(0);
     const scrollLeftRef = useRef(0);
+    const [cart, setCart] = useState<any[]>([])
+    const { toggleClicked } = useModalStore();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -87,6 +90,7 @@ export default function FreshSell() {
     ];
 
     const handleMouseDown = (e: React.MouseEvent) => {
+        
         if (scrollRef.current) {
             isDraggingRef.current = true;
             startXRef.current = e.clientX - scrollRef.current.offsetLeft;
@@ -116,6 +120,25 @@ export default function FreshSell() {
             scrollRef.current.removeEventListener("mouseleave", handleMouseUp);
             scrollRef.current.style.cursor = "grab"; // Reset cursor
         }
+    };
+
+    // const addToCart = (product: any) => {
+    //     const updatedCart = [...cart, product];
+    //     setCart(updatedCart);
+    //     localStorage.setItem("cart", JSON.stringify(updatedCart));
+    //     toggleClicked(); // trigger to update cart on other components
+    // }
+    const addToCart = (product: any) => {
+        // Retrieve existing cart items from localStorage
+        const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+        // Add the product to the cart array
+        const updatedCart = [...existingCart, product];
+
+        // Update state and localStorage
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        toggleClicked(); // Trigger update in other components
     };
 
     return (
@@ -168,7 +191,14 @@ export default function FreshSell() {
                                     style={{ width: `${product.progress}%` }}
                                 />
                             </div>
-                            <Button size="sm" variant="outline" className="w-full mt-4">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                    addToCart(product); // Add product to the cart
+                                }}
+                                className="w-full mt-2"
+                            >
                                 <ShoppingCart className="h-4 w-4 mr-2" />
                                 Add
                             </Button>

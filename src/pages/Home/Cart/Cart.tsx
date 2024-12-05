@@ -37,24 +37,39 @@ export default function Cart() {
     const [items, setItems] = React.useState<CartItem[]>([]);
 
     React.useEffect(() => {
-        const storedItems = localStorage.getItem("cart");
-        if (storedItems) {
-            setItems(JSON.parse(storedItems));
+        try {
+            const storedItems = localStorage.getItem('cart');
+            if (storedItems) {
+                const parsedItems = JSON.parse(storedItems);
+                if (Array.isArray(parsedItems)) {
+                    const itemsWithNumbers = parsedItems.map(item => ({
+                        ...item,
+                        price: Number(item.price),
+                        quantity: Number(item.quantity)
+                    }));
+                    setItems(itemsWithNumbers);
+                } else {
+                    console.warn('Invalid cart data in localStorage');
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing cart data:', error);
         }
     }, [clicked]);
 
-    const updateQuantity = (id: number, quantity: number) => {
+    const updateQuantity = (id: number, quantityChange: number) => {
         const updatedItems = items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
+            item.id === id
+                ? { ...item, quantity: Math.max(1, item.quantity + quantityChange) }
+                : item
         );
         setItems(updatedItems);
-        localStorage.setItem("cart", JSON.stringify(updatedItems));
+        localStorage.setItem('cart', JSON.stringify(updatedItems));
     };
+    console.log(items);
 
-    const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
-    const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    console.log(isCheckoutModalOpen)
-    console.log(totalItems)
+    const totalItems = items.reduce((acc, item) => acc + Number(item.quantity), 0);
+    const total = items.reduce((acc, item) => acc + (Number(item.price) * Number(item.quantity)), 0);
 
     return (
         <>
@@ -66,7 +81,7 @@ export default function Cart() {
                     <ShoppingBag className="h-6 w-6 text-red-500" />
                     <div className="border-l border-gray-300 h-8 mx-2" />
                     <div>
-                        <div className="font-semibold">{items.length} ITEMS</div>
+                        <div className="font-semibold">{items ? items.length : 0} ITEMS</div>
                         <div className="text-sm">৳ {total}</div>
                     </div>
                 </div>
@@ -79,53 +94,54 @@ export default function Cart() {
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">
                                     <Plus className="h-5 w-5" />
-                                    <span className="font-medium">{items.length} ITEMS</span>
+                                    <span className="font-medium">{items?.length || 0} ITEMS</span>
                                 </div>
-                                <Button variant="outline" className="text-sm" onClick={() => {
-                                    setIsOpen(false);
-                                   
-                                }}>
-                                    <X className="h-4 w-4"  />
+                                <Button variant="outline" className="text-sm" onClick={() => setIsOpen(false)}>
+                                    <X className="h-4 w-4" />
                                 </Button>
                             </div>
                         </div>
 
                         <div className="divide-y">
-                            {items.map((item) => (
-                                <div key={item.id} className="p-4 flex gap-4">
-                                    <div className="w-1/3">
-                                        <img
-                                            alt={item.name}
-                                            className="w-full h-auto object-cover"
-                                            src="../../../../public/image/products/maggi.webp"
-                                            width={100}
-                                            height={100}
-                                        />
-                                    </div>
-                                    <div className="flex-1 flex flex-col">
-                                        <h3 className="font-medium text-sm mb-2 text-nowrap">
-                                            {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
-                                        </h3>
-                                        <div className="flex items-center justify-around mt-auto">
-                                            <div className="flex items-center border rounded text-xs">
-                                                <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
-                                                    <ChevronDown className="h-3 w-3" />
-                                                </button>
-                                                <span className="w-6 text-center">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.id, 1)} className="px-1 py-0.5">
-                                                    <ChevronUp className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                            <p className="text-sm font-medium">
-                                                ৳ {item.price} × {item.quantity} = ৳ {item.price * item.quantity}
-                                            </p>
+                            {items && items.length > 0 ? (
+                                items.map((item) => (
+                                    <div key={item.id} className="p-4 flex gap-4">
+                                        <div className="w-1/3">
+                                            <img
+                                                alt={item.name}
+                                                className="w-full h-auto object-cover"
+                                                src="/placeholder.svg?height=100&width=100"
+                                                width={100}
+                                                height={100}
+                                            />
                                         </div>
+                                        <div className="flex-1 flex flex-col">
+                                            <h3 className="font-medium text-sm mb-2 text-nowrap">
+                                                {item.name.length > 40 ? `${item.name.slice(0, 40)}...` : item.name}
+                                            </h3>
+                                            <div className="flex items-center justify-around mt-auto">
+                                                <div className="flex items-center border rounded text-xs">
+                                                    <button onClick={() => updateQuantity(item.id, -1)} className="px-1 py-0.5">
+                                                        <ChevronDown className="h-3 w-3" />
+                                                    </button>
+                                                    <span className="w-6 text-center">{item.quantity}</span>
+                                                    <button onClick={() => updateQuantity(item.id, 1)} className="px-1 py-0.5">
+                                                        <ChevronUp className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm font-medium">
+                                                    ৳ {Number(item.price).toFixed(2)} × {Number(item.quantity)} = ৳ {(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
+                                            ×
+                                        </button>
                                     </div>
-                                    <button onClick={() => updateQuantity(item.id, -item.quantity)} className="text-gray-500 hover:text-gray-700 self-start">
-                                        ×
-                                    </button>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <div className="p-4 text-center text-gray-500">Your cart is empty</div>
+                            )}
                         </div>
 
                         <div className="sticky bottom-0 bg-white border-t p-4 space-y-4">
@@ -156,7 +172,7 @@ export default function Cart() {
                                 >
                                     <span>Place Order</span>
                                     <div className="border-2 border-primary-light h-8 mx-2" />
-                                    <span className="text-nowrap space-x-3 text-xl">৳ {total}</span>
+                                    <span className="text-nowrap space-x-3 text-xl">৳ {total.toFixed(2)}</span>
                                 </button>
                             </div>
                         </div>
@@ -168,3 +184,4 @@ export default function Cart() {
         </>
     );
 }
+

@@ -1,23 +1,70 @@
-'use client'
+'use client';
 
-import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
-import { useRef } from "react"
-import Slider from "react-slick"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import { Button } from '@/components/ui/button';
+import useModalStore from '@/store/Store';
 
 const products = [
-    { name: "Koss KPH7 Portable", price: "£60.00", discount: "-10%", oldPrice: "£86.00", image: "../../../../public/image/products/airpods.jpg" },
-    { name: "Beats Solo2 Solo 2", price: "£60.00", image: "../../../../public/image/products/beats.jpg" },
-    { name: "Beats EP Wired", price: "£60.00", oldPrice: "£86.00", discount: "-7%", image: "../../../../public/image/products/headphone.jpg" },
-    { name: "Bose SoundLink Bluetooth", price: "£60.00", image: "../../../../public/image/products/sony.jpg" },
-    { name: "Sony WH-1000XM4", price: "£299.00", image: "../../../../public/image/products/watch.jpg" },
-    { name: "AirPods Pro", price: "£249.00", discount: "-5%", oldPrice: "£262.00", image: "../../../../public/image/products/pulseoximeter.jpg" }
-]
+    { id: 1, name: 'Koss KPH7 Portable', price: '£60.00', discount: '-10%', oldPrice: '£86.00', image: '../../../../public/image/products/airpods.jpg' },
+    { id: 2, name: 'Beats Solo2 Solo 2', price: '£60.00', image: '../../../../public/image/products/beats.jpg' },
+    { id: 3, name: 'Beats EP Wired', price: '£60.00', oldPrice: '£86.00', discount: '-7%', image: '../../../../public/image/products/headphone.jpg' },
+    { id: 4, name: 'Bose SoundLink Bluetooth', price: '£60.00', image: '../../../../public/image/products/sony.jpg' },
+    { id: 5, name: 'Sony WH-1000XM4', price: '£299.00', image: '../../../../public/image/products/watch.jpg' },
+    { id: 6, name: 'AirPods Pro', price: '£249.00', discount: '-5%', oldPrice: '£262.00', image: '../../../../public/image/products/pulseoximeter.jpg' },
+];
 
 export default function TrendingCategory() {
-    const sliderRef = useRef<Slider>(null)
+    const sliderRef = useRef<Slider>(null);
+    const [cart, setCart] = useState<any[]>([]);
+    const { toggleClicked } = useModalStore();
+
+    useEffect(() => {
+        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        setCart(storedCart);
+    }, []);
+
+    const parsePrice = (price: string) => {
+        // Remove non-numeric characters and parse as a number
+        return Number(price.replace(/[^\d.]/g, ''));
+    };
+
+    // const addToCart = (product: any) => {
+    //     const sanitizedProduct = {
+    //         ...product,
+    //         numericPrice: parsePrice(product.price),
+    //         numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
+    //     };
+
+    //     const updatedCart = [...cart, sanitizedProduct];
+    //     setCart(updatedCart);
+    //     localStorage.setItem('cart', JSON.stringify(updatedCart));
+    //     toggleClicked();
+    // };
+    const addToCart = (product: any) => {
+        const sanitizedProduct = {
+            ...product,
+            numericPrice: parsePrice(product.price),
+            numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
+        };
+
+        // Retrieve the current cart from local storage
+        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+        // Add the new product to the cart
+        const updatedCart = [...storedCart, sanitizedProduct];
+
+        // Update the state and local storage
+        setCart(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+        // Trigger any additional UI changes (e.g., toggle modal)
+        toggleClicked();
+    };
+
 
     const settings = {
         dots: false,
@@ -31,22 +78,22 @@ export default function TrendingCategory() {
                 breakpoint: 1024,
                 settings: {
                     slidesToShow: 3,
-                }
+                },
             },
             {
                 breakpoint: 768,
                 settings: {
                     slidesToShow: 2,
-                }
+                },
             },
             {
                 breakpoint: 640,
                 settings: {
                     slidesToShow: 1,
-                }
-            }
-        ]
-    }
+                },
+            },
+        ],
+    };
 
     return (
         <section className="py-4 px-4 overflow-hidden md:max-w-[1040px] w-full">
@@ -60,8 +107,8 @@ export default function TrendingCategory() {
 
                 <div className="relative">
                     <Slider ref={sliderRef} {...settings}>
-                        {products.map((product, index) => (
-                            <div key={index} className="px-3">
+                        {products.map((product) => (
+                            <div key={product.id} className="px-3">
                                 <div className="bg-background rounded-lg shadow-md overflow-hidden">
                                     <div className="p-4">
                                         <div className="relative aspect-square mb-4">
@@ -81,10 +128,16 @@ export default function TrendingCategory() {
                                             <div className="flex items-center gap-2">
                                                 <p className="font-semibold">{product.price}</p>
                                                 {product.oldPrice && (
-                                                    <p className="text-sm text-muted-foreground line-through">{product.oldPrice}</p>
+                                                    <p className="text-sm text-muted-foreground line-through">
+                                                        {product.oldPrice}
+                                                    </p>
                                                 )}
                                             </div>
-                                            <Button size="sm" variant="outline">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => addToCart(product)}
+                                            >
                                                 <ShoppingCart className="h-4 w-4 mr-2" />
                                                 Add
                                             </Button>
@@ -112,6 +165,5 @@ export default function TrendingCategory() {
                 </div>
             </div>
         </section>
-    )
+    );
 }
-

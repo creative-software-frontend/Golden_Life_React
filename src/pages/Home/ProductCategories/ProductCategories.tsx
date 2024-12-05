@@ -1,7 +1,8 @@
 import { ChevronRight, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import useModalStore from '@/store/Store';
 
 const products = [
   { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg" },
@@ -16,6 +17,35 @@ const products = [
 
 export default function ProductCategories() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [cart, setCart] = useState<any[]>([]);
+  const { toggleClicked } = useModalStore();
+
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    }
+  }, []);
+
+  // const addToCart = (product: any) => {
+  //   const updatedCart = [...cart, product];
+  //   setCart(updatedCart);
+  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
+  //   toggleClicked(); // Trigger to update the cart in other components
+  // };
+  const addToCart = (product: any) => {
+    // Retrieve the current cart items from localStorage
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    // Add the product to the cart without checking for duplicates, allowing multiple of the same product
+    storedCart.push(product);
+
+    // Update the cart state and localStorage with the new cart
+    setCart(storedCart);
+    localStorage.setItem("cart", JSON.stringify(storedCart));
+    toggleClicked(); // Trigger to update the cart in other components
+  };
+
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -40,7 +70,7 @@ export default function ProductCategories() {
   };
 
   return (
-    <div className="py-2 shadow mb-5  bg-primary-default md:max-w-[1040px] sm:w-full w-[370px]  " >
+    <div className="py-2 shadow mb-5 bg-primary-default md:max-w-[1040px] sm:w-full w-[370px]">
       <div className="container mx-auto max-w-5xl px-4">
         <div className="flex items-center justify-between mb-4">
           <div className="bg-primary-light text-white px-4 py-1 rounded-full text-sm font-medium">
@@ -71,7 +101,14 @@ export default function ProductCategories() {
                 <h3 className="mt-2 text-lg font-medium text-white line-clamp-2 text-nowrap">
                   {product.title}
                 </h3>
-                <Button size="sm" variant="outline" className='w-full mt-2'>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    addToCart(product); // Add product to the cart
+                  }}
+                  className="w-full mt-2"
+                >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Add
                 </Button>
