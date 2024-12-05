@@ -141,11 +141,14 @@ const Header: React.FC = () => {
                         className="hidden"
                         id="imageInput"
                     />
-                    <label htmlFor="imageInput" className="absolute right-12 top-1/2 -translate-y-1/2 cursor-pointer">
+                    <label htmlFor="imageInput" className="absolute right-12 top-1/2 -translate-y-1/2 cursor-pointer flex">
                         <CameraIcon className="h-6 w-6 text-gray-500" />
+                        <div className="h-5 w-[1px] bg-gray-400 mx-2"></div>
                     </label>
+                   
+
                     <button
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                        className="absolute right-7 top-1/2 -translate-y-1/2"
                         onClick={handleSearch}
                     >
                         <Search className="h-6 w-6 text-gray-500" />

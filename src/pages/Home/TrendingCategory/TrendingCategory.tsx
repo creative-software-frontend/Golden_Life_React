@@ -9,12 +9,12 @@ import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
 
 const products = [
-    { id: 1, name: 'Koss KPH7 Portable', price: '£60.00', discount: '-10%', oldPrice: '£86.00', image: '../../../../public/image/products/airpods.jpg' },
-    { id: 2, name: 'Beats Solo2 Solo 2', price: '£60.00', image: '../../../../public/image/products/beats.jpg' },
-    { id: 3, name: 'Beats EP Wired', price: '£60.00', oldPrice: '£86.00', discount: '-7%', image: '../../../../public/image/products/headphone.jpg' },
-    { id: 4, name: 'Bose SoundLink Bluetooth', price: '£60.00', image: '../../../../public/image/products/sony.jpg' },
-    { id: 5, name: 'Sony WH-1000XM4', price: '£299.00', image: '../../../../public/image/products/watch.jpg' },
-    { id: 6, name: 'AirPods Pro', price: '£249.00', discount: '-5%', oldPrice: '£262.00', image: '../../../../public/image/products/pulseoximeter.jpg' },
+    { id: 1, name: 'Koss KPH7 Portable', price: '£60.00', discount: '-10%', oldPrice: '£86.00', image: '/image/products/airpods.jpg' },
+    { id: 2, name: 'Beats Solo2 Solo 2', price: '£60.00', image: '/image/products/beats.jpg' },
+    { id: 3, name: 'Beats EP Wired', price: '£60.00', oldPrice: '£86.00', discount: '-7%', image: '/image/products/headphone.jpg' },
+    { id: 4, name: 'Bose SoundLink Bluetooth', price: '£60.00', image: '/image/products/sony.jpg' },
+    { id: 5, name: 'Sony WH-1000XM4', price: '£299.00', image: '/image/products/watch.jpg' },
+    { id: 6, name: 'AirPods Pro', price: '£249.00', discount: '-5%', oldPrice: '£262.00', image: '/image/products/pulseoximeter.jpg' },
 ];
 
 export default function TrendingCategory() {
@@ -28,22 +28,10 @@ export default function TrendingCategory() {
     }, []);
 
     const parsePrice = (price: string) => {
-        // Remove non-numeric characters and parse as a number
-        return Number(price.replace(/[^\d.]/g, ''));
+        const numericValue = price.replace(/[^\d.]/g, '');
+        return parseFloat(numericValue);
     };
 
-    // const addToCart = (product: any) => {
-    //     const sanitizedProduct = {
-    //         ...product,
-    //         numericPrice: parsePrice(product.price),
-    //         numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
-    //     };
-
-    //     const updatedCart = [...cart, sanitizedProduct];
-    //     setCart(updatedCart);
-    //     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    //     toggleClicked();
-    // };
     const addToCart = (product: any) => {
         const sanitizedProduct = {
             ...product,
@@ -64,7 +52,6 @@ export default function TrendingCategory() {
         // Trigger any additional UI changes (e.g., toggle modal)
         toggleClicked();
     };
-
 
     const settings = {
         dots: false,

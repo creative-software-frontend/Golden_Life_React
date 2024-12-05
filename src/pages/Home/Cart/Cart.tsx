@@ -111,7 +111,7 @@ export default function Cart() {
                                                 alt={item.name}
                                                 className="w-full h-auto object-cover"
                                                 src="/placeholder.svg?height=100&width=100"
-                                                width={100}
+                                                width={200}
                                                 height={100}
                                             />
                                         </div>
