@@ -5,16 +5,53 @@ import { useEffect, useRef, useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+// import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
 
 const products = [
-    { id: 1, name: 'Koss KPH7 Portable', price: '£60.00', discount: '-10%', oldPrice: '£86.00', image: '/image/products/airpods.jpg' },
-    { id: 2, name: 'Beats Solo2 Solo 2', price: '£60.00', image: '/image/products/beats.jpg' },
-    { id: 3, name: 'Beats EP Wired', price: '£60.00', oldPrice: '£86.00', discount: '-7%', image: '/image/products/headphone.jpg' },
-    { id: 4, name: 'Bose SoundLink Bluetooth', price: '£60.00', image: '/image/products/sony.jpg' },
-    { id: 5, name: 'Sony WH-1000XM4', price: '£299.00', image: '/image/products/watch.jpg' },
-    { id: 6, name: 'AirPods Pro', price: '£249.00', discount: '-5%', oldPrice: '£262.00', image: '/image/products/pulseoximeter.jpg' },
+    {
+        id: 1,
+        name: 'Koss KPH7 Portable',
+        price: '£60.00',
+        discount: '-10%',
+        oldPrice: '£86.00',
+        image: '/image/products/airpods.jpg',
+    },
+    {
+        id: 2,
+        name: 'Beats Solo2 Solo 2',
+        price: '£60.00',
+        image: '/image/products/beats.jpg',
+    },
+    {
+        id: 3,
+        name: 'Beats EP Wired',
+        price: '£60.00',
+        oldPrice: '£86.00',
+        discount: '-7%',
+        image: '/image/products/headphone.jpg',
+    },
+    {
+        id: 4,
+        name: 'Bose SoundLink Bluetooth',
+        price: '£60.00',
+        image: '/image/products/sony.jpg',
+    },
+    {
+        id: 5,
+        name: 'Sony WH-1000XM4',
+        price: '£299.00',
+        image: '/image/products/watch.jpg',
+    },
+    {
+        id: 6,
+        name: 'AirPods Pro',
+        price: '£249.00',
+        discount: '-5%',
+        oldPrice: '£262.00',
+        image: '/image/products/pulseoximeter.jpg',
+    },
 ];
 
 export default function TrendingCategory() {
@@ -27,27 +64,56 @@ export default function TrendingCategory() {
         setCart(storedCart);
     }, []);
 
-    const parsePrice = (price: string) => {
-        const numericValue = price.replace(/[^\d.]/g, '');
-        return parseFloat(numericValue);
+    const parsePrice = (price: string): number => {
+        // Remove non-numeric characters and parse as a number
+        return Number(price.replace(/[^\d.]/g, ''));
     };
 
+    // const addToCart = (product: any) => {
+    //     const sanitizedProduct = {
+    //         ...product,
+    //         numericPrice: parsePrice(product.price),
+    //         numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
+    //     };
+
+    //     // Retrieve the current cart from local storage
+    //     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    //     // Add the new product to the cart
+    //     const updatedCart = [...storedCart, sanitizedProduct];
+
+    //     // Update the state and local storage
+    //     setCart(updatedCart);
+    //     localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+    //     // Trigger any additional UI changes (e.g., toggle modal)
+    //     toggleClicked();
+    // };
     const addToCart = (product: any) => {
         const sanitizedProduct = {
             ...product,
-            numericPrice: parsePrice(product.price),
-            numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
+            price: parsePrice(product.price), // Parse numeric price
+            oldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined, // Parse old price if exists
+            quantity: 1, // Default quantity set to 1
         };
 
         // Retrieve the current cart from local storage
         const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-        // Add the new product to the cart
-        const updatedCart = [...storedCart, sanitizedProduct];
+        // Check if the product already exists in the cart
+        const existingProductIndex = storedCart.findIndex((item: any) => item.id === product.id);
+
+        if (existingProductIndex > -1) {
+            // If the product exists, increase the quantity
+            storedCart[existingProductIndex].quantity += 1;
+        } else {
+            // If the product is new, add it to the cart
+            storedCart.push(sanitizedProduct);
+        }
 
         // Update the state and local storage
-        setCart(updatedCart);
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        setCart(storedCart);
+        localStorage.setItem('cart', JSON.stringify(storedCart));
 
         // Trigger any additional UI changes (e.g., toggle modal)
         toggleClicked();
@@ -88,7 +154,7 @@ export default function TrendingCategory() {
                 <div className="text-center mb-10">
                     <h2 className="text-3xl font-bold mb-4">Trending Products</h2>
                     <p className="text-muted-foreground">
-                        Contemporary, minimal and modern designs embody the Lavish Alice handwriting
+                        Contemporary, minimal, and modern designs embody the Lavish Alice handwriting.
                     </p>
                 </div>
 
@@ -102,6 +168,8 @@ export default function TrendingCategory() {
                                             <img
                                                 src={product.image}
                                                 alt={product.name}
+                                                width={200}
+                                                height={200}
                                                 className="rounded-md object-cover w-full h-full"
                                             />
                                             {product.discount && (

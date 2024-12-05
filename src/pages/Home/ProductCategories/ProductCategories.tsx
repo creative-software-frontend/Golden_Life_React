@@ -37,14 +37,27 @@ export default function ProductCategories() {
     // Retrieve the current cart items from localStorage
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    // Add the product to the cart without checking for duplicates, allowing multiple of the same product
-    storedCart.push(product);
+    // Check if the product already exists in the cart
+    const existingProductIndex = storedCart.findIndex((item: any) => item.id === product.id);
+
+    if (existingProductIndex !== -1) {
+      // If the product exists, update the quantity
+      storedCart[existingProductIndex].quantity += 1;
+    } else {
+      // If the product doesn't exist, add it with a price and quantity
+      storedCart.push({
+        ...product,
+        price: product.price, // Set price directly from the product
+        quantity: 1, // Initialize quantity as 1
+      });
+    }
 
     // Update the cart state and localStorage with the new cart
     setCart(storedCart);
     localStorage.setItem("cart", JSON.stringify(storedCart));
     toggleClicked(); // Trigger to update the cart in other components
   };
+
 
 
   const handleMouseDown = (e: React.MouseEvent) => {

@@ -132,14 +132,29 @@ export default function FreshSell() {
         // Retrieve existing cart items from localStorage
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-        // Add the product to the cart array
-        const updatedCart = [...existingCart, product];
+        // Check if the product already exists in the cart
+        const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
+
+        if (existingProductIndex !== -1) {
+            // If the product exists, update the quantity
+            existingCart[existingProductIndex].quantity += 1;
+        } else {
+            // If the product does not exist, add it to the cart
+            existingCart.push({
+                ...product,
+                price: product.discountedPrice, // Use the discounted price as price
+                quantity: 1, // Initialize quantity to 1
+            });
+        }
 
         // Update state and localStorage
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-        toggleClicked(); // Trigger update in other components
+        setCart(existingCart);
+        localStorage.setItem("cart", JSON.stringify(existingCart));
+
+        // Trigger update in other components
+        toggleClicked();
     };
+
 
     return (
         <div className="  md:max-w-[1040px]  w-[370px]   sm:w-full">
