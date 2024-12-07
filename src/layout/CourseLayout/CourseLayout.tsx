@@ -368,8 +368,8 @@ export default function CourseLayout() {
                             </div>
                         </div>
                     </button>
-                    {/* <CourseHeader /> */}
-                    <Header />
+                    <CourseHeader />
+                    {/* <Header /> */}
                     <Cart />
                     <LiveChat />
                     <Outlet />
