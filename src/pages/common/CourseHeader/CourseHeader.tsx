@@ -9,14 +9,14 @@ import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
 import logo from '../../../../public/image/logo/logo.jpg';
 
-const products = [
-    { id: 1, name: 'Laptop', image: '../../../../public/image/search/laptop.jpg' },
-    { id: 2, name: 'Smartphone', image: '../../../../public/image/search/smartphones.jpg' },
-    { id: 3, name: 'Headphones', image: '../../../../public/image/search/headphones.jpg' },
-    { id: 4, name: 'Camera', image: '../../../../public/image/search/camera.jpg' },
+const courses = [
+    { id: 1, name: 'Introduction to React', image: '../../../../public/image/courses/ai.jpg', duration: '4 weeks' },
+    { id: 2, name: 'Advanced JavaScript', image: '../../../../public/image/courses/c3.png', duration: '6 weeks' },
+    { id: 3, name: 'Web Design Fundamentals', image: '../../../../public/image/courses/c4.jpg', duration: '3 weeks' },
+    { id: 4, name: 'Data Science with Python', image: '../../../../public/image/courses/cloud.jpg', duration: '8 weeks' },
 ];
 
-const Header: React.FC = () => {
+const CourseHeader: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -29,15 +29,15 @@ const Header: React.FC = () => {
     const cancelButtonRef = useRef(null);
     const [value, setValue] = useState<string | undefined>();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [suggestions, setSuggestions] = useState([]);
+    const [suggestions, setSuggestions] = useState<typeof courses>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     useEffect(() => {
         if (searchText) {
-            const filteredProducts = products.filter(product =>
-                product.name.toLowerCase().includes(searchText.toLowerCase())
+            const filteredCourses = courses.filter(course =>
+                course.name.toLowerCase().includes(searchText.toLowerCase())
             );
-            setSuggestions(filteredProducts);
+            setSuggestions(filteredCourses);
             setShowSuggestions(true);
         } else {
             setSuggestions([]);
@@ -102,8 +102,8 @@ const Header: React.FC = () => {
         }
     };
 
-    const handleSuggestionClick = (productName: string) => {
-        setSearchText(productName);
+    const handleSuggestionClick = (courseName: string) => {
+        setSearchText(courseName);
         setShowSuggestions(false);
     };
 
@@ -113,7 +113,7 @@ const Header: React.FC = () => {
 
     const translations = {
         en: {
-            search: "Search products...",
+            searchCourses: "Search courses...",
             login: "Login",
             profile: "Profile",
             settings: "Settings",
@@ -128,10 +128,11 @@ const Header: React.FC = () => {
             verify: "Verify",
             verificationComplete: "Verification Complete!",
             loggedIn: "You are now logged in.",
-            finish: "Finish"
+            finish: "Finish",
+            noCoursesFound: "No courses found"
         },
         bn: {
-            search: "অনুসন্ধান...",
+            searchCourses: "কোর্স অনুসন্ধান করুন...",
             login: "লগইন",
             profile: "প্রোফাইল",
             settings: "সেটিংস",
@@ -146,17 +147,18 @@ const Header: React.FC = () => {
             verify: "যাচাই করুন",
             verificationComplete: "যাচাইকরণ সম্পূর্ণ!",
             loggedIn: "আপনি এখন লগ ইন করেছেন।",
-            finish: "শেষ করুন"
+            finish: "শেষ করুন",
+            noCoursesFound: "কোন কোর্স পাওয়া যায়নি"
         }
     };
 
     return (
         <div className=''>
-            <header className=" shadow md:w-[1040px] sm:w-full w-[370px] fixed top-3  -mt-7 sm:-mt-4 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
+            <header className="shadow md:w-[1040px] sm:w-full w-[370px] fixed top-3 -mt-7 sm:-mt-4 flex items-center justify-between bg-gray-50 p-2 z-10 rounded">
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
                         type="text"
-                        placeholder={translations[language].search}
+                        placeholder={translations[language].searchCourses}
                         className="w-full pr-20 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -183,25 +185,28 @@ const Header: React.FC = () => {
                 </div>
                 {imagePreview && (
                     <div className="absolute top-full left-0 mt-2">
-                        <img src={imagePreview} alt="Preview" className="w-10 h-10 object-cover rounded" />
+                        <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded" />
                     </div>
                 )}
 
                 {showSuggestions && (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-20">
+                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                         {suggestions.length > 0 ? (
-                            suggestions.map((product) => (
+                            suggestions.map((course) => (
                                 <div
-                                    key={product.id}
+                                    key={course.id}
                                     className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => handleSuggestionClick(product.name)}
+                                    onClick={() => handleSuggestionClick(course.name)}
                                 >
-                                    <img src={product.image} alt={product.name} className="w-10 h-10 mr-2 object-cover" />
-                                    <span>{product.name}</span>
+                                    <img src={course.image} alt={course.name} className="w-10 h-10 object-cover rounded mr-2" />
+                                    <div>
+                                        <div className="font-medium">{course.name}</div>
+                                        <div className="text-sm text-gray-500">{course.duration}</div>
+                                    </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="p-2 text-gray-500">No products found</div>
+                            <div className="p-2 text-gray-500">{translations[language].noCoursesFound}</div>
                         )}
                     </div>
                 )}
@@ -396,5 +401,5 @@ const Header: React.FC = () => {
     );
 };
 
-export default Header;
+export default CourseHeader;
 

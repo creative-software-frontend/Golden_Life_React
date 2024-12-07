@@ -108,7 +108,7 @@ export default function Categories() {
                         <span className="text-sm text-center text-gray-900 text-nowrap">
                             {category.name}
                         </span>
-                        <Button
+                        {/* <Button
                             size="sm"
                             variant="outline"
                             onClick={() => {
@@ -118,7 +118,7 @@ export default function Categories() {
                         >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Add
-                        </Button>
+                        </Button> */}
                     </Link>
                 ))}
             </div>

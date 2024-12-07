@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
 
 const products = [
-  { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg" },
-  { id: 2, title: 'Smart Watch & Device', image: "../../../../public/image/categories/c1.jpg" },
-  { id: 3, title: 'Snap and Grip', image: "../../../../public/image/categories/c12.png" },
-  { id: 4, title: 'Ladies Winter Overcoat', image: "../../../../public/image/categories/c3.jpg" },
-  { id: 5, title: 'Attractive Stylish Shirt', image: "../../../../public/image/categories/c13.png" },
-  { id: 6, title: 'M19 100% Original', image: "../../../../public/image/categories/c4.jpg" },
-  { id: 7, title: 'M19 100% Original', image: "../../../../public/image/categories/c15png.jpg" },
-  { id: 8, title: 'M19 100% Original', image: "../../../../public/image/products/sharee3.jpg" },
+  { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg", price: 59.99 },
+  { id: 2, title: 'Smart Watch & Device', image: "../../../../public/image/categories/c1.jpg", price: 129.99 },
+  { id: 3, title: 'Snap and Grip', image: "../../../../public/image/categories/c12.png", price: 19.99 },
+  { id: 4, title: 'Ladies Winter Overcoat', image: "../../../../public/image/categories/c3.jpg", price: 89.99 },
+  { id: 5, title: 'Attractive Stylish Shirt', image: "../../../../public/image/categories/c13.png", price: 39.99 },
+  { id: 6, title: 'M19 100% Original', image: "../../../../public/image/categories/c4.jpg", price: 49.99 },
+  { id: 7, title: 'M19 100% Original', image: "../../../../public/image/categories/c15png.jpg", price: 54.99 },
+  { id: 8, title: 'M19 100% Original', image: "../../../../public/image/products/sharee3.jpg", price: 79.99 },
 ];
 
 export default function ProductCategories() {
@@ -27,38 +27,24 @@ export default function ProductCategories() {
     }
   }, []);
 
-  // const addToCart = (product: any) => {
-  //   const updatedCart = [...cart, product];
-  //   setCart(updatedCart);
-  //   localStorage.setItem("cart", JSON.stringify(updatedCart));
-  //   toggleClicked(); // Trigger to update the cart in other components
-  // };
   const addToCart = (product: any) => {
-    // Retrieve the current cart items from localStorage
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    // Check if the product already exists in the cart
     const existingProductIndex = storedCart.findIndex((item: any) => item.id === product.id);
 
     if (existingProductIndex !== -1) {
-      // If the product exists, update the quantity
       storedCart[existingProductIndex].quantity += 1;
     } else {
-      // If the product doesn't exist, add it with a price and quantity
       storedCart.push({
         ...product,
-        price: product.price, // Set price directly from the product
-        quantity: 1, // Initialize quantity as 1
+        price: product.price,
+        quantity: 1,
       });
     }
 
-    // Update the cart state and localStorage with the new cart
     setCart(storedCart);
     localStorage.setItem("cart", JSON.stringify(storedCart));
-    toggleClicked(); // Trigger to update the cart in other components
+    toggleClicked();
   };
-
-
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
@@ -69,7 +55,7 @@ export default function ProductCategories() {
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!scrollRef.current) return;
       const x = moveEvent.clientX;
-      const walk = (x - startX) * 1.5; // Adjust the speed here
+      const walk = (x - startX) * 1.5;
       scrollRef.current.scrollLeft = scrollLeft - walk;
     };
 
@@ -99,17 +85,20 @@ export default function ProductCategories() {
           className="flex overflow-x-auto pb-4 cursor-grab"
           ref={scrollRef}
           onMouseDown={handleMouseDown}
-          style={{ scrollbarWidth: 'none' }} // For Firefox
+          style={{ scrollbarWidth: 'none' }}
         >
           <div className="flex gap-4">
             {products.map((product) => (
               <Link key={product.id} to="#" className="flex-none w-[140px] group border border-gray-300 rounded-lg p-2">
-                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
                   <img
                     src={product.image}
                     alt={product.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
+                  <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xl font-bold">${product.price.toFixed(2)}</span>
+                  </div>
                 </div>
                 <h3 className="mt-2 text-lg font-medium text-white line-clamp-2 text-nowrap">
                   {product.title}
@@ -117,8 +106,9 @@ export default function ProductCategories() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => {
-                    addToCart(product); // Add product to the cart
+                  onClick={(e) => {
+                    e.preventDefault();
+                    addToCart(product);
                   }}
                   className="w-full mt-2"
                 >
@@ -133,3 +123,4 @@ export default function ProductCategories() {
     </div>
   );
 }
+

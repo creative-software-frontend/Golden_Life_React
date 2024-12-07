@@ -34,6 +34,7 @@ import Footer from "@/pages/common/Footer/Footer"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
+import CourseHeader from "@/pages/common/CourseHeader/CourseHeader"
 
 const data = {
     categories: [
@@ -367,6 +368,7 @@ export default function CourseLayout() {
                             </div>
                         </div>
                     </button>
+                    {/* <CourseHeader /> */}
                     <Header />
                     <Cart />
                     <LiveChat />
