@@ -1,0 +1,55 @@
+{
+  "header": {
+    "search": "Search products...",
+    "login": "Login",
+    "profile": "Profile",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "close": "Close",
+    "enterPhoneNumber": "Enter your phone number",
+    "enterOTP": "Enter OTP",
+    "verifyDetails": "Verify your details",
+    "phoneNumber": "Phone Number",
+    "next": "Next",
+    "back": "Back",
+    "verify": "Verify",
+    "verificationComplete": "Verification Complete!",
+    "loggedIn": "You are now logged in.",
+    "finish": "Finish",
+    "title": "Courses",
+    "allCourses": "All Courses",
+    "categories": "Categories",
+    "allCategories": "All Categories"
+  },
+  "courseNames": {
+    "webDevelopment": "Web Development",
+    "dataScience": "Data Science",
+    "graphicDesign": "Graphic Design",
+    "digitalMarketing": "Digital Marketing",
+    "appDevelopment": "App Development",
+    "machineLearning": "Machine Learning",
+    "cybersecurity": "Cybersecurity",
+    "uiUxDesign": "UI/UX Design",
+    "cloudComputing": "Cloud Computing",
+    "blockchain": "Blockchain",
+    "softwareTesting": "Software Testing",
+    "bigData": "Big Data"
+  },
+  "buttons": {
+    "addToCart": "Add"
+  },
+  "categories": {
+    "beautyCare": "Beauty & Personal Care",
+    "womensApparels": "Women's Apparels",
+    "mensWear": "Men's Wear",
+    "mobileGadgets": "Mobile & Gadgets",
+    "homeDecoration": "Home Decoration",
+    "homeAppliances": "Home Appliances",
+    "toysKidsBabies": "Toys, Kids & Babies",
+    "kidsFashion": "Kids Fashion",
+    "jewelleryAccessories": "Jewellery & Accessories",
+    "womensBag": "Women's Bag",
+    "mensBag": "Men's Bag",
+    "watchesAccessories": "Watches & Accessories"
+  }
+}

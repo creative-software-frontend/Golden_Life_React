@@ -1,78 +1,72 @@
-import { Button } from "@/components/ui/button";
-import useModalStore from "@/store/Store";
-import { ChevronRight, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 export default function Courses() {
-    const [cart, setCart] = useState<any[]>([])
-    const { toggleClicked } = useModalStore();
+    const [t] = useTranslation('global')
 
-    const addToCart = (product: any) => {
-        const updatedCart = [...cart, product];
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-        toggleClicked(); // trigger to update cart on other components
-    }
+
+
+
     const courses = [
         {
             id: 1,
-            name: "Web Development ",
+            name: t("courseNames.webDevelopment"), // Use t() for translation
             icon: "../../../../public/image/courses/c1.avif",
         },
         {
             id: 2,
-            name: "Data Science ",
+            name: t("courseNames.blockchain"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 3,
-            name: "Graphic Design ",
+            name: t("courseNames.webDevelopment"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 4,
-            name: "Digital Marketing ",
+            name: t("courseNames.dataScience"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 5,
-            name: " App Development",
+            name: t("courseNames.graphicDesign"), // Use t() for translation
             icon: "../../../../public/image/courses/c2.jpg",
         },
         {
             id: 6,
-            name: " Machine Learning",
+            name: t("courseNames.digitalMarketing"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 7,
-            name: "Cybersecurity ",
+            name: t("courseNames.machineLearning"), // Use t() for translation
             icon: "../../../../public/image/courses/c4.jpg",
         },
         {
             id: 8,
-            name: "UI/UX Design ",
+            name: t("courseNames.uiUxDesign"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 9,
-            name: "Cloud Computing ",
+            name: t("courseNames.cloudComputing"), // Use t() for translation
             icon: "../../../../public/image/courses/c2.jpg",
         },
         {
             id: 10,
-            name: "Blockchain ",
+            name: t("courseNames.blockchain"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 11,
-            name: "Software Testing ",
+            name: t("courseNames.softwareTesting"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
         {
             id: 12,
-            name: "Big Data ",
+            name: t("courseNames.bigData"), // Use t() for translation
             icon: "../../../../public/image/courses/c3.png",
         },
     ];
@@ -80,12 +74,12 @@ export default function Courses() {
     return (
         <div className="py-10 -mt-6 md:max-w-[1040px] w-[370px] sm:w-full">
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
-                <h2 className="text-lg text-white font-medium">Courses</h2>
+                <h2 className="text-lg text-white font-medium">{t('header.title')}</h2>
                 <Link
                     to="/all-courses"
                     className="text-white text-sm font-medium flex items-center hover:underline"
                 >
-                    All Courses
+                    {t('header.allCourses')}
                     <ChevronRight className="h-6 w-6" />
                 </Link>
             </div>
@@ -108,17 +102,6 @@ export default function Courses() {
                         <span className="text-sm text-center text-gray-900 text-nowrap">
                             {course.name}
                         </span>
-                        {/* <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                                addToCart(courses); // Add product to the cart
-                            }}
-                            className="w-full mt-2"
-                        >
-                            <ShoppingCart className="h-4 w-4 mr-2" />
-                            Add
-                        </Button> */}
                     </Link>
                 ))}
             </div>

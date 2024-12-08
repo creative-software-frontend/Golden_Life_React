@@ -1,0 +1,55 @@
+{
+  "header": {
+    "search": "পণ্য খুঁজুন...",
+    "login": "লগইন",
+    "profile": "প্রোফাইল",
+    "settings": "সেটিংস",
+    "dashboard": "ড্যাশবোর্ড",
+    "close": "বন্ধ করুন",
+    "enterPhoneNumber": "আপনার ফোন নম্বর দিন",
+    "enterOTP": "ওটিপি প্রবেশ করুন",
+    "verifyDetails": "আপনার তথ্য যাচাই করুন",
+    "phoneNumber": "ফোন নম্বর",
+    "next": "পরবর্তী",
+    "back": "পেছনে",
+    "verify": "যাচাই করুন",
+    "verificationComplete": "যাচাই সম্পন্ন!",
+    "loggedIn": "আপনি এখন লগইন করেছেন।",
+    "finish": "শেষ করুন",
+    "title": "কোর্সসমূহ",
+    "allCourses": "সব কোর্স",
+    "categories": "ক্যাটেগরি",
+    "allCategories": "সব ক্যাটেগরি"
+  },
+  "courseNames": {
+    "webDevelopment": "ওয়েব ডেভেলপমেন্ট",
+    "dataScience": "ডাটা সায়েন্স",
+    "graphicDesign": "গ্রাফিক ডিজাইন",
+    "digitalMarketing": "ডিজিটাল মার্কেটিং",
+    "appDevelopment": "অ্যাপ ডেভেলপমেন্ট",
+    "machineLearning": "মেশিন লার্নিং",
+    "cybersecurity": "সাইবারসিকিউরিটি",
+    "uiUxDesign": "ইউআই/ইউএক্স ডিজাইন",
+    "cloudComputing": "ক্লাউড কম্পিউটিং",
+    "blockchain": "ব্লকচেইন",
+    "softwareTesting": "সফটওয়্যার টেস্টিং",
+    "bigData": "বিগ ডাটা"
+  },
+  "buttons": {
+    "addToCart": "যুক্ত করুন"
+  },
+  "categories": {
+    "beautyCare": "বিউটি & পার্সোনাল কেয়ার",
+    "womensApparels": "মহিলাদের পোশাক",
+    "mensWear": "পুরুষদের পোশাক",
+    "mobileGadgets": "মোবাইল & গ্যাজেটস",
+    "homeDecoration": "হোম ডেকোরেশন",
+    "homeAppliances": "হোম অ্যাপ্লায়েন্সেস",
+    "toysKidsBabies": "খেলনা, শিশু & বাচ্চারা",
+    "kidsFashion": "শিশুদের ফ্যাশন",
+    "jewelleryAccessories": "গহনা & এক্সেসরিজ",
+    "womensBag": "মহিলাদের ব্যাগ",
+    "mensBag": "পুরুষদের ব্যাগ",
+    "watchesAccessories": "ঘড়ি & এক্সেসরিজ"
+  }
+}

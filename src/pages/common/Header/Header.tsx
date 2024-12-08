@@ -8,6 +8,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
 import logo from '../../../../public/image/logo/logo.jpg';
+import { useTranslation } from 'react-i18next';
 
 const products = [
     { id: 1, name: 'Laptop', image: '../../../../public/image/search/laptop.jpg' },
@@ -25,12 +26,13 @@ const Header: React.FC = () => {
     const [step, setStep] = useState(1);
     const [phone, setPhone] = useState("");
     const [otp, setOtp] = useState(["", "", "", ""]);
-    const [language, setLanguage] = useState<'en' | 'bn'>('en');
+    const [language] = useState<'en' | 'bn'>('en');
     const cancelButtonRef = useRef(null);
-    const [value, setValue] = useState<string | undefined>();
+    const [value] = useState<string | undefined>();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [t, i18n] = useTranslation('global')
 
     useEffect(() => {
         if (searchText) {
@@ -107,48 +109,13 @@ const Header: React.FC = () => {
         setShowSuggestions(false);
     };
 
-    const toggleLanguage = () => {
-        setLanguage(prev => prev === 'en' ? 'bn' : 'en');
-    };
 
-    const translations = {
-        en: {
-            search: "Search products...",
-            login: "Login",
-            profile: "Profile",
-            settings: "Settings",
-            dashboard: "Dashboard",
-            close: "Close",
-            enterPhoneNumber: "Enter your phone number",
-            enterOTP: "Enter OTP",
-            verifyDetails: "Verify your details",
-            phoneNumber: "Phone Number",
-            next: "Next",
-            back: "Back",
-            verify: "Verify",
-            verificationComplete: "Verification Complete!",
-            loggedIn: "You are now logged in.",
-            finish: "Finish"
-        },
-        bn: {
-            search: "অনুসন্ধান...",
-            login: "লগইন",
-            profile: "প্রোফাইল",
-            settings: "সেটিংস",
-            dashboard: "ড্যাশবোর্ড",
-            close: "বন্ধ করুন",
-            enterPhoneNumber: "আপনার ফোন নম্বর লিখুন",
-            enterOTP: "ওটিপি লিখুন",
-            verifyDetails: "আপনার বিবরণ যাচাই করুন",
-            phoneNumber: "ফোন নম্বর",
-            next: "পরবর্তী",
-            back: "পিছনে",
-            verify: "যাচাই করুন",
-            verificationComplete: "যাচাইকরণ সম্পূর্ণ!",
-            loggedIn: "আপনি এখন লগ ইন করেছেন।",
-            finish: "শেষ করুন"
-        }
-    };
+    const handleChangeLanguage = (language: string) => {
+        i18n.changeLanguage(language)
+
+    }
+    console.log(i18n.language); // Should log 'bn' when switched to Bangla
+
 
     return (
         <div className=''>
@@ -156,7 +123,7 @@ const Header: React.FC = () => {
                 <div className="relative flex items-center gap-2 w-full p-2">
                     <input
                         type="text"
-                        placeholder={translations[language].search}
+                        placeholder={t('header.search')}
                         className="w-full pr-20 py-2 px-4 text-gray-800 rounded-md bg-gray-100 border-primary-default border"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -207,7 +174,7 @@ const Header: React.FC = () => {
                 )}
 
                 <div className="flex items-center">
-                    <div className="flex items-center border bg-primary-default rounded-full p-2 shadow hidden sm:hidden">
+                    <div className=" items-center border bg-primary-default rounded-full p-2 shadow hidden sm:hidden">
                         <MapPin size={20} className="text-white" />
                         <select className="bg-primary-default transition outline-none text-white hidden sm:hidden">
                             <option value="Dhaka">Dhaka</option>
@@ -219,14 +186,14 @@ const Header: React.FC = () => {
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4" />
-                            <span className="ml-1 hidden sm:inline">{translations[language].login}</span>
+                            <span className="ml-1 hidden sm:inline">{t('header.login')}</span>
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].login}</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].profile}</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].settings}</button>
-                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].dashboard}</Link>
+                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.login')}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.profile')}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.settings')}</button>
+                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.dashboard')}</Link>
                             </div>
                         )}
                     </div>
@@ -234,14 +201,14 @@ const Header: React.FC = () => {
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
                         <button
                             className={`px-3 py-1 ${language === 'en' ? 'text-white' : 'text-gray-500'}`}
-                            onClick={() => setLanguage('en')}
+                            onClick={() => handleChangeLanguage('en')}
                         >
                             EN
                         </button>
                         <div className="h-6 w-[1px] bg-white mx-2"></div>
                         <button
                             className={`px-3 py-1 ${language === 'bn' ? 'text-white' : 'text-gray-500'}`}
-                            onClick={() => setLanguage('bn')}
+                            onClick={() => handleChangeLanguage('bn')}
                         >
                             BN
                         </button>
@@ -280,16 +247,16 @@ const Header: React.FC = () => {
                                         className="absolute top-4 right-4 inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
                                         onClick={closeLoginModal}
                                     >
-                                        {translations[language].close}
+                                        {t('header.close')}
                                     </button>
 
                                     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
                                         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                                             <img className="mx-auto h-15 w-auto" src={logo} alt="Your Company" />
                                             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                                                {step === 1 && translations[language].enterPhoneNumber}
-                                                {step === 2 && translations[language].enterOTP}
-                                                {step === 3 && translations[language].verifyDetails}
+                                                {step === 1 && t('header.enterPhoneNumber')}
+                                                {step === 2 && t('header.enterOTP')}
+                                                {step === 3 && t('header.verifyDetails')}
                                             </h2>
                                         </div>
 
@@ -298,7 +265,7 @@ const Header: React.FC = () => {
                                                 {step === 1 && (
                                                     <div>
                                                         <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
-                                                            {translations[language].phoneNumber}
+                                                            {t('header.phoneNumber')}
                                                         </label>
                                                         <div className="flex flex-col items-start w-full">
                                                             <PhoneInput
@@ -308,7 +275,7 @@ const Header: React.FC = () => {
                                                                 onChange={handlePhoneChange}
                                                                 required
                                                                 defaultCountry="BD"
-                                                                placeholder={translations[language].enterPhoneNumber}
+                                                                placeholder={t('header.phoneNumber')}
                                                                 className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                             />
                                                         </div>
@@ -324,7 +291,7 @@ const Header: React.FC = () => {
                                                             }}
                                                             className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
-                                                            {translations[language].next}
+                                                            {t('header.next')}
                                                         </button>
                                                     </div>
                                                 )}
@@ -351,14 +318,14 @@ const Header: React.FC = () => {
                                                                 className="text-gray-500 hover:underline"
                                                                 onClick={handleBack}
                                                             >
-                                                                <ArrowLeft className="h-5 w-5 inline" /> {translations[language].back}
+                                                                <ArrowLeft className="h-5 w-5 inline" /> {t('header.back')}
                                                             </button>
                                                             <button
                                                                 type="button"
                                                                 onClick={handleVerify}
                                                                 className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
                                                             >
-                                                                {translations[language].verify}
+                                                                {t('header.verify')}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -366,14 +333,14 @@ const Header: React.FC = () => {
 
                                                 {step === 3 && (
                                                     <div>
-                                                        <h3 className="text-center text-lg font-semibold text-gray-700">{translations[language].verificationComplete}</h3>
-                                                        <p className="text-center text-gray-600 mt-4">{translations[language].loggedIn}</p>
+                                                        <h3 className="text-center text-lg font-semibold text-gray-700">{t('header.verificationComplete')}</h3>
+                                                        <p className="text-center text-gray-600 mt-4">{t('header.loggedIn')}</p>
                                                         <button
                                                             type="button"
                                                             onClick={handleSubmit}
                                                             className="mt-4 w-full flex justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                                         >
-                                                            {translations[language].finish}
+                                                            {t('header.finish')}
                                                         </button>
                                                     </div>
                                                 )}
