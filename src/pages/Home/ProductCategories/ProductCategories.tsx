@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
+import { useTranslation } from 'react-i18next';
 
 const products = [
   { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg", price: 59.99 },
@@ -19,6 +20,7 @@ export default function ProductCategories() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [cart, setCart] = useState<any[]>([]);
   const { toggleClicked } = useModalStore();
+  const [t] = useTranslation('global');
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
@@ -73,10 +75,10 @@ export default function ProductCategories() {
       <div className="container mx-auto max-w-5xl px-4">
         <div className="flex items-center justify-between mb-4">
           <div className="bg-primary-light text-white px-4 py-1 rounded-full text-sm font-medium">
-            Special Products
+            {t('productCategories.heading')}
           </div>
           <Link to="/allProducts" className="text-white text-sm font-medium flex items-center hover:underline">
-            All Products
+            {t('productCategories.allProducts')}
             <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
@@ -113,7 +115,7 @@ export default function ProductCategories() {
                   className="w-full mt-2"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add
+                  {t('buttons.addToCart')}
                 </Button>
               </Link>
             ))}

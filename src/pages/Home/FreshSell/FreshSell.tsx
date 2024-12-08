@@ -5,8 +5,10 @@ import { ChevronRight, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useModalStore from "@/store/Store";
+import { useTranslation } from "react-i18next";
 
 export default function FreshSell() {
+    const [t] = useTranslation('global');
     const [timeLeft, setTimeLeft] = useState({
         hours: 2,
         minutes: 30,
@@ -168,7 +170,7 @@ export default function FreshSell() {
                     <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
                 </div>
                 <Link to="/allProducts" className="flex items-center hover:underline">
-                    All Products
+                   {t('header.allProducts')}
                     <ChevronRight className="h-4 w-4" />
                 </Link>
             </div>
@@ -215,7 +217,7 @@ export default function FreshSell() {
                                 className="w-full mt-2"
                             >
                                 <ShoppingCart className="h-4 w-4 mr-2" />
-                                Add
+                             {t('buttons.addToCart')}
                             </Button>
                         </div>
                     </Link>

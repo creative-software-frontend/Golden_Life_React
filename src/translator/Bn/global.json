@@ -19,7 +19,8 @@
     "title": "কোর্সসমূহ",
     "allCourses": "সব কোর্স",
     "categories": "ক্যাটেগরি",
-    "allCategories": "সব ক্যাটেগরি"
+    "allCategories": "সব ক্যাটেগরি",
+     "allProducts": "সমস্ত পণ্য"
   },
   "courseNames": {
     "webDevelopment": "ওয়েব ডেভেলপমেন্ট",
@@ -51,5 +52,25 @@
     "womensBag": "মহিলাদের ব্যাগ",
     "mensBag": "পুরুষদের ব্যাগ",
     "watchesAccessories": "ঘড়ি & এক্সেসরিজ"
+  },
+  "productCategories": {
+    "heading": "বিশেষ পণ্যসমূহ",
+    "allProducts": "সব পণ্য",
+    "priceLabel": "মূল্য",
+    "addToCart": "যোগ করুন",
+    "currency": "৳"
+  },
+  "newArrivals": {
+    "heading": "নতুন আগমন",
+    "seeAll": "সব দেখুন"
+  },
+  "common": {
+    "cartAdded": "আইটেম কার্টে যোগ করা হয়েছে"
+  },
+  "freshSell": {
+    "hours": "ঘন্টা",
+    "minutes": "মিনিট",
+    "seconds": "সেকেন্ড",
+    "addToCart": "কার্টে যোগ করুন"
   }
 }

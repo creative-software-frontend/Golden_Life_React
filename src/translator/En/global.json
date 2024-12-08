@@ -19,7 +19,8 @@
     "title": "Courses",
     "allCourses": "All Courses",
     "categories": "Categories",
-    "allCategories": "All Categories"
+    "allCategories": "All Categories",
+    "allProducts": "All Products"
   },
   "courseNames": {
     "webDevelopment": "Web Development",
@@ -51,5 +52,25 @@
     "womensBag": "Women's Bag",
     "mensBag": "Men's Bag",
     "watchesAccessories": "Watches & Accessories"
+  },
+  "productCategories": {
+    "heading": "Special Products",
+    "allProducts": "All Products",
+    "priceLabel": "Price",
+    "addToCart": "Add",
+    "currency": "$"
+  },
+  "newArrivals": {
+    "heading": "New Arrivals",
+    "seeAll": "See All"
+  },
+  "common": {
+    "cartAdded": "Item added to the cart"
+  },
+  "freshSell": {
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds",
+    "addToCart": "Add to Cart"
   }
 }
