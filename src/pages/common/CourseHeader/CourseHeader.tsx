@@ -8,6 +8,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
 import logo from '../../../../public/image/logo/logo.jpg';
+import { useTranslation } from 'react-i18next';
 
 const courses = [
     { id: 1, name: 'Introduction to React', image: '../../../../public/image/courses/ai.jpg', duration: '4 weeks' },
@@ -31,7 +32,14 @@ const CourseHeader: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [suggestions, setSuggestions] = useState<typeof courses>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [t, i18n] = useTranslation('global')
 
+
+
+    const handleChangeLanguage = (language: string) => {
+        i18n.changeLanguage(language)
+
+    }
     useEffect(() => {
         if (searchText) {
             const filteredCourses = courses.filter(course =>
@@ -224,14 +232,14 @@ const CourseHeader: React.FC = () => {
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center bg-primary-default text-white px-3 py-1 border border-primary-default rounded-full">
                             <UserIcon className="h-6 w-4" />
-                            <span className="ml-1 hidden sm:inline">{translations[language].login}</span>
+                            <span className="ml-1 hidden sm:inline text-nowrap">{t('header.login')}</span>
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].login}</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].profile}</button>
-                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].settings}</button>
-                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{translations[language].dashboard}</Link>
+                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.login')}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.profile')}</button>
+                                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.settings')}</button>
+                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.dashboard')}</Link>
                             </div>
                         )}
                     </div>
@@ -239,14 +247,14 @@ const CourseHeader: React.FC = () => {
                     <div className="flex items-center gap-1 mx-1 bg-primary-default border-gray-400 rounded-full">
                         <button
                             className={`px-3 py-1 ${language === 'en' ? 'text-white' : 'text-gray-500'}`}
-                            onClick={() => setLanguage('en')}
+                            onClick={() => handleChangeLanguage('en')}
                         >
                             EN
                         </button>
                         <div className="h-6 w-[1px] bg-white mx-2"></div>
                         <button
                             className={`px-3 py-1 ${language === 'bn' ? 'text-white' : 'text-gray-500'}`}
-                            onClick={() => setLanguage('bn')}
+                            onClick={() => handleChangeLanguage('bn')}
                         >
                             BN
                         </button>

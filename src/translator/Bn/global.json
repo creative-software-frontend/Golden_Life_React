@@ -1,26 +1,26 @@
 {
   "header": {
-    "search": "পণ্য খুঁজুন...",
+    "search": "পণ্য অনুসন্ধান করুন...",
     "login": "লগইন",
     "profile": "প্রোফাইল",
     "settings": "সেটিংস",
     "dashboard": "ড্যাশবোর্ড",
     "close": "বন্ধ করুন",
-    "enterPhoneNumber": "আপনার ফোন নম্বর লিখুন",
-    "enterOTP": "OTP লিখুন",
-    "verifyDetails": "আপনার বিস্তারিত যাচাই করুন",
+    "enterPhoneNumber": "আপনার ফোন নম্বর দিন",
+    "enterOTP": "OTP দিন",
+    "verifyDetails": "আপনার তথ্য যাচাই করুন",
     "phoneNumber": "ফোন নম্বর",
     "next": "পরবর্তী",
     "back": "পিছনে",
     "verify": "যাচাই করুন",
     "verificationComplete": "যাচাই সম্পন্ন!",
     "loggedIn": "আপনি এখন লগইন করেছেন।",
-    "finish": "শেষ",
+    "finish": "সম্পন্ন",
     "title": "কোর্স",
-    "allCourses": "সমস্ত কোর্স",
-    "categories": "ক্যাটাগরি",
-    "allCategories": "সমস্ত ক্যাটাগরি",
-    "allProducts": "সমস্ত পণ্য"
+    "allCourses": "সব কোর্স",
+    "categories": "বিভাগ",
+    "allCategories": "সব বিভাগ",
+    "allProducts": "সব পণ্য"
   },
   "courseNames": {
     "webDevelopment": "ওয়েব ডেভেলপমেন্ট",
@@ -29,7 +29,7 @@
     "digitalMarketing": "ডিজিটাল মার্কেটিং",
     "appDevelopment": "অ্যাপ ডেভেলপমেন্ট",
     "machineLearning": "মেশিন লার্নিং",
-    "cybersecurity": "সাইবার নিরাপত্তা",
+    "cybersecurity": "সাইবার সিকিউরিটি",
     "uiUxDesign": "UI/UX ডিজাইন",
     "cloudComputing": "ক্লাউড কম্পিউটিং",
     "blockchain": "ব্লকচেইন",
@@ -37,55 +37,59 @@
     "bigData": "বিগ ডেটা"
   },
   "buttons": {
-    "addToCart": "যোগ করুন"
+    "addToCart": "যোগ করুন",
+    "addToCart2": "কার্টে যোগ করুন",
+    "enroll": "কোর্সে ভর্তি হন",
+    "show": "দেখান",
+    "promo": "প্রোমো কোড"
   },
   "categories": {
-    "beautyCare": "বিউটি অ্যান্ড পার্সোনাল কেয়ার",
+    "beautyCare": "বিউটি ও পার্সোনাল কেয়ার",
     "womensApparels": "মহিলাদের পোশাক",
     "mensWear": "পুরুষদের পোশাক",
     "mobileGadgets": "মোবাইল ও গ্যাজেট",
-    "homeDecoration": "হোম ডেকোরেশন",
+    "homeDecoration": "বাড়ির সজ্জা",
     "homeAppliances": "হোম অ্যাপ্লায়েন্স",
-    "toysKidsBabies": "খেলনা, শিশু ও বাচ্চারা",
-    "kidsFashion": "শিশু ফ্যাশন",
-    "jewelleryAccessories": "গয়না এবং অ্যাকসেসরিজ",
+    "toysKidsBabies": "খেলনা, বাচ্চা ও শিশুর পণ্য",
+    "kidsFashion": "বাচ্চাদের ফ্যাশন",
+    "jewelleryAccessories": "গহনা ও অ্যাকসেসরিজ",
     "womensBag": "মহিলাদের ব্যাগ",
     "mensBag": "পুরুষদের ব্যাগ",
     "watchesAccessories": "ঘড়ি ও অ্যাকসেসরিজ"
   },
   "productCategories": {
     "heading": "বিশেষ পণ্য",
-    "allProducts": "সমস্ত পণ্য",
+    "allProducts": "সব পণ্য",
     "priceLabel": "মূল্য",
     "addToCart": "যোগ করুন",
     "currency": "৳"
   },
   "products": {
-    "onePieceGown": "ওয়ান পিস গাউন",
-    "smartWatch": "স্মার্ট ওয়াচ ও ডিভাইস",
-    "snapAndGrip": "স্ন্যাপ অ্যান্ড গ্রিপ",
-    "ladiesWinterOvercoat": "মহিলাদের শীতকালীন কোট",
+    "onePieceGown": "একটি পিস গাউন",
+    "smartWatch": "স্মার্টওয়াচ ও ডিভাইস",
+    "snapAndGrip": "স্ন্যাপ এবং গ্রিপ",
+    "ladiesWinterOvercoat": "লেডিস উইন্টার ওভারকোট",
     "stylishShirt": "আকর্ষণীয় স্টাইলিশ শার্ট",
     "m19Original": "M19 100% অরিজিনাল",
     "samsungGalaxy": "স্যামসাং গ্যালাক্সি",
-    "LadisWatchwith": "লেডিস ওয়াচ উইথ",
+    "LadisWatchwith": "লেডিস ওয়াচ উইথ",
     "pulseOximeter": "পালস অক্সিমিটার",
-    "SkatingShoe": "স্কেটিং শু",
+    "SkatingShoe": "স্কেটিং জুতা",
     "EidCollection": "ঈদ কালেকশন",
     "Silk Katan Saree": "সিল্ক কাটান শাড়ি",
-    "product1": "কস কেপিএইচ 7 পোর্টেবল",
-    "product2": "বিটস সোলো 2",
-    "product3": "বিটস ইপি ওয়্যারড",
-    "product4": "বোসম সাউন্ডলিংক ব্লুটুথ",
-    "product5": "সনি WH-1000XM4",
-    "product6": "এয়ারপডস প্রো"
+    "product1": "Koss KPH7 পোর্টেবল",
+    "product2": "Beats Solo2 Solo 2",
+    "product3": "Beats EP ওয়্যারড",
+    "product4": "Bose SoundLink ব্লুটুথ",
+    "product5": "Sony WH-1000XM4",
+    "product6": "AirPods Pro"
   },
   "newArrivals": {
     "heading": "নতুন আগমন",
     "seeAll": "সব দেখুন"
   },
   "common": {
-    "cartAdded": "আইটেম কার্টে যোগ করা হয়েছে"
+    "cartAdded": "পণ্য কার্টে যোগ হয়েছে"
   },
   "freshSell": {
     "hours": "ঘণ্টা",
@@ -100,31 +104,50 @@
   },
   "product": {
     "price": "মূল্য",
-    "originalPrice": "মূল দাম",
-    "discountedPrice": "ছাড় দাম"
+    "originalPrice": "মূল মূল্যে",
+    "discountedPrice": "ছাড়কৃত মূল্য"
   },
   "sections": {
     "freshSell": "ফ্রেশ সেল",
     "trendingProductsTitle": "ট্রেন্ডিং পণ্য",
-    "trendingProductsDescription": "আধুনিক, মিনিমাল এবং আধুনিক ডিজাইনগুলি ল্যাভিশ অ্যালিস হ্যান্ডরাইটিংকে ধারণ করে।",
-    "discount": "-10%",
-    "oldPrice": "পুরনো দাম",
+    "trendingProductsDescription": "আধুনিক, মিনিমাল, এবং আধুনিক ডিজাইনগুলি Lavish Alice হাতলেখার প্রতিফলন।",
+    "discount": "-১০%",
+    "oldPrice": "পুরানো মূল্য",
     "price": "মূল্য"
+  },
+  "course": {
+    "HSC242526": "HSC ২৪, ২৫, ২৬",
+    "১০ম শ্রেণি": "১০ম শ্রেণি",
+    "৯ম শ্রেণি": "৯ম শ্রেণি",
+    "৮ম শ্রেণি": "৮ম শ্রেণি",
+    "৭ম শ্রেণি": "৭ম শ্রেণি",
+    "৬ষ্ঠ শ্রেণি": "৬ষ্ঠ শ্রেণি",
+    "p": "বিশেষ মূল্যে ১০ মিনিট স্কুলের নির্বাচিত কোর্সে এই মাসজুড়ে আপনার শেখার যাত্রা শুরু করুন! এখনই ক্রিয়েটিভ সফটওয়্যার দিয়ে শিখতে শুরু করুন!",
+    "h": "স্কিল ডেভেলপমেন্ট কোর্সে চমৎকার ডিসকাউন্ট!",
+    "fb": "ফেসবুক মার্কেটিং",
+    "yt": "ইউটিউব মার্কেটিং",
+    "seo": "এসইও",
+    "smm": "এসএমএম"
+  },
+  "name": {
+    "ayman": "আইমান সাদিক ও সাদমান সাদিক",
+    "shahid": "শাহিদুল ইসলাম",
+    "sakib": "সাকিব বিন রশিদ"
   },
   "footer": {
     "aboutGoldenLife": "গোল্ডেন লাইফ সম্পর্কে",
     "ourStory": "আমাদের গল্প",
     "team": "টিম",
     "privacyPolicy": "গোপনীয়তা নীতি",
-    "termsOfUse": "ব্যবহারের শর্তাবলী",
+    "termsOfUse": "ব্যবহার শর্তাবলী",
     "customerService": "গ্রাহক সেবা",
-    "contactUs": "যোগাযোগ করুন",
-    "faq": "প্রশ্নাবলী",
+    "contactUs": "আমাদের সাথে যোগাযোগ করুন",
+    "faq": "প্রশ্নোত্তর",
     "help": "সাহায্য",
     "forBusiness": "ব্যবসার জন্য",
-    "corporate": "কর্মকর্তা",
+    "corporate": "কর্পোরেট",
     "phoneNumber": "ফোন নম্বর",
-    "getApp": "অ্যাপ পান",
+    "getApp": "অ্যাপ ডাউনলোড করুন",
     "paymentMethods": "পেমেন্ট পদ্ধতি"
   },
   "socialLinks": {

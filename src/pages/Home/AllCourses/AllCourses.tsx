@@ -24,6 +24,7 @@ import CoursePlan from "../CoursePlan/CoursePlan"
 import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
 import useModalStore from "@/store/Store"
+import { useTranslation } from "react-i18next"
 
 interface Lesson {
   id: string
@@ -61,6 +62,38 @@ const lessons: Lesson[] = [
   },
   {
     id: "2",
+    type: "SSC পদার্থবিজ্ঞান",
+    number: "8.1",
+    title: "আলোর প্রকৃতি",
+    thumbnail: "/placeholder.svg?height=200&width=400",
+    color: "bg-blue-500",
+    badge: "SSC",
+    image: "/placeholder.svg?height=400&width=800",
+    instructor: "Prof. Salma Begum",
+    rating: 4.7,
+    studentsEnrolled: 2000,
+    duration: "6 weeks",
+    level: "Beginner",
+    category: "Physics",
+  },
+  {
+    id: "3",
+    type: "SSC পদার্থবিজ্ঞান",
+    number: "8.1",
+    title: "আলোর প্রকৃতি",
+    thumbnail: "/placeholder.svg?height=200&width=400",
+    color: "bg-blue-500",
+    badge: "SSC",
+    image: "/placeholder.svg?height=400&width=800",
+    instructor: "Prof. Salma Begum",
+    rating: 4.7,
+    studentsEnrolled: 2000,
+    duration: "6 weeks",
+    level: "Beginner",
+    category: "Physics",
+  },
+  {
+    id: "4",
     type: "SSC পদার্থবিজ্ঞান",
     number: "8.1",
     title: "আলোর প্রকৃতি",
@@ -152,6 +185,7 @@ export default function AllCourses() {
   const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")
   const [cart, setCart] = React.useState<Lesson[]>([])
   const [isCartModalOpen, setIsCartModalOpen] = React.useState(false)
+  const [t] = useTranslation("global");
 
 
   // const addToCart = (product: Product) => {
@@ -278,7 +312,7 @@ export default function AllCourses() {
             </DialogContent>
           </Dialog>
         )}
-
+{/* 
         <Dialog open={isCartModalOpen} onOpenChange={closeCartModal}>
           <DialogContent>
             <DialogHeader>
@@ -294,7 +328,7 @@ export default function AllCourses() {
             </div>
             <Button onClick={closeCartModal} className="mt-4">Close</Button>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
     </>
   )

@@ -37,7 +37,11 @@
     "bigData": "Big Data"
   },
   "buttons": {
-    "addToCart": "Add"
+    "addToCart": "Add",
+    "addToCart2": "  Add to Cart",
+    "enroll": "Enroll in Course",
+    "show": "Show",
+    "promo": "Promo code"
   },
   "categories": {
     "beautyCare": "Beauty & Personal Care",
@@ -110,6 +114,27 @@
     "discount": "-10%",
     "oldPrice": "Old Price",
     "price": "Price"
+  },
+  "course": {
+    "HSC242526": "HSC 24, 25, 26",
+    "১০ম শ্রেণি": "10th Grade",
+    "৯ম শ্রেণি": "9th Grade",
+    "৮ম শ্রেণি": "8th Grade",
+    "৭ম শ্রেণি": "7th Grade",
+    "৬ষ্ঠ শ্রেণি": "6th Grade",
+    "p": "Enjoy special prices on selected 10 Minute School courses throughout the month. Start learning now with Creative Software!",
+    "h": "Amazing Discounts on Skill Development Courses!",
+    "fb": "Facebook Marketing",
+    "yt": "YouTube Marketing",
+    "seo": "SEO",
+    "smm": "SMM"
+  },
+  "name":{
+    "ayman":"Ayman Sadiq & Sadman Sadiq",
+    "shahid":"Shahidul Islam",
+    "sakib":"Sakib Bin Rashid"
+    
+
   },
   "footer": {
     "aboutGoldenLife": "About Golden Life",
