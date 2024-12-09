@@ -6,59 +6,79 @@
     "settings": "সেটিংস",
     "dashboard": "ড্যাশবোর্ড",
     "close": "বন্ধ করুন",
-    "enterPhoneNumber": "আপনার ফোন নম্বর দিন",
-    "enterOTP": "ওটিপি প্রবেশ করুন",
-    "verifyDetails": "আপনার তথ্য যাচাই করুন",
+    "enterPhoneNumber": "আপনার ফোন নম্বর লিখুন",
+    "enterOTP": "OTP লিখুন",
+    "verifyDetails": "আপনার বিস্তারিত যাচাই করুন",
     "phoneNumber": "ফোন নম্বর",
     "next": "পরবর্তী",
-    "back": "পেছনে",
+    "back": "পিছনে",
     "verify": "যাচাই করুন",
     "verificationComplete": "যাচাই সম্পন্ন!",
     "loggedIn": "আপনি এখন লগইন করেছেন।",
-    "finish": "শেষ করুন",
-    "title": "কোর্সসমূহ",
-    "allCourses": "সব কোর্স",
-    "categories": "ক্যাটেগরি",
-    "allCategories": "সব ক্যাটেগরি",
-     "allProducts": "সমস্ত পণ্য"
+    "finish": "শেষ",
+    "title": "কোর্স",
+    "allCourses": "সমস্ত কোর্স",
+    "categories": "ক্যাটাগরি",
+    "allCategories": "সমস্ত ক্যাটাগরি",
+    "allProducts": "সমস্ত পণ্য"
   },
   "courseNames": {
     "webDevelopment": "ওয়েব ডেভেলপমেন্ট",
-    "dataScience": "ডাটা সায়েন্স",
+    "dataScience": "ডেটা সায়েন্স",
     "graphicDesign": "গ্রাফিক ডিজাইন",
     "digitalMarketing": "ডিজিটাল মার্কেটিং",
     "appDevelopment": "অ্যাপ ডেভেলপমেন্ট",
     "machineLearning": "মেশিন লার্নিং",
-    "cybersecurity": "সাইবারসিকিউরিটি",
-    "uiUxDesign": "ইউআই/ইউএক্স ডিজাইন",
+    "cybersecurity": "সাইবার নিরাপত্তা",
+    "uiUxDesign": "UI/UX ডিজাইন",
     "cloudComputing": "ক্লাউড কম্পিউটিং",
     "blockchain": "ব্লকচেইন",
     "softwareTesting": "সফটওয়্যার টেস্টিং",
-    "bigData": "বিগ ডাটা"
+    "bigData": "বিগ ডেটা"
   },
   "buttons": {
-    "addToCart": "যুক্ত করুন"
+    "addToCart": "যোগ করুন"
   },
   "categories": {
-    "beautyCare": "বিউটি & পার্সোনাল কেয়ার",
+    "beautyCare": "বিউটি অ্যান্ড পার্সোনাল কেয়ার",
     "womensApparels": "মহিলাদের পোশাক",
     "mensWear": "পুরুষদের পোশাক",
-    "mobileGadgets": "মোবাইল & গ্যাজেটস",
+    "mobileGadgets": "মোবাইল ও গ্যাজেট",
     "homeDecoration": "হোম ডেকোরেশন",
-    "homeAppliances": "হোম অ্যাপ্লায়েন্সেস",
-    "toysKidsBabies": "খেলনা, শিশু & বাচ্চারা",
-    "kidsFashion": "শিশুদের ফ্যাশন",
-    "jewelleryAccessories": "গহনা & এক্সেসরিজ",
+    "homeAppliances": "হোম অ্যাপ্লায়েন্স",
+    "toysKidsBabies": "খেলনা, শিশু ও বাচ্চারা",
+    "kidsFashion": "শিশু ফ্যাশন",
+    "jewelleryAccessories": "গয়না এবং অ্যাকসেসরিজ",
     "womensBag": "মহিলাদের ব্যাগ",
     "mensBag": "পুরুষদের ব্যাগ",
-    "watchesAccessories": "ঘড়ি & এক্সেসরিজ"
+    "watchesAccessories": "ঘড়ি ও অ্যাকসেসরিজ"
   },
   "productCategories": {
-    "heading": "বিশেষ পণ্যসমূহ",
-    "allProducts": "সব পণ্য",
+    "heading": "বিশেষ পণ্য",
+    "allProducts": "সমস্ত পণ্য",
     "priceLabel": "মূল্য",
     "addToCart": "যোগ করুন",
     "currency": "৳"
+  },
+  "products": {
+    "onePieceGown": "ওয়ান পিস গাউন",
+    "smartWatch": "স্মার্ট ওয়াচ ও ডিভাইস",
+    "snapAndGrip": "স্ন্যাপ অ্যান্ড গ্রিপ",
+    "ladiesWinterOvercoat": "মহিলাদের শীতকালীন কোট",
+    "stylishShirt": "আকর্ষণীয় স্টাইলিশ শার্ট",
+    "m19Original": "M19 100% অরিজিনাল",
+    "samsungGalaxy": "স্যামসাং গ্যালাক্সি",
+    "LadisWatchwith": "লেডিস ওয়াচ উইথ",
+    "pulseOximeter": "পালস অক্সিমিটার",
+    "SkatingShoe": "স্কেটিং শু",
+    "EidCollection": "ঈদ কালেকশন",
+    "Silk Katan Saree": "সিল্ক কাটান শাড়ি",
+    "product1": "কস কেপিএইচ 7 পোর্টেবল",
+    "product2": "বিটস সোলো 2",
+    "product3": "বিটস ইপি ওয়্যারড",
+    "product4": "বোসম সাউন্ডলিংক ব্লুটুথ",
+    "product5": "সনি WH-1000XM4",
+    "product6": "এয়ারপডস প্রো"
   },
   "newArrivals": {
     "heading": "নতুন আগমন",
@@ -68,9 +88,55 @@
     "cartAdded": "আইটেম কার্টে যোগ করা হয়েছে"
   },
   "freshSell": {
-    "hours": "ঘন্টা",
+    "hours": "ঘণ্টা",
     "minutes": "মিনিট",
     "seconds": "সেকেন্ড",
     "addToCart": "কার্টে যোগ করুন"
-  }
+  },
+  "time": {
+    "hours": "ঘণ্টা",
+    "minutes": "মিনিট",
+    "seconds": "সেকেন্ড"
+  },
+  "product": {
+    "price": "মূল্য",
+    "originalPrice": "মূল দাম",
+    "discountedPrice": "ছাড় দাম"
+  },
+  "sections": {
+    "freshSell": "ফ্রেশ সেল",
+    "trendingProductsTitle": "ট্রেন্ডিং পণ্য",
+    "trendingProductsDescription": "আধুনিক, মিনিমাল এবং আধুনিক ডিজাইনগুলি ল্যাভিশ অ্যালিস হ্যান্ডরাইটিংকে ধারণ করে।",
+    "discount": "-10%",
+    "oldPrice": "পুরনো দাম",
+    "price": "মূল্য"
+  },
+  "footer": {
+    "aboutGoldenLife": "গোল্ডেন লাইফ সম্পর্কে",
+    "ourStory": "আমাদের গল্প",
+    "team": "টিম",
+    "privacyPolicy": "গোপনীয়তা নীতি",
+    "termsOfUse": "ব্যবহারের শর্তাবলী",
+    "customerService": "গ্রাহক সেবা",
+    "contactUs": "যোগাযোগ করুন",
+    "faq": "প্রশ্নাবলী",
+    "help": "সাহায্য",
+    "forBusiness": "ব্যবসার জন্য",
+    "corporate": "কর্মকর্তা",
+    "phoneNumber": "ফোন নম্বর",
+    "getApp": "অ্যাপ পান",
+    "paymentMethods": "পেমেন্ট পদ্ধতি"
+  },
+  "socialLinks": {
+    "linkedin": "লিঙ্কডইন",
+    "youtube": "ইউটিউব",
+    "facebook": "ফেসবুক",
+    "twitter": "টুইটার",
+    "instagram": "ইনস্টাগ্রাম"
+  },
+  "language": {
+    "en": "EN",
+    "bn": "BN"
+  },
+  "copyright": "© {{year}} গোল্ডেন লাইফ শপিং।"
 }

@@ -60,6 +60,26 @@
     "addToCart": "Add",
     "currency": "$"
   },
+  "products": {
+    "onePieceGown": "One piece gown",
+    "smartWatch": "Smart Watch & Device",
+    "snapAndGrip": "Snap and Grip",
+    "ladiesWinterOvercoat": "Ladies Winter Overcoat",
+    "stylishShirt": "Attractive Stylish Shirt",
+    "m19Original": "M19 100% Original",
+    "samsungGalaxy": "Samsung Galaxy",
+    "LadisWatchwith": "Ladis Watch with",
+    "pulseOximeter": "Pulse Oximeter",
+    "SkatingShoe": "Skating Shoe",
+    "EidCollection": "Eid Collection",
+    "Silk Katan Saree": "Silk Katan Saree",
+    "product1": "Koss KPH7 Portable",
+    "product2": "Beats Solo2 Solo 2",
+    "product3": "Beats EP Wired",
+    "product4": "Bose SoundLink Bluetooth",
+    "product5": "Sony WH-1000XM4",
+    "product6": "AirPods Pro"
+  },
   "newArrivals": {
     "heading": "New Arrivals",
     "seeAll": "See All"
@@ -72,5 +92,51 @@
     "minutes": "minutes",
     "seconds": "seconds",
     "addToCart": "Add to Cart"
-  }
+  },
+  "time": {
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
+  },
+  "product": {
+    "price": "Price",
+    "originalPrice": "Original Price",
+    "discountedPrice": "Discounted Price"
+  },
+  "sections": {
+    "freshSell": "Fresh Sell",
+    "trendingProductsTitle": "Trending Products",
+    "trendingProductsDescription": "Contemporary, minimal, and modern designs embody the Lavish Alice handwriting.",
+    "discount": "-10%",
+    "oldPrice": "Old Price",
+    "price": "Price"
+  },
+  "footer": {
+    "aboutGoldenLife": "About Golden Life",
+    "ourStory": "Our Story",
+    "team": "Team",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use",
+    "customerService": "Customer Service",
+    "contactUs": "Contact Us",
+    "faq": "FAQ",
+    "help": "Help",
+    "forBusiness": "For Business",
+    "corporate": "Corporate",
+    "phoneNumber": "Phone Number",
+    "getApp": "Get app",
+    "paymentMethods": "Payment Methods"
+  },
+  "socialLinks": {
+    "linkedin": "LinkedIn",
+    "youtube": "YouTube",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram"
+  },
+  "language": {
+    "en": "EN",
+    "bn": "BN"
+  },
+  "copyright": "© {{year}} Golden Life Shopping."
 }

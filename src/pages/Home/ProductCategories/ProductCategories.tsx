@@ -5,22 +5,22 @@ import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
 import { useTranslation } from 'react-i18next';
 
-const products = [
-  { id: 1, title: 'One piece gown', image: "../../../../public/image/categories/c2.jpg", price: 59.99 },
-  { id: 2, title: 'Smart Watch & Device', image: "../../../../public/image/categories/c1.jpg", price: 129.99 },
-  { id: 3, title: 'Snap and Grip', image: "../../../../public/image/categories/c12.png", price: 19.99 },
-  { id: 4, title: 'Ladies Winter Overcoat', image: "../../../../public/image/categories/c3.jpg", price: 89.99 },
-  { id: 5, title: 'Attractive Stylish Shirt', image: "../../../../public/image/categories/c13.png", price: 39.99 },
-  { id: 6, title: 'M19 100% Original', image: "../../../../public/image/categories/c4.jpg", price: 49.99 },
-  { id: 7, title: 'M19 100% Original', image: "../../../../public/image/categories/c15png.jpg", price: 54.99 },
-  { id: 8, title: 'M19 100% Original', image: "../../../../public/image/products/sharee3.jpg", price: 79.99 },
-];
-
 export default function ProductCategories() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [cart, setCart] = useState<any[]>([]);
   const { toggleClicked } = useModalStore();
-  const [t] = useTranslation('global');
+  const { t } = useTranslation('global');
+
+  const products = [
+    { id: 1, title: t('products.onePieceGown'), image: "../../../../public/image/categories/c2.jpg", price: 59.99 },
+    { id: 2, title: t('products.smartWatch'), image: "../../../../public/image/categories/c1.jpg", price: 129.99 },
+    { id: 3, title: t('products.snapAndGrip'), image: "../../../../public/image/categories/c12.png", price: 19.99 },
+    { id: 4, title: t('products.ladiesWinterOvercoat'), image: "../../../../public/image/categories/c3.jpg", price: 89.99 },
+    { id: 5, title: t('products.stylishShirt'), image: "../../../../public/image/categories/c13.png", price: 39.99 },
+    { id: 6, title: t('products.m19Original'), image: "../../../../public/image/categories/c4.jpg", price: 49.99 },
+    { id: 7, title: t('products.m19Original'), image: "../../../../public/image/categories/c15png.jpg", price: 54.99 },
+    { id: 8, title: t('products.m19Original'), image: "../../../../public/image/products/sharee3.jpg", price: 79.99 },
+  ];
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
@@ -125,4 +125,3 @@ export default function ProductCategories() {
     </div>
   );
 }
-

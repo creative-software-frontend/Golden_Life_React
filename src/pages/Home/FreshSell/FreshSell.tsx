@@ -19,7 +19,7 @@ export default function FreshSell() {
     const isDraggingRef = useRef(false);
     const startXRef = useRef(0);
     const scrollLeftRef = useRef(0);
-    const [cart, setCart] = useState<any[]>([])
+    const [cart, setCart] = useState<any[]>([]);
     const { toggleClicked } = useModalStore();
 
     useEffect(() => {
@@ -42,7 +42,7 @@ export default function FreshSell() {
     const products = [
         {
             id: 1,
-            name: "সিল্ক কাতান শাড়ি",
+            name: t('products.Silk Katan Saree'),
             image: "../../../../public/image/products/sharee2.jpg",
             originalPrice: 829,
             discountedPrice: 813,
@@ -50,7 +50,7 @@ export default function FreshSell() {
         },
         {
             id: 2,
-            name: "Eid Collection",
+            name: t('products.EidCollection'),
             image: "../../../../public/image/products/watch.jpg",
             originalPrice: 1165,
             discountedPrice: 981,
@@ -58,7 +58,7 @@ export default function FreshSell() {
         },
         {
             id: 3,
-            name: "Skating Shoe",
+            name: t('products.SkatingShoe'),
             image: "../../../../public/image/products/shoe.jpg",
             originalPrice: 2820,
             discountedPrice: 2120,
@@ -66,7 +66,7 @@ export default function FreshSell() {
         },
         {
             id: 4,
-            name: "D166 Smart Watch",
+            name: t('products.samsungGalaxy'),
             image: "../../../../public/image/products/sharee3.jpg",
             originalPrice: 460,
             discountedPrice: 348,
@@ -74,7 +74,7 @@ export default function FreshSell() {
         },
         {
             id: 5,
-            name: "Ladis Watch with",
+            name: t('products.LadisWatchwith'),
             image: "../../../../public/image/categories/c1.jpg",
             originalPrice: 480,
             discountedPrice: 435,
@@ -82,9 +82,8 @@ export default function FreshSell() {
         },
         {
             id: 6,
-            name: "Pulse Oximeter A",
+            name: t('products.pulseOximeter'),
             image: "../../../../public/image/products/pulseoximeter.jpg",
-
             originalPrice: 1180,
             discountedPrice: 1157,
             progress: 30,
@@ -92,7 +91,6 @@ export default function FreshSell() {
     ];
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        
         if (scrollRef.current) {
             isDraggingRef.current = true;
             startXRef.current = e.clientX - scrollRef.current.offsetLeft;
@@ -124,12 +122,6 @@ export default function FreshSell() {
         }
     };
 
-    // const addToCart = (product: any) => {
-    //     const updatedCart = [...cart, product];
-    //     setCart(updatedCart);
-    //     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    //     toggleClicked(); // trigger to update cart on other components
-    // }
     const addToCart = (product: any) => {
         // Retrieve existing cart items from localStorage
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -157,11 +149,10 @@ export default function FreshSell() {
         toggleClicked();
     };
 
-
     return (
-        <div className="  md:max-w-[1040px]  w-[370px]   sm:w-full">
+        <div className="md:max-w-[1040px] w-[370px] sm:w-full">
             <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-between">
-                <span className="font-medium">Fresh Sell</span>
+                <span className="font-medium">{t('sections.freshSell')}</span>
                 <div className="flex gap-1">
                     <span>{String(timeLeft.hours).padStart(2, '0')}</span>
                     <span>:</span>
@@ -170,7 +161,7 @@ export default function FreshSell() {
                     <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
                 </div>
                 <Link to="/allProducts" className="flex items-center hover:underline">
-                   {t('header.allProducts')}
+                    {t('header.allProducts')}
                     <ChevronRight className="h-4 w-4" />
                 </Link>
             </div>
@@ -182,10 +173,9 @@ export default function FreshSell() {
                 style={{ scrollbarWidth: 'none' }} // For Firefox
             >
                 {products.map((product) => (
-                    <Link
+                    <div
                         key={product.id}
-                        to="#"
-                        className="flex-none  w-[200px] md:w-[200px] bg-white  overflow-hidden hover:shadow-lg transition-shadow"
+                        className="flex-none w-[200px] md:w-[200px] bg-white overflow-hidden hover:shadow-lg transition-shadow"
                     >
                         <div className="aspect-square">
                             <img
@@ -202,7 +192,7 @@ export default function FreshSell() {
                                 <span className="text-lg font-bold">৳ {product.discountedPrice}</span>
                                 <span className="text-sm text-gray-500 line-through">৳ {product.originalPrice}</span>
                             </div>
-                            <div className="h-2 bg-gray-200 rounded-ful overflow-hidden">
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-orange-500 rounded-full"
                                     style={{ width: `${product.progress}%` }}
@@ -211,19 +201,19 @@ export default function FreshSell() {
                             <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.preventDefault(); // Prevent default Link behavior
                                     addToCart(product); // Add product to the cart
                                 }}
                                 className="w-full mt-2"
                             >
                                 <ShoppingCart className="h-4 w-4 mr-2" />
-                             {t('buttons.addToCart')}
+                                {t('buttons.addToCart')}
                             </Button>
                         </div>
-                    </Link>
+                    </div>
                 ))}
             </div>
-
         </div>
     );
 }

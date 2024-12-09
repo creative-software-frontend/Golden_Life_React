@@ -8,56 +8,58 @@ import 'slick-carousel/slick/slick-theme.css';
 // import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import useModalStore from '@/store/Store';
-
-const products = [
-    {
-        id: 1,
-        name: 'Koss KPH7 Portable',
-        price: '£60.00',
-        discount: '-10%',
-        oldPrice: '£86.00',
-        image: '/image/products/airpods.jpg',
-    },
-    {
-        id: 2,
-        name: 'Beats Solo2 Solo 2',
-        price: '£60.00',
-        image: '/image/products/beats.jpg',
-    },
-    {
-        id: 3,
-        name: 'Beats EP Wired',
-        price: '£60.00',
-        oldPrice: '£86.00',
-        discount: '-7%',
-        image: '/image/products/headphone.jpg',
-    },
-    {
-        id: 4,
-        name: 'Bose SoundLink Bluetooth',
-        price: '£60.00',
-        image: '/image/products/sony.jpg',
-    },
-    {
-        id: 5,
-        name: 'Sony WH-1000XM4',
-        price: '£299.00',
-        image: '/image/products/watch.jpg',
-    },
-    {
-        id: 6,
-        name: 'AirPods Pro',
-        price: '£249.00',
-        discount: '-5%',
-        oldPrice: '£262.00',
-        image: '/image/products/pulseoximeter.jpg',
-    },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function TrendingCategory() {
     const sliderRef = useRef<Slider>(null);
     const [cart, setCart] = useState<any[]>([]);
     const { toggleClicked } = useModalStore();
+    const { t } = useTranslation("global");
+
+    const products = [
+        {
+            id: 1,
+            name: t('products.product1'), // Translate the product name
+            price: '£60.00',
+            discount: '-10%',
+            oldPrice: '£86.00',
+            image: '/image/products/airpods.jpg',
+        },
+        {
+            id: 2,
+            name: t('products.product2'),
+            price: '£60.00',
+            image: '/image/products/beats.jpg',
+        },
+        {
+            id: 3,
+            name: t('products.product3'),
+            price: '£60.00',
+            oldPrice: '£86.00',
+            discount: '-7%',
+            image: '/image/products/headphone.jpg',
+        },
+        {
+            id: 4,
+            name: t('products.product4'),
+            price: '£60.00',
+            image: '/image/products/sony.jpg',
+        },
+        {
+            id: 5,
+            name: t('products.product5'),
+            price: '£299.00',
+            image: '/image/products/watch.jpg',
+        },
+        {
+            id: 6,
+            name: t('products.product6'),
+            price: '£249.00',
+            discount: t('sections.discount'),
+            oldPrice: '£262.00',
+            image: '/image/products/pulseoximeter.jpg',
+        },
+    ];
 
     useEffect(() => {
         const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -65,57 +67,28 @@ export default function TrendingCategory() {
     }, []);
 
     const parsePrice = (price: string): number => {
-        // Remove non-numeric characters and parse as a number
         return Number(price.replace(/[^\d.]/g, ''));
     };
 
-    // const addToCart = (product: any) => {
-    //     const sanitizedProduct = {
-    //         ...product,
-    //         numericPrice: parsePrice(product.price),
-    //         numericOldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
-    //     };
-
-    //     // Retrieve the current cart from local storage
-    //     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    //     // Add the new product to the cart
-    //     const updatedCart = [...storedCart, sanitizedProduct];
-
-    //     // Update the state and local storage
-    //     setCart(updatedCart);
-    //     localStorage.setItem('cart', JSON.stringify(updatedCart));
-
-    //     // Trigger any additional UI changes (e.g., toggle modal)
-    //     toggleClicked();
-    // };
     const addToCart = (product: any) => {
         const sanitizedProduct = {
             ...product,
-            price: parsePrice(product.price), // Parse numeric price
-            oldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined, // Parse old price if exists
-            quantity: 1, // Default quantity set to 1
+            price: parsePrice(product.price),
+            oldPrice: product.oldPrice ? parsePrice(product.oldPrice) : undefined,
+            quantity: 1,
         };
 
-        // Retrieve the current cart from local storage
         const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-        // Check if the product already exists in the cart
         const existingProductIndex = storedCart.findIndex((item: any) => item.id === product.id);
 
         if (existingProductIndex > -1) {
-            // If the product exists, increase the quantity
             storedCart[existingProductIndex].quantity += 1;
         } else {
-            // If the product is new, add it to the cart
             storedCart.push(sanitizedProduct);
         }
 
-        // Update the state and local storage
         setCart(storedCart);
         localStorage.setItem('cart', JSON.stringify(storedCart));
-
-        // Trigger any additional UI changes (e.g., toggle modal)
         toggleClicked();
     };
 
@@ -152,9 +125,9 @@ export default function TrendingCategory() {
         <section className="py-4 px-4 overflow-hidden md:max-w-[1040px] w-full">
             <div className="container mx-auto">
                 <div className="text-center mb-10">
-                    <h2 className="text-3xl font-bold mb-4">Trending Products</h2>
+                    <h2 className="text-3xl font-bold mb-4">{t("sections.trendingProductsTitle")}</h2>
                     <p className="text-muted-foreground">
-                        Contemporary, minimal, and modern designs embody the Lavish Alice handwriting.
+                        {t("sections.trendingProductsDescription")}
                     </p>
                 </div>
 
@@ -194,7 +167,7 @@ export default function TrendingCategory() {
                                                 onClick={() => addToCart(product)}
                                             >
                                                 <ShoppingCart className="h-4 w-4 mr-2" />
-                                                Add
+                                                {t("buttons.addToCart")}
                                             </Button>
                                         </div>
                                     </div>
