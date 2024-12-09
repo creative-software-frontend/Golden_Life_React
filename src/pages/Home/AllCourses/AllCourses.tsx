@@ -43,73 +43,8 @@ interface Lesson {
   category: string
 }
 
-const lessons: Lesson[] = [
-  {
-    id: "1",
-    type: "HSC উচ্চতর গণিত ১ম পত্র",
-    number: "2.1",
-    title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-purple-500",
-    badge: "HSC",
-    image: "/placeholder.svg?height=400&width=800",
-    instructor: "Dr. Rahim Khan",
-    rating: 4.8,
-    studentsEnrolled: 1500,
-    duration: "8 weeks",
-    level: "Intermediate",
-    category: "Mathematics",
-  },
-  {
-    id: "2",
-    type: "SSC পদার্থবিজ্ঞান",
-    number: "8.1",
-    title: "আলোর প্রকৃতি",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-blue-500",
-    badge: "SSC",
-    image: "/placeholder.svg?height=400&width=800",
-    instructor: "Prof. Salma Begum",
-    rating: 4.7,
-    studentsEnrolled: 2000,
-    duration: "6 weeks",
-    level: "Beginner",
-    category: "Physics",
-  },
-  {
-    id: "3",
-    type: "SSC পদার্থবিজ্ঞান",
-    number: "8.1",
-    title: "আলোর প্রকৃতি",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-blue-500",
-    badge: "SSC",
-    image: "/placeholder.svg?height=400&width=800",
-    instructor: "Prof. Salma Begum",
-    rating: 4.7,
-    studentsEnrolled: 2000,
-    duration: "6 weeks",
-    level: "Beginner",
-    category: "Physics",
-  },
-  {
-    id: "4",
-    type: "SSC পদার্থবিজ্ঞান",
-    number: "8.1",
-    title: "আলোর প্রকৃতি",
-    thumbnail: "/placeholder.svg?height=200&width=400",
-    color: "bg-blue-500",
-    badge: "SSC",
-    image: "/placeholder.svg?height=400&width=800",
-    instructor: "Prof. Salma Begum",
-    rating: 4.7,
-    studentsEnrolled: 2000,
-    duration: "6 weeks",
-    level: "Beginner",
-    category: "Physics",
-  },
-  // Add more lessons here...
-]
+
+
 
 const CourseCarousel: React.FC<{
   courses: Lesson[],
@@ -186,7 +121,73 @@ export default function AllCourses() {
   const [cart, setCart] = React.useState<Lesson[]>([])
   const [isCartModalOpen, setIsCartModalOpen] = React.useState(false)
   const [t] = useTranslation("global");
-
+  const lessons: Lesson[] = [
+    {
+      id: "1",
+      type: t("type.1"),
+      number: "2.1",
+      title: t("title.2"),
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-purple-500",
+      badge: t("badge.HSC"),
+      image: "/placeholder.svg?height=400&width=800",
+      instructor: "Dr. Rahim Khan",
+      rating: 4.8,
+      studentsEnrolled: 1500,
+      duration: "8 weeks",
+      level: "Intermediate",
+      category: "Mathematics",
+    },
+    {
+      id: "2",
+      type: t("type.2"),
+      number: "8.1",
+      title: t("title.3"),
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-blue-500",
+      badge: t("badge.JSC"),
+      image: "/placeholder.svg?height=400&width=800",
+      instructor: "Prof. Salma Begum",
+      rating: 4.7,
+      studentsEnrolled: 2000,
+      duration: "6 weeks",
+      level: "Beginner",
+      category: "Physics",
+    },
+    {
+      id: "3",
+      type: t("type.5"),
+      number: "8.1",
+      title: t("title.1"),
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-blue-500",
+      badge: t("badge.SSC"),
+      image: "/placeholder.svg?height=400&width=800",
+      instructor: "Prof. Salma Begum",
+      rating: 4.7,
+      studentsEnrolled: 2000,
+      duration: "6 weeks",
+      level: "Beginner",
+      category: "Physics",
+    },
+    {
+      id: "4",
+      type: t("type.4"),
+      number: "8.1",
+      title: t("title.2"),
+      thumbnail: "/placeholder.svg?height=200&width=400",
+      color: "bg-blue-500",
+      badge: t("badge.PSC"),
+      image: "/placeholder.svg?height=400&width=800",
+      instructor: "Prof. Salma Begum",
+      rating: 4.7,
+      studentsEnrolled: 2000,
+      duration: "6 weeks",
+      level: "Beginner",
+      category: "Physics",
+    },
+    // Add more lessons here...
+  ];
 
   // const addToCart = (product: Product) => {
   //   const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");

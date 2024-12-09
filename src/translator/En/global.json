@@ -129,12 +129,29 @@
     "seo": "SEO",
     "smm": "SMM"
   },
-  "name":{
-    "ayman":"Ayman Sadiq & Sadman Sadiq",
-    "shahid":"Shahidul Islam",
-    "sakib":"Sakib Bin Rashid"
-    
-
+  "name": {
+    "ayman": "Ayman Sadiq & Sadman Sadiq",
+    "shahid": "Shahidul Islam",
+    "sakib": "Sakib Bin Rashid"
+  },
+  "type": {
+    "1": "HSC Advanced Mathematics 1st Paper",
+    "2": "HSC Advanced Mathematics 2nd Paper",
+    "3": "HSC Higher Mathematics 1st Paper",
+    "4": "HSC Higher Mathematics 2nd Paper",
+    "5": "HSC Physics 1st Paper"
+  },
+  "title": {
+    "1": "Nature of Light",
+    "2": "Wave Theory of Light",
+    "3": "Geometrical Optics",
+    "4": "Physical Optics"
+  },
+  "badge":{
+    "SSC": "SSC",
+    "HSC": "HSC",
+    "JSC": "JSC",
+    "PSC": "PSC"
   },
   "footer": {
     "aboutGoldenLife": "About Golden Life",
