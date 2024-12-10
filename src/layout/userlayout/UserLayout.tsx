@@ -208,7 +208,7 @@ export default function UserLayout() {
                     ],
                 },
                 {
-                    title: t("navMain.title13"),                    url: "",
+                    title: t("navMain.title14"),                    url: "",
                     icon: Dumbbell,
                     items: [
                         // { title: "Vitamins & Supplements", url: "" },
@@ -220,7 +220,7 @@ export default function UserLayout() {
                     ],
                 },
                 {
-                    title: t("navMain.title14"),                    url: "",
+                    title: t("navMain.title15"),                    url: "",
                     icon: ChefHat,
                     items: [
                         // { title: "Bread", url: "" },
@@ -229,47 +229,27 @@ export default function UserLayout() {
                         // { title: "Buns & Rolls", url: "" },
                     ],
                 },
-                {
-                    title: t("navMain.title15"),                    url: "",
-                    icon: Package,
-                    items: [
-                        // { title: "Chicken", url: "" },
-                        // { title: "Beef", url: "" },
-                        // { title: "Pork", url: "" },
-                        // { title: "Fish", url: "" },
-                        // { title: "Shellfish", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title1"),                    url: "",
-                    icon: ShoppingBag,
-                    items: [
-                        // { title: "Water", url: "" },
-                        // { title: "Soft Drinks", url: "" },
-                        // { title: "Juices", url: "" },
-                        // { title: "Tea & Coffee", url: "" },
-                    ],
-                },
+              
             ],
-            Clothes: [
-                {
-                    title: t("navMain.title1"),                    url: "/",
-                    icon: SquareTerminal,
-                    isActive: true,
-                    items: [
-                        // { title: "Web Development", url: "" },
-                        // { title: "Mobile App Development", url: "" },
-                        // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-                        // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-                        // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-                        // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-                        // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-                        // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-                        // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-                        // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
-                    ],
-                },
-            ],
+            // Clothes: [
+            //     {
+            //         title: t("navMain.title1"),                    url: "/",
+            //         icon: SquareTerminal,
+            //         isActive: true,
+            //         items: [
+            //             // { title: "Web Development", url: "" },
+            //             // { title: "Mobile App Development", url: "" },
+            //             // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
+            //             // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
+            //             // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
+            //             // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
+            //             // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
+            //             // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
+            //             // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
+            //             // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
+            //         ],
+            //     },
+            // ],
             course: [
                 {
                     title: "Course",
@@ -376,7 +356,7 @@ export default function UserLayout() {
                                                 <div className="bg-teal-500 rounded-full p-1">
                                                     <HelpCircleIcon className="h-4 w-4 text-white" />
                                                 </div>
-                                                <span className="text-teal-600">Help</span>
+                                                <span className="text-teal-600">{t("help")}</span>
                                             </Link>
                                         </div>
                                         <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
@@ -385,7 +365,7 @@ export default function UserLayout() {
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" />
                                                 </div>
-                                                <span className="text-blue-400">Login</span>
+                                                <span className="text-blue-400">{t("login")}</span>
                                             </Link>
                                         </div>
                                     </SidebarMenuButton>

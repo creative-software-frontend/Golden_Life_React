@@ -184,12 +184,12 @@
     "title5": "outlet"
   },
   "navMain": {
-    "title1": "fruitsVegetables",
+    "title1": "fruits Vegetables",
     "title2": "snacksConfectionery",
     "title3": "dairyEggs",
-    "title4": "meatSeafood",
+    "title4": "Seafood",
     "title5": "beverages",
-    "title6": "snacksConfectionery",
+    "title6": "Meat",
     "title7": "pantryStaples",
     "title8": "frozenFoods",
     "title9": "personalCare",
@@ -198,14 +198,38 @@
     "title12": "healthWellness",
     "title13": "bakery",
     "title14": "meatSeafood",
-    "title15": "beverages"
+    "title15": "Milk",
+    "title16": "Programming",
+    "title17": "Business",
+    "title18": "Design",
+    "title19": "Technology",
+    "title20": "Photography",
+    "title21": "Language",
+    "title22": "Mathematics",
+    "title23": "Health & Fitness",
+    "title24": "Science",
+    "title25": "Environmental Studies",
+    "title26": "Finance",
+    "title27": "Social Sciences",
+    "title28": "Engineering",
+    "title29": "Writing",
+    "title30": "Personal Development",
+    "title31": "Percel Services"
   },
+  "help": "Help",
+  "login": "Login",
+"comming":{
 
-  "clothes": { "title": "fruitsVegetables" },
+  "title1": "Coming Soon",
+  "title2": "We're working on something exciting! Stay tuned for updates.",
+  "title3": "Expected launch:",
+  "title4": "[Your Date Here]",
+  "title5": "Enter your email",
+  "title6": "Notify Me",
+  "title7": "Subscribe to receive updates and announcements."
 
-  "course2": { "title": "course" },
-  "cookups": { "title": "design" },
 
+},
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

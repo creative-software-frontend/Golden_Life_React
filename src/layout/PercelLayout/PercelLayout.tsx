@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Link, Outlet } from "react-router-dom";
 import logo from '../../../public/image/logo/logo.jpg';
-import { ChevronRight, SquareTerminal, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Pill, ChefHat } from 'lucide-react';
+import { ChevronRight, SquareTerminal, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Pill, ChefHat, Package, Truck } from 'lucide-react';
 import {
     Collapsible,
     CollapsibleContent,
@@ -35,45 +35,47 @@ import Header from "@/pages/common/Header/Header";
 import useModalStore from "@/store/Store";
 import Cart from "@/pages/Home/Cart/Cart";
 import LiveChat from "@/pages/Home/LiveChat/Livechat";
+import { useTranslation } from "react-i18next";
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
-        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "percel", name: "Percel", icon: Pill, path: "/percel" },
-        { id: "topup", name: "Topup", icon: Pill, path: "/topup" },
-        { id: "drive", name: "Drive", icon: Pill, path: "/drive" },
-        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
-    ],
-    navMain: {
-        percel: [
-            {
-                title: "Percel Services",
-                url: "/percel/services",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    { title: "Web Development", url: "" },
-                    { title: "Mobile App Development", url: "" },
-                    // { title: "Local Delivery", url: "/percel/services/local-delivery" },
-                    // { title: "International Shipping", url: "/percel/services/international-shipping" },
-                    // { title: "Express Services", url: "/percel/services/express" },
-                    // { title: "Tracking", url: "/percel/services/tracking" },
-                ],
-            },
-        ],
-    }
-};
+
 
 export default function PercelLayout() {
     const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("percel");
-
+    const [t] = useTranslation("global")
+    const data = {
+        user: {
+            name: "shadcn",
+            email: "m@example.com",
+            avatar: "/avatars/shadcn.jpg",
+        },
+        categories: [
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
+            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
+            { id: "cookups", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+        ],
+        navMain: {
+            percel: [
+                {
+                    title: t("navMain.title31"),
+                    url: "/percel/services",
+                    icon: SquareTerminal,
+                    isActive: true,
+                    items: [
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                        // { title: "Local Delivery", url: "/percel/services/local-delivery" },
+                        // { title: "International Shipping", url: "/percel/services/international-shipping" },
+                        // { title: "Express Services", url: "/percel/services/express" },
+                        // { title: "Tracking", url: "/percel/services/tracking" },
+                    ],
+                },
+            ],
+        }
+    };
     return (
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">

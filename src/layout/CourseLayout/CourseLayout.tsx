@@ -29,231 +29,233 @@ import {
     SidebarProvider,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
 import CourseHeader from "@/pages/common/CourseHeader/CourseHeader"
+import { useTranslation } from "react-i18next"
 
-const data = {
-    categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
-        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "percel", name: "Percel", icon: Package, path: "/percel" },
-        { id: "topup", name: "Topup", icon: Package, path: "/topup" },
-        { id: "drive", name: "Drive", icon: Truck, path: "/drive" },
-        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
-    ],
-    navMain: {
-        courses: [
-            {
-                title: "Programming",
-                url: "/courses/programming",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    { title: "Web Development", url: "" },
-                    { title: "Mobile App Development", url: "" },
-                    // { title: "Data Science", url: "/courses/programming/data-science" },
-                    // { title: "Machine Learning", url: "/courses/programming/machine-learning" },
-                    // { title: "Game Development", url: "/courses/programming/game-development" },
-                    // { title: "Cloud Computing", url: "/courses/programming/cloud-computing" },
-                ],
-            },
-            {
-                title: "Business",
-                url: "/courses/business",
-                icon: Pill,
-                items: [
-                    // { title: "Entrepreneurship", url: "/courses/business/entrepreneurship" },
-                    // { title: "Marketing", url: "/courses/business/marketing" },
-                    // { title: "Finance", url: "/courses/business/finance" },
-                    // { title: "Project Management", url: "/courses/business/project-management" },
-                    // { title: "Leadership", url: "/courses/business/leadership" },
-                ],
-            },
-            {
-                title: "Design",
-                url: "/courses/design",
-                icon: ShoppingBag,
-                items: [
-                    // { title: "Graphic Design", url: "/courses/design/graphic-design" },
-                    // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
-                    // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
-                    // { title: "Animation", url: "/courses/design/animation" },
-                    // { title: "Illustration", url: "/courses/design/illustration" },
-                ],
-            },
-            {
-                title: "Technology",
-                url: "",
-                icon: Code,
-                isActive: true,
-                items: [
-                    { title: "Web Development", url: "" },
-                    { title: "Mobile App Development", url: "" },
-                    { title: "Data Science", url: "" },
-                    { title: "Machine Learning", url: "" },
-                    { title: "Cloud Computing", url: "" },
-                    { title: "Cybersecurity", url: "" },
-                ],
-            },
-            {
-                title: "Design",
-                url: "",
-                icon: Palette,
-                items: [
-                    { title: "Graphic Design", url: "" },
-                    { title: "UX/UI Design", url: "" },
-                    { title: "3D Modeling", url: "" },
-                    { title: "Animation", url: "" },
-                    { title: "Illustration", url: "" },
-                ],
-            },
-            {
-                title: "Business",
-                url: "",
-                icon: Briefcase,
-                items: [
-                    { title: "Entrepreneurship", url: "" },
-                    { title: "Marketing", url: "" },
-                    { title: "Finance", url: "" },
-                    { title: "Project Management", url: "" },
-                    { title: "Leadership", url: "" },
-                ],
-            },
-            {
-                title: "Photography",
-                url: "",
-                icon: Camera,
-                items: [
-                    { title: "Digital Photography", url: "" },
-                    { title: "Portrait Photography", url: "" },
-                    { title: "Landscape Photography", url: "" },
-                    { title: "Photo Editing", url: "" },
-                ],
-            },
-            
-            {
-                title: "Language",
-                url: "",
-                icon: Globe,
-                items: [
-                    { title: "English", url: "" },
-                    { title: "Spanish", url: "" },
-                    { title: "Mandarin", url: "" },
-                    { title: "French", url: "" },
-                    { title: "German", url: "" },
-                ],
-            },
-            {
-                title: "Mathematics",
-                url: "",
-                icon: Calculator,
-                items: [
-                    { title: "Algebra", url: "" },
-                    { title: "Calculus", url: "" },
-                    { title: "Statistics", url: "" },
-                    { title: "Geometry", url: "" },
-                ],
-            },
-            {
-                title: "Health & Fitness",
-                url: "",
-                icon: Heart,
-                items: [
-                    { title: "Nutrition", url: "" },
-                    { title: "Yoga", url: "" },
-                    { title: "Personal Training", url: "" },
-                    { title: "Mental Health", url: "" },
-                ],
-            },
-            {
-                title: "Science",
-                url: "",
-                icon: Microscope,
-                items: [
-                    { title: "Physics", url: "" },
-                    { title: "Chemistry", url: "" },
-                    { title: "Biology", url: "" },
-                    { title: "Astronomy", url: "" },
-                ],
-            },
-            {
-                title: "Environmental Studies",
-                url: "",
-                icon: Leaf,
-                items: [
-                    { title: "Climate Change", url: "" },
-                    { title: "Sustainability", url: "" },
-                    { title: "Conservation", url: "" },
-                    { title: "Renewable Energy", url: "" },
-                ],
-            },
-            {
-                title: "Personal Finance",
-                url: "",
-                icon: DollarSign,
-                items: [
-                    { title: "Investing", url: "" },
-                    { title: "Budgeting", url: "" },
-                    { title: "Retirement Planning", url: "" },
-                    { title: "Tax Planning", url: "" },
-                ],
-            },
-            {
-                title: "Social Sciences",
-                url: "",
-                icon: Users,
-                items: [
-                    { title: "Psychology", url: "" },
-                    { title: "Sociology", url: "" },
-                    { title: "Anthropology", url: "" },
-                    { title: "Political Science", url: "" },
-                ],
-            },
-            {
-                title: "Engineering",
-                url: "",
-                icon: Zap,
-                items: [
-                    { title: "Electrical Engineering", url: "" },
-                    { title: "Mechanical Engineering", url: "" },
-                    { title: "Civil Engineering", url: "" },
-                    { title: "Chemical Engineering", url: "" },
-                ],
-            },
-            {
-                title: "Writing",
-                url: "",
-                icon: Book,
-                items: [
-                    { title: "Creative Writing", url: "" },
-                    { title: "Technical Writing", url: "" },
-                    { title: "Journalism", url: "" },
-                    { title: "Copywriting", url: "" },
-                ],
-            },
-            {
-                title: "Personal Development",
-                url: "",
-                icon: Lightbulb,
-                items: [
-                    { title: "Time Management", url: "" },
-                    { title: "Public Speaking", url: "" },
-                    { title: "Critical Thinking", url: "" },
-                    { title: "Emotional Intelligence", url: "" },
-                ],
-            },
-        ],
-    }
-}
+
 
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
     const { openLoginModal, toggleClicked, changeCheckoutModal } = useModalStore();
+    const [t] = useTranslation("global")
 
+    const data = {
+        categories: [
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
+            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
+            { id: "cookups", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+        ],
+        navMain: {
+            courses: [
+                // {
+                //     title: t("navMain.title30"),
+                //     url: "/courses/programming",
+                //     icon: SquareTerminal,
+                //     isActive: true,
+                //     items: [
+                //         // { title: "Web Development", url: "" },
+                //         // { title: "Mobile App Development", url: "" },
+                //         // { title: "Data Science", url: "/courses/programming/data-science" },
+                //         // { title: "Machine Learning", url: "/courses/programming/machine-learning" },
+                //         // { title: "Game Development", url: "/courses/programming/game-development" },
+                //         // { title: "Cloud Computing", url: "/courses/programming/cloud-computing" },
+                //     ],
+                // },
+                // {
+                //     title: t("navMain.title15"),
+                //     url: "/courses/business",
+                //     icon: Pill,
+                //     items: [
+                //         // { title: "Entrepreneurship", url: "/courses/business/entrepreneurship" },
+                //         // { title: "Marketing", url: "/courses/business/marketing" },
+                //         // { title: "Finance", url: "/courses/business/finance" },
+                //         // { title: "Project Management", url: "/courses/business/project-management" },
+                //         // { title: "Leadership", url: "/courses/business/leadership" },
+                //     ],
+                // },
+                {
+                    title: t("navMain.title16"),
+                    url: "/courses/design",
+                    icon: ShoppingBag,
+                    items: [
+                        // { title: "Graphic Design", url: "/courses/design/graphic-design" },
+                        // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
+                        // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
+                        // { title: "Animation", url: "/courses/design/animation" },
+                        // { title: "Illustration", url: "/courses/design/illustration" },
+                    ],
+                },
+                {
+                    title: t("navMain.title17"),
+                    url: "",
+                    icon: Code,
+                    isActive: true,
+                    items: [
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                        // { title: "Data Science", url: "" },
+                        // { title: "Machine Learning", url: "" },
+                        // { title: "Cloud Computing", url: "" },
+                        // { title: "Cybersecurity", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title18"),
+                    url: "",
+                    icon: Palette,
+                    items: [
+                        // { title: "Graphic Design", url: "" },
+                        // { title: "UX/UI Design", url: "" },
+                        // { title: "3D Modeling", url: "" },
+                        // { title: "Animation", url: "" },
+                        // { title: "Illustration", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title19"),
+                    url: "",
+                    icon: Briefcase,
+                    items: [
+                        // { title: "Entrepreneurship", url: "" },
+                        // { title: "Marketing", url: "" },
+                        // { title: "Finance", url: "" },
+                        // { title: "Project Management", url: "" },
+                        // { title: "Leadership", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title20"),
+                    url: "",
+                    icon: Camera,
+                    items: [
+                        // { title: "Digital Photography", url: "" },
+                        // { title: "Portrait Photography", url: "" },
+                        // { title: "Landscape Photography", url: "" },
+                        // { title: "Photo Editing", url: "" },
+                    ],
+                },
+
+                {
+                    title: t("navMain.title21"),
+                    url: "",
+                    icon: Globe,
+                    items: [
+                        // { title: "English", url: "" },
+                        // { title: "Spanish", url: "" },
+                        // { title: "Mandarin", url: "" },
+                        // { title: "French", url: "" },
+                        // { title: "German", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title22"),
+                    url: "",
+                    icon: Calculator,
+                    items: [
+                        // { title: "Algebra", url: "" },
+                        // { title: "Calculus", url: "" },
+                        // { title: "Statistics", url: "" },
+                        // { title: "Geometry", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title23"),
+                    url: "",
+                    icon: Heart,
+                    items: [
+                        // { title: "Nutrition", url: "" },
+                        // { title: "Yoga", url: "" },
+                        // { title: "Personal Training", url: "" },
+                        // { title: "Mental Health", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title24"),
+                    url: "",
+                    icon: Microscope,
+                    items: [
+                        // { title: "Physics", url: "" },
+                        // { title: "Chemistry", url: "" },
+                        // { title: "Biology", url: "" },
+                        // { title: "Astronomy", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title25"),
+                    url: "",
+                    icon: Leaf,
+                    items: [
+                        // { title: "Climate Change", url: "" },
+                        // { title: "Sustainability", url: "" },
+                        // { title: "Conservation", url: "" },
+                        // { title: "Renewable Energy", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title26"),
+                                        url: "",
+                    icon: DollarSign,
+                    items: [
+                        // { title: "Investing", url: "" },
+                        // { title: "Budgeting", url: "" },
+                        // { title: "Retirement Planning", url: "" },
+                        // { title: "Tax Planning", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title27"),
+                    url: "",
+                    icon: Users,
+                    items: [
+                        // { title: "Psychology", url: "" },
+                        // { title: "Sociology", url: "" },
+                        // { title: "Anthropology", url: "" },
+                        // { title: "Political Science", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title28"),
+                    url: "",
+                    icon: Zap,
+                    items: [
+                        // { title: "Electrical Engineering", url: "" },
+                        // { title: "Mechanical Engineering", url: "" },
+                        // { title: "Civil Engineering", url: "" },
+                        // { title: "Chemical Engineering", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title29"),
+                    url: "",
+                    icon: Book,
+                    items: [
+                        // { title: "Creative Writing", url: "" },
+                        // { title: "Technical Writing", url: "" },
+                        // { title: "Journalism", url: "" },
+                        // { title: "Copywriting", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title30"),
+                    url: "",
+                    icon: Lightbulb,
+                    items: [
+                        // { title: "Time Management", url: "" },
+                        // { title: "Public Speaking", url: "" },
+                        // { title: "Critical Thinking", url: "" },
+                        // { title: "Emotional Intelligence", url: "" },
+                    ],
+                },
+            ],
+        }
+    }
     return (
         <SidebarProvider>
             <Sidebar collapsible="icon">
