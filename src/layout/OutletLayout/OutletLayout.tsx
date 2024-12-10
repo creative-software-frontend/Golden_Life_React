@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
+import { ChevronRight, SquareTerminal, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -18,7 +18,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
@@ -35,75 +34,64 @@ import Header from "@/pages/common/Header/Header"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
+import { useTranslation } from "react-i18next"
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
-        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "percel", name: "Percel", icon: Package, path: "/percel" },
-        { id: "topup", name: "Topup", icon: Package, path: "/topup" },
-        { id: "drive", name: "Drive", icon: Truck, path: "/drive" },
-        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
-    ],
-    navMain: {
-        shopping: [
-            {
-                title: "Fruits & Vegetables",
-                url: "/",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-                    // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-                    // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-                    // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-                    // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-                    // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-                    // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-                    // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
-                ],
-            },
-        ],
-        course: [
-            {
-                title: "Course",
-                url: "/course/medicines",
-            },
-        ],
-        percel: [],
-        topup: [],
-        drive: [],
-        cookups: [
-            {
-                title: "Ready Meals",
-                url: "/cookups/ready-meals",
-                icon: ChefHat,
-                isActive: true,
-                items: [
-                    // { title: "Breakfast", url: "/cookups/ready-meals/breakfast" },
-                    // { title: "Lunch", url: "/cookups/ready-meals/lunch" },
-                    // { title: "Dinner", url: "/cookups/ready-meals/dinner" },
-                    // { title: "Appetizers", url: "/cookups/ready-meals/appetizers" },
-                    // { title: "Soups", url: "/cookups/ready-meals/soups" },
-                    // { title: "Salads", url: "/cookups/ready-meals/salads" },
-                    // { title: "Desserts", url: "/cookups/ready-meals/desserts" },
-                    // { title: "Snacks", url: "/cookups/ready-meals/snacks" },
-                ],
-            },
-        ],
-        outlet: [],
-    }
-}
+
 
 export default function OutletLayout() {
-    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
-    const [activeCategory, setActiveCategory] = React.useState("shopping")
+    const { changeCheckoutModal, openLoginModal } = useModalStore();
+    const [activeCategory, setActiveCategory] = React.useState("outlet")
+    const [t] = useTranslation("global");
 
+
+    const data = {
+        user: {
+            name: "shadcn",
+            email: "m@example.com",
+            avatar: "/avatars/shadcn.jpg",
+        },
+        categories: [
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
+            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
+            { id: "outlet", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+        ],
+        navMain: {
+            shopping: [
+                {
+                    title: t("navMain.title13"),
+                    url: "/",
+                    icon: SquareTerminal,
+                    isActive: true,
+                    items: [
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                    ],
+                },
+            ],
+            course: [
+                {
+                    title: "Medicines",
+                    url: "/course/medicines",
+                },
+            ],
+            percel: [],
+            topup: [],
+            drive: [],
+            cookups: [
+                {
+                    title: t("navMain.title13"),
+                    url: "/cookups/ready-meals",
+                    icon: ChefHat,
+                    isActive: true,
+                    items: [],
+                },
+            ],
+            outlet: [],
+        },
+    };
     return (
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
