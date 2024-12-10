@@ -22,6 +22,27 @@
     "allCategories": "All Categories",
     "allProducts": "All Products"
   },
+
+  "label": {
+    "Shopping": "Shopping",
+    "Food": "Food",
+    "Grocery": "Grocery",
+    "Pharmacy": "Pharmacy",
+    "Gift": "Gift",
+    "Ride Share": "Ride Share",
+    "Top Up": "Top Up",
+    "Parcel": "Parcel",
+    "Mobile": "Mobile",
+    "Drive Offer": "Drive Offer",
+    "Air Ticket": "Air Ticket",
+    "News Paper": "News Paper",
+    "Live TV": "Live TV",
+    "Blood Bank": "Blood Bank",
+    "STU Product": "STU Product",
+    "Online Shop": "Online Shop",
+    "Covid Business": "Covid Business",
+    "Local Outlet": "Local Outlet"
+  },
   "courseNames": {
     "webDevelopment": "Web Development",
     "dataScience": "Data Science",
@@ -147,12 +168,44 @@
     "3": "Geometrical Optics",
     "4": "Physical Optics"
   },
-  "badge":{
+  "badge": {
     "SSC": "SSC",
     "HSC": "HSC",
     "JSC": "JSC",
     "PSC": "PSC"
   },
+
+  "categories2": {
+    "title": "shopping",
+    "title1": "courses",
+    "title2": "percel",
+    "title3": "topup",
+    "title4": "drive",
+    "title5": "outlet"
+  },
+  "navMain": {
+    "title1": "fruitsVegetables",
+    "title2": "snacksConfectionery",
+    "title3": "dairyEggs",
+    "title4": "meatSeafood",
+    "title5": "beverages",
+    "title6": "snacksConfectionery",
+    "title7": "pantryStaples",
+    "title8": "frozenFoods",
+    "title9": "personalCare",
+    "title10": "household",
+    "title11": "babyKids",
+    "title12": "healthWellness",
+    "title13": "bakery",
+    "title14": "meatSeafood",
+    "title15": "beverages"
+  },
+
+  "clothes": { "title": "fruitsVegetables" },
+
+  "course2": { "title": "course" },
+  "cookups": { "title": "design" },
+
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

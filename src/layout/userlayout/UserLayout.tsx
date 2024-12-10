@@ -18,7 +18,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
@@ -35,281 +34,268 @@ import Header from "@/pages/common/Header/Header"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
+import { useTranslation } from "react-i18next"
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
-        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
-        { id: "percel", name: "Percel", icon: Package, path: "/percel" },
-        { id: "topup", name: "Topup", icon: Package, path: "/topup" },
-        { id: "drive", name: "Drive", icon: Truck, path: "/drive" },
-        { id: "cookups", name: "Outlet", icon: ChefHat, path: "/outlet" },
-    ],
-    navMain: {
-        shopping: [
-            {
-                title: "Fruits & Vegetables",
-                url: "/",
-                icon: Carrot,
-                isActive: true,
-                items: [
-                    { title: "Fresh Fruits", url: "" },
-                    { title: "Fresh Vegetables", url: "" },
-                    // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-                    // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-                    // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-                    // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-                    // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-                    // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-                    // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-                    // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
-                ],
-            },
-            {
-                title: "Snacks & Confectionery",
-                url: "",
-                icon: ShoppingCart,
-                items: [
-                    { title: "Chips & Crisps", url: "" },
-                    { title: "Chocolates", url: "" },
-                    { title: "Candies", url: "" },
-                    { title: "Nuts & Dried Fruits", url: "" },
-                ],
-            },
-            {
-                title: "Dairy & Eggs",
-                url: "",
-                icon: Pill,
-                items: [
-                    { title: "Milk", url: "" },
-                    { title: "Butter & Cream", url: "" },
-                    { title: "Cheese", url: "" },
-                    { title: "Eggs", url: "" },
-                    { title: "Yogurt", url: "" },
-                ],
-            },
-            {
-                title: "Dairy & Eggs",
-                url: "",
-                icon: Milk,
-                items: [
-                    { title: "Milk", url: "" },
-                    { title: "Butter & Cream", url: "" },
-                    { title: "Cheese", url: "" },
-                    { title: "Eggs", url: "" },
-                    { title: "Yogurt", url: "" },
-                    { title: "Plant-based Alternatives", url: "" },
-                ],
-            },
-       
-            {
-                title: "Meat & Seafood",
-                url: "",
-                icon: Fish,
-                items: [
-                    { title: "Chicken", url: "" },
-                    { title: "Beef", url: "" },
-                    { title: "Pork", url: "" },
-                    { title: "Fish", url: "" },
-                    { title: "Shellfish", url: "" },
-                    { title: "Plant-based Proteins", url: "" },
-                ],
-            },
-            {
-                title: "Beverages",
-                url: "",
-                icon: Coffee,
-                items: [
-                    { title: "Water", url: "" },
-                    { title: "Soft Drinks", url: "" },
-                    { title: "Juices", url: "" },
-                    { title: "Tea & Coffee", url: "" },
-                    { title: "Energy Drinks", url: "" },
-                    { title: "Alcoholic Beverages", url: "" },
-                ],
-            },
-            {
-                title: "Snacks & Confectionery",
-                url: "",
-                icon: Cookie,
-                items: [
-                    { title: "Chips & Crisps", url: "" },
-                    { title: "Chocolates", url: "" },
-                    { title: "Candies", url: "" },
-                    { title: "Nuts & Dried Fruits", url: "" },
-                    { title: "Popcorn & Pretzels", url: "" },
-                    { title: "Energy Bars", url: "" },
-                ],
-            },
-            {
-                title: "Pantry & Staples",
-                url: "",
-                icon: Package,
-                items: [
-                    { title: "Rice & Grains", url: "" },
-                    { title: "Pasta & Noodles", url: "" },
-                    { title: "Canned Goods", url: "" },
-                    { title: "Oils & Vinegars", url: "" },
-                    { title: "Spices & Seasonings", url: "" },
-                    { title: "Baking Essentials", url: "" },
-                ],
-            },
-            {
-                title: "Frozen Foods",
-                url: "",
-                icon: Snowflake,
-                items: [
-                    { title: "Frozen Vegetables", url: "" },
-                    { title: "Frozen Fruits", url: "" },
-                    { title: "Ice Cream & Desserts", url: "" },
-                    { title: "Frozen Meals", url: "" },
-                    { title: "Frozen Pizza", url: "" },
-                    { title: "Frozen Seafood", url: "" },
-                ],
-            },
-            {
-                title: "Personal Care",
-                url: "",
-                icon: Scissors,
-                items: [
-                    { title: "Skincare", url: "" },
-                    { title: "Hair Care", url: "" },
-                    { title: "Oral Care", url: "" },
-                    { title: "Body Care", url: "" },
-                    { title: "Cosmetics", url: "" },
-                    { title: "Men's Grooming", url: "" },
-                ],
-            },
-            {
-                title: "Household",
-                url: "",
-                icon: Home,
-                items: [
-                    { title: "Cleaning Supplies", url: "" },
-                    { title: "Laundry Products", url: "" },
-                    { title: "Paper & Plastic", url: "" },
-                    { title: "Home Decor", url: "" },
-                    { title: "Kitchen Essentials", url: "" },
-                    { title: "Pet Supplies", url: "" },
-                ],
-            },
-            {
-                title: "Baby & Kids",
-                url: "",
-                icon: Baby,
-                items: [
-                    { title: "Baby Food", url: "" },
-                    { title: "Diapers & Wipes", url: "" },
-                    { title: "Baby Care", url: "" },
-                    { title: "Baby Gear", url: "" },
-                    { title: "Kids' Snacks", url: "" },
-                    { title: "Kids' Health", url: "" },
-                ],
-            },
-            {
-                title: "Health & Wellness",
-                url: "",
-                icon: Dumbbell,
-                items: [
-                    { title: "Vitamins & Supplements", url: "" },
-                    { title: "Protein & Fitness", url: "" },
-                    { title: "Herbal Remedies", url: "" },
-                    { title: "First Aid", url: "" },
-                    { title: "Pharmacy", url: "" },
-                    { title: "Personal Care", url: "" },
-                ],
-            },
-            {
-                title: "Bakery",
-                url: "",
-                icon: ChefHat,
-                items: [
-                    { title: "Bread", url: "" },
-                    { title: "Cakes & Pastries", url: "" },
-                    { title: "Cookies", url: "" },
-                    { title: "Buns & Rolls", url: "" },
-                ],
-            },
-            {
-                title: "Meat & Seafood",
-                url: "",
-                icon: Package,
-                items: [
-                    { title: "Chicken", url: "" },
-                    { title: "Beef", url: "" },
-                    { title: "Pork", url: "" },
-                    { title: "Fish", url: "" },
-                    { title: "Shellfish", url: "" },
-                ],
-            },
-            {
-                title: "Beverages",
-                url: "",
-                icon: ShoppingBag,
-                items: [
-                    { title: "Water", url: "" },
-                    { title: "Soft Drinks", url: "" },
-                    { title: "Juices", url: "" },
-                    { title: "Tea & Coffee", url: "" },
-                ],
-            },
-        ],
-        Clothes: [
-            {
-                title: "Fruits & Vegetables",
-                url: "/",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    { title: "Web Development", url: "" },
-                    { title: "Mobile App Development", url: "" },
-                    // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-                    // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-                    // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-                    // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-                    // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-                    // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-                    // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-                    // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
-                ],
-            },
-        ],
-        course: [
-            {
-                title: "Course",
-                url: "/course/medicines",
-            },
-        ],
-        percel: [],
-        topup: [],
-        drive: [],
-        cookups: [
-            {
-                title: "Design",
-                url: "/courses/design",
-                icon: ShoppingBag,
-                items: [
-                    // { title: "Graphic Design", url: "/courses/design/graphic-design" },
-                    // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
-                    // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
-                    // { title: "Animation", url: "/courses/design/animation" },
-                    // { title: "Illustration", url: "/courses/design/illustration" },
-                ],
-            },
-        ],
-        outlet: [],
-    }
-}
+
+
 
 export default function UserLayout() {
     const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("shopping")
+    const [t] = useTranslation("global")
 
+
+
+    const data = {
+        user: {
+            name: "shadcn",
+            email: "m@example.com",
+            avatar: "/avatars/shadcn.jpg",
+        },
+        categories: [
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
+            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
+            { id: "cookups", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+        ],
+        navMain: {
+            shopping: [
+                {
+                    title: t("navMain.title1"),
+                    url: "/",
+                    icon: Carrot,
+                    isActive: true,
+                    items: [
+                        // { title: "Fresh Fruits", url: "" },
+                        // { title: "Fresh Vegetables", url: "" },
+
+                    ],
+                },
+                {
+                    title: t("navMain.title2"),
+                    url: "",
+                    icon: ShoppingCart,
+                    items: [
+                        // { title: "Chips & Crisps", url: "" },
+                        // { title: "Chocolates", url: "" },
+                        // { title: "Candies", url: "" },
+                        // { title: "Nuts & Dried Fruits", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title3"),
+                    url: "",
+                    icon: Pill,
+                    items: [
+                        // { title: "Milk", url: "" },
+                        // { title: "Butter & Cream", url: "" },
+                        // { title: "Cheese", url: "" },
+                        // { title: "Eggs", url: "" },
+                        // { title: "Yogurt", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title4"),
+                    url: "",
+                    icon: Milk,
+                    items: [
+                        // { title: "Milk", url: "" },
+                        // { title: "Butter & Cream", url: "" },
+                        // { title: "Cheese", url: "" },
+                        // { title: "Eggs", url: "" },
+                        // { title: "Yogurt", url: "" },
+                        // { title: "Plant-based Alternatives", url: "" },
+                    ],
+                },
+
+                {
+                    title: t("navMain.title5"),
+                    url: "",
+                    icon: Fish,
+                    items: [
+                        // { title: "Chicken", url: "" },
+                        // { title: "Beef", url: "" },
+                        // { title: "Pork", url: "" },
+                        // { title: "Fish", url: "" },
+                        // { title: "Shellfish", url: "" },
+                        // { title: "Plant-based Proteins", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title6"),                    url: "",
+                    icon: Coffee,
+                    items: [
+                        // { title: "Water", url: "" },
+                        // { title: "Soft Drinks", url: "" },
+                        // { title: "Juices", url: "" },
+                        // { title: "Tea & Coffee", url: "" },
+                        // { title: "Energy Drinks", url: "" },
+                        // { title: "Alcoholic Beverages", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title7"),                    url: "",
+                    icon: Cookie,
+                    items: [
+                        // { title: "Chips & Crisps", url: "" },
+                        // { title: "Chocolates", url: "" },
+                        // { title: "Candies", url: "" },
+                        // { title: "Nuts & Dried Fruits", url: "" },
+                        // { title: "Popcorn & Pretzels", url: "" },
+                        // { title: "Energy Bars", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title8"),                    url: "",
+                    icon: Package,
+                    items: [
+                        // { title: "Rice & Grains", url: "" },
+                        // { title: "Pasta & Noodles", url: "" },
+                        // { title: "Canned Goods", url: "" },
+                        // { title: "Oils & Vinegars", url: "" },
+                        // { title: "Spices & Seasonings", url: "" },
+                        // { title: "Baking Essentials", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title9"),                    url: "",
+                    icon: Snowflake,
+                    items: [
+                        // { title: "Frozen Vegetables", url: "" },
+                        // { title: "Frozen Fruits", url: "" },
+                        // { title: "Ice Cream & Desserts", url: "" },
+                        // { title: "Frozen Meals", url: "" },
+                        // { title: "Frozen Pizza", url: "" },
+                        // { title: "Frozen Seafood", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title10"),                    url: "",
+                    icon: Scissors,
+                    items: [
+                        // { title: "Skincare", url: "" },
+                        // { title: "Hair Care", url: "" },
+                        // { title: "Oral Care", url: "" },
+                        // { title: "Body Care", url: "" },
+                        // { title: "Cosmetics", url: "" },
+                        // { title: "Men's Grooming", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title11"),                    url: "",
+                    icon: Home,
+                    items: [
+                        // { title: "Cleaning Supplies", url: "" },
+                        // { title: "Laundry Products", url: "" },
+                        // { title: "Paper & Plastic", url: "" },
+                        // { title: "Home Decor", url: "" },
+                        // { title: "Kitchen Essentials", url: "" },
+                        // { title: "Pet Supplies", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title12"),                    url: "",
+                    icon: Baby,
+                    items: [
+                        // { title: "Baby Food", url: "" },
+                        // { title: "Diapers & Wipes", url: "" },
+                        // { title: "Baby Care", url: "" },
+                        // { title: "Baby Gear", url: "" },
+                        // { title: "Kids' Snacks", url: "" },
+                        // { title: "Kids' Health", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title13"),                    url: "",
+                    icon: Dumbbell,
+                    items: [
+                        // { title: "Vitamins & Supplements", url: "" },
+                        // { title: "Protein & Fitness", url: "" },
+                        // { title: "Herbal Remedies", url: "" },
+                        // { title: "First Aid", url: "" },
+                        // { title: "Pharmacy", url: "" },
+                        // { title: "Personal Care", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title14"),                    url: "",
+                    icon: ChefHat,
+                    items: [
+                        // { title: "Bread", url: "" },
+                        // { title: "Cakes & Pastries", url: "" },
+                        // { title: "Cookies", url: "" },
+                        // { title: "Buns & Rolls", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title15"),                    url: "",
+                    icon: Package,
+                    items: [
+                        // { title: "Chicken", url: "" },
+                        // { title: "Beef", url: "" },
+                        // { title: "Pork", url: "" },
+                        // { title: "Fish", url: "" },
+                        // { title: "Shellfish", url: "" },
+                    ],
+                },
+                {
+                    title: t("navMain.title1"),                    url: "",
+                    icon: ShoppingBag,
+                    items: [
+                        // { title: "Water", url: "" },
+                        // { title: "Soft Drinks", url: "" },
+                        // { title: "Juices", url: "" },
+                        // { title: "Tea & Coffee", url: "" },
+                    ],
+                },
+            ],
+            Clothes: [
+                {
+                    title: t("navMain.title1"),                    url: "/",
+                    icon: SquareTerminal,
+                    isActive: true,
+                    items: [
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                        // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
+                        // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
+                        // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
+                        // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
+                        // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
+                        // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
+                        // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
+                        // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
+                    ],
+                },
+            ],
+            course: [
+                {
+                    title: "Course",
+                    url: "/course/medicines",
+                },
+            ],
+            percel: [],
+            topup: [],
+            drive: [],
+            cookups: [
+                {
+                    title: "Design",
+                    url: "/courses/design",
+                    icon: ShoppingBag,
+                    items: [
+                        // { title: "Graphic Design", url: "/courses/design/graphic-design" },
+                        // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
+                        // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
+                        // { title: "Animation", url: "/courses/design/animation" },
+                        // { title: "Illustration", url: "/courses/design/illustration" },
+                    ],
+                },
+            ],
+            outlet: [],
+        }
+    }
     return (
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">

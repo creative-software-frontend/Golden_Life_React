@@ -1,27 +1,49 @@
 {
   "header": {
-    "search": "পণ্য অনুসন্ধান করুন...",
+    "search": "পণ্য খুঁজুন...",
     "login": "লগইন",
     "profile": "প্রোফাইল",
     "settings": "সেটিংস",
     "dashboard": "ড্যাশবোর্ড",
-    "close": "বন্ধ করুন",
-    "enterPhoneNumber": "আপনার ফোন নম্বর দিন",
-    "enterOTP": "OTP দিন",
-    "verifyDetails": "আপনার তথ্য যাচাই করুন",
+    "close": "বন্ধ",
+    "enterPhoneNumber": "আপনার ফোন নম্বর প্রবেশ করুন",
+    "enterOTP": "ওটিপি প্রবেশ করুন",
+    "verifyDetails": "আপনার বিবরণ যাচাই করুন",
     "phoneNumber": "ফোন নম্বর",
     "next": "পরবর্তী",
     "back": "পিছনে",
     "verify": "যাচাই করুন",
-    "verificationComplete": "যাচাই সম্পন্ন!",
+    "verificationComplete": "যাচাই সম্পূর্ণ!",
     "loggedIn": "আপনি এখন লগইন করেছেন।",
-    "finish": "সম্পন্ন",
+    "finish": "শেষ",
     "title": "কোর্স",
     "allCourses": "সব কোর্স",
-    "categories": "বিভাগ",
-    "allCategories": "সব বিভাগ",
+    "categories": "ক্যাটাগরিসমূহ",
+    "allCategories": "সব ক্যাটাগরি",
     "allProducts": "সব পণ্য"
   },
+
+  "label": {
+    "Shopping": "শপিং",
+    "Food": "খাদ্য",
+    "Grocery": "মুদির দোকান",
+    "Pharmacy": "ফার্মেসী",
+    "Gift": "উপহার",
+    "Ride Share": "রাইড শেয়ার",
+    "Top Up": "টপ আপ",
+    "Parcel": "পার্সেল",
+    "Mobile": "মোবাইল",
+    "Drive Offer": "ড্রাইভ অফার",
+    "Air Ticket": "এয়ার টিকেট",
+    "News Paper": "নিউজ পেপার",
+    "Live TV": "লাইভ টিভি",
+    "Blood Bank": "ব্লাড ব্যাংক",
+    "STU Product": "STU পণ্য",
+    "Online Shop": "অনলাইন শপ",
+    "Covid Business": "কোভিড ব্যবসা",
+    "Local Outlet": "লোকাল আউটলেট"
+  },
+
   "courseNames": {
     "webDevelopment": "ওয়েব ডেভেলপমেন্ট",
     "dataScience": "ডেটা সায়েন্স",
@@ -29,13 +51,14 @@
     "digitalMarketing": "ডিজিটাল মার্কেটিং",
     "appDevelopment": "অ্যাপ ডেভেলপমেন্ট",
     "machineLearning": "মেশিন লার্নিং",
-    "cybersecurity": "সাইবার সিকিউরিটি",
+    "cybersecurity": "সাইবার নিরাপত্তা",
     "uiUxDesign": "UI/UX ডিজাইন",
     "cloudComputing": "ক্লাউড কম্পিউটিং",
     "blockchain": "ব্লকচেইন",
     "softwareTesting": "সফটওয়্যার টেস্টিং",
     "bigData": "বিগ ডেটা"
   },
+
   "buttons": {
     "addToCart": "যোগ করুন",
     "addToCart2": "কার্টে যোগ করুন",
@@ -43,20 +66,22 @@
     "show": "দেখান",
     "promo": "প্রোমো কোড"
   },
+
   "categories": {
     "beautyCare": "বিউটি ও পার্সোনাল কেয়ার",
     "womensApparels": "মহিলাদের পোশাক",
     "mensWear": "পুরুষদের পোশাক",
     "mobileGadgets": "মোবাইল ও গ্যাজেট",
-    "homeDecoration": "বাড়ির সজ্জা",
+    "homeDecoration": "হোম ডেকোরেশন",
     "homeAppliances": "হোম অ্যাপ্লায়েন্স",
-    "toysKidsBabies": "খেলনা, বাচ্চা ও শিশুর পণ্য",
+    "toysKidsBabies": "খেলনা, শিশু ও বাচ্চারা",
     "kidsFashion": "বাচ্চাদের ফ্যাশন",
-    "jewelleryAccessories": "গহনা ও অ্যাকসেসরিজ",
+    "jewelleryAccessories": "গহনা ও এক্সেসরিজ",
     "womensBag": "মহিলাদের ব্যাগ",
     "mensBag": "পুরুষদের ব্যাগ",
-    "watchesAccessories": "ঘড়ি ও অ্যাকসেসরিজ"
+    "watchesAccessories": "ঘড়ি ও এক্সেসরিজ"
   },
+
   "productCategories": {
     "heading": "বিশেষ পণ্য",
     "allProducts": "সব পণ্য",
@@ -64,95 +89,140 @@
     "addToCart": "যোগ করুন",
     "currency": "৳"
   },
+
   "products": {
-    "onePieceGown": "একটি পিস গাউন",
+    "onePieceGown": "এক পিস গাউন",
     "smartWatch": "স্মার্টওয়াচ ও ডিভাইস",
-    "snapAndGrip": "স্ন্যাপ এবং গ্রিপ",
-    "ladiesWinterOvercoat": "লেডিস উইন্টার ওভারকোট",
+    "snapAndGrip": "স্ন্যাপ অ্যান্ড গ্রিপ",
+    "ladiesWinterOvercoat": "মহিলাদের শীতকালীন কোট",
     "stylishShirt": "আকর্ষণীয় স্টাইলিশ শার্ট",
     "m19Original": "M19 100% অরিজিনাল",
     "samsungGalaxy": "স্যামসাং গ্যালাক্সি",
-    "LadisWatchwith": "লেডিস ওয়াচ উইথ",
+    "LadisWatchwith": "মহিলাদের ঘড়ি",
     "pulseOximeter": "পালস অক্সিমিটার",
-    "SkatingShoe": "স্কেটিং জুতা",
+    "SkatingShoe": "স্কেটিং শু",
     "EidCollection": "ঈদ কালেকশন",
     "Silk Katan Saree": "সিল্ক কাটান শাড়ি",
-    "product1": "Koss KPH7 পোর্টেবল",
-    "product2": "Beats Solo2 Solo 2",
-    "product3": "Beats EP ওয়্যারড",
-    "product4": "Bose SoundLink ব্লুটুথ",
-    "product5": "Sony WH-1000XM4",
-    "product6": "AirPods Pro"
+    "product1": "কস কেপিএইচ7 পোর্টেবল",
+    "product2": "বিটস সোলো2 সোলো 2",
+    "product3": "বিটস ইপি ওয়্যারড",
+    "product4": "বোস্ট সাউন্ডলিংক ব্লুটুথ",
+    "product5": "সনি WH-1000XM4",
+    "product6": "এয়ারপডস প্রো"
   },
+
   "newArrivals": {
     "heading": "নতুন আগমন",
     "seeAll": "সব দেখুন"
   },
+
   "common": {
-    "cartAdded": "পণ্য কার্টে যোগ হয়েছে"
+    "cartAdded": "পণ্য কার্টে যোগ করা হয়েছে"
   },
+
   "freshSell": {
     "hours": "ঘণ্টা",
     "minutes": "মিনিট",
     "seconds": "সেকেন্ড",
     "addToCart": "কার্টে যোগ করুন"
   },
+
   "time": {
     "hours": "ঘণ্টা",
     "minutes": "মিনিট",
     "seconds": "সেকেন্ড"
   },
+
   "product": {
     "price": "মূল্য",
-    "originalPrice": "মূল মূল্যে",
-    "discountedPrice": "ছাড়কৃত মূল্য"
+    "originalPrice": "মূল মূল্য",
+    "discountedPrice": "ডিসকাউন্টেড মূল্য"
   },
+
   "sections": {
     "freshSell": "ফ্রেশ সেল",
     "trendingProductsTitle": "ট্রেন্ডিং পণ্য",
-    "trendingProductsDescription": "আধুনিক, মিনিমাল, এবং আধুনিক ডিজাইনগুলি Lavish Alice হাতলেখার প্রতিফলন।",
+    "trendingProductsDescription": "আধুনিক, মিনিমাল, এবং আধুনিক ডিজাইনগুলি ল্যাভিশ অ্যালিসের হ্যান্ডরাইটিংকে উপস্থাপন করে।",
     "discount": "-১০%",
     "oldPrice": "পুরানো মূল্য",
     "price": "মূল্য"
   },
+
   "course": {
-    "HSC242526": "HSC ২৪, ২৫, ২৬",
+    "HSC242526": "এইচএসসি ২৪, ২৫, ২৬",
     "১০ম শ্রেণি": "১০ম শ্রেণি",
     "৯ম শ্রেণি": "৯ম শ্রেণি",
     "৮ম শ্রেণি": "৮ম শ্রেণি",
     "৭ম শ্রেণি": "৭ম শ্রেণি",
     "৬ষ্ঠ শ্রেণি": "৬ষ্ঠ শ্রেণি",
-    "p": "বিশেষ মূল্যে ১০ মিনিট স্কুলের নির্বাচিত কোর্সে এই মাসজুড়ে আপনার শেখার যাত্রা শুরু করুন! এখনই ক্রিয়েটিভ সফটওয়্যার দিয়ে শিখতে শুরু করুন!",
+    "p": "বৈশিষ্ট্যযুক্ত ১০ মিনিট স্কুল কোর্সে বিশেষ মূল্য ছাড় পাওয়া যাচ্ছে। ক্রিয়েটিভ সফটওয়্যার দিয়ে এখনই শিখতে শুরু করুন!",
     "h": "স্কিল ডেভেলপমেন্ট কোর্সে চমৎকার ডিসকাউন্ট!",
     "fb": "ফেসবুক মার্কেটিং",
     "yt": "ইউটিউব মার্কেটিং",
     "seo": "এসইও",
     "smm": "এসএমএম"
   },
+
   "name": {
     "ayman": "আইমান সাদিক ও সাদমান সাদিক",
     "shahid": "শাহিদুল ইসলাম",
-    "sakib": "সাকিব বিন রশিদ"
+    "sakib": "সাকিব বিন রাশিদ"
   },
+
   "type": {
-    "1": "এইচএসসি উন্নত গণিত প্রথম পত্র",
-    "2": "এইচএসসি উন্নত গণিত দ্বিতীয় পত্র",
-    "3": "এইচএসসি উচ্চতর গণিত প্রথম পত্র",
-    "4": "এইচএসসি উচ্চতর গণিত দ্বিতীয় পত্র",
-    "5": "এইচএসসি পদার্থবিজ্ঞান প্রথম পত্র"
+    "1": "এইচএসসি অ্যাডভান্সড ম্যাথমেটিক্স ১ম পেপার",
+    "2": "এইচএসসি অ্যাডভান্সড ম্যাথমেটিক্স ২য় পেপার",
+    "3": "এইচএসসি হায়ার ম্যাথমেটিক্স ১ম পেপার",
+    "4": "এইচএসসি হায়ার ম্যাথমেটিক্স ২য় পেপার",
+    "5": "এইচএসসি ফিজিক্স ১ম পেপার"
   },
+
   "title": {
     "1": "আলোর প্রকৃতি",
     "2": "আলোর তরঙ্গ তত্ত্ব",
     "3": "জ্যামিতিক অপটিক্স",
-    "4": "ভৌত অপটিক্স"
+    "4": "শারীরিক অপটিক্স"
   },
+
   "badge": {
     "SSC": "এসএসসি",
     "HSC": "এইচএসসি",
     "JSC": "জেএসসি",
     "PSC": "পিএসসি"
   },
+
+  "categories2": {
+    "title": "শপিং",
+    "title1": "কোর্স",
+    "title2": "পার্সেল",
+    "title3": "টপআপ",
+    "title4": "ড্রাইভ",
+    "title5": "আউটলেট"
+  },
+
+  "navMain": {
+    "title1": "ফল ও সবজি",
+    "title2": "স্ন্যাকস ও কনফেকশনারি",
+    "title3": "ডেইরি ও ডিম",
+    "title4": "মাংস ও সীফুড",
+    "title5": "বেভারেজ",
+    "title6": "স্ন্যাকস ও কনফেকশনারি",
+    "title7": "প্যান্ট্রি স্টেপলস",
+    "title8": "ফ্রোজেন ফুডস",
+    "title9": "পার্সোনাল কেয়ার",
+    "title10": "হাউসহোল্ড",
+    "title11": "শিশু ও বাচ্চারা",
+    "title12": "স্বাস্থ্য ও সুস্থতা",
+    "title13": "বেকারি",
+    "title14": "মাংস ও সীফুড",
+    "title15": "বেভারেজ"
+  },
+
+  "clothes": { "title": "ফল ও সবজি" },
+
+  "course2": { "title": "কোর্স" },
+  "cookups": { "title": "ডিজাইন" },
+
   "footer": {
     "aboutGoldenLife": "গোল্ডেন লাইফ সম্পর্কে",
     "ourStory": "আমাদের গল্প",
@@ -160,7 +230,7 @@
     "privacyPolicy": "গোপনীয়তা নীতি",
     "termsOfUse": "ব্যবহার শর্তাবলী",
     "customerService": "গ্রাহক সেবা",
-    "contactUs": "আমাদের সাথে যোগাযোগ করুন",
+    "contactUs": "যোগাযোগ করুন",
     "faq": "প্রশ্নোত্তর",
     "help": "সাহায্য",
     "forBusiness": "ব্যবসার জন্য",
@@ -169,6 +239,7 @@
     "getApp": "অ্যাপ ডাউনলোড করুন",
     "paymentMethods": "পেমেন্ট পদ্ধতি"
   },
+
   "socialLinks": {
     "linkedin": "লিঙ্কডইন",
     "youtube": "ইউটিউব",
@@ -176,9 +247,11 @@
     "twitter": "টুইটার",
     "instagram": "ইনস্টাগ্রাম"
   },
+
   "language": {
-    "en": "EN",
-    "bn": "BN"
+    "en": "ইংরেজি",
+    "bn": "বাংলা"
   },
+
   "copyright": "© {{year}} গোল্ডেন লাইফ শপিং।"
 }

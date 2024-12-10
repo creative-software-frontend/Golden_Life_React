@@ -2,31 +2,32 @@
 
 import { useRef, useEffect, useState } from 'react'
 import { ShoppingBag, Bike, Store, Building2, Gift, Car, Smartphone, Package, Newspaper, Plane, Tv, Activity, Globe, Store as StoreIcon } from "lucide-react"
+import { useTranslation } from 'react-i18next'
 
 export default function RightToLeftIconScroll() {
     const scrollRef = useRef<HTMLDivElement>(null)
     const [itemWidth, setItemWidth] = useState(80) // Default width, will be updated
-
+const [t] = useTranslation("global");
     const items = [
-        { icon: ShoppingBag, label: "Shopping" },
-        { icon: Bike, label: "Food" },
-        { icon: Store, label: "Grocery" },
-        { icon: Building2, label: "Pharmacy" },
-        { icon: Gift, label: "Gift" },
-        { icon: Car, label: "Ride Share" },
-        { icon: Smartphone, label: "Top Up" },
-        { icon: Package, label: "Parcel" },
-        { icon: Smartphone, label: "Mobile" },
-        { icon: Bike, label: "Drive Offer" },
-        { icon: Plane, label: "Air Ticket" },
-        { icon: Newspaper, label: "News Paper" },
-        { icon: Tv, label: "Live TV" },
-        { icon: Activity, label: "Blood Bank" },
-        { icon: Globe, label: "STU Product" },
-        { icon: Package, label: "Online Shop" },
-        { icon: Smartphone, label: "Covid Business" },
-        { icon: StoreIcon, label: "Local Outlet" },
-    ]
+        { icon: ShoppingBag, label: t("label.Shopping") },
+        { icon: Bike, label: t("label.Food") },
+        { icon: Store, label: t("label.Grocery") },
+        { icon: Building2, label: t("label.Pharmacy") },
+        { icon: Gift, label: t("label.Gift") },
+        { icon: Car, label: t("label.Ride Share") },
+        { icon: Smartphone, label: t("label.Top Up") },
+        { icon: Package, label: t("label.Parcel") },
+        { icon: Smartphone, label: t("label.Mobile") },
+        { icon: Bike, label: t("label.Drive Offer") },
+        { icon: Plane, label: t("label.Air Ticket") },
+        { icon: Newspaper, label: t("label.News Paper") },
+        { icon: Tv, label: t("label.Live TV") },
+        { icon: Activity, label: t("label.Blood Bank") },
+        { icon: Globe, label: t("label.STU Product") },
+        { icon: Package, label: t("label.Online Shop") },
+        { icon: Smartphone, label: t("label.Covid Business") },
+        { icon: StoreIcon, label: t("label.Local Outlet") },
+    ];
 
     const getColor = (label: string) => {
         const colorMap: { [key: string]: string } = {
