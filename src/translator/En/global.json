@@ -228,6 +228,21 @@
     "title6": "Notify Me",
     "title7": "Subscribe to receive updates and announcements."
   },
+  "Hmenu": {
+    "story": "Our Story ",
+    "Career": "Career",
+    "ContactUs": "Contact Us",
+    "PrivacyPolicy": "Privacy Policy",
+    "TermsofUse": "Terms of Use",
+    "WelcometoHelp": "Welcome to Help",
+    "1": " Our Story",
+    "2": "Career",
+    "3": "Contact Us",
+    "4": "Privacy Policy",
+    "5": "Terms of Use",
+    "6": "Welcome to Help"
+    
+  },
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

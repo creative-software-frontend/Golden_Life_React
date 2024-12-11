@@ -135,37 +135,37 @@ export default function HelpLayout() {
             case '/help/our-story':
                 return (
                     <div className="banner our-story-banner">
-                        <h1>Our Story</h1>
+                        <h1>{t("Hmenu.story")}</h1>
                     </div>
                 );
             case '/help/career':
                 return (
                     <div className="banner career-banner">
-                        <h1>Career</h1>
+                        <h1>{t("Hmenu.Career")}</h1>
                     </div>
                 );
             case '/help/contact':
                 return (
                     <div className="banner contact-banner">
-                        <h1>Contact Us</h1>
+                        <h1>{t("Hmenu.ContactUs")}</h1>
                     </div>
                 );
             case '/help/privacy-policy':
                 return (
                     <div className="banner privacy-policy-banner">
-                        <h1>Privacy Policy</h1>
+                        <h1>{t("Hmenu.PrivacyPolicy")}</h1>
                     </div>
                 );
             case '/help/terms':
                 return (
                     <div className="banner terms-banner">
-                        <h1>Terms of Use</h1>
+                        <h1>{t("Hmenu.TermsofUse")}</h1>
                     </div>
                 );
             default:
                 return (
                     <div className="banner default-banner">
-                        <h1>Welcome to Help</h1>
+                        <h1>{t("Hmenu.WelcometoHelp")}</h1>
                     </div>
                 );
         }
@@ -262,7 +262,7 @@ export default function HelpLayout() {
                                                 <div className="bg-teal-500 rounded-full p-1">
                                                     <HelpCircleIcon className="h-4 w-4 text-white" /> {/* Icon with teal background and white color */}
                                                 </div>
-                                                <span className="text-teal-600">Help</span>
+                                                <span className="text-teal-600">{t("help")}</span>
                                             </Link>
                                         </div>
 
@@ -275,7 +275,7 @@ export default function HelpLayout() {
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
                                                 </div>
-                                                <span className="text-blue-400">Login</span>
+                                                <span className="text-blue-400">{t("login")}</span>
                                             </button>
                                         </div>
                                     </SidebarMenuButton>
@@ -322,22 +322,22 @@ export default function HelpLayout() {
                             <div className="border-b border-gray-200">
                                 <nav className="-mb-px flex space-x-8 justify-center" aria-label="Tabs">
                                     <Link to="/help/our-story" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        Our Story
+                                        {t("Hmenu.1")}
                                     </Link>
                                     <Link to="/help" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        FAQ
+                                        {t("Hmenu.2")}
                                     </Link>
                                     <Link to="/help/career" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        Career
+                                        {t("Hmenu.3")}
                                     </Link>
                                     <Link to="/help/contact" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        Contact
+                                        {t("Hmenu.4")}
                                     </Link>
                                     <Link to="/help/privacy-policy" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        Privacy Policy
+                                        {t("Hmenu.5")}
                                     </Link>
                                     <Link to="/help/terms" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium">
-                                        Terms of Use
+                                        {t("Hmenu.6")}
                                     </Link>
                                 </nav>
                             </div>
