@@ -55,7 +55,7 @@ export default function PercelLayout() {
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
             { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
-            { id: "cookups", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+            { id: "outlet", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
         ],
         navMain: {
             percel: [

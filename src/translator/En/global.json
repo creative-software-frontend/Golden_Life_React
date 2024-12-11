@@ -176,12 +176,13 @@
   },
 
   "categories2": {
-    "title": "shopping",
-    "title1": "courses",
-    "title2": "percel",
-    "title3": "topup",
-    "title4": "drive",
-    "title5": "outlet"
+    "title": "Shopping",
+    "title1": "Courses",
+    "title2": "Percel",
+    "title3": "Topup",
+    "title4": "Drive",
+    "title5": "Outlet",
+    "title6": "Help"
   },
   "navMain": {
     "title1": "fruits Vegetables",
@@ -218,18 +219,15 @@
   },
   "help": "Help",
   "login": "Login",
-"comming":{
-
-  "title1": "Coming Soon",
-  "title2": "We're working on something exciting! Stay tuned for updates.",
-  "title3": "Expected launch:",
-  "title4": "[Your Date Here]",
-  "title5": "Enter your email",
-  "title6": "Notify Me",
-  "title7": "Subscribe to receive updates and announcements."
-
-
-},
+  "comming": {
+    "title1": "Coming Soon",
+    "title2": "We're working on something exciting! Stay tuned for updates.",
+    "title3": "Expected launch:",
+    "title4": "[Your Date Here]",
+    "title5": "Enter your email",
+    "title6": "Notify Me",
+    "title7": "Subscribe to receive updates and announcements."
+  },
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

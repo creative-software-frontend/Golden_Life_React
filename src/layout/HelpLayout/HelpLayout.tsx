@@ -3,19 +3,7 @@
 import * as React from "react"
 import logo from '../../../public/image/logo/logo.jpg'
 
-import {
-    BookOpen,
-    Bot,
-    ChevronRight,
-    SquareTerminal,
-    ShoppingCart,
-    Pill,
-    ChefHat,
-    HelpCircleIcon,
-    LogInIcon,
-    XCircle,
-    GraduationCap
-} from "lucide-react"
+import { BookOpen, Bot, ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, XCircle, GraduationCap, Package, Truck, HelpCircle } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -44,171 +32,12 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, Outlet, useLocation } from "react-router-dom"
 import useModalStore from "@/store/Store"
+import { useTranslation } from "react-i18next"
 
 
 
 // This is sample data.
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    categories: [
-        { id: "shopping", name: "Shopping", icon: ShoppingCart, path: "/" },
-        { id: "courses", name: "Courses", icon: GraduationCap, path: "/courses" },
 
-        { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/pharmacy" },
-        { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },
-    ],
-    navMain: {
-        shopping: [
-            {
-                title: "Fruits & Vegetables",
-                url: "#",
-                icon: SquareTerminal,
-                isActive: true,
-                items: [
-                    // { title: "Fresh Fruits", url: "#" },
-                    // { title: "Fresh Vegetables", url: "#" },
-                    // { title: "Herbs & Seasonings", url: "#" },
-                    // { title: "Organic Produce", url: "#" },
-                    // { title: "Exotic Fruits", url: "#" },
-                    // { title: "Sprouts", url: "#" },
-                    // { title: "Cut Vegetables", url: "#" },
-                    // { title: "Leafy Greens", url: "#" },
-                ],
-            },
-            {
-                title: "Dairy & Eggs",
-                url: "#",
-                icon: Bot,
-                items: [
-                    // { title: "Milk", url: "#" },
-                    // { title: "Cheese", url: "#" },
-                    // { title: "Eggs", url: "#" },
-                    // { title: "Yogurt", url: "#" },
-                    // { title: "Butter", url: "#" },
-                    // { title: "Cream", url: "#" },
-                    // { title: "Paneer", url: "#" },
-                    // { title: "Ghee", url: "#" },
-                ],
-            },
-            {
-                title: "Bakery",
-                url: "#",
-                icon: BookOpen,
-                items: [
-                    // { title: "Bread", url: "#" },
-                    // { title: "Cakes", url: "#" },
-                    // { title: "Pastries", url: "#" },
-                    // { title: "Cookies", url: "#" },
-                    // { title: "Bagels", url: "#" },
-                    // { title: "Muffins", url: "#" },
-                    // { title: "Croissants", url: "#" },
-                    // { title: "Donuts", url: "#" },
-                ],
-            },
-        ],
-        pharmacy: [
-            {
-                title: "Medicines",
-                url: "#",
-                icon: Pill,
-                isActive: true,
-                items: [
-                    // { title: "Prescription Drugs", url: "#" },
-                    // { title: "Over-the-Counter", url: "#" },
-                    // { title: "Vitamins & Supplements", url: "#" },
-                    // { title: "Pain Relief", url: "#" },
-                    // { title: "Cold & Flu", url: "#" },
-                    // { title: "Antibiotics", url: "#" },
-                    // { title: "Allergy Medication", url: "#" },
-                    // { title: "Digestive Health", url: "#" },
-                ],
-            },
-            {
-                title: "Personal Care",
-                url: "#",
-                icon: Bot,
-                items: [
-                    { title: "Skincare", url: "#" },
-                    { title: "Haircare", url: "#" },
-                    { title: "Oral Care", url: "#" },
-                    { title: "Deodorants", url: "#" },
-                    { title: "Bath & Body", url: "#" },
-                    { title: "Men's Grooming", url: "#" },
-                    { title: "Feminine Hygiene", url: "#" },
-                    { title: "Hand Sanitizers", url: "#" },
-                ],
-            },
-            {
-                title: "Health Devices",
-                url: "#",
-                icon: BookOpen,
-                items: [
-                    { title: "Blood Pressure Monitors", url: "#" },
-                    { title: "Thermometers", url: "#" },
-                    { title: "First Aid Kits", url: "#" },
-                    { title: "Oximeters", url: "#" },
-                    { title: "Glucose Meters", url: "#" },
-                    { title: "Weighing Scales", url: "#" },
-                    { title: "Nebulizers", url: "#" },
-                    { title: "Pulse Oximeters", url: "#" },
-                ],
-            },
-        ],
-        cookups: [
-            {
-                title: "Ready Meals",
-                url: "#",
-                icon: ChefHat,
-                isActive: true,
-                items: [
-                    { title: "Breakfast", url: "#" },
-                    { title: "Lunch", url: "#" },
-                    { title: "Dinner", url: "#" },
-                    { title: "Appetizers", url: "#" },
-                    { title: "Soups", url: "#" },
-                    { title: "Salads", url: "#" },
-                    { title: "Desserts", url: "#" },
-                    { title: "Snacks", url: "#" },
-                ],
-            },
-            {
-                title: "Meal Kits",
-                url: "#",
-                icon: Bot,
-                items: [
-                    { title: "Family Meals", url: "#" },
-                    { title: "Vegetarian", url: "#" },
-                    { title: "Gourmet", url: "#" },
-                    { title: "Low-Calorie", url: "#" },
-                    { title: "Quick & Easy", url: "#" },
-                    { title: "Asian Cuisine", url: "#" },
-                    { title: "Italian Cuisine", url: "#" },
-                    { title: "Mexican Cuisine", url: "#" },
-                ],
-            },
-            {
-                title: "Catering",
-                url: "#",
-                icon: BookOpen,
-                items: [
-                    { title: "Corporate Events", url: "#" },
-                    { title: "Weddings", url: "#" },
-                    { title: "Parties", url: "#" },
-                    { title: "Birthday Parties", url: "#" },
-                    { title: "Baby Showers", url: "#" },
-                    { title: "Holiday Events", url: "#" },
-                    { title: "Anniversary Dinners", url: "#" },
-                    { title: "Private Chefs", url: "#" },
-                ],
-            },
-        ],
-    }
-
-}
 const faqs = [
     {
         question: "What's the best thing about Switzerland?",
@@ -255,10 +84,50 @@ function classNames(...classes) {
 
 
 export default function HelpLayout() {
-    const [activeCategory, setActiveCategory] = React.useState("shopping")
+    const [activeCategory, setActiveCategory] = React.useState("help")
     const location = useLocation();
     const { openLoginModal } = useModalStore();
-
+    const [t] = useTranslation("global")
+    const data = {
+        user: {
+            name: "shadcn",
+            email: "m@example.com",
+            avatar: "/avatars/shadcn.jpg",
+        },
+        categories: [
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
+            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
+            { id: "outlet", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
+            { id: "help", name: t("categories2.title6"), icon: HelpCircle, path: "/help" },
+        ],
+        navMain: {
+            shopping: [],
+            courses: [],
+            percel: [
+                {
+                    title: t("navMain.title31"),
+                    url: "/percel/services",
+                    icon: SquareTerminal,
+                    isActive: true,
+                    items: [
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                        // { title: "Local Delivery", url: "/percel/services/local-delivery" },
+                        // { title: "International Shipping", url: "/percel/services/international-shipping" },
+                        // { title: "Express Services", url: "/percel/services/express" },
+                        // { title: "Tracking", url: "/percel/services/tracking" },
+                    ],
+                },
+            ],
+            topup: [],
+            drive: [],
+            outlet: [],
+            help: []
+        }
+    };
 
     // Function to render the banner based on the current path
     const getBannerForPage = () => {
@@ -342,9 +211,9 @@ export default function HelpLayout() {
                 </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel>
+                        {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
-                            {data.navMain[activeCategory].map((item) => (
+                            {data.navMain[activeCategory]?.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild
@@ -374,7 +243,7 @@ export default function HelpLayout() {
                                         </CollapsibleContent>
                                     </SidebarMenuItem>
                                 </Collapsible>
-                            ))}
+                            )) || null}
                         </SidebarMenu>
                     </SidebarGroup>
                 </SidebarContent>
@@ -475,7 +344,7 @@ export default function HelpLayout() {
                         </div>
                     </div>
 
-                   
+
                     <Outlet />
                     {/* <Footer /> */}
                 </main>
@@ -487,3 +356,4 @@ export default function HelpLayout() {
         // </div>
     )
 }
+

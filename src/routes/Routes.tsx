@@ -151,7 +151,7 @@ export const routes = createBrowserRouter([
         children: [
 
             {
-                path: '',
+                path: '/help',
                 element: <Faq />
             },
             {

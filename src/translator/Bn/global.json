@@ -191,14 +191,16 @@
     "PSC": "পিএসসি"
   },
 
-  "categories2": {
+ "categories2": {
     "title": "শপিং",
     "title1": "কোর্স",
     "title2": "পার্সেল",
     "title3": "টপআপ",
     "title4": "ড্রাইভ",
-    "title5": "আউটলেট"
-  },
+    "title5": "আউটলেট",
+    "title6": "সাহায্য"
+}
+,
 
   "navMain": {
     "title1": "ফলমূল ও সবজি",
