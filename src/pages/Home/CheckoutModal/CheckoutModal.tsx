@@ -2,6 +2,7 @@
 
 import useModalStore from "@/store/Store"
 import * as React from "react"
+import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 
 interface Address {
@@ -214,9 +215,9 @@ const AddressManager: React.FC<{ onSaveAddress: (address: Address, isDefault: bo
                             <option value="">Select a district</option>
                             <option value="Uttar Badda">Uttar Badda</option>
                             <option value="Banani">Banani</option>
-                            <option value="Gulshan">Gulshan</option>
+                            {/* <option value="Gulshan">Gulshan</option>
                             <option value="Mirpur">Mirpur</option>
-                            <option value="Dhanmondi">Dhanmondi</option>
+                            <option value="Dhanmondi">Dhanmondi</option> */}
                         </Select>
                     </div>
                     <div className="space-y-2">
@@ -269,7 +270,7 @@ export default function CheckoutModal() {
     const [currentAddress, setCurrentAddress] = React.useState<Address | null>(null);
     const [items, setItems] = React.useState<CartItem[]>([]);
     const navigate = useNavigate();
-
+const [t]=useTranslation("global");
     
 
     // Load cart items from local storage on component mount

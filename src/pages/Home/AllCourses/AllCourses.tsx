@@ -88,12 +88,10 @@ const CourseCarousel: React.FC<{
                         Show
                       </Button>
                       <Button 
-                      // onClick={() => {
-
-
-                      //   addToCart(product);
-                      //   toggleClicked()
-                      // }} 
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevent default Link behavior
+                          addToCart(product); // Add product to the cart
+                        }}
                       className="w-full bg-gray-400 hover:bg-green-600 text-white" onClick={() => onAddToCart(lesson)}>
                         Add to Cart
                       </Button>
@@ -121,6 +119,9 @@ export default function AllCourses() {
   const [cart, setCart] = React.useState<Lesson[]>([])
   const [isCartModalOpen, setIsCartModalOpen] = React.useState(false)
   const [t] = useTranslation("global");
+  const scrollLeftRef = React.useRef(0);
+  
+  // const [cart, setCart] = React.useState<any[]>([]);
   const lessons: Lesson[] = [
     {
       id: "1",
@@ -188,6 +189,7 @@ export default function AllCourses() {
     },
     // Add more lessons here...
   ];
+  
 
   // const addToCart = (product: Product) => {
   //   const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -207,14 +209,40 @@ export default function AllCourses() {
     setSelectedLesson(null)
   }
 
-  const addToCart = (lesson: Lesson) => {
-    setCart((prevCart) => [...prevCart, lesson])
-    setIsCartModalOpen(true)
-  }
+  // const addToCart = (lesson: Lesson) => {
+  //   setCart((prevCart) => [...prevCart, lesson])
+  //   setIsCartModalOpen(true)
+  // }
 
   const closeCartModal = () => {
     setIsCartModalOpen(false)
   }
+  const addToCart = (product: any) => {
+    // Retrieve existing cart items from localStorage
+    const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    // Check if the product already exists in the cart
+    const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
+
+    if (existingProductIndex !== -1) {
+      // If the product exists, update the quantity
+      existingCart[existingProductIndex].quantity += 1;
+    } else {
+      // If the product does not exist, add it to the cart
+      existingCart.push({
+        ...product,
+        price: product.discountedPrice, // Use the discounted price as price
+        quantity: 1, // Initialize quantity to 1
+      });
+    }
+
+    // Update state and localStorage
+    setCart(existingCart);
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+
+    // Trigger update in other components
+    toggleClicked();
+  };
 
   return (
     <>
@@ -225,13 +253,13 @@ export default function AllCourses() {
             courses={lessons.slice(0, 4)}
             title="Popular Courses"
             onSelect={handleCourseSelect}
-            onAddToCart={addToCart}
+            // onAddToCart={addToCart}
           />
           <CourseCarousel
             courses={lessons}
             title="All Courses"
             onSelect={handleCourseSelect}
-            onAddToCart={addToCart}
+            // onAddToCart={addToCart}
           />
         </div>
 
@@ -239,7 +267,7 @@ export default function AllCourses() {
           <Dialog open={isModalOpen} onOpenChange={closeModal}>
             <DialogContent className="max-w-4xl">
               <DialogHeader>
-                <DialogTitle>{selectedLesson.title}</DialogTitle>
+                {/* <DialogTitle>{selectedLesson.title}</DialogTitle> */}
               </DialogHeader>
               <div className="overflow-y-auto max-h-[80vh]">
                 <div
@@ -286,7 +314,7 @@ export default function AllCourses() {
                 <div className="p-2">
                   <div className="flex justify-center mb-4">
                     <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
-                      {["instructor", "structure", "details", "feature"].map((tab) => (
+                      {["instructor", "structure", "details", "feature","Add To cart"].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => setSelectedTab(tab as any)}

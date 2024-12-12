@@ -228,6 +228,15 @@
     "title6": "Notify Me",
     "title7": "Subscribe to receive updates and announcements."
   },
+
+  "checkout": {
+    "Name": "Name",
+    "Address": "Address",
+    "District": "District",
+    "1": "Select a district",
+    "2": "Uttar Badda",
+    "3": "Banani"
+  },
   "Hmenu": {
     "story": "Our Story ",
     "Career": "Career",
@@ -241,7 +250,177 @@
     "4": "Privacy Policy",
     "5": "Terms of Use",
     "6": "Welcome to Help"
-    
+  },
+  "cart": {
+    "CartButton": "Shopping Cart Button",
+    "TotalItems": " Items",
+    "TotalPrice": "Total Price",
+    "CheckoutButton": "Place Order",
+    "QuantityUp": "Increase Quantity",
+    "QuantityDown": "Decrease Quantity",
+    "RemoveItem": "Remove Item",
+    "CartEmpty": "Your cart is empty",
+    "ApplyCode": "Have a special code?",
+    "CodePlaceholder": "Referral/Discount Code",
+    "CloseCodeInput": "Close ",
+    "GoButton": " Code"
+  },
+
+  "DecreaseQuantity": "Decrease quantity for {{itemName}}",
+  "IncreaseQuantity": "Increase quantity for {{itemName}}",
+  "Quantity": "{{quantity}}",
+  "ItemTotal": "৳ {{price}} × {{quantity}} = ৳ {{total}}",
+
+  "ITEMS": "ITEMS",
+  "orderDetails": {
+    "title": "Order Details",
+    "companyName": "Creative Software",
+    "companyAddress": "123 Tech Street, Digital City",
+    "companyPhone": "+1 (555) 123-4567",
+    "printButtonLabel": "Print order details",
+    "orderNumber": "Order #18769",
+    "orderPlacedOn": "Placed on 31 Dec 2024 20:16:02",
+    "totalLabel": "Total:",
+    "totalAmount": "৳ 779.00",
+    "orderProgress": {
+      "step1": "order placed",
+      "step2": "order confirmed",
+      "step3": "ready for shipment",
+      "step4": "ship to courier",
+      "step5": "order on the way",
+      "step6": "order delivered"
+    },
+    "packageLabel": "Package 1",
+    "visitShop": "Visit Shop",
+    "soldBy": "sold by PICKY MALL",
+    "productName": "Ignite Breast Bigger for girls women and Lady",
+    "sizeLabel": "Size:",
+    "colorLabel": "Color:",
+    "quantityLabel": "Qty:",
+    "shippingAddress": "Shipping Address",
+    "totalSummary": "Total Summary",
+    "subTotal": "Sub Total",
+    "deliveryFee": "Delivery Fee",
+    "total": "Total",
+    "paidBy": "Paid by",
+    "paymentMethod": "cash"
+  },
+
+  "addressManager": {
+    "form": {
+      "name": "Name",
+      "address": "Address",
+      "district": "District",
+      "phone": "Phone",
+      "notes": "Delivery Notes",
+      "notesPlaceholder": "Add any specific delivery instructions",
+      "label": "Add a label",
+      "saveButton": "Save Address",
+      "defaultSwitch": "Save as default address"
+    },
+    "labels": {
+      "home": "Home",
+      "work": "Work",
+      "partner": "Partner",
+      "other": "Other"
+    },
+    "districts": {
+      "select": "Select a district",
+      "uttarBadda": "Uttar Badda",
+      "banani": "Banani"
+    }
+  },
+
+  "checkoutModal": {
+    "address": {
+      "change": "Change",
+      "name": "Name",
+      "address": "Address",
+      "district": "District"
+    },
+    "cart": {
+      "totalItems": "Total Items:",
+      "subtotal": "Subtotal:",
+      "deliveryCharge": "Delivery Charge:",
+      "totalPrice": "Total Price:"
+    },
+    "payment": {
+      "paymentOption": "Payment Option",
+      "wallet": "Wallet",
+      "bkash": "Bkash",
+      "nogod": "Nogod"
+    },
+    "terms": {
+      "accept": "I accept the",
+      "privacyPolicy": "Privacy Policy",
+      "termsAndConditions": "Terms and Conditions"
+    },
+    "errorMessage": "Please accept the terms and conditions before proceeding.",
+    "confirm": "Confirm",
+    "product": {
+      "unknownProduct": "Unknown Product",
+      "priceCalculation": "x {quantity} = ৳{totalPrice}"
+    },
+    "addressManager": {
+      "saveAddress": "Save Address"
+    }
+  },
+  "instructor": {
+    "profile": {
+      "name": "Munzereen Shahid",
+      "qualifications": [
+        "MSc (English), University of Oxford (UK);",
+        "BA, MA (English), University of Dhaka;",
+        "IELTS: 8.5"
+      ],
+      "imageAlt": "Instructor profile picture"
+    },
+    "ui": {
+      "change": "Change",
+      "viewMore": "View More",
+      "contact": "Contact"
+    }
+  },
+  "courseStructure": {
+    "title": "How the Course is Structured"
+  },
+  "features": {
+    "text1": "45 Example Video Lectures",
+
+    "text2": "24/7 Support via Chatbot",
+
+    "text3": "Live Q&A Classes",
+
+    "text4": "Facebook Support Group"
+  },
+
+  "faqItems": {
+    "question1": "Who is the 'Complete English Grammar Course' for?",
+    "answer1": "Course content details here...",
+
+    "question2": "What is the 'Complete English Grammar Course' details section (Earning Area)?",
+    "answer2": "Course section details here...",
+
+    "question3": "How long will the 'Complete English Grammar Course' be, and what can you do?",
+    "answer3": "Course duration and activities details here...",
+
+    "question4": "Why should you take the 'Complete English Grammar Course'?",
+    "answer4": "Course benefits details here...",
+
+    "question5": "What is the utility of the 'Complete English Grammar Course'?",
+    "answer5": "Course utility details here...",
+
+    "question6": "Final Words:",
+    "answer6": "Concluding remarks here..."
+  },
+  "features2": {
+    "title": "Course Features",
+    "text1": "All the basic topics and concepts generally required to learn English",
+    "text2": "Opportunity to evaluate each grammar rule through assessment questions at the end",
+    "text3": "Initiative to cover English grammar with a focus on various exams",
+    "text4": "Examples and concepts of different ways to express the same grammar rules",
+    "text5": "Primary English grammar rules and examples based on school, college, and university syllabuses",
+    "text6": "Assimilation and application of simple to complex English grammar concepts in everyday language"
   },
   "footer": {
     "aboutGoldenLife": "About Golden Life",

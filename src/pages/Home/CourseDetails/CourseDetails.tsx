@@ -1,37 +1,40 @@
+import { useTranslation } from 'react-i18next';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 
 export default function CourseDetails() {
+    const { t } = useTranslation("global");
+
     const faqItems = [
         {
-            question: "'Complete English Grammar Course' টি যাদের জন্য",
-            answer: "Course content details here..."
+            question: t("faqItems.question1"),
+            answer: t("faqItems.answer1")
         },
         {
-            question: "'Complete English Grammar Course' কোর্সটি ডিটেইলস সেকশন (আর্নিং এরিয়া):",
-            answer: "Course section details here..."
+            question: t("faqItems.question2"),
+            answer: t("faqItems.answer2")
         },
         {
-            question: "'Complete English Grammar Course'-টি কতদিন ধরে আপনি কী কী করতে পারবেন?",
-            answer: "Course duration and activities details here..."
+            question: t("faqItems.question3"),
+            answer: t("faqItems.answer3")
         },
         {
-            question: "কেন 'Complete English Grammar Course' কোর্সটি করবেন?",
-            answer: "Course benefits details here..."
+            question: t("faqItems.question4"),
+            answer: t("faqItems.answer4")
         },
         {
-            question: "'Complete English Grammar Course'-এর উপযোগীতা সম্পর্কে বিস্তারিত:",
-            answer: "Course utility details here..."
+            question: t("faqItems.question5"),
+            answer: t("faqItems.answer5")
         },
         {
-            question: "শেষ কথা:",
-            answer: "Concluding remarks here..."
+            question: t("faqItems.question6"),
+            answer: t("faqItems.answer6")
         }
-    ]
+    ];
 
     return (
         <div className="p-6 border rounded-lg h-[450px]">
@@ -48,5 +51,5 @@ export default function CourseDetails() {
                 ))}
             </Accordion>
         </div>
-    )
+    );
 }
