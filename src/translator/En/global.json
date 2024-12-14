@@ -143,7 +143,7 @@
     "৮ম শ্রেণি": "8th Grade",
     "৭ম শ্রেণি": "7th Grade",
     "৬ষ্ঠ শ্রেণি": "6th Grade",
-    "p": "Enjoy special prices on selected 10 Minute School courses throughout the month. Start learning now with Creative Software!",
+    "p": "Enjoy special prices on selected Golden Life courses throughout the month. Start learning now with Golden Life!",
     "h": "Amazing Discounts on Skill Development Courses!",
     "fb": "Facebook Marketing",
     "yt": "YouTube Marketing",
@@ -422,10 +422,163 @@
     "text5": "Primary English grammar rules and examples based on school, college, and university syllabuses",
     "text6": "Assimilation and application of simple to complex English grammar concepts in everyday language"
   },
-  "Popular Courses":"Popular Courses",
-  "All Courses":"All Courses",
+  "Popular Courses": "Popular Courses",
+  "All Courses": "All Courses",
 
+  "buttons2": {
+    "addToCart": "Add to Cart",
+    "wishlist": "Add to Wishlist",
+    "viewDetails": "Details"
+  },
+  "labels": {
+    "price": "Price",
+    "mrp": "MRP",
+    "discount": "Discount",
+    "quantity": "Quantity",
+    "weight": "Weight",
+    "freshVegetables": "Fresh Vegetables"
+  },
+  "messages": {
+    "cartUpdated": "Cart has been successfully updated.",
+    "addedToWishlist": "Added to Wishlist.",
+    "quantityLimit": "Quantity must be at least 1."
+  },
+  "products2": {
+    "product1": {
+      "name": "Potato",
+      "description": "Regular potatoes, suitable for home cooking. Rich in carbohydrates and minerals."
+    },
+    "product2": {
+      "name": "Red Potato (Cardinal)",
+      "description": "Red Cardinal potatoes, suitable for home cooking. Rich in vitamins and minerals."
+    },
+    "product3": {
+      "name": "Garlic (Imported)",
+      "description": "Imported garlic, known for its strong flavor and health benefits."
+    }
+  },
+  "course1": {
+    "title": "Course 2.1",
+    "description": "Taught by Dr. Rahim Khan. Total duration: 8 weeks. Intermediate level curriculum. Title: Mathematical Lectures."
+  },
+  "course2": {
+    "title": "Course 8.1",
+    "description": "Taught by Professor Salma Begum. Total duration: 6 weeks. Basic level curriculum. Title: Physics."
+  },
+  "course3": {
+    "title": "Course 8.1",
+    "description": "Taught by Professor Salma Begum. Total duration: 6 weeks. Basic level curriculum. Title: Physics."
+  },
+  "course4": {
+    "title": "Course 8.1",
+    "description": "Taught by Professor Salma Begum. Total duration: 6 weeks. Basic level curriculum. Title: Physics."
+  },
 
+  "clickInfo": "Click on a course to know more details",
+  "webDev": "Web Development",
+  "dataSci": "Data Science",
+  "digitalMkt": "Digital Marketing",
+  "graphicDes": "Graphic Design",
+  "cyberSec": "Cybersecurity",
+  "projMgmt": "Project Management",
+  "uiUx": "UI/UX Design",
+  "ai": "Artificial Intelligence",
+  "cloudComp": "Cloud Computing",
+  "photo": "Photography",
+  "contentWrite": "Content Writing",
+  "appDev": "App Development",
+  "beautyPersonalCare": "Beauty & Personal Care",
+  "womensApparels": "Women's Apparels",
+  "mensWear": "Men's Wear",
+  "mobileGadgets": "Mobile & Gadgets",
+  "homeDecoration": "Home Decoration",
+  "homeAppliances": "Home Appliances",
+  "toyKidsBabies": "Toy, Kids & Babies",
+  "kidsFashion": "Kids Fashion",
+  "jewelleryAccessories": "Jewellery & Accessories",
+  "womensBag": "Women's Bag",
+  "mensBag": "Men's Bag",
+  "watchesAccessories": "Watches & Accessories",
+  "footwear": "Footwear",
+  "booksStationery": "Books & Stationery",
+  "groceries": "Groceries",
+  "healthWellness": "Health & Wellness",
+  "petSupplies": "Pet Supplies",
+  "sportsEquipment": "Sports Equipment",
+  "courses": {
+    "ssc": "SSC Courses",
+    "popular": "Popular Courses"
+  },
+
+  "lesson": {
+    "type": {
+      "hsc": "HSC Advanced Mathematics Part 1",
+      "ssc": "SSC Physics"
+    },
+    "badge": {
+      "hsc": "HSC",
+      "ssc": "SSC"
+    },
+    "vectorIntroduction": "Introduction to Vectors and Types",
+    "lightNature": "Nature of Light"
+  },
+  "carousel": {
+    "title": "Course Carousel"
+  },
+  "courses2": {
+    "hsc": "HSC Courses",
+    "popular": "Popular Courses"
+  },
+  "lesson2": {
+    "type": {
+      "hsc": "HSC Advanced Mathematics 1st Paper",
+      "ssc": "SSC Physics"
+    },
+    "badge": {
+      "hsc": "HSC",
+      "ssc": "SSC"
+    },
+    "vectorIntroduction": "Introduction to Vectors and Their Types",
+    "lightNature": "Nature of Light"
+  },
+  "carousel2": {
+    "title": "Course Carousel"
+  },
+  "title1": "HSC",
+  "carousell": {
+    "title": "Course Carousel",
+    "courses": [
+      {
+        "type": "HSC Advanced Mathematics 1st Paper",
+        "number": "2.1",
+        "title": "Introduction to Vectors and Types",
+        "badge": "HSC",
+        "button": "Enroll"
+      },
+      {
+        "type": "SSC Physics",
+        "number": "8.1",
+        "title": "Nature of Light",
+        "badge": "SSC",
+        "button": "Enroll"
+      },
+      {
+        "type": "HSC Advanced Mathematics 1st Paper",
+        "number": "2.1",
+        "title": "Introduction to Vectors and Types",
+        "badge": "HSC",
+        "button": "Enroll"
+      },
+      {
+        "type": "SSC Physics",
+        "number": "8.1",
+        "title": "Nature of Light",
+        "badge": "SSC",
+        "button": "Enroll"
+      }
+    ]
+  },
+  "chat": "chat with us",
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

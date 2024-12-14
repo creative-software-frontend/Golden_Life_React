@@ -91,7 +91,7 @@ export default function ProductCategories() {
         >
           <div className="flex gap-4">
             {products.map((product) => (
-              <Link key={product.id} to="#" className="flex-none w-[140px] group border border-gray-300 rounded-lg p-2">
+              <Link key={product.id} to="#" className="flex-none w-[190px] group border border-gray-300 rounded-lg p-2">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
                   <img
                     src={product.image}
@@ -102,7 +102,7 @@ export default function ProductCategories() {
                     <span className="text-white text-xl font-bold">${product.price.toFixed(2)}</span>
                   </div>
                 </div>
-                <h3 className="mt-2 text-lg font-medium text-white line-clamp-2 text-nowrap">
+                <h3 className="mt-2 text-sm font-medium text-white line-clamp-2 text-nowrap">
                   {product.title}
                 </h3>
                 <Button

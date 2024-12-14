@@ -268,6 +268,7 @@ export default function AllCourses() {
                         </button>
                       ))}
                     </div>
+                    
                   </div>
 
                   <div>
@@ -281,23 +282,7 @@ export default function AllCourses() {
             </DialogContent>
           </Dialog>
         )}
-        {/* 
-        <Dialog open={isCartModalOpen} onOpenChange={closeCartModal}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Your Cart</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4">
-              {cart.map((item, index) => (
-                <div key={index} className="flex justify-between items-center mb-2">
-                  <span>{item.title}</span>
-                  <Badge>{item.badge}</Badge>
-                </div>
-              ))}
-            </div>
-            <Button onClick={closeCartModal} className="mt-4">Close</Button>
-          </DialogContent>
-        </Dialog> */}
+        
       </div>
     </>
   )

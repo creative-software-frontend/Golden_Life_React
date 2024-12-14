@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-// import { Badge } from "@/components/ui/badge"
 import { Play } from 'lucide-react'
 import {
     Carousel,
@@ -12,6 +11,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel"
+import { useTranslation } from "react-i18next"
 
 interface Lesson {
     type: string
@@ -24,60 +24,60 @@ interface Lesson {
 
 const lessons: Lesson[] = [
     {
-        type: "HSC উচ্চতর গণিত ১ম পত্র",
+        type: "ssc",
         number: "2.1",
         title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-purple-500",
-        badge: "HSC",
+        badge: "ssc",
     },
     {
-        type: "SSC পদার্থবিজ্ঞান",
+        type: "hsc",
         number: "8.1",
         title: "আলোর প্রকৃতি",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-blue-500",
-        badge: "SSC",
+        badge: "hsc",
     },
     {
-        type: "HSC উচ্চতর গণিত ১ম পত্র",
+        type: "ssc",
         number: "2.1",
         title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-purple-500",
-        badge: "HSC",
+        badge: "ssc",
     },
     {
-        type: "SSC পদার্থবিজ্ঞান",
+        type: "hsc",
         number: "8.1",
         title: "আলোর প্রকৃতি",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-blue-500",
-        badge: "SSC",
+        badge: "hsc",
     },
     {
-        type: "HSC উচ্চতর গণিত ১ম পত্র",
+        type: "ssc",
         number: "2.1",
         title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-purple-500",
-        badge: "HSC",
+        badge: "ssc",
     },
     {
-        type: "SSC পদার্থবিজ্ঞান",
+        type: "hsc",
         number: "8.1",
         title: "আলোর প্রকৃতি",
         thumbnail: "/placeholder.svg?height=200&width=400",
         color: "bg-blue-500",
-        badge: "SSC",
+        badge: "hsc",
     },
-    // Add more courses here...
 ]
 
 const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ courses, title }) => {
+    const { t } = useTranslation("global")
     return (
-        <div className="mb-12 sm:w-full md:max-w-[1040px] w-[370px]">
-            <h3 className="text-xl font-semibold mb-4">{title}</h3>
+        <div className="mb-12">
+            <h3 className="text-xl font-semibold mb-4">{t(title)}</h3>
             <Carousel
                 opts={{
                     align: "start",
@@ -97,17 +97,17 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
                                             </Button>
                                         </div>
                                         <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
-                                            {lesson.badge}
+                                            {t(`lesson.badge.${lesson.badge}`)}
                                         </div>
                                     </div>
                                     <div className="p-4 space-y-2">
                                         <div className="flex items-center gap-2">
                                             <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
-                                            <span className="text-sm text-slate-600">{lesson.type}</span>
+                                            <span className="text-sm text-slate-600">{t(`lesson.type.${lesson.type}`)}</span>
                                         </div>
-                                        <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
+                                        <h4 className="font-medium text-start text-slate-900">{lesson.number} - {t(`lesson.${lesson.type.toLowerCase().replace(/\s+/g, '')}`)}</h4>
                                         <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                                            Enroll in Course
+                                            {t("buttons.enroll")}
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -124,9 +124,8 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function Hsc() {
     return (
-        <div className="w-full md:max-w-[1040px] mt-8 mb-4">
-            <CourseCarousel courses={lessons.slice(0, 4)} title="HSC Courses" />
-            {/* <CourseCarousel courses={lessons.slice(4, 8)} title="Popular Courses" /> */}
+        <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4 items-center">
+            <CourseCarousel courses={lessons.slice(0, 4)} title="courses.ssc" />
         </div>
     )
 }

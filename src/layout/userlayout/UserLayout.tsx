@@ -284,15 +284,14 @@ export default function UserLayout() {
                         <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
                     </div>
                 </SidebarHeader>
-                <div className="px-4 py-3 border-b ">
+                <div className="px-2 py-3 border-b ">
                     <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
                         {data.categories.map((category) => (
                             <Link
                                 key={category.id}
                                 to={category.path}
-
                                 onClick={() => setActiveCategory(category.id)}
-                                className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
+                                className={`h-20 w-32 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
                                     ? "bg-primary-default border border-primary-default text-white"
                                     : "border border-primary-default text-gray-700"
                                     }`}
@@ -302,6 +301,7 @@ export default function UserLayout() {
                                 <span className="text-xs">{category.name}</span>
                             </Link>
                         ))}
+
                     </div>
                 </div>
                 <SidebarContent>

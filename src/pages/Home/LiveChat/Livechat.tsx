@@ -5,6 +5,7 @@ import { faWhatsapp, faTelegram } from '@fortawesome/free-brands-svg-icons';
 // import { Telegram } from 'lucide-react'; // Use Lucid Icons for Telegram
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type Message = {
     id: number
@@ -13,6 +14,7 @@ type Message = {
 }
 
 export default function LiveChat() {
+    const [t] = useTranslation("global");
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState<Message[]>([
         { id: 1, text: "Hello! How can I help you today?", sender: 'agent' }
@@ -106,7 +108,7 @@ export default function LiveChat() {
                     onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
                     className="px-4  text-black-500"
                 >
-                    Chat with us
+                    { t("chat") }
                 </button>
                 <div className="flex justify-center  space-x-2">
                     <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">

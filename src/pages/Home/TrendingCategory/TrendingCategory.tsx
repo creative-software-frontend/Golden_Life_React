@@ -165,8 +165,9 @@ export default function TrendingCategory() {
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => addToCart(product)}
+                                                className='  w-24 -mr-2 '
                                             >
-                                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                                <ShoppingCart className="h-4 w-4 " />
                                                 {t("buttons.addToCart")}
                                             </Button>
                                         </div>
