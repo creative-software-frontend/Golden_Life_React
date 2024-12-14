@@ -25,6 +25,7 @@ import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
 import useModalStore from "@/store/Store"
 import { useTranslation } from "react-i18next"
+import CourseCarousel from "@/pages/Home/AllCourses/CourseCaroudel"
 
 interface Lesson {
   id: string
@@ -41,73 +42,13 @@ interface Lesson {
   duration: string
   level: string
   category: string
+  quantity?: number;
 }
 
 
 
 
-const CourseCarousel: React.FC<{
-  courses: Lesson[],
-  title: string,
-  onSelect: (lesson: Lesson) => void,
-  onAddToCart: (lesson: Lesson) => void
-}> = ({ courses, title, onSelect, onAddToCart }) => {
-  return (
-    <div className="mb-12">
-      <h3 className="text-xl font-semibold mb-4">{title}</h3>
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full max-w-6xl mx-auto"
-      >
-        <CarouselContent>
-          {courses.map((lesson, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 pl-4">
-              <Card className="border-0 shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
-                <CardContent className="p-0">
-                  <div className="relative aspect-[2/1] bg-teal-100">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Button size="icon" className="h-16 w-16 rounded-full bg-white/90 hover:bg-white shadow-lg">
-                        <Play className="h-8 w-8 text-slate-600 ml-1" />
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-2 right-2 bg-white rounded-md px-2 py-1 text-xs">
-                      {lesson.badge}
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
-                      <span className="text-sm text-slate-600">{lesson.type}</span>
-                    </div>
-                    <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
-                    <div className="flex justify-between gap-4">
-                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white" onClick={() => onSelect(lesson)}>
-                        Show
-                      </Button>
-                      <Button 
-                        onClick={(e) => {
-                          e.preventDefault(); // Prevent default Link behavior
-                          addToCart(product); // Add product to the cart
-                        }}
-                      className="w-full bg-gray-400 hover:bg-green-600 text-white" onClick={() => onAddToCart(lesson)}>
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
-        <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
-      </Carousel>
-    </div>
-  )
-}
+//const CourseCarousel: React.FC<{ ... }> = ({ courses, title, onSelect, onAddToCart }) => { ... }
 
 
 export default function AllCourses() {
@@ -118,19 +59,19 @@ export default function AllCourses() {
   const [selectedTab, setSelectedTab] = React.useState<"instructor" | "structure" | "details" | "feature">("instructor")
   const [cart, setCart] = React.useState<Lesson[]>([])
   const [isCartModalOpen, setIsCartModalOpen] = React.useState(false)
-  const [t] = useTranslation("global");
+  const { t } = useTranslation("global"); // Update here
   const scrollLeftRef = React.useRef(0);
-  
+
   // const [cart, setCart] = React.useState<any[]>([]);
   const lessons: Lesson[] = [
     {
       id: "1",
-      type: t("type.1"),
+      type: t("type.1"), // Update here
       number: "2.1",
-      title: t("title.2"),
+      title: t("title.2"), // Update here
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-purple-500",
-      badge: t("badge.HSC"),
+      badge: t("badge.HSC"), // Update here
       image: "/placeholder.svg?height=400&width=800",
       instructor: "Dr. Rahim Khan",
       rating: 4.8,
@@ -141,12 +82,12 @@ export default function AllCourses() {
     },
     {
       id: "2",
-      type: t("type.2"),
+      type: t("type.2"), // Update here
       number: "8.1",
-      title: t("title.3"),
+      title: t("title.3"), // Update here
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-blue-500",
-      badge: t("badge.JSC"),
+      badge: t("badge.JSC"), // Update here
       image: "/placeholder.svg?height=400&width=800",
       instructor: "Prof. Salma Begum",
       rating: 4.7,
@@ -157,12 +98,12 @@ export default function AllCourses() {
     },
     {
       id: "3",
-      type: t("type.5"),
+      type: t("type.5"), // Update here
       number: "8.1",
-      title: t("title.1"),
+      title: t("title.1"), // Update here
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-blue-500",
-      badge: t("badge.SSC"),
+      badge: t("badge.SSC"), // Update here
       image: "/placeholder.svg?height=400&width=800",
       instructor: "Prof. Salma Begum",
       rating: 4.7,
@@ -173,12 +114,12 @@ export default function AllCourses() {
     },
     {
       id: "4",
-      type: t("type.4"),
+      type: t("type.4"), // Update here
       number: "8.1",
-      title: t("title.2"),
+      title: t("title.2"), // Update here
       thumbnail: "/placeholder.svg?height=200&width=400",
       color: "bg-blue-500",
-      badge: t("badge.PSC"),
+      badge: t("badge.PSC"), // Update here
       image: "/placeholder.svg?height=400&width=800",
       instructor: "Prof. Salma Begum",
       rating: 4.7,
@@ -189,7 +130,7 @@ export default function AllCourses() {
     },
     // Add more lessons here...
   ];
-  
+
 
   // const addToCart = (product: Product) => {
   //   const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -217,21 +158,20 @@ export default function AllCourses() {
   const closeCartModal = () => {
     setIsCartModalOpen(false)
   }
-  const addToCart = (product: any) => {
+  const addToCart = (lesson: Lesson) => {
     // Retrieve existing cart items from localStorage
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-    // Check if the product already exists in the cart
-    const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
+    // Check if the lesson already exists in the cart
+    const existingLessonIndex = existingCart.findIndex((item: Lesson) => item.id === lesson.id);
 
-    if (existingProductIndex !== -1) {
-      // If the product exists, update the quantity
-      existingCart[existingProductIndex].quantity += 1;
+    if (existingLessonIndex !== -1) {
+      // If the lesson exists, update the quantity
+      existingCart[existingLessonIndex].quantity += 1;
     } else {
-      // If the product does not exist, add it to the cart
+      // If the lesson does not exist, add it to the cart
       existingCart.push({
-        ...product,
-        price: product.discountedPrice, // Use the discounted price as price
+        ...lesson,
         quantity: 1, // Initialize quantity to 1
       });
     }
@@ -241,7 +181,7 @@ export default function AllCourses() {
     localStorage.setItem("cart", JSON.stringify(existingCart));
 
     // Trigger update in other components
-    toggleClicked();
+    // toggleClicked();
   };
 
   return (
@@ -251,15 +191,15 @@ export default function AllCourses() {
         <div className="space-y-12">
           <CourseCarousel
             courses={lessons.slice(0, 4)}
-            title="Popular Courses"
+            title={t("Popular Courses")}
             onSelect={handleCourseSelect}
-            // onAddToCart={addToCart}
+            onAddToCart={addToCart}
           />
           <CourseCarousel
             courses={lessons}
-            title="All Courses"
+            title={t("All Courses")}
             onSelect={handleCourseSelect}
-            // onAddToCart={addToCart}
+            onAddToCart={addToCart}
           />
         </div>
 
@@ -314,7 +254,7 @@ export default function AllCourses() {
                 <div className="p-2">
                   <div className="flex justify-center mb-4">
                     <div className="flex space-x-4 bg-gray-200 p-1 rounded-md shadow">
-                      {["instructor", "structure", "details", "feature","Add To cart"].map((tab) => (
+                      {["instructor", "structure", "details", "feature", "Add To cart"].map((tab) => (
                         <button
                           key={tab}
                           onClick={() => setSelectedTab(tab as any)}
@@ -341,7 +281,7 @@ export default function AllCourses() {
             </DialogContent>
           </Dialog>
         )}
-{/* 
+        {/* 
         <Dialog open={isCartModalOpen} onOpenChange={closeCartModal}>
           <DialogContent>
             <DialogHeader>
