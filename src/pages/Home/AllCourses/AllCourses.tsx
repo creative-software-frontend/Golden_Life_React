@@ -85,7 +85,7 @@ const CourseCarousel: React.FC<{
                     <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
                     <div className="flex justify-between gap-4">
                       <Button className="w-full bg-green-500 hover:bg-green-600 text-white" onClick={() => onSelect(lesson)}>
-                        Show
+                        show
                       </Button>
                       <Button 
                         onClick={(e) => {
