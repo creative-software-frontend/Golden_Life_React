@@ -579,6 +579,94 @@
     ]
   },
   "chat": "chat with us",
+  "adminPage": {
+    "sections": {
+      "briefStats": {
+        "name": "Brief Stats",
+        "description": "An overview of key metrics related to your business performance."
+      },
+      "dateRangeSelector": {
+        "name": "Date Range Selector",
+        "description": "Select and display data for specific time periods: Today,This Week, This Month, or This Year."
+      },
+      "totalDelivered": {
+        "name": "Total Delivered",
+        "description": "Shows the total number of delivered orders along with pending deliveries and total returns."
+      },
+      "paymentInvoiced": {
+        "name": "Payment Invoiced",
+        "description": "Displays the total amount invoiced, payment due, and parcel in process details."
+      },
+      "outForDelivery": {
+        "name": "Out for Delivery",
+        "description": "Displays the current status of orders out for delivery."
+      },
+      "pickUpPending": {
+        "name": "Pick up Pending",
+        "description": "Shows the orders awaiting pickup from the merchant."
+      },
+      "deliverProducts": {
+        "name": "Deliver Products",
+        "description": "Encourages merchants to create orders for nationwide product delivery."
+      },
+      "quickLinks": {
+        "name": "Quick Links",
+        "description": "Provides easy access to create bulk or single delivery orders."
+      }
+    },
+    "buttons": {
+      "createOrder": {
+        "name": "Create Order",
+        "description": "Initiates the process to create a new delivery order."
+      },
+      "details": {
+        "name": "Details",
+        "description": "Displays detailed information about the payment invoiced."
+      },
+      "createBulkDelivery": {
+        "name": "Create Bulk Delivery",
+        "description": "Allows merchants to create delivery orders in bulk."
+      },
+      "createSingleDelivery": {
+        "name": "Create Single Delivery",
+        "description": "Allows merchants to create a delivery order for a single package."
+      }
+    }
+  },
+  "total_returned": "Total Returned",
+  "payment_invoiced": "Payment Invoiced",
+  "details": "Details",
+  "brief_stats": "Brief Stats",
+  "today": "Today",
+  "this_week": "This Week",
+  "this_month": "This Month",
+  "this_year": "This Year",
+  "total_delivered": "Total Delivered",
+  "pending_delivery": "Pending Delivery",
+  "payment_due": "Payment Due",
+  "parcel_in_process": "Parcel In Process",
+  "out_for_delivery": "Out for Delivery",
+  "pick_up_pending": "Pick up Pending",
+  "deliver_products": "Deliver Products",
+  "create_order": "Create Order",
+  "quick_links": "Quick Links",
+  "create_bulk_delivery": "Create Bulk Delivery",
+  "create_single_delivery": "Create Single Delivery",
+
+  "logo_alt": "Courier Delivery Limited",
+  "dashboard": "Dashboard",
+  "deliveries": "Deliveries",
+  "invoices": "Invoices",
+  "store": "Store",
+  "new_order": "New order",
+  "your_profile": "Your Profile",
+  "settings": "Settings",
+  "sign_out": "Sign out",
+  "instructor2": "Instructor",
+  "structure": "Structure",
+  "details2": "Details",
+  "feature": "Feature",
+  "add_to_cart": "Add To Cart",
   "footer": {
     "aboutGoldenLife": "About Golden Life",
     "ourStory": "Our Story",

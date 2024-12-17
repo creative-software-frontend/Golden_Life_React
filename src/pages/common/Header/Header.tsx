@@ -9,7 +9,7 @@ import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
 import logo from '../../../../public/image/logo/logo.jpg';
 import { useTranslation } from 'react-i18next';
-
+import LoginOptionsModal from '@/components/LoginoptionsModal';
 const products = [
     { id: 1, name: 'Laptop', image: '../../../../public/image/search/laptop.jpg' },
     { id: 2, name: 'Smartphone', image: '../../../../public/image/search/smartphones.jpg' },
@@ -33,6 +33,12 @@ const Header: React.FC = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [t, i18n] = useTranslation('global')
+    const [isLoginOptionsModalOpen, setIsLoginOptionsModalOpen] = useState(false);
+    const [loginMethod, setLoginMethod] = useState<'phone' | 'email' | null>(null);
+    // const [value, setValue] = useState('');
+    // const [phone, setPhone] = useState("");
+    // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (searchText) {
@@ -51,10 +57,19 @@ const Header: React.FC = () => {
         setDropdownOpen((prev) => !prev);
     };
 
+    // const handlePhoneChange = (value: string | undefined) => {
+    //     setPhone(value || "");
+    //     setErrorMessage(null);
+    // };
     const handlePhoneChange = (value: string | undefined) => {
-        setPhone(value || "");
-        setErrorMessage(null);
+        setPhone(value || ""); // Update the phone state
+        if (!value || value.length !== 11) {
+            setErrorMessage("Phone number must be exactly 11 digits."); // Set error message
+        } else {
+            setErrorMessage(null); // Clear the error message if validation passes
+        }
     };
+
 
     const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const newOtp = [...otp];
@@ -115,6 +130,22 @@ const Header: React.FC = () => {
 
     }
     console.log(i18n.language); // Should log 'bn' when switched to Bangla
+
+    const openLoginOptionsModal = () => {
+        setIsLoginOptionsModalOpen(true);
+    };
+
+    const handlePhoneLogin = () => {
+        setLoginMethod('phone');
+        setIsLoginOptionsModalOpen(false);
+        openLoginModal();
+    };
+
+    const handleEmailLogin = () => {
+        setLoginMethod('email');
+        setIsLoginOptionsModalOpen(false);
+        openLoginModal();
+    };
 
 
     return (
@@ -190,7 +221,7 @@ const Header: React.FC = () => {
                         </button>
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-                                <button onClick={openLoginModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.login')}</button>
+                                <button onClick={openLoginOptionsModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.login')}</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.profile')}</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.settings')}</button>
                                 <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.dashboard')}</Link>
@@ -254,94 +285,155 @@ const Header: React.FC = () => {
                                         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                                             <img className="mx-auto h-15 w-auto" src={logo} alt="Your Company" />
                                             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                                                {step === 1 && t('header.enterPhoneNumber')}
-                                                {step === 2 && t('header.enterOTP')}
-                                                {step === 3 && t('header.verifyDetails')}
+                                                {loginMethod === 'phone' ? (
+                                                    <>
+                                                        {step === 1 && t('header.enterPhoneNumber')}
+                                                        {step === 2 && t('header.enterOTP')}
+                                                        {step === 3 && t('header.verifyDetails')}
+                                                    </>
+                                                ) : (
+                                                    t('header.enterEmail')
+                                                )}
                                             </h2>
                                         </div>
 
                                         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                                             <form className="space-y-6">
-                                                {step === 1 && (
-                                                    <div>
-                                                        <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
-                                                            {t('header.phoneNumber')}
-                                                        </label>
-                                                        <div className="flex flex-col items-start w-full">
-                                                            <PhoneInput
-                                                                id="phone"
-                                                                name="phone"
-                                                                value={value}
-                                                                onChange={handlePhoneChange}
-                                                                required
-                                                                defaultCountry="BD"
-                                                                placeholder={t('header.phoneNumber')}
-                                                                className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                if (phone.length < 10) {
-                                                                    setErrorMessage("Please enter a valid phone number");
-                                                                } else {
-                                                                    setErrorMessage(null);
-                                                                    setStep(2);
-                                                                }
-                                                            }}
-                                                            className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                                        >
-                                                            {t('header.next')}
-                                                        </button>
-                                                    </div>
-                                                )}
-
-                                                {step === 2 && (
-                                                    <div>
-                                                        <div className="mt-2 flex justify-center">
-                                                            <div className="grid grid-cols-4 gap-2">
-                                                                {otp.map((value, index) => (
-                                                                    <input
-                                                                        key={index}
-                                                                        type="text"
+                                                {loginMethod === 'phone' ? (
+                                                    <>
+                                                        {step === 1 && (
+                                                            <div>
+                                                                <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                    {t('header.phoneNumber')}
+                                                                </label>
+                                                                <div className="flex flex-col items-start w-full">
+                                                                    <PhoneInput
+                                                                        id="phone"
+                                                                        name="phone"
                                                                         value={value}
-                                                                        onChange={(e) => handleOtpChange(e, index)}
-                                                                        maxLength={1}
-                                                                        className="text-center border p-2 rounded-md"
+                                                                        onChange={handlePhoneChange}
+                                                                        required
+                                                                        defaultCountry="BD"
+                                                                        placeholder={t('header.phoneNumber')}
+                                                                        className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                     />
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex justify-center mt-4 gap-4">
-                                                            <button
-                                                                type="button"
-                                                                className="text-gray-500 hover:underline"
-                                                                onClick={handleBack}
-                                                            >
-                                                                <ArrowLeft className="h-5 w-5 inline" /> {t('header.back')}
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={handleVerify}
-                                                                className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
-                                                            >
-                                                                {t('header.verify')}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                                    {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
 
-                                                {step === 3 && (
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        if (phone.length < 10) {
+                                                                            setErrorMessage("Please enter a valid phone number");
+                                                                        } else {
+                                                                            setErrorMessage(null);
+                                                                            setStep(2);
+                                                                        }
+                                                                    }}
+                                                                    className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                                >
+                                                                    {t('header.next')}
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {step === 2 && (
+                                                            <div>
+                                                                <div className="mt-2 flex justify-center">
+                                                                    <div className="grid grid-cols-4 gap-2">
+                                                                        {otp.map((value, index) => (
+                                                                            <input
+                                                                                key={index}
+                                                                                type="text"
+                                                                                value={value}
+                                                                                onChange={(e) => handleOtpChange(e, index)}
+                                                                                maxLength={1}
+                                                                                className="text-center border p-2 rounded-md"
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex justify-center mt-4 gap-4">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="text-gray-500 hover:underline"
+                                                                        onClick={handleBack}
+                                                                    >
+                                                                        <ArrowLeft className="h-5 w-5 inline" /> {t('header.back')}
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={handleVerify}
+                                                                        className="rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
+                                                                    >
+                                                                        {t('header.verify')}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {step === 3 && (
+                                                            <div>
+                                                                {/* <h3 className="text-center text-lg font-semibold text-gray-700">{t('header.verificationComplete')}</h3> */}
+                                                                {/* <p className="text-center text-gray-600 mt-4">{t('header.loggedIn')}</p> */}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={handleSubmit}
+                                                                    className="mt-4 w-full flex justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                                >
+                                                                    {t('header.finish')}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                ) : (
                                                     <div>
-                                                        <h3 className="text-center text-lg font-semibold text-gray-700">{t('header.verificationComplete')}</h3>
-                                                        <p className="text-center text-gray-600 mt-4">{t('header.loggedIn')}</p>
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleSubmit}
-                                                            className="mt-4 w-full flex justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                                        >
-                                                            {t('header.finish')}
-                                                        </button>
+                                                        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                                            {t('header.email')}
+                                                        </label>
+                                                            <div className="mt-2">
+                                                                <input
+                                                                    id="email"
+                                                                    name="email"
+                                                                    type="email"
+                                                                    autoComplete="email"
+                                                                    required
+                                                                    className="block w-full rounded-md border-0 py-1.5 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                    onChange={(e) => {
+                                                                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                                                        if (!emailRegex.test(e.target.value)) {
+                                                                            setErrorMessage("Please enter a valid email address");
+                                                                        } else {
+                                                                            setErrorMessage(null);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <div className="mt-2">
+                                                                <input
+                                                                    id="password"
+                                                                    name="password"
+                                                                    type="password"
+                                                                    autoComplete="current-password"
+                                                                    required
+                                                                    className="block w-full rounded-md border-0 py-1.5 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                    onChange={(e) => {
+                                                                        if (e.target.value.length < 8) {
+                                                                            setErrorMessage("Password must be at least 8 characters long");
+                                                                        } else {
+                                                                            setErrorMessage(null);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        <div className="mt-2">
+                                                            <button
+                                                                type="submit"
+                                                                className="flex w-full justify-center rounded-md bg-primary-default px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                                            >
+                                                                {t('header.login')}
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
 
@@ -359,6 +451,12 @@ const Header: React.FC = () => {
                     </div>
                 </Dialog>
             </Transition.Root>
+            <LoginOptionsModal
+                isOpen={isLoginOptionsModalOpen}
+                onClose={() => setIsLoginOptionsModalOpen(false)}
+                onPhoneLogin={handlePhoneLogin}
+                onEmailLogin={handleEmailLogin}
+            />
         </div>
     );
 };

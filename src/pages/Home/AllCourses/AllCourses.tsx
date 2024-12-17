@@ -268,7 +268,7 @@ export default function AllCourses() {
                         </button>
                       ))}
                     </div>
-                    
+
                   </div>
 
                   <div>
@@ -282,7 +282,7 @@ export default function AllCourses() {
             </DialogContent>
           </Dialog>
         )}
-        
+
       </div>
     </>
   )

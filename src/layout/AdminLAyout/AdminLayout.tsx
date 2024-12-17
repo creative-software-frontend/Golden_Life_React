@@ -1,12 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Truck, ChevronRight, Info } from 'lucide-react'
+// import { useTranslation } from 'next-i18next'
+import { Truck, ChevronRight, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import AdminHeader from '@/pages/Dashboard/UserPanelHeader/UserPanelHeader'
+import { useTranslation } from 'react-i18next'
+import Products from '@/pages/Home/products/Products'
+import IconsSection from '@/pages/Home/IconSection/IconSection'
+// import AdminHeader from '@/components/AdminHeader'
 
-export default function AdminLayout() {
-  const [dateRange, setDateRange] = useState<string>("This week")
+
+export default function AdminDashboard() {
+  const { t } = useTranslation('global')
+  const [dateRange, setDateRange] = useState<string>(t('today'))
 
   const handleDateRangeChange = (range: string) => {
     setDateRange(range)
@@ -15,15 +22,19 @@ export default function AdminLayout() {
   return (
     <>
       <AdminHeader />
+      <div className='flex w-full justify-between'>
+        <IconsSection />
+        <Products />
+      </div>
+
       <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-8 bg-slate-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
               {/* First Div - 1/3 of Width */}
               <div className="shadow rounded-lg w-full lg:w-1/3 bg-white flex items-center justify-center py-8">
-                <h2 className="text-lg font-medium text-center">Brief Stats</h2>
+                <h2 className="text-lg font-medium text-center">{t('brief_stats')}</h2>
               </div>
-
 
               {/* Second Div - 2/3 of Width */}
               <div className="shadow rounded-lg p-6 w-full lg:w-2/3 bg-white">
@@ -35,65 +46,73 @@ export default function AdminLayout() {
                   >
                     <Button
                       variant="outline"
-                      className={`w-full sm:w-auto rounded-r-none ${dateRange === "This Week"
-                          ? "bg-primary-default text-primary-foreground"
-                          : "hover:bg-accent hover:text-accent-foreground"
+                      className={`w-full sm:w-auto rounded-r-none ${dateRange === t('today')
+                        ? "bg-primary-default text-primary-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
                         }`}
-                      onClick={() => handleDateRangeChange("This Week")}
+                      onClick={() => handleDateRangeChange(t('today'))}
                     >
-                      This Week
+                      {t('today')}
                     </Button>
                     <Button
                       variant="outline"
-                      className={`w-full sm:w-auto rounded-none border-x-0 ${dateRange === "This Month"
-                          ? "bg-primary-default text-primary-foreground"
-                          : "hover:bg-accent hover:text-accent-foreground"
+                      className={`w-full sm:w-auto rounded-r-none ${dateRange === t('this_week')
+                        ? "bg-primary-default text-primary-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
                         }`}
-                      onClick={() => handleDateRangeChange("This Month")}
+                      onClick={() => handleDateRangeChange(t('this_week'))}
                     >
-                      This Month
+                      {t('this_week')}
                     </Button>
                     <Button
                       variant="outline"
-                      className={`w-full sm:w-auto rounded-l-none ${dateRange === "This Year"
-                          ? "bg-primary-default text-primary-foreground"
-                          : "hover:text-accent-foreground"
+                      className={`w-full sm:w-auto rounded-none border-x-0 ${dateRange === t('this_month')
+                        ? "bg-primary-default text-primary-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
                         }`}
-                      onClick={() => handleDateRangeChange("This Year")}
+                      onClick={() => handleDateRangeChange(t('this_month'))}
                     >
-                      This Year
+                      {t('this_month')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className={`w-full sm:w-auto rounded-l-none ${dateRange === t('this_year')
+                        ? "bg-primary-default text-primary-foreground"
+                        : "hover:text-accent-foreground"
+                        }`}
+                      onClick={() => handleDateRangeChange(t('this_year'))}
+                    >
+                      {t('this_year')}
                     </Button>
                   </div>
 
-
                   {/* Date Range Display */}
-                  <Button className="flex items-center bg-primary-default text-primary-foreground">
+                  {/* <Button className="flex items-center bg-primary-default text-primary-foreground">
                     {dateRange}
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
-
 
             {/* Other content */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="pb-4">
                   <h2 className="text-lg font-medium text-start">
-                    Total Delivered
+                    {t('total_delivered')}
                   </h2>
                 </div>
                 <div className="text-4xl font-bold text-start">0</div>
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground text-gray-400">
-                      Pending Delivery
+                      {t('pending_delivery')}
                     </span>
                     <span>0</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground text-gray-400">
-                      Total Returned
+                      {t('total_returned')}
                     </span>
                     <span>0</span>
                   </div>
@@ -103,11 +122,11 @@ export default function AdminLayout() {
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="flex flex-row items-center justify-between pb-4">
                   <h2 className="text-lg font-medium text-start">
-                    Payment Invoiced
+                    {t('payment_invoiced')}
                   </h2>
                   <div className="flex items-center justify-center ">
                     <Button className="mr-4 bg-primary-default">
-                      Details
+                      {t('details')}
                     </Button>
                   </div>
                 </div>
@@ -115,7 +134,7 @@ export default function AdminLayout() {
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <a href="#" className="flex items-center text-gray-400">
-                      Payment Due
+                      {t('payment_due')}
                       <div className="flex items-center justify-center w-4 h-4 bg-gray-500 rounded-full ml-2">
                         <Info className="h-4 w-4 text-white" />
                       </div>
@@ -124,7 +143,7 @@ export default function AdminLayout() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <a href="#" className="flex items-center text-gray-400">
-                      Parcel In Process
+                      {t('parcel_in_process')}
                       <div className="flex items-center justify-center w-4 h-4 bg-gray-500 rounded-full ml-2">
                         <Info className="h-4 w-4 text-white" />
                       </div>
@@ -139,7 +158,7 @@ export default function AdminLayout() {
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="pb-4">
                   <h2 className="text-lg font-medium text-start">
-                    Out for Delivery
+                    {t('out_for_delivery')}
                   </h2>
                 </div>
               </div>
@@ -147,7 +166,7 @@ export default function AdminLayout() {
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="pb-4 px-4 py-4">
                   <h2 className=" font-medium text-start text-2xl">
-                    Pick up Pending
+                    {t('pick_up_pending')}
                   </h2>
                 </div>
               </div>
@@ -157,34 +176,33 @@ export default function AdminLayout() {
           <div className="space-y-6">
             <div className="bg-gradient-to-r from-primary-default to-primary-light text-white rounded-lg p-6">
               <div className="pt-6">
-                <h2 className="text-2xl font-bold mb-2">Deliver Products</h2>
-                <p className="mb-4">Hello, PROMISEDELIVERY MERCHANT</p>
+                <h2 className="text-2xl font-bold mb-2">{t('deliver_products')}</h2>
+                <p className="mb-4">{t('hello_merchant', { name: 'PROMISEDELIVERY MERCHANT' })}</p>
                 <p className="mb-4">
-                  Our team of professionals is here to deliver your products
-                  nationwide.
+                  {t('delivery_team_message')}
                 </p>
                 <Button className="w-1/2 bg-primary-default text-white font-bold">
-                  Create Order
+                  {t('create_order')}
                 </Button>
               </div>
             </div>
 
             <div className="bg-white shadow rounded-lg p-6">
               <div className="pb-4">
-                <h2 className="text-lg font-medium text-start">Quick Links</h2>
+                <h2 className="text-lg font-medium text-start">{t('quick_links')}</h2>
               </div>
               <div className="space-y-4 mt-4">
                 <Button variant="outline" className="w-full justify-between px-4 py-6 hover:bg-gray-100">
                   <div className="flex items-center">
                     <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
-                    <span className="font-bold text-lg">Create Bulk Delivery</span>
+                    <span className="font-bold text-lg">{t('create_bulk_delivery')}</span>
                   </div>
                   <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
                 </Button>
                 <Button variant="outline" className="w-full justify-between px-4 py-6 hover:bg-gray-100">
                   <div className="flex items-center">
                     <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
-                    <span className="font-bold text-lg">Create Single Delivery</span>
+                    <span className="font-bold text-lg">{t('create_single_delivery')}</span>
                   </div>
                   <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
                 </Button>
@@ -196,3 +214,4 @@ export default function AdminLayout() {
     </>
   )
 }
+
