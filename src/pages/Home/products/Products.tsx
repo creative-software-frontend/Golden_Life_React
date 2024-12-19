@@ -19,7 +19,7 @@ const services = [
 
 const Products = () => {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-10 gap-2 p-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-2">
             {services.map((service, index) => (
                 <div
                     key={index}

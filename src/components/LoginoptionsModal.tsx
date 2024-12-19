@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { PhoneIcon, MailIcon } from 'lucide-react';
+import { PhoneIcon, MailIcon, Fingerprint } from 'lucide-react';
 
 interface LoginOptionsModalProps {
     isOpen: boolean;
@@ -56,8 +56,8 @@ const LoginOptionsModal: React.FC<LoginOptionsModalProps> = ({ isOpen, onClose, 
                                                 className="inline-flex w-full justify-center items-center rounded-md bg-primary-default px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-default"
                                                 onClick={onEmailLogin}
                                             >
-                                                <MailIcon className="mr-2 h-5 w-5" />
-                                                Login with Email
+                                                <Fingerprint className="mr-2 h-5 w-5" />
+                                                Login with User & Password
                                             </button>
                                         </div>
                                     </div>

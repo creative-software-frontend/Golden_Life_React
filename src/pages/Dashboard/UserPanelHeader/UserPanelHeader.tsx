@@ -70,13 +70,13 @@ export default function AdminHeader() {
                 </div>
 
                 <div className="flex items-center space-x-1">
-                    <Button  className="hidden lg:block color-primary-light">
+                    <Button className="hidden lg:block color-primary-light">
                         {/* {t('new_order')} */}
-                         Wallet 10230.00
+                        Wallet 10230.00
                     </Button>
                     <Button variant="default" className="hidden lg:block">
                         {/* {t('new_order')} */}
-                    Boucher 30500.00
+                        Boucher 30500.00
                     </Button>
                     <Button variant="default" className="hidden lg:block">
                         {/* {t('new_order')} */}
@@ -95,17 +95,67 @@ export default function AdminHeader() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                             <DropdownMenuItem>
-                                <Link to="">{t('your_profile')}</Link>
+                                <Link to="">
+
+                                    {/* {t('your_profile')} */}
+                                    Address Book
+
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                                <Link to="">{t('settings')}</Link>
+                                <Link to="">
+                                    {/* {t('settings')} */}
+                                    Help Center
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                                 <button onClick={() => {
                                     localStorage.removeItem('isAuthenticated')
                                     // Add logout logic here
                                 }}>
-                                    {t('sign_out')}
+                                    {/* {t('sign_out')} */}
+                                    My Reviews
+
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+
+                                    Return/Repair
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+                                    Setting
+
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+                                    Survey
+
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+                                    Feedback
+
                                 </button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>

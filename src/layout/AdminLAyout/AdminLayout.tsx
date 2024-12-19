@@ -8,6 +8,8 @@ import AdminHeader from '@/pages/Dashboard/UserPanelHeader/UserPanelHeader'
 import { useTranslation } from 'react-i18next'
 import Products from '@/pages/Home/products/Products'
 import IconsSection from '@/pages/Home/IconSection/IconSection'
+import DCatagories from '@/pages/DCatagories/DCatagories'
+import DCourse from '@/pages/DCourse/DCourse'
 // import AdminHeader from '@/components/AdminHeader'
 
 
@@ -22,10 +24,11 @@ export default function AdminDashboard() {
   return (
     <>
       <AdminHeader />
-      <div className='flex w-full justify-between'>
+      <IconsSection />
+      {/* <div className='flex w-full justify-between'>
         <IconsSection />
         <Products />
-      </div>
+      </div> */}
 
       <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-8 bg-slate-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -174,8 +177,8 @@ export default function AdminDashboard() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-gradient-to-r from-primary-default to-primary-light text-white rounded-lg p-6">
-              <div className="pt-6">
+            <div className="bg-white rounded-lg p-6">
+              {/* <div className="pt-6">
                 <h2 className="text-2xl font-bold mb-2">{t('deliver_products')}</h2>
                 <p className="mb-4">{t('hello_merchant', { name: 'PROMISEDELIVERY MERCHANT' })}</p>
                 <p className="mb-4">
@@ -184,7 +187,8 @@ export default function AdminDashboard() {
                 <Button className="w-1/2 bg-primary-default text-white font-bold">
                   {t('create_order')}
                 </Button>
-              </div>
+              </div> */}
+              <Products />
             </div>
 
             <div className="bg-white shadow rounded-lg p-6">
@@ -210,7 +214,13 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+        <div className='flex justify-between' >
+          <DCatagories />
+          <DCourse />
+        </div>
       </main>
+
+
     </>
   )
 }

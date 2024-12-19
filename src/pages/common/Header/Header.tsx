@@ -39,6 +39,7 @@ const Header: React.FC = () => {
     // const [phone, setPhone] = useState("");
     // const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [error, setError] = useState('');
+    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
     useEffect(() => {
         if (searchText) {
@@ -61,12 +62,21 @@ const Header: React.FC = () => {
     //     setPhone(value || "");
     //     setErrorMessage(null);
     // };
+
     const handlePhoneChange = (value: string | undefined) => {
-        setPhone(value || ""); // Update the phone state
-        if (!value || value.length !== 11) {
+        const newValue = value || "";
+        setPhone(newValue); // Update the phone state
+
+        // Validation logic
+        if (newValue.length !== 11) {
             setErrorMessage("Phone number must be exactly 11 digits."); // Set error message
+            setIsButtonDisabled(true); // Disable the button
+        } else if (!/^\d+$/.test(newValue)) {
+            setErrorMessage("Phone number can only contain digits."); // Only digits are allowed
+            setIsButtonDisabled(true); // Disable the button
         } else {
-            setErrorMessage(null); // Clear the error message if validation passes
+            setErrorMessage(null); // Clear the error message
+            setIsButtonDisabled(false); // Enable the button
         }
     };
 
@@ -391,23 +401,19 @@ const Header: React.FC = () => {
                                                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                                             {t('header.email')}
                                                         </label>
-                                                            <div className="mt-2">
-                                                                <input
-                                                                    id="email"
-                                                                    name="email"
-                                                                    type="email"
-                                                                    autoComplete="email"
+                                                            <div className="flex flex-col items-start w-full">
+                                                                <PhoneInput
+                                                                    id="phone"
+                                                                    name="phone"
+                                                                    value={value}
+                                                                    onChange={handlePhoneChange}
                                                                     required
-                                                                    className="block w-full rounded-md border-0 py-1.5 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                                    onChange={(e) => {
-                                                                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                                                        if (!emailRegex.test(e.target.value)) {
-                                                                            setErrorMessage("Please enter a valid email address");
-                                                                        } else {
-                                                                            setErrorMessage(null);
-                                                                        }
-                                                                    }}
+                                                                    defaultCountry="BD"
+                                                                    placeholder={t('header.phoneNumber')}
+                                                                    className="p-4 block w-full rounded-md mb-4 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
+                                                                {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
+
                                                             </div>
                                                             <div className="mt-2">
                                                                 <input
@@ -415,6 +421,7 @@ const Header: React.FC = () => {
                                                                     name="password"
                                                                     type="password"
                                                                     autoComplete="current-password"
+                                                                    placeholder='Password Please'
                                                                     required
                                                                     className="block w-full rounded-md border-0 py-1.5 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                     onChange={(e) => {
