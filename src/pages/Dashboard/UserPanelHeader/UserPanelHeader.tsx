@@ -72,15 +72,15 @@ export default function AdminHeader() {
                 <div className="flex items-center space-x-1">
                     <Button className="hidden lg:block color-primary-light">
                         {/* {t('new_order')} */}
-                        Wallet 10230.00
+                        Wallet 
                     </Button>
                     <Button variant="default" className="hidden lg:block">
                         {/* {t('new_order')} */}
-                        Boucher 30500.00
+                        Boucher
                     </Button>
                     <Button variant="default" className="hidden lg:block">
                         {/* {t('new_order')} */}
-                        Recharge  45900.00
+                        Recharge 
                     </Button>
 
                     <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
@@ -134,18 +134,8 @@ export default function AdminHeader() {
                                     // Add logout logic here
                                 }}>
                                     {/* {t('sign_out')} */}
-                                    Setting
-
-                                </button>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <button onClick={() => {
-                                    localStorage.removeItem('isAuthenticated')
-                                    // Add logout logic here
-                                }}>
-                                    {/* {t('sign_out')} */}
+                                   
                                     Survey
-
                                 </button>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
@@ -154,7 +144,27 @@ export default function AdminHeader() {
                                     // Add logout logic here
                                 }}>
                                     {/* {t('sign_out')} */}
+
                                     Feedback
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+                                    
+                                    Profile
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button onClick={() => {
+                                    localStorage.removeItem('isAuthenticated')
+                                    // Add logout logic here
+                                }}>
+                                    {/* {t('sign_out')} */}
+                                    Logout
 
                                 </button>
                             </DropdownMenuItem>

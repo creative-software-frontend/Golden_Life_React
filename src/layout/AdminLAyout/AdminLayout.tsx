@@ -10,6 +10,7 @@ import Products from '@/pages/Home/products/Products'
 import IconsSection from '@/pages/Home/IconSection/IconSection'
 import DCatagories from '@/pages/DCatagories/DCatagories'
 import DCourse from '@/pages/DCourse/DCourse'
+import WalletAmount from '@/pages/WalletAmount/WalletAmount'
 // import AdminHeader from '@/components/AdminHeader'
 
 
@@ -24,7 +25,12 @@ export default function AdminDashboard() {
   return (
     <>
       <AdminHeader />
-      <IconsSection />
+
+      <div className='flex justify-between'>
+        <IconsSection />
+        <WalletAmount />
+
+      </div>
       {/* <div className='flex w-full justify-between'>
         <IconsSection />
         <Products />
@@ -214,9 +220,13 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-        <div className='flex justify-between' >
-          <DCatagories />
-          <DCourse />
+        <div className='flex justify-between gap-4 w-full' >
+          <div className='bg-white rounded-lg w-[50%] p-2 mt-2 '>
+            <DCatagories />
+          </div>
+          <div className='bg-white rounded-lg mt-2 p-2 w-[50%]'>
+            <DCourse />
+          </div>
         </div>
       </main>
 

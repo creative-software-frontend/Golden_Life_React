@@ -29,8 +29,8 @@ export default function DCourse() {
     ]
 
     return (
-        <div className="mt-4  ">
-            <h1 className="text-lg font-bold mb-2 text-center">Course Catalog</h1>
+        <div className="mt-4 ">
+            <h1 className="text-2xl  font-bold mb-2 text-center">Course Catagory</h1>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-2">
                 {courses.map((course, index) => (
                     <div
