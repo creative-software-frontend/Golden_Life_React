@@ -25,12 +25,12 @@ export default function ProductCategories() {
         { name: "Sports & Fitness", icon: <Dumbbell className="w-6 h-6" /> },
         { name: "Mobile Phones", icon: <Smartphone className="w-6 h-6" /> },
         { name: "Watches", icon: <Watch className="w-6 h-6" /> },
-        { name: "Audio", icon: <Headphones className="w-6 h-6" /> },
+        // { name: "Audio", icon: <Headphones className="w-6 h-6" /> },
     ]
 
     return (
         <div className="">
-            <h1 className="text-2xl font-bold mb-2 mt-4 text-center">Product Categories</h1>
+            <h1 className="text-2xl font-bold mb-2 mt-4 text-center">Product Category</h1>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-2">
                 {products.map((product, index) => (
                     <div

@@ -25,7 +25,7 @@ export default function DCourse() {
         { name: "Literature", icon: <Book className="w-6 h-6" /> },
         { name: "Biology", icon: <Microscope className="w-6 h-6" /> },
         { name: "Geography", icon: <Globe className="w-6 h-6" /> },
-        { name: "Music", icon: <Music className="w-6 h-6" /> },
+        // { name: "Music", icon: <Music className="w-6 h-6" /> },
     ]
 
     return (
