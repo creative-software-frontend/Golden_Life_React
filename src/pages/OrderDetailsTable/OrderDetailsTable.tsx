@@ -1,49 +1,60 @@
 import React from 'react';
 
-interface OrderItem {
+interface OrderDetail {
     id: number;
-    product: string;
-    quantity: number;
-    unitPrice: number;
+    date: string;
+    orderNo: string;
+    customer: string;
     total: number;
+    status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered';
 }
 
-const dummyOrderItems: OrderItem[] = [
-    { id: 1, product: 'Widget A', quantity: 2, unitPrice: 10.99, total: 21.98 },
-    { id: 2, product: 'Gadget B', quantity: 1, unitPrice: 24.99, total: 24.99 },
-    { id: 3, product: 'Tool C', quantity: 3, unitPrice: 7.50, total: 22.50 },
-    { id: 4, product: 'Device D', quantity: 1, unitPrice: 99.99, total: 99.99 },
+const dummyOrderDetails: OrderDetail[] = [
+    { id: 1, date: '2023-05-15', orderNo: 'ORD-001', customer: 'John Doe', total: 145.96, status: 'Delivered' },
+    { id: 2, date: '2023-05-16', orderNo: 'ORD-002', customer: 'Jane Smith', total: 89.97, status: 'Shipped' },
+    { id: 3, date: '2023-05-17', orderNo: 'ORD-003', customer: 'Bob Johnson', total: 299.99, status: 'Processing' },
+    { id: 4, date: '2023-05-18', orderNo: 'ORD-004', customer: 'Alice Brown', total: 74.50, status: 'Pending' },
 ];
 
 const OrderDetailsTable: React.FC = () => {
-    const orderTotal = dummyOrderItems.reduce((sum, item) => sum + item.total, 0);
+    const getStatusColor = (status: OrderDetail['status']) => {
+        switch (status) {
+            case 'Pending': return 'bg-yellow-200 text-yellow-800';
+            case 'Processing': return 'bg-blue-200 text-blue-800';
+            case 'Shipped': return 'bg-purple-200 text-purple-800';
+            case 'Delivered': return 'bg-green-200 text-green-800';
+            default: return 'bg-gray-200 text-gray-800';
+        }
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-xl font-bold mb-4">Order Details</h2>
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-300">
+            <h2 className="text-2xl font-bold mb-6">Order Details</h2>
+            <div className="overflow-x-auto shadow-md rounded-lg">
+                <table className="min-w-full bg-white">
                     <thead>
-                        <tr className="bg-gray-100">
-                            <th className="py-2 px-4 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th className="py-2 px-4 border-b text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Order-No</th>
-                            <th className="py-2 px-4 border-b text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                            <th className="py-2 px-4 border-b text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <th className="py-3 px-6 text-left">Date</th>
+                            <th className="py-3 px-6 text-center">Order-No</th>
+                            <th className="py-3 px-6 text-left">Customer</th>
+                            <th className="py-3 px-6 text-right">Total</th>
+                            <th className="py-3 px-6 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {dummyOrderItems.map((item) => (
-                            <tr key={item.id} className="hover:bg-gray-50">
-                                <td className="py-2 px-4 border-b text-sm">{item.product}</td>
-                                <td className="py-2 px-4 border-b text-right text-sm">{item.quantity}</td>
-                                <td className="py-2 px-4 border-b text-right text-sm">${item.unitPrice.toFixed(2)}</td>
-                                <td className="py-2 px-4 border-b text-right text-sm">${item.total.toFixed(2)}</td>
+                    <tbody className="text-gray-600 text-sm font-light">
+                        {dummyOrderDetails.map((order) => (
+                            <tr key={order.id} className="border-b border-gray-200 hover:bg-gray-100">
+                                <td className="py-3 px-6 text-left whitespace-nowrap">{order.date}</td>
+                                <td className="py-3 px-6 text-center">{order.orderNo}</td>
+                                <td className="py-3 px-6 text-left">{order.customer}</td>
+                                <td className="py-3 px-6 text-right">${order.total.toFixed(2)}</td>
+                                <td className="py-3 px-6 text-center">
+                                    <span className={`py-1 px-3 rounded-full text-xs ${getStatusColor(order.status)}`}>
+                                        {order.status}
+                                    </span>
+                                </td>
                             </tr>
                         ))}
-                        <tr className="bg-gray-100 text-sm font-semibold">
-                            <td colSpan={3} className="py-2 px-4 border-b text-right">Order Total:</td>
-                            <td className="py-2 px-4 border-b text-right">${orderTotal.toFixed(2)}</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -52,4 +63,3 @@ const OrderDetailsTable: React.FC = () => {
 };
 
 export default OrderDetailsTable;
-

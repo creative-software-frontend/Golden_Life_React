@@ -16,12 +16,14 @@ const services = [
     { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
     { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
     { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
+    { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
+    { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
 
 ];
 
 const Products = () => {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-0.5">
             {services.map((service, index) => (
                 <div
                     key={index}

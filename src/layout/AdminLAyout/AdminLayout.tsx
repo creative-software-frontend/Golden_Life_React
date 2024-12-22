@@ -38,7 +38,7 @@ export default function AdminDashboard() {
         <Products />
       </div> */}
 
-      <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-8 bg-slate-100">
+      <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-2 bg-slate-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
@@ -165,26 +165,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="pb-4">
-                  <h2 className="text-lg font-medium text-start">
-                    {/* {t('out_for_delivery')} */}
-
-                    <OrderDetailsTable />
-                  </h2>
-                </div>
-              </div>
-
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="pb-4 px-4 py-4">
-                  <h2 className=" font-medium text-start text-2xl">
-                    {/* {t('pick_up_pending')} */}
-                    <CourseOrderTable />
-                  </h2>
-                </div>
-              </div>
-            </div>
+            
           </div>
 
           <div className="space-y-6">
@@ -202,7 +183,7 @@ export default function AdminDashboard() {
               <Products />
             </div>
 
-            <div className="bg-white shadow rounded-lg p-6">
+            {/* <div className="bg-white shadow rounded-lg p-6">
               <div className="pb-4">
                 <h2 className="text-lg font-medium text-start">{t('quick_links')}</h2>
               </div>
@@ -222,17 +203,27 @@ export default function AdminDashboard() {
                   <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
-        <div className='flex justify-between gap-4 w-full' >
-          <div className='bg-white rounded-lg w-[50%] p-2 mt-2 '>
+        <div className="flex justify-between gap-4 w-full mt-2">
+          <div className="bg-white rounded-lg w-1/2 ">
+            <OrderDetailsTable />
+          </div>
+
+          <div className="bg-white rounded-lg w-1/2 ">
+            <CourseOrderTable />
+          </div>
+        </div>
+        <div className="flex justify-between gap-4 w-full ">
+          <div className="bg-white rounded-lg w-1/2 p-2 mt-2">
             <DCatagories />
           </div>
-          <div className='bg-white rounded-lg mt-2 p-2 w-[50%]'>
+          <div className="bg-white rounded-lg w-1/2 p-2 mt-2">
             <DCourse />
           </div>
         </div>
+
       </main>
 
 
