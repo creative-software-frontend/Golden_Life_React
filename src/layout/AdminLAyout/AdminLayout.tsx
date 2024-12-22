@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 // import { useTranslation } from 'next-i18next'
-import { Truck, ChevronRight, Info } from 'lucide-react'
+import { Truck, ChevronRight, Info, Instagram, Twitter, Facebook, Youtube, Linkedin } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import AdminHeader from '@/pages/Dashboard/UserPanelHeader/UserPanelHeader'
 import { useTranslation } from 'react-i18next'
@@ -13,11 +13,15 @@ import DCourse from '@/pages/DCourse/DCourse'
 import WalletAmount from '@/pages/WalletAmount/WalletAmount'
 import OrderDetailsTable from '@/pages/OrderDetailsTable/OrderDetailsTable'
 import CourseOrderTable from '@/pages/Home/CourseOrderTable/CourseOrderTable'
+import { Link } from 'react-router-dom'
 // import AdminHeader from '@/components/AdminHeader'
 
 
 export default function AdminDashboard() {
-  const { t } = useTranslation('global')
+
+  const currentYear = new Date().getFullYear();
+
+  const { t,i18n} = useTranslation('global')
   const [dateRange, setDateRange] = useState<string>(t('today'))
 
   const handleDateRangeChange = (range: string) => {
@@ -28,11 +32,11 @@ export default function AdminDashboard() {
     <>
       <AdminHeader />
 
-      <div className='flex justify-between'>
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <IconsSection />
         <WalletAmount />
-
       </div>
+
       {/* <div className='flex w-full justify-between'>
         <IconsSection />
         <Products />
@@ -97,10 +101,6 @@ export default function AdminDashboard() {
                     </Button>
                   </div>
 
-                  {/* Date Range Display */}
-                  {/* <Button className="flex items-center bg-primary-default text-primary-foreground">
-                    {dateRange}
-                  </Button> */}
                 </div>
               </div>
             </div>
@@ -165,45 +165,16 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            
+
           </div>
 
           <div className="space-y-6">
             <div className="bg-white rounded-lg p-6">
-              {/* <div className="pt-6">
-                <h2 className="text-2xl font-bold mb-2">{t('deliver_products')}</h2>
-                <p className="mb-4">{t('hello_merchant', { name: 'PROMISEDELIVERY MERCHANT' })}</p>
-                <p className="mb-4">
-                  {t('delivery_team_message')}
-                </p>
-                <Button className="w-1/2 bg-primary-default text-white font-bold">
-                  {t('create_order')}
-                </Button>
-              </div> */}
+           
               <Products />
             </div>
 
-            {/* <div className="bg-white shadow rounded-lg p-6">
-              <div className="pb-4">
-                <h2 className="text-lg font-medium text-start">{t('quick_links')}</h2>
-              </div>
-              <div className="space-y-4 mt-4">
-                <Button variant="outline" className="w-full justify-between px-4 py-6 hover:bg-gray-100">
-                  <div className="flex items-center">
-                    <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
-                    <span className="font-bold text-lg">{t('create_bulk_delivery')}</span>
-                  </div>
-                  <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
-                </Button>
-                <Button variant="outline" className="w-full justify-between px-4 py-6 hover:bg-gray-100">
-                  <div className="flex items-center">
-                    <Truck className="mr-2 h-10 w-10 border-2 rounded-full bg-[#f6e9f5] p-2" />
-                    <span className="font-bold text-lg">{t('create_single_delivery')}</span>
-                  </div>
-                  <ChevronRight className="ml-2 h-4 w-4 text-primary-default" />
-                </Button>
-              </div>
-            </div> */}
+          
           </div>
         </div>
         <div className="flex justify-between gap-4 w-full mt-2">
@@ -225,6 +196,36 @@ export default function AdminDashboard() {
         </div>
 
       </main>
+      <div className="border-0 -mb-8 border-gray-300 bg-white py-2">
+        <div className="flex flex-wrap justify-between items-center mx-2 px-4">
+          <p className="text-gray-600 text-start">{t('copyright', { year: currentYear })}</p>
+          <div className="flex space-x-4">
+            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+              <Linkedin size={20} className="text-gray-600" />
+            </Link>
+            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+              <Youtube size={20} className="text-gray-600" />
+            </Link>
+            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+              <Facebook size={20} className="text-gray-600" />
+            </Link>
+            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+              <Twitter size={20} className="text-gray-600" />
+            </Link>
+            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
+              <Instagram size={20} className="text-gray-600" />
+            </Link>
+            <div className="flex items-center gap-1 mx-1">
+              <button
+                onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'bn' : 'en')}
+                className="text-gray-800"
+              >
+                {i18n.language === 'en' ? 'BN' : 'EN'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
     </>

@@ -19,7 +19,7 @@ export default function DCourse() {
         { name: "Geography", icon: <Globe className="w-6 h-6" /> },
         { name: "Music", icon: <Music className="w-6 h-6" /> },
         // Row 3
-        { name: "Mathematics", icon: <Calculator className="w-6 h-6" /> },
+        { name: "Mathematics", icon: <Calculator className="w-6 h-10" /> },
         { name: "Computer Science", icon: <Code className="w-6 h-6" /> },
         { name: "Art & Design", icon: <Palette className="w-6 h-6" /> },
         { name: "Literature", icon: <Book className="w-6 h-6" /> },
@@ -30,7 +30,7 @@ export default function DCourse() {
 
     return (
         <div className="mt-4 ">
-            <h1 className="text-2xl  font-bold mb-2 text-center">Course Catagory</h1>
+            <h1 className="text-2xl  font-bold mb-2 mt-4 text-center">Course Catagory</h1>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-2">
                 {courses.map((course, index) => (
                     <div

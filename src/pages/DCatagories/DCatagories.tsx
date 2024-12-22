@@ -29,7 +29,7 @@ export default function ProductCategories() {
     ]
 
     return (
-        <div className="">
+        <div className="mt-4">
             <h1 className="text-2xl font-bold mb-2 mt-4 text-center">Product Category</h1>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-2">
                 {products.map((product, index) => (
