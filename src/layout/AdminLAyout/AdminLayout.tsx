@@ -11,6 +11,8 @@ import IconsSection from '@/pages/Home/IconSection/IconSection'
 import DCatagories from '@/pages/DCatagories/DCatagories'
 import DCourse from '@/pages/DCourse/DCourse'
 import WalletAmount from '@/pages/WalletAmount/WalletAmount'
+import OrderDetailsTable from '@/pages/OrderDetailsTable/OrderDetailsTable'
+import CourseOrderTable from '@/pages/Home/CourseOrderTable/CourseOrderTable'
 // import AdminHeader from '@/components/AdminHeader'
 
 
@@ -167,7 +169,9 @@ export default function AdminDashboard() {
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="pb-4">
                   <h2 className="text-lg font-medium text-start">
-                    {t('out_for_delivery')}
+                    {/* {t('out_for_delivery')} */}
+
+                    <OrderDetailsTable />
                   </h2>
                 </div>
               </div>
@@ -175,7 +179,8 @@ export default function AdminDashboard() {
               <div className="bg-white shadow rounded-lg p-6">
                 <div className="pb-4 px-4 py-4">
                   <h2 className=" font-medium text-start text-2xl">
-                    {t('pick_up_pending')}
+                    {/* {t('pick_up_pending')} */}
+                    <CourseOrderTable />
                   </h2>
                 </div>
               </div>

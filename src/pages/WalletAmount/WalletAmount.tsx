@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { Wallet } from 'lucide-react';
 
-const WalletButtons: React.FC = () => {
+const WalletAmount: React.FC = () => {
     const [selectedAmount, setSelectedAmount] = useState<number | null>(10);
 
     const handleButtonClick = (amount: number) => {
@@ -8,21 +9,24 @@ const WalletButtons: React.FC = () => {
     };
 
     return (
-        <div className="flex gap-4 justify-center mt-4 mx-4">
-            {[10, 20, 50].map((amount) => (
-                <button
-                    key={amount}
-                    onClick={() => handleButtonClick(amount)}
-                    className={`w-24 h-10 flex items-center justify-center text-lg font-bold rounded-md border-2 transition-all duration-300 ${selectedAmount === amount
-                        ? "bg-primary-default text-white border-primary-default shadow-md scale-105"
-                        : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
-                        }`}
-                >
-                    ${amount}
-                </button>
-            ))}
+        <div className="flex flex-col items-center">
+            <div className="flex gap-2 justify-center">
+                {[10, 20, 50].map((amount) => (
+                    <button
+                        key={amount}
+                        onClick={() => handleButtonClick(amount)}
+                        className={`flex flex-col items-center justify-center w-20 h-20 rounded-lg border-2 transition-all duration-300 ${selectedAmount === amount
+                            ? "bg-primary text-white border-primary shadow-md scale-95"
+                            : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+                            }`}
+                    >
+                        <Wallet className="w-6 h-6 mb-1" />
+                        <span className="text-sm font-bold">${amount}</span>
+                    </button>
+                ))}
+            </div>
         </div>
     );
 };
 
-export default WalletButtons;
+export default WalletAmount;

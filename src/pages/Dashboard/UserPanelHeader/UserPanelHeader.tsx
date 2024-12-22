@@ -70,18 +70,18 @@ export default function AdminHeader() {
                 </div>
 
                 <div className="flex items-center space-x-1">
-                    <Button className="hidden lg:block color-primary-light">
-                        {/* {t('new_order')} */}
+                    {/* <Button className="hidden lg:block color-primary-light">
+                        {t('new_order')}
                         Wallet 
                     </Button>
                     <Button variant="default" className="hidden lg:block">
-                        {/* {t('new_order')} */}
+                        {t('new_order')}
                         Boucher
                     </Button>
                     <Button variant="default" className="hidden lg:block">
-                        {/* {t('new_order')} */}
+                        {t('new_order')}
                         Recharge 
-                    </Button>
+                    </Button> */}
 
                     <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
                         {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
