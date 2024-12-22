@@ -181,11 +181,11 @@ export const routes = createBrowserRouter([
 
     },
     {
-        path: '/admin',
-        element: <AdminLayout />, // Layout for admin panel
+        path: '/dashboard',
+        element: <AdminLayout />, // Layout for dashboard panel
         children: [
             {
-                path: '/admin',
+                path: '/dashboard',
                 element: <Overview />,
             },
             // {

@@ -234,7 +234,7 @@ const Header: React.FC = () => {
                                 <button onClick={openLoginOptionsModal} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.login')}</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.profile')}</button>
                                 <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.settings')}</button>
-                                <Link to='/admin' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.dashboard')}</Link>
+                                <Link to='/dashboard' className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('header.dashboard')}</Link>
                             </div>
                         )}
                     </div>
