@@ -14,6 +14,8 @@ const services = [
     { label: "Shopping", icon: <ShoppingCart size={24} />, bg: "bg-blue-100" },
     { label: "Food", icon: <Store size={24} />, bg: "bg-green-100" },
     { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
+    { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
+    { label: "Grocery", icon: <Store size={24} />, bg: "bg-green-100" },
 
 ];
 
