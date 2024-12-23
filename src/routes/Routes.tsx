@@ -28,6 +28,9 @@ import CommingSoon from "./../pages/commingSoon";
 import OutletLayout from "@/layout/OutletLayout/OutletLayout";
 import DriveLayout from "@/layout/DriveLayout/DriveLayout";
 import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
+import AddMoney from "@/pages/Dashboard/AddMoney/AddMoney";
+import History from "@/pages/Dashboard/History/History";
+import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
@@ -223,9 +226,17 @@ export const routes = createBrowserRouter([
         path: '/productviewpage',  // Separate route for Help page
         element: <CourseViewPage />,
     },
+    {
+        path: '/addmoney',  // Separate route for Help page
+        element: <AddMoney />,
+    },
+    {
+        path: '/history',  // Separate route for Help page
+        element: <History />,
+    },
     // {
-    //     path: '/trending',  // Separate route for Help page
-    //     element: <TrendingCategory />,
+    //     path: '/sendmoney',  // Separate route for Help page
+    //     element: <SendMoney />,
     // },
 
 
