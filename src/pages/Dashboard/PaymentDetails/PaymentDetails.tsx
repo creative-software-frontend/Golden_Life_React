@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
+import PaymentMethod from '../PaymentMethod/PaymentMethod'
 
 interface PaymentDetailsProps {
     onClose: () => void
@@ -16,9 +17,29 @@ interface PaymentDetailsProps {
 export default function PaymentDetails({ onClose, type, amount }: PaymentDetailsProps) {
     const [agreed, setAgreed] = useState(false)
     const [inputAmount, setInputAmount] = useState(amount.toString())
+    const [showPaymentMethod, setShowPaymentMethod] = useState(false)
 
     const bonus = 500
     const willReceive = parseInt(inputAmount) * 10
+
+    const handlePayNow = () => {
+        setShowPaymentMethod(true)
+    }
+
+    const handleSelectPaymentMethod = (method: string) => {
+        console.log('Selected payment method:', method)
+        // Handle payment method selection
+    }
+
+    if (showPaymentMethod) {
+        return (
+            <PaymentMethod
+                amount={parseInt(inputAmount)}
+                onClose={() => setShowPaymentMethod(false)}
+                onSelectMethod={handleSelectPaymentMethod}
+            />
+        )
+    }
 
     return (
         <div className="w-[40%] mx-auto bg-white min-h-screen">
@@ -107,6 +128,7 @@ export default function PaymentDetails({ onClose, type, amount }: PaymentDetails
                     <Button
                         className="flex-1"
                         disabled={!agreed}
+                        onClick={handlePayNow}
                     >
                         PAY NOW
                     </Button>

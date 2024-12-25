@@ -32,6 +32,8 @@ import AddMoney from "@/pages/Dashboard/AddMoney/AddMoney";
 import History from "@/pages/Dashboard/History/History";
 import SendMoney from "@/pages/Dashboard/SendMoney/SendMoney";
 import PaymentMethod from "@/pages/Dashboard/PaymentMethod/PaymentMethod";
+import SendMoneyAmount from "@/pages/Dashboard/SendMoneyAmount/SendMoneyAmount";
+import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfirm";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -221,10 +223,11 @@ export const routes = createBrowserRouter([
                 path: 'sendmoney',  // Separate route for Help page
                 element: <SendMoney />,
             },
-            // {
-            //     path: 'paymentmethod',  // Separate route for Help page
-            //     element: <PaymentMethod />,
-            // },
+            {
+                path: 'paymentmethod',  // Separate route for Help page
+                element: <PaymentMethod />,
+            },
+           
 
         ],
     },
@@ -256,7 +259,14 @@ export const routes = createBrowserRouter([
         path: '/sendmoney',  // Separate route for Help page
         element: <SendMoney />,
     },
-
+    {
+        path: '/payamount',  // Separate route for Help page
+        element: <SendMoneyAmount />,
+    },
+    // {
+    //     path: '/sendmoneyconfirm',  // Separate route for Help page
+    //     element: <SendMoneyConfirm />,
+    // },
 
     {
         path: '*',
