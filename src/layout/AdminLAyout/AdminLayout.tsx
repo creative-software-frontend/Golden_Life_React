@@ -37,10 +37,7 @@ export default function AdminDashboard() {
         <WalletAmount />
       </div>
 
-      {/* <div className='flex w-full justify-between'>
-        <IconsSection />
-        <Products />
-      </div> */}
+    
 
       <main className="w-full min-h-screen mx-auto px-6 sm:px-6 lg:px-1 py-2 bg-slate-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

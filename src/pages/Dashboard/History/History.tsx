@@ -2,7 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Avatar } from "@/components/ui/avatar"
-import { ChevronLeft } from 'lucide-react'
+// import { ChevronLeft } from 'lucide-react'
 // import Image from "next/image"
 
 interface Transaction {

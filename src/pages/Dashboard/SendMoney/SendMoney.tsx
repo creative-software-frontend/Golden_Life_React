@@ -34,13 +34,13 @@ export default function SendMoney() {
     }
 
     return (
-        <div className=" mx-auto bg-white min-h-screen p-4">
+        <div className="w-[40%] mx-auto bg-gray-50 min-h-screen p-4">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <button className="text-blue-500">
-                    <ChevronLeft size={24} />
+                    {/* <ChevronLeft size={24} /> */}
                 </button>
-                <h1 className="text-xl font-semibold">Add Money</h1>
+                <h1 className="text-xl font-semibold">Send Money</h1>
             </div>
 
             {/* Search Input */}

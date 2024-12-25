@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function AdminHeader() {
     const { t } = useTranslation('global')
-    const [isProfileOpen, setIsProfileOpen] = useState(false)
+    // const [isProfileOpen, setIsProfileOpen] = useState(false)
     const [darkMode, setDarkMode] = useState(false)
 
     useEffect(() => {
@@ -51,15 +51,15 @@ export default function AdminHeader() {
                     />
 
                     <nav className="ml-10 hidden md:flex space-x-8">
-                        <Link to="" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        <Link to="/addmoney" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                             {/* {t('dashboard')} */}
                             Add Money
                         </Link>
-                        <Link to="" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        <Link to="/sendmoney" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                             {/* {t('deliveries')} */}
                             Send Money
                         </Link>
-                        <Link to="" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        <Link to="/history" className="text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
                             {/* {t('invoices')} */}
                             History
                         </Link>

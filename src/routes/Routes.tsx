@@ -30,7 +30,9 @@ import DriveLayout from "@/layout/DriveLayout/DriveLayout";
 import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
 import AddMoney from "@/pages/Dashboard/AddMoney/AddMoney";
 import History from "@/pages/Dashboard/History/History";
-import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
+import SendMoney from "@/pages/Dashboard/SendMoney/SendMoney";
+import PaymentMethod from "@/pages/Dashboard/PaymentMethod/PaymentMethod";
+// import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
@@ -207,6 +209,22 @@ export const routes = createBrowserRouter([
             //     path: 'setting',
             //     element: <Setting />,
             // },
+            {
+                path: 'addmoney',  // Separate route for Help page
+                element: <AddMoney />,
+            },
+            {
+                path: 'history',  // Separate route for Help page
+                element: <History />,
+            },
+            {
+                path: 'sendmoney',  // Separate route for Help page
+                element: <SendMoney />,
+            },
+            // {
+            //     path: 'paymentmethod',  // Separate route for Help page
+            //     element: <PaymentMethod />,
+            // },
 
         ],
     },
@@ -234,10 +252,10 @@ export const routes = createBrowserRouter([
         path: '/history',  // Separate route for Help page
         element: <History />,
     },
-    // {
-    //     path: '/sendmoney',  // Separate route for Help page
-    //     element: <SendMoney />,
-    // },
+    {
+        path: '/sendmoney',  // Separate route for Help page
+        element: <SendMoney />,
+    },
 
 
     {
