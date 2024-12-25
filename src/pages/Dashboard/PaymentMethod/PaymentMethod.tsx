@@ -45,7 +45,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
             </div>
 
             {/* Quick Actions */}
-            <div className="flex justify-center gap-6  ">
+            <div className="flex justify-center gap-6 mb-4 -mt-8 ">
                 <Card className="p-4 cursor-pointer hover:bg-gray-50">
                     <Headphones className="w-6 h-6 text-gray-600" />
                 </Card>
@@ -63,7 +63,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                     <TabsTrigger value="mobile">মোবাইল ব্যাংকিং</TabsTrigger>
                     <TabsTrigger value="bank">ব্যাংক</TabsTrigger>
                 </TabsList>
-                <TabsContent value="mobile" className="space-y-2">
+                <TabsContent value="mobile" className="space-y-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 ">
                     <button
                         onClick={() => onSelectMethod('bkash')}
                         className="w-full p-4 border rounded-lg hover:bg-gray-50"
@@ -104,7 +104,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                 <TabsContent value="bank" className="mt-4">
                     <TabsContent value="bank" className="mt-4">
                         {/* Bank Logos */}
-                        <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
                             {['Krishi Bank', 'IBBL', 'DBBL'].map((bank) => (
                                 <button
                                     key={bank}
@@ -132,7 +132,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                         </div>
 
                         {/* Form Fields */}
-                        <form className="space-y-4">
+                        <form className="space-y-2">
                             <div>
                                 <Input
                                     placeholder="Your Branch Name*"
@@ -186,7 +186,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 p-2">
                                 <Button
                                     variant="destructive"
                                     className="flex-1"
@@ -207,7 +207,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
             </Tabs>
 
             {/* Pay Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
+            <div className="fixed  left-0 right-0 p-4 bg-white ">
                 <Button
                     className="w-[40%] bg-blue-100 text-blue-600 hover:bg-blue-200"
                     size="lg"

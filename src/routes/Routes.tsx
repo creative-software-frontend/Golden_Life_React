@@ -263,10 +263,10 @@ export const routes = createBrowserRouter([
         path: '/payamount',  // Separate route for Help page
         element: <SendMoneyAmount />,
     },
-    // {
-    //     path: '/sendmoneyconfirm',  // Separate route for Help page
-    //     element: <SendMoneyConfirm />,
-    // },
+    {
+        path: '/sendmoneyconfirm',  // Separate route for Help page
+        element: <SendMoneyConfirm />,
+    },
 
     {
         path: '*',
