@@ -102,7 +102,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                     </button>
                 </TabsContent>
                 <TabsContent value="bank" className="mt-4">
-                    {/* <TabsContent value="bank" className="mt-4">
+                    <TabsContent value="bank" className="mt-4">
                         {/* Bank Logos */}
                         <div className="grid grid-cols-2 gap-4 mb-6">
                             {['Krishi Bank', 'IBBL', 'DBBL'].map((bank) => (
@@ -203,7 +203,7 @@ export default function PaymentMethod({ amount, onClose, onSelectMethod }: Payme
                             </div>
                         </form>
                     </TabsContent>
-                </TabsContent> */}
+                </TabsContent>
             </Tabs>
 
             {/* Pay Button */}
