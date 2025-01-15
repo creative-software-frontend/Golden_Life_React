@@ -93,8 +93,8 @@ export default function Cart() {
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
-                    <div className="bg-white rounded-md w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 ">
+                    <div className="bg-white  w-full max-w-md h-[100vh] overflow-auto  shadow-lg">
                         <div className="sticky top-0 bg-white border-b z-10">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-2">

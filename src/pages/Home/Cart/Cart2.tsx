@@ -141,7 +141,7 @@ export default function Cart2() {
                                 <button
                                     className="w-full flex justify-center bg-primary-default text-white text-xl py-2 rounded text-center gap-6"
                                 >
-                                    <span>Place Order</span>
+                                    <span>Place Orderedffff</span>
                                     <div className="border-2 border-primary-light h-8 mx-2" />
                                     <span className="text-nowrap space-x-3 text-xl">₹ {total}</span>
                                 </button>
