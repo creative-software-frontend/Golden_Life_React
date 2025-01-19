@@ -16,7 +16,7 @@ const HeroSection = () => {
     ];
 
     return (
-        <div className=" mt-4 lg:mt-8  flex justify-start py-8 md:max-w-[1040px] w-[370px]   sm:w-full">
+        <div className=" mt-4 lg:mt-8  flex justify-start py-8 md:max-w-[1100px] w-[370px]   sm:w-full">
             <Swiper
                 modules={[Pagination, Autoplay]} // Removed Navigation
                 spaceBetween={30}

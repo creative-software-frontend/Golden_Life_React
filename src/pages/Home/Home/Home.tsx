@@ -15,13 +15,13 @@ const Home = () => {
   return (
     <div>
       <HeroSection />
-      <BannerSection />
+      {/* <BannerSection /> */}
       <AutoScrollIcons />
       <CourseCategories />
       <Categories />
       <ProductCategories />
       <FreshSell />
-      <TrendingCategory />
+      {/* <TrendingCategory /> */}
     </div>
   )
 }

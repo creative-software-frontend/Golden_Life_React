@@ -150,7 +150,7 @@ export default function FreshSell() {
     };
 
     return (
-        <div className="md:max-w-[1040px] w-[370px] sm:w-full">
+        <div className="md:max-w-[1100px] w-[370px] sm:w-full">
             <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-between">
                 <span className="font-medium">{t('sections.freshSell')}</span>
                 <div className="flex gap-1">

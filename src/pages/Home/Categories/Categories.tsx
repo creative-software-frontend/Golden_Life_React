@@ -72,7 +72,7 @@ export default function Categories() {
     ];
 
     return (
-        <div className="py-10 -mt-6 md:max-w-[1040px] w-[370px] sm:w-full">
+        <div className="py-10 -mt-6 md:max-w-[1100px] w-[370px] sm:w-full">
             <div className="flex items-center justify-between mb-6 bg-primary-light p-2">
                 <h2 className="text-lg text-white font-medium">{t("header.categories")}</h2>
                 <Link

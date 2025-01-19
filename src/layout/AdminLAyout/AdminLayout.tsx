@@ -174,23 +174,24 @@ export default function AdminDashboard() {
           
           </div>
         </div>
-        <div className="flex justify-between gap-4 w-full mt-2">
-          <div className="bg-white rounded-lg w-1/2 ">
+        <div className="flex flex-col md:flex-row justify-between gap-4 w-full mt-2">
+          <div className="bg-white rounded-lg w-full md:w-1/2">
             <OrderDetailsTable />
           </div>
-
-          <div className="bg-white rounded-lg w-1/2 ">
+          <div className="bg-white rounded-lg w-full md:w-1/2">
             <CourseOrderTable />
           </div>
         </div>
-        <div className="flex justify-between gap-4 w-full ">
-          <div className="bg-white rounded-lg w-1/2 p-2 mt-2">
+
+        <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
+          <div className="bg-white rounded-lg w-full md:w-1/2 p-2 mt-2">
             <DCatagories />
           </div>
-          <div className="bg-white rounded-lg w-1/2 p-2 mt-2">
+          <div className="bg-white rounded-lg w-full md:w-1/2 p-2 mt-2">
             <DCourse />
           </div>
         </div>
+
 
       </main>
       <div className="border-0 -mb-8 border-gray-300 bg-white py-2">

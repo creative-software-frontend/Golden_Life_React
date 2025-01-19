@@ -13,7 +13,7 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-300 pt-4 md:max-w-[1040px] sm:w-full w-[370px]">
+        <footer className="bg-gray-300 pt-4 md:max-w-[1100px] sm:w-full w-[370px]">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
                 <div>
                     <h3 className="font-bold text-xl mb-4 text-gray-600">{t('footer.aboutGoldenLife')}</h3>
