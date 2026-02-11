@@ -5,7 +5,7 @@
 // import Features from "./sections/Features";
 // import Products from "./sections/Products";
 // import HowItWorks from "./sections/HowItWorks";
-// import Reviews from "./sections/Reviews";
+import Reviews from "./sections/Reviews";
 
 const Landing: React.FC = () => {
     return (
@@ -15,14 +15,14 @@ const Landing: React.FC = () => {
             {/* <Hero /> */}
 
             {/* Container to center content and add spacing */}
-            {/* <div className="container mx-auto px-4 space-y-20">
-                <Stats />
+            <div className="container mx-auto px-4 space-y-20">
+                {/* <Stats />
                 <Services />
                 <Features />
                 <Products />
-                <HowItWorks />
+                <HowItWorks /> */}
                 <Reviews />
-            </div> */}
+            </div>
         </div>
     );
 };
