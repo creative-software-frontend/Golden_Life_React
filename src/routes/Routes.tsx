@@ -5,17 +5,17 @@ import Story from "@/pages/Help/Story/Story";
 import Career from "@/pages/Help/Career/Career";
 import Contact from "@/pages/Help/Contact/Contact";
 import PrivacyPolicy from "@/pages/Help/PrivacyPolicy/PrivacyPolicy";
-import UserLayout from "@/layout/userlayout/UserLayout";
+// import UserLayout from "@/layout/userlayout/UserLayout";
 import HelpLayout from "@/layout/HelpLayout/HelpLayout";
 import Faq from "@/pages/Home/Faq/Faq";
 import TermsOfUse from "@/pages/Help/TermsOfUse/TermsOfUse";
-import AllCategories from "@/pages/Home/AllCategories/AllCategories";
-import ProductPage from "@/pages/Home/ProductPage/ProductPage";
-import Home from "@/pages/Home/Home/Home";
-import AllProduct from "@/pages/Home/AllProducts/AllProducts";
+// import AllCategories from "@/pages/Home/AllCategories/AllCategories";
+// import ProductPage from "@/pages/Home/ProductPage/ProductPage";
+// import Home from "@/pages/Home/Home/Home";
+// import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
-import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
-import Overview from "@/pages/Dashboard/Overview/Overview";
+// import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
+// import Overview from "@/pages/Dashboard/Overview/Overview";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 import CourseLayout from "@/layout/CourseLayout/CourseLayout";
@@ -27,11 +27,14 @@ import TopupLayout from "@/layout/TopUplayout/TopUplayout";
 import CommingSoon from "./../pages/commingSoon";
 import OutletLayout from "@/layout/OutletLayout/OutletLayout";
 import DriveLayout from "@/layout/DriveLayout/DriveLayout";
-import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
+import Landing from "@/pages/Landing/Landing";
+import LandingLayout from "@/layout/LandingLayout/LandingLayout";
+
+// import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
 import AddMoney from "@/pages/Dashboard/AddMoney/AddMoney";
 import History from "@/pages/Dashboard/History/History";
 import SendMoney from "@/pages/Dashboard/SendMoney/SendMoney";
-import PaymentMethod from "@/pages/Dashboard/PaymentMethod/PaymentMethod";
+// import PaymentMethod from "@/pages/Dashboard/PaymentMethod/PaymentMethod";
 import SendMoneyAmount from "@/pages/Dashboard/SendMoneyAmount/SendMoneyAmount";
 import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfirm";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
@@ -39,40 +42,52 @@ import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfir
 
 
 export const routes = createBrowserRouter([
-    {
+   {
         path: '/',
-        element: <UserLayout />,
-
-
+        element: <LandingLayout/>, // Has Navbar & Footer
         children: [
-
             {
-                path: '/',
-                element: <Home />
+                path: '/', 
+                element: <Landing/> // <--- The new Main Page
             },
-            {
-                path: 'allcategories',
-                element: <AllCategories />
-            },
-            {
-                path: 'all-courses',
-                element: < AllCourses2 />
-            },
-            {
-                path: 'productpage',  // Separate route for Help page
-                element: <ProductPage />,
-            },
-            {
-                path: 'allProducts',  // Separate route for Help page
-                element: <AllProduct />,
-            },
-
-
-
-
+            // Add other public pages here like Login, Register, etc.
         ]
-
     },
+
+    // {
+    //     path: '/dashborad',
+    //     element: <UserLayout />,
+
+
+    //     children: [
+
+    //         {
+    //             path: '/dashboard',
+    //             element: <Home />
+    //         },
+    //         {
+    //             path: 'allcategories',
+    //             element: <AllCategories />
+    //         },
+    //         {
+    //             path: 'all-courses',
+    //             element: < AllCourses2 />
+    //         },
+    //         {
+    //             path: 'productpage',  // Separate route for Help page
+    //             element: <ProductPage />,
+    //         },
+    //         {
+    //             path: 'allProducts',  // Separate route for Help page
+    //             element: <AllProduct />,
+    //         },
+
+
+
+
+    //     ]
+
+    // },
     {
         path: '/courses',
         element: <CourseLayout />,
@@ -187,50 +202,50 @@ export const routes = createBrowserRouter([
         ]
 
     },
-    {
-        path: '/dashboard',
-        element: <AdminLayout />, // Layout for dashboard panel
-        children: [
-            {
-                path: '/dashboard',
-                element: <Overview />,
-            },
-            // {
-            //     path: 'merchants',
-            //     element: <MerchantList />,
-            // },
-            // {
-            //     path: 'riders',
-            //     element: <RiderList />,
-            // },
-            // {
-            //     path: 'districts',
-            //     element: <Districts />,
-            // },
-            // {
-            //     path: 'setting',
-            //     element: <Setting />,
-            // },
-            {
-                path: 'addmoney',  // Separate route for Help page
-                element: <AddMoney />,
-            },
-            {
-                path: 'history',  // Separate route for Help page
-                element: <History />,
-            },
-            {
-                path: 'sendmoney',  // Separate route for Help page
-                element: <SendMoney />,
-            },
-            {
-                path: 'paymentmethod',  // Separate route for Help page
-                element: <PaymentMethod />,
-            },
+    // {
+    //     path: '/dashboard',
+    //     element: <AdminLayout />, // Layout for dashboard panel
+    //     children: [
+    //         {
+    //             path: '/dashboard',
+    //             element: <Overview />,
+    //         },
+    //         // {
+    //         //     path: 'merchants',
+    //         //     element: <MerchantList />,
+    //         // },
+    //         // {
+    //         //     path: 'riders',
+    //         //     element: <RiderList />,
+    //         // },
+    //         // {
+    //         //     path: 'districts',
+    //         //     element: <Districts />,
+    //         // },
+    //         // {
+    //         //     path: 'setting',
+    //         //     element: <Setting />,
+    //         // },
+    //         {
+    //             path: 'addmoney',  // Separate route for Help page
+    //             element: <AddMoney />,
+    //         },
+    //         {
+    //             path: 'history',  // Separate route for Help page
+    //             element: <History />,
+    //         },
+    //         {
+    //             path: 'sendmoney',  // Separate route for Help page
+    //             element: <SendMoney />,
+    //         },
+    //         {
+    //             path: 'paymentmethod',  // Separate route for Help page
+    //             element: <PaymentMethod />,
+    //         },
            
 
-        ],
-    },
+    //     ],
+    // },
     {
         path: '/allcourses',  // Separate route for Help page
         element: <AllCourses />,
