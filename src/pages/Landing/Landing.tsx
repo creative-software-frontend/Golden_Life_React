@@ -5,6 +5,7 @@
 // import Features from "./sections/Features";
 // import Products from "./sections/Products";
 // import HowItWorks from "./sections/HowItWorks";
+import LandingHeader from "../common/LandingHeader/LandingHeader";
 import Reviews from "./sections/Reviews";
 
 
@@ -15,6 +16,7 @@ const Landing: React.FC = () => {
         
             {/* Hero Section (Full Width) */}
             {/* <Hero /> */}
+            <LandingHeader/>
 
             {/* Container to center content and add spacing */}
             <div className="container mx-auto px-4 space-y-20">
