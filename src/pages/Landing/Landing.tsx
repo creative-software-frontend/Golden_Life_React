@@ -12,21 +12,21 @@ import Reviews from "./sections/Reviews";
 
 const Landing: React.FC = () => {
     return (
-        <div className="flex flex-col gap-10 pb-20">
-        
-            {/* Hero Section (Full Width) */}
-            {/* <Hero /> */}
+        <div className="flex flex-col w-full">
             <LandingHeader/>
-
-            {/* Container to center content and add spacing */}
-            <div className="container mx-auto px-4 space-y-20">
-                {/* <Stats />
+            {/* 1. HERO (Full Width) */}
+            {/* <Hero />
+                <Stats />
                 <Services />
                 <Features />
                 <Products />
-                <HowItWorks /> */}
-                <Reviews />
-            </div>
+                <HowItWorks />
+           */}
+
+            {/* 3. REVIEWS (Full Width) */}
+            {/* We place this OUTSIDE the container so the background hits the edges */}
+            <Reviews />
+
         </div>
     );
 };

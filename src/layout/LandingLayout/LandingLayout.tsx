@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from "react-router-dom";
 // Import the Public/Landing specific components
 // import LandingHeader from "@/pages/common/LandingHeader/LandingHeader"; 
-// import LandingFooter from "@/pages/common/LandingFooter/LandingFooter"; 
+import LandingFooter from "@/pages/common/LandingFooter/LandingFooter"; 
 
 const LandingLayout: React.FC = () => {
     return (
@@ -16,7 +16,7 @@ const LandingLayout: React.FC = () => {
             </main>
 
             {/* The Yellow Footer */}
-            {/* <LandingFooter /> */}
+            <LandingFooter />
         </div>
     );
 };

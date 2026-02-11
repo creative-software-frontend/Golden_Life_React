@@ -1,6 +1,6 @@
 import React from "react";
 import { Quote } from "lucide-react"; // Make sure you have lucide-react installed
-import { Review } from "./reviewsData";
+import { Review } from "@/data/reviewsData";
 
 interface ReviewCardProps {
   review: Review;
