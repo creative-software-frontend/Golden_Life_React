@@ -7,10 +7,12 @@
 // import HowItWorks from "./sections/HowItWorks";
 // import Reviews from "./sections/Reviews";
 
+
+
 const Landing: React.FC = () => {
     return (
         <div className="flex flex-col gap-10 pb-20">
-            <h1>hellow world</h1>
+        
             {/* Hero Section (Full Width) */}
             {/* <Hero /> */}
 
