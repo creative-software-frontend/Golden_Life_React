@@ -1,6 +1,7 @@
-import React from "react";
+
+import Hero from "@/pages/Landing/sections/Hero";
 import Header from "../Header";
-import Hero from "@/pages/landing/sections/Hero";
+
 
 
 export default function LandingHeader() {
