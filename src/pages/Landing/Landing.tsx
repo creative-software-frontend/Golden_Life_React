@@ -19,6 +19,7 @@ import LandingHeader from "../common/LandingHeader/LandingHeader";
 
 import Reviews from "./sections/Reviews";
 import Services from "./sections/Services";
+import Stats from "./sections/Stats";
 
 
 
@@ -26,6 +27,7 @@ const Landing: React.FC = () => {
     return (
         <div className="flex flex-col w-full">
             <LandingHeader/>
+            <Stats/>
             <Features />
             {/* 1. HERO (Full Width) */}
        
