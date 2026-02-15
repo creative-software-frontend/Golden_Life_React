@@ -20,6 +20,7 @@ import LandingHeader from "../common/LandingHeader/LandingHeader";
 import Reviews from "./sections/Reviews";
 import Services from "./sections/Services";
 import Stats from "./sections/Stats";
+import ProductFAQ from "./sections/ProductFAQ";
 
 
 
@@ -38,6 +39,7 @@ const Landing: React.FC = () => {
             <Services />
             <Reviews />
             <Experience />
+            <ProductFAQ></ProductFAQ>
 
         </div>
     );
