@@ -35,11 +35,11 @@ const Landing: React.FC = () => {
             {/* 3. REVIEWS (Full Width) */}
             {/* We place this OUTSIDE the container so the background hits the edges */}
              <Products />
-            <HowItWorks />
             <Services />
             <Reviews />
+          <ProductFAQ></ProductFAQ>
             <Experience />
-            <ProductFAQ></ProductFAQ>
+            
 
         </div>
     );

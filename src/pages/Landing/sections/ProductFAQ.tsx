@@ -30,7 +30,7 @@ const ProductFAQ: React.FC = () => {
 
   return (
     <section className="py-16 bg-[#FEFCE8] min-h-screen font-sans">
-      <div className="container mx-auto px-4 max-w-5xl">
+      <div className="container mx-auto px-4 ">
         
         {/* Header */}
         <div className="text-center mb-10">

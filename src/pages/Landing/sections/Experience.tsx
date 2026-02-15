@@ -4,12 +4,13 @@ import { motion } from "framer-motion";
 
 const Experience: React.FC = () => {
   return (
-    <section className="py-24 bg-[#FFF8DC] relative overflow-hidden font-sans">
+    <section className="py-24 bg-[#FFF8DC] relative overflow-hidden font-sans w-full">
       
       {/* Background Ambience (Subtle Gradients) */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-200/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
+      {/* Main Container - Reverted to standard container behavior */}
       <div className="container mx-auto px-4 relative z-10">
         
         {/* Header */}
@@ -29,6 +30,7 @@ const Experience: React.FC = () => {
           </p>
         </motion.div>
 
+        {/* Timeline Wrapper - Max width reverted to 5xl to match container style */}
         <div className="relative max-w-5xl mx-auto">
           
           {/* VERTICAL LINE (Gradient & Glow) */}
@@ -42,7 +44,6 @@ const Experience: React.FC = () => {
              ></motion.div>
           </div>
 
-          {/* DECREASED SPACING HERE: Changed space-y-20 md:space-y-32 to space-y-12 md:space-y-16 */}
           <div className="space-y-12 md:space-y-16">
             {experienceData.map((item, index) => {
               const isEven = index % 2 === 0;
@@ -64,21 +65,21 @@ const Experience: React.FC = () => {
 
                   {/* CENTER DOT (Premium Look) */}
                   <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 z-20">
-                     <motion.div 
+                      <motion.div 
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
                         className="w-12 h-12 rounded-full bg-[#FFF8DC] border-4 border-primary flex items-center justify-center shadow-lg"
-                     >
-                       <div className="w-4 h-4 bg-primary rounded-full shadow-[0_0_10px_rgba(255,145,0,0.8)]"></div>
-                     </motion.div>
+                      >
+                        <div className="w-4 h-4 bg-primary rounded-full shadow-[0_0_10px_rgba(255,145,0,0.8)]"></div>
+                      </motion.div>
                   </div>
 
-                  {/* CONTENT CARD (Glassmorphism & Depth) */}
+                  {/* CONTENT CARD */}
                   <div className="w-full pl-24 md:pl-0 md:w-[45%]">
                     <div className="group relative bg-white p-8 rounded-3xl shadow-xl border border-orange-100/50 hover:border-primary/30 transition-all duration-500 hover:-translate-y-2">
                       
-                      {/* Connector Line (Mobile & Desktop) */}
+                      {/* Connector Line (Desktop Only) */}
                       <div className={`hidden md:block absolute top-1/2 -translate-y-1/2 w-12 h-[2px] bg-orange-200 group-hover:bg-primary transition-colors duration-500 ${
                           isEven ? '-left-12' : '-right-12'
                       }`}></div>
@@ -102,7 +103,7 @@ const Experience: React.FC = () => {
                         <h4 className="text-xl font-bold text-gray-800 mb-4">
                           {item.title}
                         </h4>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 leading-relaxed text-base">
                           {item.description}
                         </p>
                       </div>
