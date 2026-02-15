@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck, Carrot, Dumbbell, Baby, Home, Scissors, Snowflake, Milk, Fish, Coffee, Cookie } from 'lucide-react'
+
 import {
     Collapsible,
     CollapsibleContent,
@@ -13,6 +13,9 @@ import {
     DropdownMenu,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
+import { Separator } from "@/components/ui/separator"
+
 import {
     Sidebar,
     SidebarContent,
@@ -20,6 +23,7 @@ import {
     SidebarGroup,
     SidebarHeader,
     SidebarInset,
+    SidebarTrigger,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -35,8 +39,15 @@ import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
 import { useTranslation } from "react-i18next"
-
-
+import { cn } from "@/lib/utils"
+import { getNavData } from "@/data/navData"
+// Update this line in your imports
+import {
+    X, ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon,
+    LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck,
+    Carrot, Dumbbell, Baby, Home, Scissors, Snowflake, Milk, Fish,
+    Coffee, Cookie, Menu, Search, Camera
+} from 'lucide-react'
 
 
 export default function UserLayout() {
@@ -46,236 +57,9 @@ export default function UserLayout() {
 
 
 
-    const data = {
-        user: {
-            name: "shadcn",
-            email: "m@example.com",
-            avatar: "/avatars/shadcn.jpg",
-        },
-        categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
-            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
-            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
-            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
-            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
-            { id: "cookups", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
-        ],
-        navMain: {
-            shopping: [
-                {
-                    title: t("navMain.title1"),
-                    url: "/",
-                    icon: Carrot,
-                    isActive: true,
-                    items: [
-                        // { title: "Fresh Fruits", url: "" },
-                        // { title: "Fresh Vegetables", url: "" },
-
-                    ],
-                },
-                {
-                    title: t("navMain.title2"),
-                    url: "",
-                    icon: ShoppingCart,
-                    items: [
-                        // { title: "Chips & Crisps", url: "" },
-                        // { title: "Chocolates", url: "" },
-                        // { title: "Candies", url: "" },
-                        // { title: "Nuts & Dried Fruits", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title3"),
-                    url: "",
-                    icon: Pill,
-                    items: [
-                        // { title: "Milk", url: "" },
-                        // { title: "Butter & Cream", url: "" },
-                        // { title: "Cheese", url: "" },
-                        // { title: "Eggs", url: "" },
-                        // { title: "Yogurt", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title4"),
-                    url: "",
-                    icon: Milk,
-                    items: [
-                        // { title: "Milk", url: "" },
-                        // { title: "Butter & Cream", url: "" },
-                        // { title: "Cheese", url: "" },
-                        // { title: "Eggs", url: "" },
-                        // { title: "Yogurt", url: "" },
-                        // { title: "Plant-based Alternatives", url: "" },
-                    ],
-                },
-
-                {
-                    title: t("navMain.title5"),
-                    url: "",
-                    icon: Fish,
-                    items: [
-                        // { title: "Chicken", url: "" },
-                        // { title: "Beef", url: "" },
-                        // { title: "Pork", url: "" },
-                        // { title: "Fish", url: "" },
-                        // { title: "Shellfish", url: "" },
-                        // { title: "Plant-based Proteins", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title6"),                    url: "",
-                    icon: Coffee,
-                    items: [
-                        // { title: "Water", url: "" },
-                        // { title: "Soft Drinks", url: "" },
-                        // { title: "Juices", url: "" },
-                        // { title: "Tea & Coffee", url: "" },
-                        // { title: "Energy Drinks", url: "" },
-                        // { title: "Alcoholic Beverages", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title7"),                    url: "",
-                    icon: Cookie,
-                    items: [
-                        // { title: "Chips & Crisps", url: "" },
-                        // { title: "Chocolates", url: "" },
-                        // { title: "Candies", url: "" },
-                        // { title: "Nuts & Dried Fruits", url: "" },
-                        // { title: "Popcorn & Pretzels", url: "" },
-                        // { title: "Energy Bars", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title8"),                    url: "",
-                    icon: Package,
-                    items: [
-                        // { title: "Rice & Grains", url: "" },
-                        // { title: "Pasta & Noodles", url: "" },
-                        // { title: "Canned Goods", url: "" },
-                        // { title: "Oils & Vinegars", url: "" },
-                        // { title: "Spices & Seasonings", url: "" },
-                        // { title: "Baking Essentials", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title9"),                    url: "",
-                    icon: Snowflake,
-                    items: [
-                        // { title: "Frozen Vegetables", url: "" },
-                        // { title: "Frozen Fruits", url: "" },
-                        // { title: "Ice Cream & Desserts", url: "" },
-                        // { title: "Frozen Meals", url: "" },
-                        // { title: "Frozen Pizza", url: "" },
-                        // { title: "Frozen Seafood", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title10"),                    url: "",
-                    icon: Scissors,
-                    items: [
-                        // { title: "Skincare", url: "" },
-                        // { title: "Hair Care", url: "" },
-                        // { title: "Oral Care", url: "" },
-                        // { title: "Body Care", url: "" },
-                        // { title: "Cosmetics", url: "" },
-                        // { title: "Men's Grooming", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title11"),                    url: "",
-                    icon: Home,
-                    items: [
-                        // { title: "Cleaning Supplies", url: "" },
-                        // { title: "Laundry Products", url: "" },
-                        // { title: "Paper & Plastic", url: "" },
-                        // { title: "Home Decor", url: "" },
-                        // { title: "Kitchen Essentials", url: "" },
-                        // { title: "Pet Supplies", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title12"),                    url: "",
-                    icon: Baby,
-                    items: [
-                        // { title: "Baby Food", url: "" },
-                        // { title: "Diapers & Wipes", url: "" },
-                        // { title: "Baby Care", url: "" },
-                        // { title: "Baby Gear", url: "" },
-                        // { title: "Kids' Snacks", url: "" },
-                        // { title: "Kids' Health", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title14"),                    url: "",
-                    icon: Dumbbell,
-                    items: [
-                        // { title: "Vitamins & Supplements", url: "" },
-                        // { title: "Protein & Fitness", url: "" },
-                        // { title: "Herbal Remedies", url: "" },
-                        // { title: "First Aid", url: "" },
-                        // { title: "Pharmacy", url: "" },
-                        // { title: "Personal Care", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title15"),                    url: "",
-                    icon: ChefHat,
-                    items: [
-                        // { title: "Bread", url: "" },
-                        // { title: "Cakes & Pastries", url: "" },
-                        // { title: "Cookies", url: "" },
-                        // { title: "Buns & Rolls", url: "" },
-                    ],
-                },
-              
-            ],
-            // Clothes: [
-            //     {
-            //         title: t("navMain.title1"),                    url: "/",
-            //         icon: SquareTerminal,
-            //         isActive: true,
-            //         items: [
-            //             // { title: "Web Development", url: "" },
-            //             // { title: "Mobile App Development", url: "" },
-            //             // { title: "Fresh Fruits", url: "/shopping/fruits-vegetables/fresh-fruits" },
-            //             // { title: "Fresh Vegetables", url: "/shopping/fruits-vegetables/fresh-vegetables" },
-            //             // { title: "Herbs & Seasonings", url: "/shopping/fruits-vegetables/herbs-seasonings" },
-            //             // { title: "Organic Produce", url: "/shopping/fruits-vegetables/organic-produce" },
-            //             // { title: "Exotic Fruits", url: "/shopping/fruits-vegetables/exotic-fruits" },
-            //             // { title: "Sprouts", url: "/shopping/fruits-vegetables/sprouts" },
-            //             // { title: "Cut Vegetables", url: "/shopping/fruits-vegetables/cut-vegetables" },
-            //             // { title: "Leafy Greens", url: "/shopping/fruits-vegetables/leafy-greens" },
-            //         ],
-            //     },
-            // ],
-            course: [
-                {
-                    title: "Course",
-                    url: "/course/medicines",
-                },
-            ],
-            percel: [],
-            topup: [],
-            drive: [],
-            cookups: [
-                {
-                    title: "Design",
-                    url: "/courses/design",
-                    icon: ShoppingBag,
-                    items: [
-                        // { title: "Graphic Design", url: "/courses/design/graphic-design" },
-                        // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
-                        // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
-                        // { title: "Animation", url: "/courses/design/animation" },
-                        // { title: "Illustration", url: "/courses/design/illustration" },
-                    ],
-                },
-            ],
-            outlet: [],
-        }
-    }
+// --- CLEAN CODE HERE ---
+    // Instead of 200 lines of data, just call the function!
+    const data = React.useMemo(() => getNavData(t), [t]);
     return (
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
@@ -377,27 +161,94 @@ export default function UserLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <main className="pt-6  ">
+                {/* --- RESPONSIVE MOBILE/TABLET HEADER --- */}
+                {/* UPDATED: Changed md:hidden to lg:hidden so it shows on tablets */}
+                <header className="flex flex-col sticky top-0 z-40 border-b bg-white lg:hidden">
+
+                    {/* ROW 1: Logo, Menu, Login & Language */}
+                    <div className="flex h-16 shrink-0 items-center justify-between px-4">
+                        <div className="flex items-center gap-2">
+                            <SidebarTrigger className="-ml-2 text-gray-600">
+                                <Menu className="h-6 w-6" />
+                            </SidebarTrigger>
+                            <Separator orientation="vertical" className="mr-2 h-4" />
+                            <img src={logo} alt="logo" className="h-8 w-auto" />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {/* Login Button (Green Pill) */}
+                            <button
+                                onClick={openLoginModal}
+                                className="flex items-center gap-1 bg-[#5ca367] hover:bg-[#4a8a54] text-white px-3 py-1.5 rounded-full transition-colors"
+                            >
+                                <LogInIcon className="h-3.5 w-3.5" />
+                                <span className="text-xs font-bold">{t("login")}</span>
+                            </button>
+
+                            {/* Language Switcher (Green Pill) */}
+                            <div className="flex items-center bg-[#5ca367] text-white rounded-full px-2 py-1.5">
+                                <button className="text-[10px] font-bold px-1 hover:opacity-80">EN</button>
+                                <div className="h-3 w-[1px] bg-white/40 mx-0.5"></div>
+                                <button className="text-[10px] font-bold px-1 hover:opacity-80 opacity-70">BN</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ROW 2: Search Bar (Full Width) */}
+                    <div className="px-4 pb-3">
+                        <div className="relative flex items-center w-full">
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                className="w-full h-10 pl-3 pr-20 text-sm bg-gray-50 border border-[#5ca367] rounded-md outline-none focus:ring-1 focus:ring-[#5ca367] transition-all placeholder:text-gray-400"
+                            />
+
+                            {/* Icons inside Input (Camera | Search) */}
+                            <div className="absolute right-2 flex items-center gap-2 text-gray-500">
+                                <button className="p-1 hover:text-[#5ca367] transition-colors">
+                                    <Camera className="h-5 w-5" />
+                                </button>
+                                <div className="h-5 w-[1px] bg-gray-300"></div>
+                                <button className="p-1 hover:text-[#5ca367] transition-colors">
+                                    <Search className="h-5 w-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                {/* UPDATED: Changed md:pt-6 to lg:pt-6 for consistent spacing */}
+                <main className="relative flex-1 p-4 lg:pt-6">
+                    {/* --- FLOATING CART BUTTON --- */}
                     <button
                         onClick={changeCheckoutModal}
-                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50 "
+                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
                     >
                         <div className="flex items-center">
-                            <ShoppingBag className="h-6 w-6 text-red-500" />
-                            <div className="border-l border-gray-300 h-8 mx-2" />
-                            <div>
-                                <div className="font-semibold">{ } ITEMS</div>
-                                <div className="text-sm">৳ { }</div>
+                            <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
+                            <div className="border-l border-gray-300 h-6 md:h-8 mx-2" />
+                            <div className="hidden sm:block">
+                                <div className="font-semibold text-xs md:text-sm"> ITEMS</div>
+                                <div className="text-[10px] md:text-xs">৳ </div>
+                            </div>
+                            <div className="sm:hidden font-bold text-red-500 text-xs">
+                                0
                             </div>
                         </div>
                     </button>
 
-                    <Header />
-                    <Cart />
+                    {/* Note: Ensure your main desktop <Header /> also has 'hidden lg:block' so you don't get two headers on tablet */}
+                    <div className="hidden lg:block">
+                        <Header />
+                    </div>
 
+                    <Cart />
                     <LiveChat />
 
-                    <Outlet />
+                    <div className="mx-auto w-full max-w-7xl">
+                        <Outlet />
+                    </div>
+
                     <Footer />
                 </main>
             </SidebarInset>

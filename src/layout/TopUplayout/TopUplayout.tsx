@@ -60,7 +60,7 @@ export default function TopupLayout() {
             avatar: "/avatars/shadcn.jpg",
         },
         categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashbord" },
             { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
@@ -71,13 +71,13 @@ export default function TopupLayout() {
             shopping: [
                 {
                     title: t("navMain.title1"),
-                    url: "/",
+                    url: "/dashboard",
                     icon: SquareTerminal,
                     isActive: true,
                     items: [
-                    // { title: "Web Development", url: "" },
-                    // { title: "Mobile App Development", url: "" },
-                ],
+                        // { title: "Web Development", url: "" },
+                        // { title: "Mobile App Development", url: "" },
+                    ],
                 },
             ],
             course: [
@@ -106,9 +106,9 @@ export default function TopupLayout() {
         <SidebarProvider className="">
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                    <div className="flex items-center justify-between p-2">
+                    <Link to="/dashboard">
                         <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
-                    </div>
+                    </Link>
                 </SidebarHeader>
                 <div className="px-4 py-3 border-b ">
                     <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2">
@@ -118,8 +118,8 @@ export default function TopupLayout() {
                                 to={category.path}
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                        ? "bg-primary-default border border-primary-default text-white"
-                                        : "border border-primary-default text-gray-700"
+                                    ? "bg-primary-default border border-primary-default text-white"
+                                    : "border border-primary-default text-gray-700"
                                     }`}
                                 aria-label={category.name}
                             >
@@ -198,15 +198,19 @@ export default function TopupLayout() {
             <SidebarInset>
                 <main className="pt-6 ">
                     <button
-                        onClick={changeCheckoutModal}
-                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
+                        onClick={changeCheckoutModal} // 1. Change this to alter click behavior
+                        className="fixed right-0 top-[55%] ..." // 2. Change this to move the button
                     >
                         <div className="flex items-center">
-                            <ShoppingBag className="h-6 w-6 text-red-500" />
-                            <div className="border-l border-gray-300 h-8 mx-2" />
-                            <div>
-                                <div className="font-semibold">{ }</div>
-                                <div className="text-sm">৳ { }</div>
+                            {/* 3. Change Icon here (currently ShoppingBag) */}
+                            <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
+
+                            <div className="border-l border-gray-300 h-6 md:h-8 mx-2" />
+
+                            <div className="hidden sm:block">
+                                {/* 4. DATA MISSING HERE: Add your cart variables inside { } */}
+                                <div className="font-semibold text-xs md:text-sm">{/* count */} ITEMS</div>
+                                <div className="text-[10px] md:text-xs">৳ {/* total */}</div>
                             </div>
                         </div>
                     </button>

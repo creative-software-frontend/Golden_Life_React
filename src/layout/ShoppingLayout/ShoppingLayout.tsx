@@ -58,7 +58,7 @@ const data: {
     navMain: NavMain
 } = {
     categories: [
-        { id: "shoppingg", name: "Shopping", icon: ShoppingCart, path: "/" },
+        { id: "shoppingg", name: "Shopping", icon: ShoppingCart, path: "/dashboard" },
         { id: "Course", name: "Course", icon: GraduationCap, path: "/Course" },
         { id: "pharmacy", name: "Pharmacy", icon: Pill, path: "/Percel" },
         { id: "cookups", name: "Cookups", icon: ChefHat, path: "/cookups" },

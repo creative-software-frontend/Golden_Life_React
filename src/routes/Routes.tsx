@@ -5,14 +5,14 @@ import Story from "@/pages/Help/Story/Story";
 import Career from "@/pages/Help/Career/Career";
 import Contact from "@/pages/Help/Contact/Contact";
 import PrivacyPolicy from "@/pages/Help/PrivacyPolicy/PrivacyPolicy";
-// import UserLayout from "@/layout/userlayout/UserLayout";
+import UserLayout from "@/layout/userlayout/UserLayout";
 import HelpLayout from "@/layout/HelpLayout/HelpLayout";
 import Faq from "@/pages/Home/Faq/Faq";
 import TermsOfUse from "@/pages/Help/TermsOfUse/TermsOfUse";
-// import AllCategories from "@/pages/Home/AllCategories/AllCategories";
-// import ProductPage from "@/pages/Home/ProductPage/ProductPage";
-// import Home from "@/pages/Home/Home/Home";
-// import AllProduct from "@/pages/Home/AllProducts/AllProducts";
+import AllCategories from "@/pages/Home/AllCategories/AllCategories";
+import ProductPage from "@/pages/Home/ProductPage/ProductPage";
+import Home from "@/pages/Home/Home/Home";
+import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
 // import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 // import Overview from "@/pages/Dashboard/Overview/Overview";
@@ -30,7 +30,7 @@ import DriveLayout from "@/layout/DriveLayout/DriveLayout";
 import Landing from "@/pages/Landing/Landing";
 import LandingLayout from "@/layout/LandingLayout/LandingLayout";
 
-// import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
+import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
 import AddMoney from "@/pages/Dashboard/AddMoney/AddMoney";
 import History from "@/pages/Dashboard/History/History";
 import SendMoney from "@/pages/Dashboard/SendMoney/SendMoney";
@@ -54,40 +54,40 @@ export const routes = createBrowserRouter([
         ]
     },
 
-    // {
-    //     path: '/dashborad',
-    //     element: <UserLayout />,
+    {
+        path: '/dashboard',
+        element: <UserLayout />,
 
 
-    //     children: [
+        children: [
 
-    //         {
-    //             path: '/dashboard',
-    //             element: <Home />
-    //         },
-    //         {
-    //             path: 'allcategories',
-    //             element: <AllCategories />
-    //         },
-    //         {
-    //             path: 'all-courses',
-    //             element: < AllCourses2 />
-    //         },
-    //         {
-    //             path: 'productpage',  // Separate route for Help page
-    //             element: <ProductPage />,
-    //         },
-    //         {
-    //             path: 'allProducts',  // Separate route for Help page
-    //             element: <AllProduct />,
-    //         },
-
-
+            {
+                path: '',
+                element: <Home />
+            },
+            {
+                path: 'allcategories',
+                element: <AllCategories />
+            },
+            {
+                path: 'all-courses',
+                element: < AllCourses2 />
+            },
+            {
+                path: 'productpage',  // Separate route for Help page
+                element: <ProductPage />,
+            },
+            {
+                path: 'allProducts',  // Separate route for Help page
+                element: <AllProduct />,
+            },
 
 
-    //     ]
 
-    // },
+
+        ]
+
+    },
     {
         path: '/courses',
         element: <CourseLayout />,

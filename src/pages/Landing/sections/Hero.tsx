@@ -7,7 +7,7 @@ export default function Hero() {
         
         {/* MIDDLE CONTENT */}
         <div className="mt-12 md:mt-20 text-left md:text-left">
-          <h1 className="text-4xl md:text-5xl lg:text-8xl font-serif leading-tight text-[#67AC79] mb-8">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-[#67AC79] mb-8">
             Live Better.<br />
             Manage Life<br />
             <span className="text-[#FF9100]">All in One Place</span>

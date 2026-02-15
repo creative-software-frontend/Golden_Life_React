@@ -7,7 +7,7 @@ export default function Features() {
             <div className="container mx-auto px-5 md:px-8">
 
                 {/* SECTION HEADER */}
-                <div className="max-w-7xl mx-auto">
+                <div className="container mx-auto">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
                         <div>
                             {/* BADGE */}
@@ -38,31 +38,44 @@ export default function Features() {
                 </div>
 
                 {/* FEATURE CARDS GRID - 3 COLUMNS */}
-                <div className="max-w-7xl mx-auto">
+                <div className="container mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                        {/* CARD 1 - Website Development */}
                         <FeatureCard
-                            title="Website Development"
-                            description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                            title="Zero Investment"
+                            description="Start your business with zero investment. Simply register and sell your products with cash on delivery through our platform."
                         />
 
-                        {/* CARD 2 - Mobile App Development */}
                         <FeatureCard
-                            title="Mobile App Development"
-                            description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                            title="Instant Payment"
+                            description="Receive your payment instantly after successful delivery. Payments are automatically transferred to your account without any hassle."
                         />
 
-                        {/* CARD 3 - UI/UX Design */}
                         <FeatureCard
-                            title="UI/UX Design"
-                            description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                            title="Cash on Delivery"
+                            description="Sell confidently with cash on delivery. Your customers can pay after receiving the product, increasing trust and conversion."
+                        />
+
+                        <FeatureCard
+                            title="Verified Products"
+                            description="All products go through a verification process to ensure quality, authenticity, and customer satisfaction."
+                        />
+
+                        <FeatureCard
+                            title="Search by Image"
+                            description="Customers can search products using images. Just upload a photo and instantly find similar products from our marketplace."
+                        />
+
+                        <FeatureCard
+                            title="Fast Delivery"
+                            description="Get your orders delivered within 1–3 days. We ensure fast and reliable delivery across major locations."
                         />
 
                     </div>
+
                 </div>
 
-                
+
 
             </div>
         </section>

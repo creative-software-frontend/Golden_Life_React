@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, X, Menu } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -214,7 +214,8 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer hidden md:block text-sidebar-foreground"
+        // UPDATED: Changed md:block to lg:block
+        className="group peer hidden lg:block text-sidebar-foreground"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
@@ -233,7 +234,8 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
+            // UPDATED: Changed md:flex to lg:flex
+            "duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear lg:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -257,11 +259,10 @@ const Sidebar = React.forwardRef<
   }
 )
 Sidebar.displayName = "Sidebar"
-
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
+>(({ className, onClick, children, ...props }, ref) => { // <--- 1. Add 'children' here
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -270,14 +271,15 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-9 w-9", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
       {...props}
     >
-      <PanelLeft />
+      {/* 2. Render children (your Menu icon). If no children, fallback to PanelLeft */}
+      {children ? children : <PanelLeft className="h-5 w-5" />}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -320,9 +322,10 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
+      // UPDATED: Changed all md: prefixes to lg: prefixes
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
-        "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+        "relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-200 ease-in-out",
+        "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow",
         className
       )}
       {...props}
@@ -352,14 +355,38 @@ SidebarInput.displayName = "SidebarInput"
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
+  const { isMobile, setOpenMobile } = useSidebar()
+
   return (
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex items-center justify-between gap-2 p-4", className)} // Increased padding slightly for better spacing
       {...props}
-    />
+    >
+      <div className="flex flex-1 items-center gap-2 overflow-hidden">
+        {children}
+      </div>
+
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          // IMPROVEMENTS:
+          // 1. rounded-full: Makes it a circle (modern standard for close buttons).
+          // 2. text-muted-foreground: Makes it subtle by default.
+          // 3. hover:bg-sidebar-accent/50: Adds a nice interaction background.
+          // 4. hover:text-sidebar-foreground: Darkens the icon on hover.
+          // 5. -mr-2: Pulls it slightly to the right to align with the edge visually.
+          className="h-9 w-9 rounded-full text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground -mr-2 transition-colors duration-200"
+          onClick={() => setOpenMobile(false)}
+        >
+          <X className="h-5 w-5" strokeWidth={2.5} /> {/* Slightly thicker stroke for clarity */}
+          <span className="sr-only">Close Sidebar</span>
+        </Button>
+      )}
+    </div>
   )
 })
 SidebarHeader.displayName = "SidebarHeader"
