@@ -18,7 +18,7 @@ const Experience: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-3xl mx-auto mb-24"
+          className="text-center max-w-3xl mx-auto mb-20"
         >
           <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Our Journey</span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
@@ -42,7 +42,8 @@ const Experience: React.FC = () => {
              ></motion.div>
           </div>
 
-          <div className="space-y-20 md:space-y-32">
+          {/* DECREASED SPACING HERE: Changed space-y-20 md:space-y-32 to space-y-12 md:space-y-16 */}
+          <div className="space-y-12 md:space-y-16">
             {experienceData.map((item, index) => {
               const isEven = index % 2 === 0;
               
@@ -79,7 +80,7 @@ const Experience: React.FC = () => {
                       
                       {/* Connector Line (Mobile & Desktop) */}
                       <div className={`hidden md:block absolute top-1/2 -translate-y-1/2 w-12 h-[2px] bg-orange-200 group-hover:bg-primary transition-colors duration-500 ${
-                         isEven ? '-left-12' : '-right-12'
+                          isEven ? '-left-12' : '-right-12'
                       }`}></div>
 
                       {/* Icon Floating Badge */}

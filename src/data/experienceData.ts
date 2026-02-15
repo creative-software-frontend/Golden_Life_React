@@ -1,4 +1,4 @@
-import { Package, TrendingUp, Award } from "lucide-react"; 
+import { Package, TrendingUp, Award, Users } from "lucide-react"; 
 
 export const experienceData = [
   {
@@ -24,5 +24,13 @@ export const experienceData = [
     count: "2nd Place",
     year: "2023",
     description: "Ranked 2nd in Steadfast Courier for the highest parcel delivery volume.",
+  },
+  {
+    id: 4,
+    icon: Users,
+    title: "Active Resellers",
+    count: "10,000+",
+    year: "2024",
+    description: "Empowered over 10,000 entrepreneurs across Bangladesh to build their own successful online businesses.",
   },
 ];

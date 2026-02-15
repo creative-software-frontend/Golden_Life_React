@@ -2,17 +2,32 @@ export const howItWorksLeft = [
   {
     id: 1,
     number: "1",
-    text: "Register completely free on our platform using your page or shop name.",
+    title: "Registration Process",
+    answers: [
+      "Register completely free on our platform.",
+      "Use your own existing page or shop name.",
+      "No hidden fees or subscription charges."
+    ],
   },
   {
     id: 2,
     number: "2",
-    text: "Download product images & descriptions, then upload them to your own page or website.",
+    title: "Product Setup & Images",
+    answers: [
+      "Download high-quality product images from our app.",
+      "Copy detailed descriptions and specifications.",
+      "Upload them directly to your Facebook page or website."
+    ],
   },
   {
     id: 3,
     number: "3",
-    text: "Sell the products online through digital marketing with a 200-300 Taka profit margin.",
+    title: "Marketing Strategy",
+    answers: [
+      "Promote products via digital marketing or social media.",
+      "Set your own prices with a 200-300 Taka profit margin.",
+      "Target your specific audience without holding inventory."
+    ],
   },
 ];
 
@@ -20,16 +35,31 @@ export const howItWorksRight = [
   {
     id: 4,
     number: "4",
-    text: "Place the orders you receive on our app using the customer's name and address.",
+    title: "Placing Customer Orders",
+    answers: [
+      "Receive orders from your customers.",
+      "Place the order on our app using the customer's details.",
+      "Select the payment method (COD or Pre-payment)."
+    ],
   },
   {
     id: 5,
     number: "5",
-    text: "Our team will invoice the order under YOUR shop's name and send it directly to your customer.",
+    title: "Shipping & Invoicing",
+    answers: [
+      "Our team packs and ships the product.",
+      "We generate the invoice under YOUR shop's name.",
+      "The customer never knows it came from us (White Label)."
+    ],
   },
   {
     id: 6,
     number: "6",
-    text: "Receive your profit via Bkash, Nagad, or Bank Account immediately after successful delivery.",
+    title: "Collecting Your Profit",
+    answers: [
+      "Wait for successful delivery to the customer.",
+      "Receive your profit immediately after delivery.",
+      "Withdraw via Bkash, Nagad, or Bank Transfer."
+    ],
   },
 ];
