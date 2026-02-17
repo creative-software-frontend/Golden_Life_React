@@ -1,13 +1,13 @@
-
 import Logo from "../Logo";
 
 export default function LandingFooter() {
   return (
     <footer className="bg-white border-t border-gray-100">
-      <div className="container mx-auto px-4 sm:px-5 md:px-8 py-12">
+      {/* UPDATE: py-12 এর বদলে pt-12 pb-4 ব্যবহার করা হয়েছে নিচের স্পেস কমানোর জন্য */}
+      <div className="container mx-auto px-4 sm:px-5 md:px-8 pt-12 pb-4">
 
         {/* MAIN FOOTER GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8">
 
           {/* COLUMN 1 - LOGO & CONTACT */}
           <div className="space-y-4">
@@ -101,7 +101,7 @@ export default function LandingFooter() {
         </div>
 
         {/* BOTTOM BAR */}
-        <div className="mt-12 pt-4 border-t border-gray-100 text-center text-xs text-gray-500">
+        <div className="mt-0 p-3 border-t border-gray-100 text-center text-xs text-gray-500">
           © {new Date().getFullYear()} Golden Life. All rights reserved.
         </div>
 
