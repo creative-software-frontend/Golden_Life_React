@@ -11,7 +11,7 @@ export default function Stats() {
       <div className="container mx-auto grid md:grid-cols-2 gap-12 items-stretch">
 
         {/* LEFT CONTENT */}
-        <div className="bg-white border p-4 border-gray-200 rounded-2xl flex flex-col justify-between">
+        <div className="bg-white border p-8 border-gray-200 rounded-2xl flex flex-col justify-between">
 
           <div>
             {/* TITLE */}
