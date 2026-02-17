@@ -7,7 +7,7 @@ export default function LandingFooter() {
       <div className="container mx-auto px-4 sm:px-5 md:px-8 pt-12 pb-4">
 
         {/* MAIN FOOTER GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-2">
 
           {/* COLUMN 1 - LOGO & CONTACT */}
           <div className="space-y-4">
