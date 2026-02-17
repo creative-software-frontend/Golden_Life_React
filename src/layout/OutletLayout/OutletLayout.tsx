@@ -181,7 +181,7 @@ export default function OutletLayout() {
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" />
                                                 </div>
-                                                <span className="text-blue-400">Login</span>
+                                                <span className="text-blue-400">logout</span>
                                             </Link>
                                         </div>
                                     </SidebarMenuButton>

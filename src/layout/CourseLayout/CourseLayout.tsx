@@ -142,8 +142,8 @@ export default function CourseLayout() {
                             <span className="text-xs font-bold text-teal-600 group-data-[collapsible=icon]:hidden">Help</span>
                         </Link>
                         <Separator orientation="vertical" className="h-6 mx-1" />
-                        <button onClick={openLoginModal} className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
-                            <span className="text-xs font-bold text-blue-500 group-data-[collapsible=icon]:hidden">Login</span>
+                        <button  className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
+                            <span className="text-xs font-bold text-blue-500 group-data-[collapsible=icon]:hidden">logout</span>
                             <div className="bg-white p-1.5 rounded-full shadow-sm">
                                 <LogInIcon className="h-4 w-4 text-blue-500" />
                             </div>

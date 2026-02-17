@@ -145,11 +145,11 @@ export default function UserLayout() {
                                         </div>
                                         <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
                                         <div className="flex items-center gap-2">
-                                            <Link to='' onClick={openLoginModal} className="flex items-center gap-2">
+                                            <Link className="flex items-center gap-2">
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" />
                                                 </div>
-                                                <span className="text-blue-400">{t("login")}</span>
+                                                <span className="text-blue-400">logout</span>
                                             </Link>
                                         </div>
                                     </SidebarMenuButton>

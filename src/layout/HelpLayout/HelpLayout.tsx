@@ -271,11 +271,11 @@ export default function HelpLayout() {
 
                                         {/* Right Side: Login Button */}
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2" onClick={openLoginModal}>
+                                            <button className="flex items-center gap-2" >
                                                 <div className="bg-blue-400 rounded-full p-1">
                                                     <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
                                                 </div>
-                                                <span className="text-blue-400">{t("login")}</span>
+                                                <span className="text-blue-400">logout</span>
                                             </button>
                                         </div>
                                     </SidebarMenuButton>
