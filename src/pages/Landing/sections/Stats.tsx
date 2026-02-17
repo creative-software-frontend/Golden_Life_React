@@ -7,37 +7,35 @@ export default function Stats() {
   const [play, setPlay] = useState(false);
 
   return (
-    <section className="py-20" style={{ backgroundColor: "#F8FAFC" }}>
-      <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-stretch">
+    <section className="py-20 bg-gray-50">
+      <div className="container mx-auto grid md:grid-cols-2 gap-12 items-stretch">
 
         {/* LEFT CONTENT */}
-        <div
-          className="p-10 rounded-xl shadow-sm h-full flex flex-col justify-between"
-          style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E2E8F0",
-          }}
-        >
+        <div className="bg-white border border-gray-200 rounded-2xl flex flex-col justify-between">
+
           <div>
-            <h2 className="text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-              About Us
+            {/* TITLE */}
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              <span className="text-black">About</span>{" "}
+              <span className="text-orange-500">Us</span>
             </h2>
 
             {/* LINE */}
-            <div className="w-24 h-1 mb-6" style={{ backgroundColor: "#F4A261" }} />
+            <div className="w-20 h-1 bg-orange-500 mb-6" />
 
-            <p className="leading-relaxed mb-10" style={{ color: "#475569" }}>
+            {/* DESCRIPTION */}
+            <p className="text-gray-600 leading-relaxed mb-10">
               SuperBiz BD is one of the largest dropshipping and reselling
               platforms in Bangladesh. We provide verified products, instant
               payments, fast delivery, and 24/7 customer support to help you
               grow your online business with confidence.
             </p>
 
-            <div className="grid sm:grid-cols-2 gap-8">
+            <div className="grid sm:grid-cols-2 gap-10">
 
               {/* Vision */}
               <div>
-                <h4 className="text-xl font-semibold mb-4" style={{ color: "#0F172A" }}>
+                <h4 className="text-lg font-semibold text-black mb-4">
                   Our Vision
                 </h4>
 
@@ -47,9 +45,9 @@ export default function Stats() {
                     "Empower digital entrepreneurs",
                     "Simplify online business",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <CheckCircle size={20} color="#F4A261" />
-                      <span style={{ color: "#475569" }}>{item}</span>
+                    <li key={i} className="flex items-center gap-3">
+                      <CheckCircle className="text-orange-500" size={20} />
+                      <span className="text-gray-600">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -57,7 +55,7 @@ export default function Stats() {
 
               {/* Mission */}
               <div>
-                <h4 className="text-xl font-semibold mb-4" style={{ color: "#0F172A" }}>
+                <h4 className="text-lg font-semibold text-black mb-4">
                   Our Mission
                 </h4>
 
@@ -67,9 +65,9 @@ export default function Stats() {
                     "Ensure fast delivery & instant payout",
                     "Offer 24/7 dedicated support",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <CheckCircle size={20} color="#F4A261" />
-                      <span style={{ color: "#475569" }}>{item}</span>
+                    <li key={i} className="flex items-center gap-3">
+                      <CheckCircle className="text-orange-500" size={20} />
+                      <span className="text-gray-600">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -77,12 +75,12 @@ export default function Stats() {
 
             </div>
           </div>
+
         </div>
 
         {/* RIGHT VIDEO */}
         <div
-          className="relative rounded-xl overflow-hidden shadow-lg h-full cursor-pointer group"
-          style={{ border: "1px solid #E2E8F0" }}
+          className="relative rounded-2xl overflow-hidden border border-gray-200 cursor-pointer group min-h-[320px] md:min-h-[420px]"
           onClick={() => setPlay(true)}
         >
 
@@ -91,30 +89,22 @@ export default function Stats() {
             <>
               <img
                 src="https://img.youtube.com/vi/ie5vl25VGRY/maxresdefault.jpg"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                alt="video thumbnail"
+                alt="About video"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
 
-              {/* DARK OVERLAY */}
+              {/* Overlay */}
               <div className="absolute inset-0 bg-black/40" />
 
-              {/* PLAY BUTTON */}
+              {/* Play Button */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative flex items-center justify-center">
+                <div className="relative">
 
-                  {/* Ripple */}
-                  <span
-                    className="absolute w-24 h-24 rounded-full animate-ping"
-                    style={{ backgroundColor: "#F4A261", opacity: 0.6 }}
-                  ></span>
+                  <span className="absolute w-24 h-24 rounded-full bg-orange-500 opacity-50 animate-ping" />
 
-                  {/* Button */}
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center z-10"
-                    style={{ backgroundColor: "#F4A261" }}
-                  >
-                    <Play size={36} color="#ffffff" />
+                  <div className="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center relative z-10 shadow-lg">
+                    <Play className="text-white" size={34} />
                   </div>
 
                 </div>
@@ -125,12 +115,12 @@ export default function Stats() {
           {/* IFRAME */}
           {play && (
             <iframe
-              className="w-full h-full"
+              className="absolute inset-0 w-full h-full"
               src="https://www.youtube.com/embed/ie5vl25VGRY?autoplay=1"
               title="About SuperBiz BD"
               allow="autoplay; encrypted-media"
               allowFullScreen
-            ></iframe>
+            />
           )}
 
         </div>

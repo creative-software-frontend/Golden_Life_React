@@ -2,28 +2,33 @@ import React from "react";
 
 export default function Hero() {
   return (
-    <section className="relative z-10 container mx-auto px-5 md:px-8 pt-32">
-      <div className="container min-h-[calc(100vh-120px)] flex flex-col">
-        
-        {/* MIDDLE CONTENT */}
-        <div className="mt-12 md:mt-20 text-left md:text-left">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif leading-tight text-[#67AC79] mb-8">
-            Live Better.<br />
-            Manage Life<br />
-            <span className="text-[#FF9100]">All in One Place</span>
+    <section className="relative z-10 min-h-[calc(100vh-120px)] flex items-center px-5 md:px-8 py-16 md:py-24">
+      <div className="container mx-auto">
+        <div className="max-w-3xl">
+          <div className="mb-6">
+            <div className="inline-block px-4 py-2 bg-black bg-opacity-5 rounded-full">
+              
+            </div>
+          </div>
+          
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-6 leading-tight">
+            <span className="block">Live Better.</span>
+            <span className="block text-[#FF8A00]">Manage Smarter.</span>
           </h1>
-
-          <button className="px-9 py-6 text-3xl rounded-r-full bg-[#FF9100] text-white">
-            Get Started
-          </button>
+          
+          <p className="text-gray-600 text-lg md:text-xl mb-10 max-w-2xl">
+            Streamline your daily routine with our intuitive platform designed for modern living.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button className="px-8 py-4 text-base font-medium rounded-lg bg-[#FF8A00] text-white hover:bg-orange-600 transition-colors duration-200 w-full sm:w-auto">
+              Get Started
+            </button>
+            <button className="px-8 py-4 text-base font-medium rounded-lg border-2 border-black text-black hover:bg-black hover:text-white transition-colors duration-200 w-full sm:w-auto">
+              Learn More
+            </button>
+          </div>
         </div>
-
-        {/* BOTTOM DESCRIPTION */}
-        <p className="mt-auto text-lg text-left md:text-left text-[#FF9100] max-w-md pb-10">
-          Golden Life is a modern multi-service platform designed for the modern
-          lifestyle — simple, seamless, and built for everyday life.
-        </p>
-
       </div>
     </section>
   );
