@@ -1,4 +1,5 @@
-import Hero from "@/pages/landing/sections/Hero";
+
+import Hero from "@/pages/Landing/sections/Hero";
 import Header from "../Header";
 
 export default function LandingHeader() {
