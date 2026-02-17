@@ -37,6 +37,9 @@ import SendMoney from "@/pages/Dashboard/SendMoney/SendMoney";
 // import PaymentMethod from "@/pages/Dashboard/PaymentMethod/PaymentMethod";
 import SendMoneyAmount from "@/pages/Dashboard/SendMoneyAmount/SendMoneyAmount";
 import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfirm";
+import Cookies from "@/pages/legal/Cookies";
+import Payments from "@/pages/legal/Payments";
+import TermsConditions from "@/pages/legal/TermsConditions";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -44,16 +47,42 @@ import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfir
 export const routes = createBrowserRouter([
    {
         path: '/',
-        element: <LandingLayout/>, // Has Navbar & Footer
+        // REMOVE 'element: <LandingLayout/>' from here to stop it applying to everything
         children: [
+            // 1. LANDING PAGE (Stays separate, assumes it has its own Header)
             {
                 path: '/', 
-                element: <Landing/> // <--- The new Main Page
+                element: <Landing/> 
             },
-            // Add other public pages here like Login, Register, etc.
+
+            // 2. LEGAL PAGES GROUP (Apply LandingLayout ONLY to these)
+            {
+                element: <LandingLayout />, // This adds Header/Footer to children below
+                children: [
+                    {
+                        path: 'cookies',
+                        element: <Cookies />
+                    },
+                    {
+                        path: 'payments',
+                        element: <Payments />
+                    },
+                    {
+                        path: 'terms', 
+                        element: <TermsConditions />
+                    },
+                    // {
+                    //     path: 'privacy', 
+                    //     element: <PrivacyPolicyLegal />
+                    // },
+                    // {
+                    //     path: 'security', 
+                    //     element: <Security />
+                    // },
+                ]
+            }
         ]
     },
-
     {
         path: '/dashboard',
         element: <UserLayout />,

@@ -1,20 +1,25 @@
 import React, { useState } from "react";
 import Logo from "./Logo";
 import AuthButtons from "./AuthButtons";
-
+import { Link } from 'react-router-dom';
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 left-0 w-full z-50 bg-white bg-opacity-90 backdrop-blur-sm">
       <div className="container mx-auto px-5 md:px-0 py-4 flex justify-between items-center">
-        
+
         {/* Logo */}
         <div className="md:hidden flex-1">
-          <Logo />
+          <Link to="/">
+            <Logo />
+          </Link>
         </div>
+
         <div className="hidden md:block">
-          <Logo />
+          <Link to="/">
+            <Logo />
+          </Link>
         </div>
 
         {/* Desktop Auth Buttons */}

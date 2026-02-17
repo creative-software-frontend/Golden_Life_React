@@ -1,4 +1,5 @@
 import Logo from "../Logo";
+import { Link } from "react-router-dom";
 
 export default function LandingFooter() {
   return (
@@ -59,15 +60,28 @@ export default function LandingFooter() {
             </ul>
           </div>
 
-          {/* COLUMN 3 - COMPANY */}
+      {/* COLUMN 3 - COMPANY */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-4 relative inline-block">
               Company
               <span className="absolute -bottom-1 left-0 w-6 h-0.5 bg-[#FF9100]" />
             </h3>
             <ul className="space-y-2 text-gray-600 text-sm">
-              {["Cookies", "Payments", "Terms & Conditions", "Privacy Policy", "Security"].map(item => (
-                <li key={item} className="hover:text-[#FF9100] cursor-pointer transition-colors">{item}</li>
+              {[
+                { name: "Cookies", path: "/cookies" },
+                { name: "Payments", path: "/payments" },
+                { name: "Terms & Conditions", path: "/terms" },
+                { name: "Privacy Policy", path: "/privacy" },
+                { name: "Security", path: "/security" },
+              ].map((item) => (
+                <li key={item.name}>
+                  <Link 
+                    to={item.path} 
+                    className="hover:text-[#FF9100] cursor-pointer transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>

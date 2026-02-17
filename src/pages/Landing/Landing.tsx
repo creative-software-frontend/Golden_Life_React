@@ -8,6 +8,7 @@ import Reviews from "./sections/Reviews";
 import Services from "./sections/Services";
 import Stats from "./sections/Stats";
 import ProductFAQ from "./sections/ProductFAQ";
+import LandingFooter from '../common/LandingFooter/LandingFooter';
 
 
 
@@ -26,6 +27,7 @@ const Landing: React.FC = () => {
             <Reviews />
           <ProductFAQ></ProductFAQ>
             <Experience />
+            <LandingFooter/>
             
 
         </div>
