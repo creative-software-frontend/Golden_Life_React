@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { ChevronRight, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronRight, ShoppingCart, Timer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useModalStore from "@/store/Store";
@@ -15,205 +15,136 @@ export default function FreshSell() {
         seconds: 0,
     });
 
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const isDraggingRef = useRef(false);
-    const startXRef = useRef(0);
-    const scrollLeftRef = useRef(0);
-    const [cart, setCart] = useState<any[]>([]);
     const { toggleClicked } = useModalStore();
 
+    // Flash Sale Timer Logic
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prev => {
-                if (prev.seconds > 0) {
-                    return { ...prev, seconds: prev.seconds - 1 };
-                } else if (prev.minutes > 0) {
-                    return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 };
-                } else if (prev.hours > 0) {
-                    return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-                }
+                if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+                if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+                if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
                 return prev;
             });
         }, 1000);
-
         return () => clearInterval(timer);
     }, []);
 
     const products = [
-        {
-            id: 1,
-            name: t('products.Silk Katan Saree'),
-            image: "../../../../public/image/products/sharee2.jpg",
-            originalPrice: 829,
-            discountedPrice: 813,
-            progress: 75,
-        },
-        {
-            id: 2,
-            name: t('products.EidCollection'),
-            image: "../../../../public/image/products/watch.jpg",
-            originalPrice: 1165,
-            discountedPrice: 981,
-            progress: 60,
-        },
-        {
-            id: 3,
-            name: t('products.SkatingShoe'),
-            image: "../../../../public/image/products/shoe.jpg",
-            originalPrice: 2820,
-            discountedPrice: 2120,
-            progress: 85,
-        },
-        {
-            id: 4,
-            name: t('products.samsungGalaxy'),
-            image: "../../../../public/image/products/sharee3.jpg",
-            originalPrice: 460,
-            discountedPrice: 348,
-            progress: 45,
-        },
-        {
-            id: 5,
-            name: t('products.LadisWatchwith'),
-            image: "../../../../public/image/categories/c1.jpg",
-            originalPrice: 480,
-            discountedPrice: 435,
-            progress: 90,
-        },
-        {
-            id: 6,
-            name: t('products.pulseOximeter'),
-            image: "../../../../public/image/products/pulseoximeter.jpg",
-            originalPrice: 1180,
-            discountedPrice: 1157,
-            progress: 30,
-        },
+        { id: 1, name: t('products.Silk Katan Saree'), image: "../../../../public/image/products/sharee2.jpg", originalPrice: 829, discountedPrice: 813, progress: 75 },
+        { id: 2, name: t('products.EidCollection'), image: "../../../../public/image/products/watch.jpg", originalPrice: 1165, discountedPrice: 981, progress: 60 },
+        { id: 3, name: t('products.SkatingShoe'), image: "../../../../public/image/products/shoe.jpg", originalPrice: 2820, discountedPrice: 2120, progress: 85 },
+        { id: 4, name: t('products.samsungGalaxy'), image: "../../../../public/image/products/sharee3.jpg", originalPrice: 460, discountedPrice: 348, progress: 45 },
+        { id: 5, name: t('products.LadisWatchwith'), image: "../../../../public/image/categories/c1.jpg", originalPrice: 480, discountedPrice: 435, progress: 90 },
+        { id: 6, name: t('products.pulseOximeter'), image: "../../../../public/image/products/pulseoximeter.jpg", originalPrice: 1180, discountedPrice: 1157, progress: 30 },
     ];
 
-    const handleMouseDown = (e: React.MouseEvent) => {
-        if (scrollRef.current) {
-            isDraggingRef.current = true;
-            startXRef.current = e.clientX - scrollRef.current.offsetLeft;
-            scrollLeftRef.current = scrollRef.current.scrollLeft;
-
-            scrollRef.current.style.cursor = "grabbing";
-
-            scrollRef.current.addEventListener("mousemove", handleMouseMove);
-            scrollRef.current.addEventListener("mouseup", handleMouseUp);
-            scrollRef.current.addEventListener("mouseleave", handleMouseUp);
-        }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-        if (!isDraggingRef.current || !scrollRef.current) return;
-
-        const x = e.clientX - scrollRef.current.offsetLeft;
-        const walk = (x - startXRef.current) * 1.5; // Adjust the speed here
-        scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
-    };
-
-    const handleMouseUp = () => {
-        isDraggingRef.current = false;
-        if (scrollRef.current) {
-            scrollRef.current.removeEventListener("mousemove", handleMouseMove);
-            scrollRef.current.removeEventListener("mouseup", handleMouseUp);
-            scrollRef.current.removeEventListener("mouseleave", handleMouseUp);
-            scrollRef.current.style.cursor = "grab"; // Reset cursor
-        }
-    };
-
     const addToCart = (product: any) => {
-        // Retrieve existing cart items from localStorage
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-        // Check if the product already exists in the cart
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
 
         if (existingProductIndex !== -1) {
-            // If the product exists, update the quantity
             existingCart[existingProductIndex].quantity += 1;
         } else {
-            // If the product does not exist, add it to the cart
-            existingCart.push({
-                ...product,
-                price: product.discountedPrice, // Use the discounted price as price
-                quantity: 1, // Initialize quantity to 1
-            });
+            existingCart.push({ ...product, price: product.discountedPrice, quantity: 1 });
         }
 
-        // Update state and localStorage
-        setCart(existingCart);
         localStorage.setItem("cart", JSON.stringify(existingCart));
-
-        // Trigger update in other components
         toggleClicked();
     };
 
     return (
-        <div className="md:max-w-[1100px] w-[370px] sm:w-full">
-            <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-between">
-                <span className="font-medium">{t('sections.freshSell')}</span>
-                <div className="flex gap-1">
-                    <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-                    <span>:</span>
-                    <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-                    <span>:</span>
-                    <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-                </div>
-                <Link to="/allProducts" className="flex items-center hover:underline">
-                    {t('header.allProducts')}
-                    <ChevronRight className="h-4 w-4" />
-                </Link>
-            </div>
-
-            <div
-                className="flex gap-4 overflow-x-auto cursor-grab"
-                ref={scrollRef}
-                onMouseDown={handleMouseDown}
-                style={{ scrollbarWidth: 'none' }} // For Firefox
-            >
-                {products.map((product) => (
-                    <div
-                        key={product.id}
-                        className="flex-none w-[200px] md:w-[200px] bg-white overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                        <div className="aspect-square">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-300 transform hover:scale-105"
-                            />
+        <section className="py-8 md:py-12 mt-4 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                
+                {/* Header Bar - Responsive Flex */}
+                <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full md:w-auto">
+                        <div className="bg-white/20 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold tracking-wide border border-white/20 text-center">
+                            {t('sections.freshSell')}
                         </div>
-                        <div className="p-3">
-                            <h3 className="text-sm font-medium line-clamp-2 mb-2">
-                                {product.name}
-                            </h3>
-                            <div className="flex items-baseline gap-2 mb-2">
-                                <span className="text-lg font-bold">৳ {product.discountedPrice}</span>
-                                <span className="text-sm text-gray-500 line-through">৳ {product.originalPrice}</span>
+                        
+                        {/* Countdown Timer */}
+                        <div className="flex items-center gap-2 text-white bg-black/20 px-3 py-1 rounded-lg">
+                            <Timer className="h-4 w-4" />
+                            <div className="flex gap-1 font-mono font-bold text-xs md:text-sm">
+                                <span>{String(timeLeft.hours).padStart(2, '0')}</span>:
+                                <span>{String(timeLeft.minutes).padStart(2, '0')}</span>:
+                                <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
                             </div>
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-orange-500 rounded-full"
-                                    style={{ width: `${product.progress}%` }}
-                                />
-                            </div>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={(e) => {
-                                    e.preventDefault(); // Prevent default Link behavior
-                                    addToCart(product); // Add product to the cart
-                                }}
-                                className="w-full mt-2"
-                            >
-                                <ShoppingCart className="h-4 w-4 mr-2" />
-                                {t('buttons.addToCart')}
-                            </Button>
                         </div>
                     </div>
-                ))}
+                    
+                    <Link to="/dashboard/allProducts" className="group flex items-center gap-1 text-[11px] md:text-sm font-bold text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all">
+                        {t('header.allProducts')}
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                </div>
+
+                {/* Responsive Grid Area */}
+                {/* 2 Cols Mobile | 3 Cols Tablet | 6 Cols Desktop */}
+                <div className="p-4 md:p-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-5">
+                        {products.map((product) => (
+                            <div
+                                key={product.id}
+                                className="group flex flex-col bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm hover:shadow-2xl hover:border-orange-100 transition-all duration-500 transform hover:-translate-y-1 h-full"
+                            >
+                                {/* Image Wrap */}
+                                <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                    {/* Flash Badge */}
+                                    <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-md">
+                                        FLASH
+                                    </div>
+                                </div>
+
+                                {/* Info Area */}
+                                <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
+                                            {product.name}
+                                        </h3>
+                                        
+                                        <div className="flex flex-wrap items-baseline gap-1 md:gap-2 mt-1">
+                                            <span className="text-sm md:text-lg font-black text-gray-900">৳{product.discountedPrice}</span>
+                                            <span className="text-[10px] md:text-xs text-gray-400 line-through">৳{product.originalPrice}</span>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div className="mt-2 space-y-1">
+                                            <div className="h-1 md:h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full"
+                                                    style={{ width: `${product.progress}%` }}
+                                                />
+                                            </div>
+                                            <p className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase">{product.progress}% SOLD</p>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        size="sm"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            addToCart(product);
+                                        }}
+                                        className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg h-8 md:h-10 text-[10px] md:text-xs transition-all border-none shadow-md active:scale-95 flex items-center justify-center gap-1 md:gap-2 mt-2"
+                                    >
+                                        <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
+                                        <span className="hidden sm:inline">{t('buttons.addToCart')}</span>
+                                        <span className="sm:hidden">Add</span>
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     );
 }

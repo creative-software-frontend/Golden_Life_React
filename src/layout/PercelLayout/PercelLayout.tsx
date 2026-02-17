@@ -50,7 +50,7 @@ export default function PercelLayout() {
             avatar: "/avatars/shadcn.jpg",
         },
         categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard"},
             { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },

@@ -26,6 +26,7 @@ import CourseFeatures from "../CourseFeature/CourseFeature"
 import useModalStore from "@/store/Store"
 import { useTranslation } from "react-i18next"
 import CourseCarousel from "@/pages/Home/AllCourses/CourseCaroudel"
+import CourseGrid from "./CourseGrid"
 
 interface Lesson {
   id: string
@@ -187,15 +188,15 @@ export default function AllCourses() {
   return (
     <>
       <Coursecatagory2 />
-      <div className="sm:w-full md:max-w-[1040px] w-[385px] mt-8 mb-4">
+      <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="space-y-12">
-          <CourseCarousel
+          <CourseGrid
             courses={lessons.slice(0, 4)}
             title={t("Popular Courses")}
             onSelect={handleCourseSelect}
             onAddToCart={addToCart}
           />
-          <CourseCarousel
+          <CourseGrid
             courses={lessons}
             title={t("All Courses")}
             onSelect={handleCourseSelect}

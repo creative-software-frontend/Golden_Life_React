@@ -1,127 +1,75 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
-import { ShoppingBag, Bike, Store, Building2, Gift, Car, Smartphone, Package, Newspaper, Plane, Tv, Activity, Globe, Store as StoreIcon } from "lucide-react"
+import Marquee from "react-fast-marquee";
+import { ShoppingBag, Bike, Store, Building2, Gift, Car, Smartphone, Package, Plane, Activity, Store as StoreIcon } from "lucide-react"
 import { useTranslation } from 'react-i18next'
 
-export default function RightToLeftIconScroll() {
-    const scrollRef = useRef<HTMLDivElement>(null)
-    const [itemWidth, setItemWidth] = useState(80) // Default width, will be updated
-const [t] = useTranslation("global");
+export default function CompactIconScroll() {
+    const { t } = useTranslation("global");
+
     const items = [
-        { icon: ShoppingBag, label: t("label.Shopping") },
-        { icon: Bike, label: t("label.Food") },
-        { icon: Store, label: t("label.Grocery") },
-        { icon: Building2, label: t("label.Pharmacy") },
-        { icon: Gift, label: t("label.Gift") },
-        { icon: Car, label: t("label.Ride Share") },
-        { icon: Smartphone, label: t("label.Top Up") },
-        { icon: Package, label: t("label.Parcel") },
-        { icon: Smartphone, label: t("label.Mobile") },
-        { icon: Bike, label: t("label.Drive Offer") },
-        { icon: Plane, label: t("label.Air Ticket") },
-        { icon: Newspaper, label: t("label.News Paper") },
-        { icon: Tv, label: t("label.Live TV") },
-        { icon: Activity, label: t("label.Blood Bank") },
-        { icon: Globe, label: t("label.STU Product") },
-        { icon: Package, label: t("label.Online Shop") },
-        { icon: Smartphone, label: t("label.Covid Business") },
-        { icon: StoreIcon, label: t("label.Local Outlet") },
+        { icon: ShoppingBag, label: "Shopping", color: "#38bdf8" },
+        { icon: Bike, label: "Food", color: "#f97316" },
+        { icon: Store, label: "Grocery", color: "#84cc16" },
+        { icon: Building2, label: "Pharmacy", color: "#ef4444" },
+        { icon: Gift, label: "Gift", color: "#a855f7" },
+        { icon: Car, label: "Ride Share", color: "#10b981" },
+        { icon: Smartphone, label: "Top Up", color: "#f59e0b" },
+        { icon: Package, label: "Parcel", color: "#4b5563" },
+        { icon: Plane, label: "Air Ticket", color: "#ec4899" },
+        { icon: Activity, label: "Blood Bank", color: "#e11d48" },
+        { icon: StoreIcon, label: "Local Outlet", color: "#2563eb" },
     ];
 
-    const getColor = (label: string) => {
-        const colorMap: { [key: string]: string } = {
-            "Shopping": "#38bdf8",
-            "Food": "#f97316",
-            "Grocery": "#84cc16",
-            "Pharmacy": "#ef4444",
-            "Gift": "#a855f7",
-            "Ride Share": "#10b981",
-            "Top Up": "#f59e0b",
-            "Parcel": "#4b5563",
-            "Mobile": "#3b82f6",
-            "Drive Offer": "#8b5cf6",
-            "Air Ticket": "#ec4899",
-            "News Paper": "#10b981",
-            "Live TV": "#0ea5e9",
-            "Blood Bank": "#e11d48",
-            "STU Product": "#14b8a6",
-            "Online Shop": "#d97706",
-            "Covid Business": "#db2777",
-            "Local Outlet": "#2563eb",
-        }
-        return colorMap[label] || "#000"
-    }
-
-    useEffect(() => {
-        const scrollContainer = scrollRef.current
-        if (scrollContainer) {
-            const updateDimensions = () => {
-                const containerWidth = scrollContainer.offsetWidth
-                const newItemWidth = Math.floor(containerWidth / Math.floor(containerWidth / 80))
-                setItemWidth(newItemWidth)
-
-                const totalWidth = items.length * newItemWidth
-                scrollContainer.style.setProperty('--total-width', `${totalWidth}px`)
-                scrollContainer.style.setProperty('--item-width', `${newItemWidth}px`)
-
-                // Adjust animation duration based on the number of items
-                const animationDuration = items.length * 2 // 2 seconds per item
-                scrollContainer.style.setProperty('--animation-duration', `${animationDuration}s`)
-            }
-
-            updateDimensions()
-            window.addEventListener('resize', updateDimensions)
-
-            return () => window.removeEventListener('resize', updateDimensions)
-        }
-    }, [items])
+    const IconItem = ({ item }: { item: typeof items[0] }) => (
+        <div className="group flex flex-col items-center justify-center w-full cursor-pointer">
+            <div className="relative flex items-center justify-center w-11 h-11 md:w-14 md:h-14 lg:w-18 lg:h-18 rounded-2xl transition-transform duration-300 group-hover:-translate-y-1">
+                <div 
+                    className="absolute inset-0 rounded-2xl opacity-10 group-hover:opacity-100 transition-opacity"
+                    style={{ backgroundColor: item.color }}
+                />
+                <item.icon 
+                    className="w-5 h-5 md:w-7 md:h-7 lg:w-9 lg:h-9 relative z-10 transition-colors group-hover:text-white" 
+                    style={{ color: item.color }}
+                />
+            </div>
+            <span className="mt-2 text-[10px] md:text-xs font-bold text-gray-500 group-hover:text-gray-900 text-center leading-tight">
+                {t(`label.${item.label}`, item.label)}
+            </span>
+        </div>
+    );
 
     return (
-        <div className="  md:max-w-[1100px] w-[370px] sm:w-full bg-white overflow-hidden">
-            <div className="border border-gray-200 rounded-lg w-full md:max-w-[1040px] relative py-2 ">
-                <div
-                    ref={scrollRef}
-                    className="flex overflow-hidden right-to-left-scroll "
-                    style={{ direction: 'rtl' }} // This makes the content flow from right to left
-                >
-                    {items.concat(items).map((item, index) => (
-                        <div
-                            key={index}
-                            className="flex flex-col items-center justify-start flex-shrink-0"
-                            style={{ width: `${itemWidth}px`, direction: 'ltr' }} // Reset direction for icon and text
-                        >
-                            <div className="p-1 border-2 rounded-full bg-white">
-                                <button
-                                    className="h-16 w-16 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity"
-                                    aria-label={item.label}
-                                    style={{ backgroundColor: getColor(item.label) }}
-                                >
-                                    <item.icon className="h-8 w-8" strokeWidth={1.5} />
-                                </button>
-                            </div>
-                            <span className="mt-1 text-xs text-gray-600 whitespace-nowrap">{item.label}</span>
-                        </div>
-                    ))}
+        <section className="w-full py-4 md:py-8 bg-gray-50/30">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="bg-white border border-gray-100 rounded-3xl shadow-sm py-6 md:py-8 relative overflow-hidden">
+                    
+                    {/* --- MOBILE & TABLET: STATIC GRID (No Scroll) --- */}
+                    {/* grid-cols-4 ensures exactly 4 items per row */}
+                    <div className="grid grid-cols-4 gap-y-6 md:gap-y-8 lg:hidden">
+                        {items.map((item, idx) => (
+                            <IconItem key={`grid-${idx}`} item={item} />
+                        ))}
+                    </div>
+
+                    {/* --- DESKTOP: MARQUEE (Infinite Scroll) --- */}
+                    <div className="hidden lg:block relative">
+                         {/* Gradients only needed for Marquee */}
+                        <div className="absolute left-0 inset-y-0 w-24 z-10 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none" />
+                        <div className="absolute right-0 inset-y-0 w-24 z-10 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none" />
+
+                        <Marquee speed={45} gradient={false} pauseOnHover>
+                            {items.map((item, idx) => (
+                                // Wrapper div for marquee spacing
+                                <div key={`marquee-${idx}`} className="mx-8"> 
+                                    <IconItem item={item} />
+                                </div>
+                            ))}
+                        </Marquee>
+                    </div>
+
                 </div>
             </div>
-            <style jsx>{`
-                .right-to-left-scroll {
-                    --total-width: 0px;
-                    --item-width: 0px;
-                    --animation-duration: 0s;
-                    width: calc(var(--total-width) * 2);
-                    animation: rightToLeftScroll var(--animation-duration) linear infinite;
-                }
-                @keyframes rightToLeftScroll {
-                    0% {
-                        transform: translateX(calc(-1 * var(--total-width)));
-                    }
-                    100% {
-                        transform: translateX(0);
-                    }
-                }
-            `}</style>
-        </div>
-    )
+        </section>
+    );
 }

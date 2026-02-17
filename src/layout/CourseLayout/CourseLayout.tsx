@@ -2,33 +2,21 @@
 
 import * as React from "react"
 import { Link, Outlet } from "react-router-dom"
-import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal, Pill, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck, Lightbulb, Book, Zap, Users, DollarSign, Leaf, Microscope, Heart, Calculator, Globe, Camera, Briefcase, Palette, Code } from 'lucide-react'
+import logo from '../../../public/image/logo/logo.jpg' // Adjust path if needed
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+    ChevronRight, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck,
+    ChefHat, HelpCircleIcon, LogInIcon, Code, Palette, Briefcase, Camera,
+    Globe, Calculator, Heart, Microscope, Leaf, DollarSign, Zap, Users, Book, Lightbulb, Grid, Home
+} from 'lucide-react'
 import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarProvider,
-    SidebarRail,
+    Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader,
+    SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+    SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem,
+    SidebarProvider, SidebarRail,
 } from "@/components/ui/sidebar"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Sheet, SheetContent } from "@/components/ui/sheet" // Import Sheet for Mobile Drawer
+import { Separator } from "@/components/ui/separator"
 import Footer from "@/pages/common/Footer/Footer"
 import useModalStore from "@/store/Store"
 import Cart from "@/pages/Home/Cart/Cart"
@@ -36,16 +24,16 @@ import LiveChat from "@/pages/Home/LiveChat/Livechat"
 import CourseHeader from "@/pages/common/CourseHeader/CourseHeader"
 import { useTranslation } from "react-i18next"
 
-
-
 export default function CourseLayout() {
     const [activeCategory, setActiveCategory] = React.useState("courses")
-    const { openLoginModal, toggleClicked, changeCheckoutModal } = useModalStore();
-    const [t] = useTranslation("global")
+    const [isMobileOpen, setIsMobileOpen] = React.useState(false) // State for Mobile Drawer
+    const { openLoginModal, changeCheckoutModal } = useModalStore();
+    const { t } = useTranslation("global")
 
+    // --- Data Configuration ---
     const data = {
         categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard" },
             { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
@@ -54,330 +42,174 @@ export default function CourseLayout() {
         ],
         navMain: {
             courses: [
-                // {
-                //     title: t("navMain.title30"),
-                //     url: "/courses/programming",
-                //     icon: SquareTerminal,
-                //     isActive: true,
-                //     items: [
-                //         // { title: "Web Development", url: "" },
-                //         // { title: "Mobile App Development", url: "" },
-                //         // { title: "Data Science", url: "/courses/programming/data-science" },
-                //         // { title: "Machine Learning", url: "/courses/programming/machine-learning" },
-                //         // { title: "Game Development", url: "/courses/programming/game-development" },
-                //         // { title: "Cloud Computing", url: "/courses/programming/cloud-computing" },
-                //     ],
-                // },
-                // {
-                //     title: t("navMain.title15"),
-                //     url: "/courses/business",
-                //     icon: Pill,
-                //     items: [
-                //         // { title: "Entrepreneurship", url: "/courses/business/entrepreneurship" },
-                //         // { title: "Marketing", url: "/courses/business/marketing" },
-                //         // { title: "Finance", url: "/courses/business/finance" },
-                //         // { title: "Project Management", url: "/courses/business/project-management" },
-                //         // { title: "Leadership", url: "/courses/business/leadership" },
-                //     ],
-                // },
-                {
-                    title: t("navMain.title16"),
-                    url: "/courses/design",
-                    icon: ShoppingBag,
-                    items: [
-                        // { title: "Graphic Design", url: "/courses/design/graphic-design" },
-                        // { title: "UX/UI Design", url: "/courses/design/ux-ui-design" },
-                        // { title: "3D Modeling", url: "/courses/design/3d-modeling" },
-                        // { title: "Animation", url: "/courses/design/animation" },
-                        // { title: "Illustration", url: "/courses/design/illustration" },
-                    ],
-                },
-                {
-                    title: t("navMain.title17"),
-                    url: "",
-                    icon: Code,
-                    isActive: true,
-                    items: [
-                        // { title: "Web Development", url: "" },
-                        // { title: "Mobile App Development", url: "" },
-                        // { title: "Data Science", url: "" },
-                        // { title: "Machine Learning", url: "" },
-                        // { title: "Cloud Computing", url: "" },
-                        // { title: "Cybersecurity", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title18"),
-                    url: "",
-                    icon: Palette,
-                    items: [
-                        // { title: "Graphic Design", url: "" },
-                        // { title: "UX/UI Design", url: "" },
-                        // { title: "3D Modeling", url: "" },
-                        // { title: "Animation", url: "" },
-                        // { title: "Illustration", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title19"),
-                    url: "",
-                    icon: Briefcase,
-                    items: [
-                        // { title: "Entrepreneurship", url: "" },
-                        // { title: "Marketing", url: "" },
-                        // { title: "Finance", url: "" },
-                        // { title: "Project Management", url: "" },
-                        // { title: "Leadership", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title20"),
-                    url: "",
-                    icon: Camera,
-                    items: [
-                        // { title: "Digital Photography", url: "" },
-                        // { title: "Portrait Photography", url: "" },
-                        // { title: "Landscape Photography", url: "" },
-                        // { title: "Photo Editing", url: "" },
-                    ],
-                },
-
-                {
-                    title: t("navMain.title21"),
-                    url: "",
-                    icon: Globe,
-                    items: [
-                        // { title: "English", url: "" },
-                        // { title: "Spanish", url: "" },
-                        // { title: "Mandarin", url: "" },
-                        // { title: "French", url: "" },
-                        // { title: "German", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title22"),
-                    url: "",
-                    icon: Calculator,
-                    items: [
-                        // { title: "Algebra", url: "" },
-                        // { title: "Calculus", url: "" },
-                        // { title: "Statistics", url: "" },
-                        // { title: "Geometry", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title23"),
-                    url: "",
-                    icon: Heart,
-                    items: [
-                        // { title: "Nutrition", url: "" },
-                        // { title: "Yoga", url: "" },
-                        // { title: "Personal Training", url: "" },
-                        // { title: "Mental Health", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title24"),
-                    url: "",
-                    icon: Microscope,
-                    items: [
-                        // { title: "Physics", url: "" },
-                        // { title: "Chemistry", url: "" },
-                        // { title: "Biology", url: "" },
-                        // { title: "Astronomy", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title25"),
-                    url: "",
-                    icon: Leaf,
-                    items: [
-                        // { title: "Climate Change", url: "" },
-                        // { title: "Sustainability", url: "" },
-                        // { title: "Conservation", url: "" },
-                        // { title: "Renewable Energy", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title26"),
-                                        url: "",
-                    icon: DollarSign,
-                    items: [
-                        // { title: "Investing", url: "" },
-                        // { title: "Budgeting", url: "" },
-                        // { title: "Retirement Planning", url: "" },
-                        // { title: "Tax Planning", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title27"),
-                    url: "",
-                    icon: Users,
-                    items: [
-                        // { title: "Psychology", url: "" },
-                        // { title: "Sociology", url: "" },
-                        // { title: "Anthropology", url: "" },
-                        // { title: "Political Science", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title28"),
-                    url: "",
-                    icon: Zap,
-                    items: [
-                        // { title: "Electrical Engineering", url: "" },
-                        // { title: "Mechanical Engineering", url: "" },
-                        // { title: "Civil Engineering", url: "" },
-                        // { title: "Chemical Engineering", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title29"),
-                    url: "",
-                    icon: Book,
-                    items: [
-                        // { title: "Creative Writing", url: "" },
-                        // { title: "Technical Writing", url: "" },
-                        // { title: "Journalism", url: "" },
-                        // { title: "Copywriting", url: "" },
-                    ],
-                },
-                {
-                    title: t("navMain.title30"),
-                    url: "",
-                    icon: Lightbulb,
-                    items: [
-                        // { title: "Time Management", url: "" },
-                        // { title: "Public Speaking", url: "" },
-                        // { title: "Critical Thinking", url: "" },
-                        // { title: "Emotional Intelligence", url: "" },
-                    ],
-                },
+                { title: t("navMain.title16"), url: "/courses/design", icon: ShoppingBag, items: [] },
+                { title: t("navMain.title17"), url: "", icon: Code, isActive: true, items: [] },
+                { title: t("navMain.title18"), url: "", icon: Palette, items: [] },
+                { title: t("navMain.title19"), url: "", icon: Briefcase, items: [] },
+                { title: t("navMain.title20"), url: "", icon: Camera, items: [] },
+                { title: t("navMain.title21"), url: "", icon: Globe, items: [] },
+                { title: t("navMain.title22"), url: "", icon: Calculator, items: [] },
+                { title: t("navMain.title23"), url: "", icon: Heart, items: [] },
+                { title: t("navMain.title24"), url: "", icon: Microscope, items: [] },
+                { title: t("navMain.title25"), url: "", icon: Leaf, items: [] },
+                { title: t("navMain.title26"), url: "", icon: DollarSign, items: [] },
+                { title: t("navMain.title27"), url: "", icon: Users, items: [] },
+                { title: t("navMain.title28"), url: "", icon: Zap, items: [] },
+                { title: t("navMain.title29"), url: "", icon: Book, items: [] },
+                { title: t("navMain.title30"), url: "", icon: Lightbulb, items: [] },
             ],
         }
     }
+
+    // --- Reusable Sidebar Content (Used in both Desktop Sidebar & Mobile Sheet) ---
+    const SidebarContentComponent = () => (
+        <>
+            {/* Category Icons (Top Row) */}
+            <div className="px-4 py-3 border-b bg-gray-50/50">
+                <div className="flex flex-row justify-between gap-3 overflow-x-auto scrollbar-none p-1">
+                    {data.categories.map((category) => (
+                        <Link
+                            key={category.id}
+                            to={category.path}
+                            onClick={() => { setActiveCategory(category.id); setIsMobileOpen(false); }}
+                            className={`shrink-0 h-16 w-20 flex flex-col items-center justify-center rounded-lg border transition-all ${activeCategory === category.id
+                                    ? "bg-primary-default border-primary-default text-white shadow-md"
+                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary-default/50"
+                                }`}
+                        >
+                            <category.icon className="h-5 w-5 mb-1" />
+                            <span className="text-[10px] font-medium">{category.name}</span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {/* Main Navigation Menu (Accordion) */}
+            <SidebarContent>
+                <SidebarGroup>
+                    <SidebarMenu>
+                        {activeCategory === "courses" && data.navMain.courses.map((item) => (
+                            <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
+                                <SidebarMenuItem>
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton tooltip={item.title}>
+                                            {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                                            <span className="font-medium">{item.title}</span>
+                                            <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <SidebarMenuSub>
+                                            {item.items?.map((subItem) => (
+                                                <SidebarMenuSubItem key={subItem.title}>
+                                                    <SidebarMenuSubButton asChild>
+                                                        <Link to={subItem.url} onClick={() => setIsMobileOpen(false)}>
+                                                            <span>{subItem.title}</span>
+                                                        </Link>
+                                                    </SidebarMenuSubButton>
+                                                </SidebarMenuSubItem>
+                                            ))}
+                                        </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </SidebarMenuItem>
+                            </Collapsible>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroup>
+            </SidebarContent>
+        </>
+    );
+
     return (
         <SidebarProvider>
-            <Sidebar collapsible="icon">
+
+            {/* 1. DESKTOP SIDEBAR (Hidden on Mobile/Tablet) */}
+            <Sidebar collapsible="icon" className="hidden lg:flex border-r bg-white z-40">
                 <SidebarHeader>
-                    <div className="flex items-center justify-between p-2">
-                        <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
+                    <div className="flex items-center justify-center py-4 border-b h-16">
+                        <img src={logo} alt="logo" className="h-8 w-auto object-contain" />
                     </div>
                 </SidebarHeader>
-                <div className="px-4 py-3 border-b">
-                    <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2">
-                        {data.categories.map((category) => (
-                            <Link
-                                key={category.id}
-                                to={category.path}
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`h-16 w-24 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-primary-default border border-primary-default text-white"
-                                    : "border border-primary-default text-gray-700"
-                                    }`}
-                                aria-label={category.name}
-                            >
-                                <category.icon className="h-6 w-6 mb-1" />
-                                <span className="text-xs">{category.name}</span>
-                            </Link>
-                        ))}
+
+                <SidebarContentComponent />
+
+                <SidebarFooter className="p-2 border-t">
+                    <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2 border border-gray-200">
+                        <Link to="/help" className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
+                            <div className="bg-white p-1.5 rounded-full shadow-sm">
+                                <HelpCircleIcon className="h-4 w-4 text-teal-600" />
+                            </div>
+                            <span className="text-xs font-bold text-teal-600 group-data-[collapsible=icon]:hidden">Help</span>
+                        </Link>
+                        <Separator orientation="vertical" className="h-6 mx-1" />
+                        <button onClick={openLoginModal} className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
+                            <span className="text-xs font-bold text-blue-500 group-data-[collapsible=icon]:hidden">Login</span>
+                            <div className="bg-white p-1.5 rounded-full shadow-sm">
+                                <LogInIcon className="h-4 w-4 text-blue-500" />
+                            </div>
+                        </button>
                     </div>
-                </div>
-                <SidebarContent>
-                    <SidebarGroup>
-                        {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
-                        <SidebarMenu>
-                            {activeCategory === "courses" && data.navMain.courses.map((item) => (
-                                <Collapsible
-                                    key={item.title}
-                                    asChild
-                                    defaultOpen={item.isActive}
-                                    className="group/collapsible"
-                                >
-                                    <SidebarMenuItem>
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}>
-                                                {item.icon && <item.icon className="mr-2" />}
-                                                <span>{item.title}</span>
-                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <SidebarMenuSub>
-                                                {item.items?.map((subItem) => (
-                                                    <SidebarMenuSubItem key={subItem.title}>
-                                                        <SidebarMenuSubButton asChild>
-                                                            <Link to={subItem.url}>
-                                                                <span>{subItem.title}</span>
-                                                            </Link>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>
-                                                ))}
-                                            </SidebarMenuSub>
-                                        </CollapsibleContent>
-                                    </SidebarMenuItem>
-                                </Collapsible>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroup>
-                </SidebarContent>
-                <SidebarFooter>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton
-                                        size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
-                                                <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-teal-600">Help</span>
-                                            </Link>
-                                        </div>
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
-                                        <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2" onClick={openLoginModal}>
-                                                <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-blue-400">Login</span>
-                                            </button>
-                                        </div>
-                                    </SidebarMenuButton>
-                                </DropdownMenuTrigger>
-                            </DropdownMenu>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
                 </SidebarFooter>
                 <SidebarRail />
             </Sidebar>
-            <SidebarInset>
-                <main className="pt-8 ms-4">
-                    <button
-                        onClick={changeCheckoutModal}
-                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
-                    >
-                        <div className="flex items-center">
-                            <ShoppingBag className="h-6 w-6 text-red-500" />
-                            <div className="border-l border-gray-300 h-8 mx-2" />
-                            <div>
-                                <div className="font-semibold">{ } ITEMS</div>
-                                <div className="text-sm">৳ { }</div>
-                            </div>
-                        </div>
-                    </button>
-                    <CourseHeader />
-                    {/* <Header /> */}
-                    <Cart />
-                    <LiveChat />
+
+            {/* 2. MOBILE DRAWER (Sheet) - Visible when hamburger is clicked */}
+            <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                <SheetContent side="left" className="w-[300px] p-0 flex flex-col z-[100]">
+                    <div className="p-4 border-b flex items-center gap-3 bg-gray-50 h-16">
+                        <img src={logo} alt="logo" className="h-8 w-auto" />
+                        <span className="font-bold text-lg text-primary-default">Menu</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                        <SidebarContentComponent />
+                    </div>
+                    {/* Mobile Drawer Footer */}
+                    <div className="p-4 border-t bg-gray-50">
+                        <button onClick={openLoginModal} className="w-full flex items-center justify-center gap-2 bg-primary-default text-white py-2.5 rounded-lg font-semibold">
+                            <LogInIcon className="h-4 w-4" />
+                            Login / Sign Up
+                        </button>
+                    </div>
+                </SheetContent>
+            </Sheet>
+
+            {/* 3. MAIN CONTENT AREA */}
+            <SidebarInset className="flex flex-col min-h-screen bg-gray-50/30">
+
+                {/* Header: Passing the callback to open mobile menu */}
+                <CourseHeader onMenuClick={() => setIsMobileOpen(true)} />
+
+                <main className="flex-1 p-4 lg:p-6 relative w-full max-w-full mx-auto">
+{/* Floating Cart Button */}
+<button
+    onClick={changeCheckoutModal}
+    className="fixed z-50 bg-white border-2 border-primary-default/20 shadow-xl flex items-center gap-2 hover:bg-gray-50 transition-all 
+    bottom-24 right-4 rounded-full p-3 
+    lg:bottom-auto lg:top-[50%] lg:right-0 lg:rounded-l-xl lg:rounded-r-none lg:px-4 lg:py-3 lg:-translate-y-1/2"
+>
+    <div className="relative">
+        <ShoppingBag className="h-6 w-6 text-red-500" />
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
+            4
+        </span>
+    </div>
+    {/* Only show text on Desktop to prevent mobile overlapping */}
+    <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
+        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">MY CART</div>
+        <div className="text-xs font-bold text-gray-800">৳ 2369</div>
+    </div>
+</button>
                     <Outlet />
-                    <Footer />
+
+                    <div className="mt-12">
+                        <Footer />
+                    </div>
                 </main>
             </SidebarInset>
+
+            {/* Global Overlays */}
+            <Cart />
+            <LiveChat />
         </SidebarProvider>
     )
 }

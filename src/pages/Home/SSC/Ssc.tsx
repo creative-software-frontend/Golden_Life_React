@@ -115,8 +115,8 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
-                <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
+                <CarouselPrevious className="absolute -left-8 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
+                <CarouselNext className="absolute -right-8 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
             </Carousel>
         </div>
     )
@@ -124,8 +124,13 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function Ssc() {
     return (
-        <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4 items-center">
-            <CourseCarousel courses={lessons.slice(0, 4)} title="courses.ssc" />
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-6 flex justify-center">
+            <div className="w-full">
+                <CourseCarousel
+                    courses={lessons.slice(0, 4)}
+                    title="courses.ssc"
+                />
+            </div>
         </div>
     )
 }

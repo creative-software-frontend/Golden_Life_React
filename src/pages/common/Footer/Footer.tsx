@@ -1,106 +1,113 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin, ChevronRight } from 'lucide-react';
 import playstore from '../../../../public/image/footer/Play Store.png';
 import paywith from '../../../../public/image/footer/Pay-With.png';
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-    const { t, i18n } = useTranslation("global"); // Initialize translation hook
+    const { t, i18n } = useTranslation("global");
     const [value, setValue] = useState();
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-300 pt-4 md:max-w-[1100px] sm:w-full w-[370px]">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
+        <footer className="bg-gray-100 pt-16 mt-8 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                {/* About Section */}
                 <div>
-                    <h3 className="font-bold text-xl mb-4 text-gray-600">{t('footer.aboutGoldenLife')}</h3>
-                    <ul className="space-y-2">
-                        <li><Link to="/help/our-story" className="text-gray-600 hover:text-gray-900">{t('footer.ourStory')}</Link></li>
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">{t('footer.team')}</Link></li>
-                        <li><Link to="/help/privacy-policy" className="text-gray-600 hover:text-gray-900">{t('footer.privacyPolicy')}</Link></li>
-                        <li><Link to="/help/terms" className="text-gray-600 hover:text-gray-900">{t('footer.termsOfUse')}</Link></li>
+                    <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.aboutGoldenLife')}</h3>
+                    <ul className="space-y-3">
+                        <li><Link to="/help/our-story" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.ourStory')}</Link></li>
+                        <li><Link to="#" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.team')}</Link></li>
+                        <li><Link to="/help/privacy-policy" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.privacyPolicy')}</Link></li>
+                        <li><Link to="/help/terms" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.termsOfUse')}</Link></li>
                     </ul>
                 </div>
+
+                {/* Customer Service */}
                 <div>
-                    <h3 className="font-bold text-xl mb-4 text-gray-600">{t('footer.customerService')}</h3>
-                    <ul className="space-y-2">
-                        <li><Link to="/help/contact" className="text-gray-600 hover:text-gray-900">{t('footer.contactUs')}</Link></li>
-                        <li><Link to="/help" className="text-gray-600 hover:text-gray-900">{t('footer.faq')}</Link></li>
-                        <li><Link to="/help" className="text-gray-600 hover:text-gray-900">{t('footer.help')}</Link></li>
+                    <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.customerService')}</h3>
+                    <ul className="space-y-3">
+                        <li><Link to="/help/contact" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.contactUs')}</Link></li>
+                        <li><Link to="/help" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.faq')}</Link></li>
+                        <li><Link to="/help" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.help')}</Link></li>
                     </ul>
                 </div>
+
+                {/* For Business & Payment */}
                 <div>
-                    <h3 className="font-bold text-xl mb-4 text-gray-600">{t('footer.forBusiness')}</h3>
-                    <ul className="space-y-2">
-                        <li><Link to="#" className="text-gray-600 hover:text-gray-900">{t('footer.corporate')}</Link></li>
+                    <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.forBusiness')}</h3>
+                    <ul className="space-y-3">
+                        <li><Link to="#" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.corporate')}</Link></li>
                     </ul>
-                </div>
-                <div className="space-y-3 px-2">
-                    <div className="flex flex-col items-start w-full">
-                        <PhoneInput
-                            placeholder={t('footer.phoneNumber')}
-                            value={value}
-                            onChange={setValue}
-                            defaultCountry="BD"
-                            international
-                            className="w-full px-2 py-2 border border-gray-400 rounded-lg bg-white PhoneInputInput:focus"
+                    <div className="mt-12">
+                        {/* Enlarged Heading */}
+                        <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.paymentMethods')}</h3>
+                        {/* Bigger Image: Changed h-12 to h-16/h-20 for more impact */}
+                        <img 
+                            src={paywith} 
+                            alt="Payment Methods" 
+                            className="h-16 md:h-20 w-auto grayscale hover:grayscale-0 transition-all opacity-100 drop-shadow-md" 
                         />
-                        <button className="bg-primary-default w-full text-white px-3 py-2 mt-2 rounded-lg">
+                    </div>
+                </div>
+
+                {/* App & Support */}
+                <div className="space-y-8">
+                    <h3 className="font-bold text-lg mb-4 text-gray-800 uppercase tracking-wider">{t('footer.getApp')}</h3>
+                    <div className="space-y-4">
+                        <div className="relative border border-gray-300 rounded-2xl overflow-hidden bg-white shadow-sm focus-within:border-emerald-500 transition-colors">
+                            <PhoneInput
+                                placeholder={t('footer.phoneNumber')}
+                                value={value}
+                                onChange={setValue}
+                                defaultCountry="BD"
+                                international
+                                className="footer-phone-input px-4 py-3 text-sm outline-none"
+                            />
+                        </div>
+                        <button className="bg-emerald-600 hover:bg-emerald-700 w-full text-white px-5 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg active:scale-95">
                             {t('footer.getApp')}
                         </button>
                     </div>
-                    <div className="flex justify-between gap-3 p-2">
-                        <Link to="#">
-                            <img src={playstore} alt="Play Store" className="object-cover h-15 w-auto" />
-                        </Link>
-                    </div>
-                    <div className="text-start">
-                        <div className="flex items-center justify-end">
-                            <Phone className="h-4 w-4 text-gray-800 mr-2" />
-                            <p className="text-2xl text-gray-500 font-bold">0000000000000</p>
+                    
+                    <div className="pt-6 border-t border-gray-200">
+                        <div className="flex items-center text-gray-800 mb-2">
+                            <Phone className="h-5 w-5 mr-3 text-emerald-600" />
+                            <p className="text-2xl font-black tracking-tighter">0000000000000</p>
                         </div>
-                        <p className="text-gray-500 text-lg">or support@goldenlife.com</p>
+                        <p className="text-gray-500 text-sm font-medium italic opacity-80">or support@goldenlife.com</p>
                     </div>
                 </div>
             </div>
-            <div>
-                <div className="flex flex-wrap justify-between items-center mb-4 px-4">
-                    <div className='flex items-center'>
-                        <h3 className="font-bold text-lg mb-2 text-gray-500">{t('footer.paymentMethods')}</h3>
-                        <img src={paywith} alt="paywith" className="h-auto w-full max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[500px] object-cover" />
-                    </div>
-                </div>
-                <div className="border-0 -mb-8 border-gray-300 bg-white py-2">
-                    <div className="flex flex-wrap justify-between items-center mx-2 px-4">
-                        <p className="text-gray-600 text-start">{t('copyright', { year: currentYear })}</p>
-                        <div className="flex space-x-4">
-                            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                <Linkedin size={20} className="text-gray-600" />
+
+            {/* Bottom Bar */}
+            <div className="border-t border-gray-200 py-10">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <p className="text-gray-500 text-sm font-medium order-2 md:order-1">
+                        {t('copyright', { year: currentYear })}
+                    </p>
+                    
+                    <div className="flex items-center gap-4 order-1 md:order-2">
+                        {/* Enlarged Social Icons: Increased container w/h and Icon size */}
+                        {[Linkedin, Youtube, Facebook, Twitter, Instagram].map((Icon, idx) => (
+                            <Link 
+                                key={idx} 
+                                to="#" 
+                                className="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 rounded-full text-gray-600 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all shadow-md hover:-translate-y-1"
+                            >
+                                <Icon size={24} />
                             </Link>
-                            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                <Youtube size={20} className="text-gray-600" />
-                            </Link>
-                            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                <Facebook size={20} className="text-gray-600" />
-                            </Link>
-                            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                <Twitter size={20} className="text-gray-600" />
-                            </Link>
-                            <Link to="#" className="flex items-center justify-center bg-gray-200 rounded-full p-2 shadow hover:bg-gray-300 transition">
-                                <Instagram size={20} className="text-gray-600" />
-                            </Link>
-                            <div className="flex items-center gap-1 mx-1">
-                                <button
-                                    onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'bn' : 'en')}
-                                    className="text-gray-800"
-                                >
-                                    {i18n.language === 'en' ? 'BN' : 'EN'}
-                                </button>
-                            </div>
-                        </div>
+                        ))}
+                        <div className="h-8 w-px bg-gray-300 mx-2 hidden sm:block" />
+                        <button
+                            onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'bn' : 'en')}
+                            className="bg-gray-800 text-white text-xs font-black px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors uppercase tracking-widest shadow-md"
+                        >
+                            {i18n.language === 'en' ? 'BN' : 'EN'}
+                        </button>
                     </div>
                 </div>
             </div>

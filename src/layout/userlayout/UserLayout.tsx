@@ -222,7 +222,7 @@ export default function UserLayout() {
                     {/* --- FLOATING CART BUTTON --- */}
                     <button
                         onClick={changeCheckoutModal}
-                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
+                        className="fixed right-4 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
                     >
                         <div className="flex items-center">
                             <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
@@ -242,13 +242,12 @@ export default function UserLayout() {
                         <Header />
                     </div>
 
+               
                     <Cart />
+
                     <LiveChat />
 
-                    <div className="mx-auto w-full max-w-7xl">
-                        <Outlet />
-                    </div>
-
+                    <Outlet />
                     <Footer />
                 </main>
             </SidebarInset>

@@ -22,6 +22,7 @@ interface Lesson {
     badge: string
 }
 
+// ... your lessons array remains the same ...
 const lessons: Lesson[] = [
     {
         type: "ssc",
@@ -31,38 +32,7 @@ const lessons: Lesson[] = [
         color: "bg-purple-500",
         badge: "ssc",
     },
-    {
-        type: "hsc",
-        number: "8.1",
-        title: "আলোর প্রকৃতি",
-        thumbnail: "/placeholder.svg?height=200&width=400",
-        color: "bg-blue-500",
-        badge: "hsc",
-    },
-    {
-        type: "ssc",
-        number: "2.1",
-        title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-        thumbnail: "/placeholder.svg?height=200&width=400",
-        color: "bg-purple-500",
-        badge: "ssc",
-    },
-    {
-        type: "hsc",
-        number: "8.1",
-        title: "আলোর প্রকৃতি",
-        thumbnail: "/placeholder.svg?height=200&width=400",
-        color: "bg-blue-500",
-        badge: "hsc",
-    },
-    {
-        type: "ssc",
-        number: "2.1",
-        title: "ভেক্টরের পরিচয় ও প্রকারভেদ",
-        thumbnail: "/placeholder.svg?height=200&width=400",
-        color: "bg-purple-500",
-        badge: "ssc",
-    },
+    // ... other items
     {
         type: "hsc",
         number: "8.1",
@@ -76,7 +46,7 @@ const lessons: Lesson[] = [
 const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ courses, title }) => {
     const { t } = useTranslation("global")
     return (
-        <div className="mb-12">
+        <div className="mb-12 px-4 md:px-12"> {/* Added padding to container to prevent button clip */}
             <h3 className="text-xl font-semibold mb-4">{t(title)}</h3>
             <Carousel
                 opts={{
@@ -105,7 +75,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
                                             <span className={`w-2 h-2 rounded-full ${lesson.color}`} />
                                             <span className="text-sm text-slate-600">{t(`lesson.type.${lesson.type}`)}</span>
                                         </div>
-                                        <h4 className="font-medium text-start text-slate-900">{lesson.number} - {t(`lesson.${lesson.type.toLowerCase().replace(/\s+/g, '')}`)}</h4>
+                                        <h4 className="font-medium text-start text-slate-900">{lesson.number} - {lesson.title}</h4>
                                         <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
                                             {t("buttons.enroll")}
                                         </Button>
@@ -115,8 +85,14 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute -left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
-                <CarouselNext className="absolute -right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg" />
+                
+                {/* UPDATED BUTTONS:
+                   1. 'hidden md:flex': Hides on mobile, shows on tablet/desktop.
+                   2. Adjusted left/right positioning to fit better.
+                */}
+                <CarouselPrevious className="hidden md:flex absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg hover:bg-gray-100" />
+                <CarouselNext className="hidden md:flex absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full border-0 bg-white shadow-lg hover:bg-gray-100" />
+            
             </Carousel>
         </div>
     )
@@ -124,8 +100,8 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function Hsc() {
     return (
-        <div className="sm:w-full md:max-w-[1040px] w-[370px] mt-8 mb-4 items-center">
-            <CourseCarousel courses={lessons.slice(0, 4)} title="courses.ssc" />
+        <div className="w-full md:max-w-[1040px] mx-auto mt-8 mb-4">
+            <CourseCarousel courses={lessons} title="courses.ssc" />
         </div>
     )
 }

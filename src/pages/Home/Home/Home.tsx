@@ -20,8 +20,8 @@ const Home = () => {
       <CourseCategories />
       <Categories />
       <ProductCategories />
-      <FreshSell />
-      {/* <TrendingCategory /> */}
+      <FreshSell /> 
+      {/* {/* <TrendingCategory /> */}
     </div>
   )
 }

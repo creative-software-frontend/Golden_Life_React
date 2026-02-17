@@ -1,12 +1,10 @@
 'use client'
 
 import * as React from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import useEmblaCarousel from 'embla-carousel-react'
-import Autoplay from 'embla-carousel-autoplay'
 import { useTranslation } from "react-i18next"
+import { ShoppingCart } from 'lucide-react'
 
 interface Course {
     id: string
@@ -18,122 +16,82 @@ interface Course {
 }
 
 export default function FeaturedCourse() {
-    const { t } = useTranslation('global') // Moved this to the top
+    const { t } = useTranslation('global')
 
     const courses: Course[] = [
-        {
-            id: '1',
-            title: t("course.fb"), // Now t is available here
-            instructor: t("name.sakib"),
-            price: '1,690',
-            promoCode: 'SE1690',
-            image: '../../../../public/image/featiredcourse/f4.jpg',
-        },
-        {
-            id: '2',
-            title: t("course.yt"), // Now t is available here
-            instructor: t("name.ayman"),
-            price: '3,850',
-            promoCode: 'IELTS3850',
-            image: '../../../../public/image/featiredcourse/f3.jpg',
-        },
-        {
-            id: '3',
-            title: t("course.seo"), // Now t is available here
-            instructor: t("name.shahid"),
-            price: '1,690',
-            promoCode: 'EMKF1690',
-            image: '../../../../public/image/featiredcourse/f2.jpg',
-        },
-        {
-            id: '4',
-            title: t("course.smm"), // Now t is available here
-            instructor: t("name.ayman"),
-            price: '890',
-            promoCode: 'FBM890',
-            image: '../../../../public/image/featiredcourse/f1.jpg',
-        },
+        { id: '1', title: t("course.fb"), instructor: t("name.sakib"), price: '1,690', promoCode: 'SE1690', image: '/image/featiredcourse/f4.jpg' },
+        { id: '2', title: t("course.yt"), instructor: t("name.ayman"), price: '3,850', promoCode: 'IELTS3850', image: '/image/featiredcourse/f3.jpg' },
+        { id: '3', title: t("course.seo"), instructor: t("name.shahid"), price: '1,690', promoCode: 'EMKF1690', image: '/image/featiredcourse/f2.jpg' },
+        { id: '4', title: t("course.smm"), instructor: t("name.ayman"), price: '890', promoCode: 'FBM890', image: '/image/featiredcourse/f1.jpg' },
     ]
 
-    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay()])
-
-    const scrollPrev = React.useCallback(() => {
-        if (emblaApi) emblaApi.scrollPrev()
-    }, [emblaApi])
-
-    const scrollNext = React.useCallback(() => {
-        if (emblaApi) emblaApi.scrollNext()
-    }, [emblaApi])
-
     return (
-        <div className="md:max-w-[1040px] w-[370px] sm:w-full min-h-[400px] py-12">
-            <div className="container mx-auto px-4">
-                <h1 className="text-4xl font-bold text-black mb-4">
-                    {t("course.h")}
-                </h1>
-                <p className="text-black mb-8">
-                    {t("course.p")}
-                </p>
+        <section className="w-full py-12 bg-gray-50/50">
+            {/* Width decreased to max-w-6xl to match consistent narrower design */}
+            <div className="mx-auto px-4 max-w-6xl">
+                
+                {/* Header - Aligned and compact */}
+                <div className="text-center mb-10">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                        {t("course.h") || "Featured Courses"}
+                    </h2>
+                    <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base">
+                        {t("course.p") || "Explore our top-rated courses designed for your career success."}
+                    </p>
+                </div>
 
-                <div className="relative">
-                    <div className="overflow-hidden" ref={emblaRef}>
-                        <div className="flex">
-                            {courses.map((course) => (
-                                <div key={course.id} className="flex-[0_0_100%] min-w-0 sm:flex-[0_0_50%] lg:flex-[0_0_33.33%] px-4">
-                                    <Card className="border-0 shadow mb-4">
-                                        <CardContent className="p-0 relative">
-                                            <div className="relative pb-[30%]">
-                                                <img
-                                                    src={course.image}
-                                                    alt={course.title}
-                                                    className="w-[500px] h-[170px] object-cover rounded-t-lg" />
-                                                <div className="absolute bottom-0 left-0 right-0 p-4">
-                                                    <h3 className="text-xl font-bold text-black mb-2">{course.title}</h3>
-                                                    <p className="text-gray-600 text-sm">{course.instructor}</p>
-                                                </div>
-                                            </div>
-                                            <div className="p-4 space-y-4">
-                                                <div className="flex justify-between items-center">
-                                                    <div className="text-black">
-                                                        <span className="text-sm">{t("sections.price")}</span>
-                                                        <div className="text-2xl font-bold">৳{course.price}</div>
-                                                    </div>
-                                                    <div className="rounded px-3 py-1">
-                                                        <span className="text-white text-sm">PROMO CODE</span>
-                                                        <div className="text-green-400 font-mono font-bold">{course.promoCode}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between gap-4">
-                                                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
-                                                        {t("buttons.show")}
-                                                    </Button>
-                                                    <Button className="w-full bg-gray-400 hover:bg-green-600 text-white">
-                                                        {t("buttons.enroll")}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
+                {/* Grid Layout - Responsive 1, 2, or 4 columns */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {courses.map((course) => (
+                        <Card key={course.id} className="border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl overflow-hidden group bg-white flex flex-col h-full hover:-translate-y-1.5">
+                            
+                            {/* Image Section */}
+                            <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img
+                                    src={course.image}
+                                    alt={course.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+
+                            {/* Content Section */}
+                            <CardContent className="p-4 flex-1 flex flex-col">
+                                <h3 className="text-base font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-emerald-600 transition-colors cursor-pointer mb-1">
+                                    {course.title}
+                                </h3>
+                                <p className="text-gray-400 text-xs font-medium mb-4">
+                                    by {course.instructor}
+                                </p>
+
+                                {/* Price & Promo - More compact */}
+                                <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+                                    <div>
+                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Price</p>
+                                        <p className="text-lg font-black text-slate-900">৳{course.price}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[9px] text-gray-400 uppercase font-bold tracking-wider">Promo</p>
+                                        <span className="inline-block bg-emerald-50 text-emerald-700 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-emerald-100">
+                                            {course.promoCode}
+                                        </span>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                    <Button
-                        onClick={scrollPrev}
-                        className="absolute -left-12 top-1/2 -translate-y-1/2 bg-white hover:bg-white/20 text-white border-0"
-                        aria-label="Previous slide"
-                    >
-                        <ChevronLeft className="h-6 w-6 text-black" />
-                    </Button>
-                    <Button
-                        onClick={scrollNext}
-                        className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white hover:bg-white/20 text-white border-0"
-                        aria-label="Next slide"
-                    >
-                        <ChevronRight className="h-6 w-6 text-black" />
-                    </Button>
+                            </CardContent>
+
+                            {/* Actions Footer */}
+                            <CardFooter className="p-4 pt-0 grid grid-cols-5 gap-2">
+                                <Button className="col-span-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 rounded-xl shadow-md transition-all active:scale-95">
+                                    {t("buttons.show") || "View Details"}
+                                </Button>
+                                <Button variant="outline" size="icon" className="col-span-1 border-emerald-100 text-emerald-600 hover:bg-emerald-50 h-9 rounded-xl">
+                                    <ShoppingCart className="w-4 h-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))}
                 </div>
             </div>
-        </div>
+        </section>
     )
 }

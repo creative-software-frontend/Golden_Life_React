@@ -1,39 +1,91 @@
 import React from 'react';
-import { Backpack, ArrowRight } from 'lucide-react'; // Use appropriate icons from Lucide Icons
-import { Link } from 'react-router-dom'; // Import Link for routing
+import { Backpack, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 const Coursecatagory2 = () => {
-    const [t] = useTranslation("global"); // Translation hook
+    const { t } = useTranslation("global");
+
     const grades = [
-        { id: 1, label: t("course.HSC242526"), color: 'bg-red-400', textColor: 'text-red-600', path: '/courses/hsc' },
-        { id: 2, label: t("course.১০ম শ্রেণি"), color: 'bg-yellow-400', textColor: 'text-yellow-600', path: '/courses/ssc' },
-        { id: 3, label: t("course.৯ম শ্রেণি"), color: 'bg-teal-400', textColor: 'text-teal-600', path: '/courses/ssc' },
-        { id: 4, label: t("course.৮ম শ্রেণি"), color: 'bg-orange-400', textColor: 'text-orange-600', path: '/courses/ssc' },
-        { id: 5, label: t("course.৭ম শ্রেণি"), color: 'bg-yellow-300', textColor: 'text-yellow-500', path: '/courses/ssc' },
-        { id: 6, label: t("course.৬ষ্ঠ শ্রেণি"), color: 'bg-blue-300', textColor: 'text-blue-500', path: '/courses/ssc' },
+        { id: 1, label: t("course.HSC242526") || "HSC 24, 25, 26", color: 'bg-rose-50', iconBg: 'bg-rose-500', path: '/courses/hsc' },
+        { id: 2, label: t("course.১০ম শ্রেণি") || "10th Grade", color: 'bg-amber-50', iconBg: 'bg-amber-500', path: '/courses/ssc' },
+        { id: 3, label: t("course.৯ম শ্রেণি") || "9th Grade", color: 'bg-emerald-50', iconBg: 'bg-emerald-500', path: '/courses/ssc' },
+        { id: 4, label: t("course.৮ম শ্রেণি") || "8th Grade", color: 'bg-orange-50', iconBg: 'bg-orange-500', path: '/courses/ssc' },
+        { id: 5, label: t("course.৭ম শ্রেণি") || "7th Grade", color: 'bg-indigo-50', iconBg: 'bg-indigo-500', path: '/courses/ssc' },
+        { id: 6, label: t("course.৬ষ্ঠ শ্রেণি") || "6th Grade", color: 'bg-sky-50', iconBg: 'bg-sky-500', path: '/courses/ssc' },
     ];
 
-    return (
-        <div className=" lg:mt-12  grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4  mt-6 sm:w-full md:max-w-[1040px] w-[377px]">
-            {grades.map((grade) => (
-                <Link
-                    key={grade.id}
-                    to={grade.path} // Dynamic path
-                    className="flex flex-col items-center justify-between bg-[#ccfbf1] text-black p-4 rounded-md shadow-md"
-                >
-                    {/* Icon Section */}
-                    <div className={`p-3 rounded-full ${grade.color}`}>
-                        <Backpack className="text-white w-6 h-6" />
-                    </div>
-                    {/* Text Section */}
-                    <p className="mt-2 text-center font-semibold text-sm text-nowrap">{grade.label}</p>
-                    {/* Arrow */}
-                    <ArrowRight className="w-4 h-4 text-black mt-2" />
-                </Link>
-            ))}
-        </div>
+    // Animation Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1, // Staggers the entry of each card
+            },
+        },
+    };
 
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { type: 'spring', stiffness: 100 },
+        },
+    };
+
+    return (
+        <section className="w-full py-8 px-4 overflow-hidden">
+            <motion.div 
+                className="max-w-6xl mx-auto"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
+            >
+                <motion.div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                    {grades.map((grade) => (
+                        <motion.div
+                            key={grade.id}
+                            variants={itemVariants}
+                            whileHover={{ y: -8 }} // Lifts card on hover
+                            className="h-full"
+                        >
+                            <Link
+                                to={grade.path}
+                                className="group relative flex flex-col items-center justify-center p-6 rounded-2xl border border-gray-100 bg-white shadow-sm h-full overflow-hidden"
+                            >
+                                {/* Background Highlight on Hover */}
+                                <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${grade.color}`} />
+
+                                {/* Icon Container with Framer Motion Animation */}
+                                <motion.div 
+                                    className={`p-4 rounded-2xl ${grade.iconBg} text-white shadow-lg z-10`}
+                                    whileHover={{ rotate: 5, scale: 1.1 }}
+                                    transition={{ type: 'spring', stiffness: 300 }}
+                                >
+                                    <Backpack className="w-6 h-6" />
+                                </motion.div>
+
+                                <h3 className="mt-5 text-center font-bold text-gray-800 text-xs sm:text-sm leading-tight group-hover:text-emerald-600 transition-colors z-10">
+                                    {grade.label}
+                                </h3>
+
+                                {/* Arrow Button with Motion */}
+                                <motion.div 
+                                    className="mt-4 flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 group-hover:bg-emerald-500 group-hover:text-white transition-all z-10"
+                                    whileHover={{ x: 3 }}
+                                >
+                                    <ArrowRight className="w-4 h-4" />
+                                </motion.div>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </motion.div>
+        </section>
     );
 };
 
