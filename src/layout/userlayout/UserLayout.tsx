@@ -178,11 +178,11 @@ export default function UserLayout() {
                         <div className="flex items-center gap-2">
                             {/* Login Button (Green Pill) */}
                             <button
-                                onClick={openLoginModal}
+                          
                                 className="flex items-center gap-1 bg-[#5ca367] hover:bg-[#4a8a54] text-white px-3 py-1.5 rounded-full transition-colors"
                             >
-                                <LogInIcon className="h-3.5 w-3.5" />
-                                <span className="text-xs font-bold">{t("login")}</span>
+                               
+                                <span className="text-xs font-bold">Dashboard</span>
                             </button>
 
                             {/* Language Switcher (Green Pill) */}
