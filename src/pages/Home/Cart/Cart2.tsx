@@ -52,7 +52,7 @@ export default function Cart2() {
 
     return (
         <>
-            <button
+            {/* <button
                 onClick={() => setIsOpen(true)}
                 className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
             >
@@ -64,9 +64,9 @@ export default function Cart2() {
                         <div className="text-sm">₹ {total}</div>
                     </div>
                 </div>
-            </button>
+            </button> */}
 
-            {isOpen && (
+            {/* {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end  z-50 pt-16">
                     <div className="bg-white rounded-md w-full max-w-md h-[80vh] overflow-auto rounded-t-lg shadow-lg">
                         <div className="sticky top-0 bg-white border-b z-10">
@@ -149,7 +149,7 @@ export default function Cart2() {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
         </>
     )
 }

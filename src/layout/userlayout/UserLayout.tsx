@@ -57,7 +57,7 @@ export default function UserLayout() {
 
 
 
-// --- CLEAN CODE HERE ---
+    // --- CLEAN CODE HERE ---
     // Instead of 200 lines of data, just call the function!
     const data = React.useMemo(() => getNavData(t), [t]);
     return (
@@ -166,63 +166,58 @@ export default function UserLayout() {
                 <header className="flex flex-col sticky top-0 z-40 border-b bg-white lg:hidden">
 
                     {/* ROW 1: Logo, Menu, Login & Language */}
-                    <div className="flex h-16 shrink-0 items-center justify-between px-4">
-                        <div className="flex items-center gap-2">
-                            <SidebarTrigger className="-ml-2 text-gray-600">
-                                <Menu className="h-6 w-6" />
+                    <div className="flex h-14 sm:h-16 shrink-0 items-center justify-between px-2 sm:px-4">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                            <SidebarTrigger className="-ml-1 sm:-ml-2 text-gray-600">
+                                <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                             </SidebarTrigger>
-                            <Separator orientation="vertical" className="mr-2 h-4" />
-                            <img src={logo} alt="logo" className="h-8 w-auto" />
+                            <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4" />
+                            <img src={logo} alt="logo" className="h-6 sm:h-8 w-auto" />
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                             {/* Login Button (Green Pill) */}
-                            <button
-                          
-                                className="flex items-center gap-1 bg-[#5ca367] hover:bg-[#4a8a54] text-white px-3 py-1.5 rounded-full transition-colors"
-                            >
-                               
-                                <span className="text-xs font-bold">Dashboard</span>
+                            <button className="flex items-center gap-1 bg-[#5ca367] hover:bg-[#4a8a54] text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full transition-colors">
+                                <span className="text-[10px] sm:text-xs font-bold">Dashboard</span>
                             </button>
 
                             {/* Language Switcher (Green Pill) */}
-                            <div className="flex items-center bg-[#5ca367] text-white rounded-full px-2 py-1.5">
-                                <button className="text-[10px] font-bold px-1 hover:opacity-80">EN</button>
-                                <div className="h-3 w-[1px] bg-white/40 mx-0.5"></div>
-                                <button className="text-[10px] font-bold px-1 hover:opacity-80 opacity-70">BN</button>
+                            <div className="flex items-center bg-[#5ca367] text-white rounded-full px-1 py-1 sm:px-2 sm:py-1.5">
+                                <button className="text-[9px] sm:text-[10px] font-bold px-0.5 sm:px-1 hover:opacity-80">EN</button>
+                                <div className="h-2.5 sm:h-3 w-[1px] bg-white/40 mx-0.5"></div>
+                                <button className="text-[9px] sm:text-[10px] font-bold px-0.5 sm:px-1 hover:opacity-80 opacity-70">BN</button>
                             </div>
                         </div>
                     </div>
 
                     {/* ROW 2: Search Bar (Full Width) */}
-                    <div className="px-4 pb-3">
+                    <div className="px-2 sm:px-4 pb-2 sm:pb-3">
                         <div className="relative flex items-center w-full">
                             <input
                                 type="text"
                                 placeholder="Search products..."
-                                className="w-full h-10 pl-3 pr-20 text-sm bg-gray-50 border border-[#5ca367] rounded-md outline-none focus:ring-1 focus:ring-[#5ca367] transition-all placeholder:text-gray-400"
+                                className="w-full h-9 sm:h-10 pl-3 pr-16 sm:pr-20 text-xs sm:text-sm bg-gray-50 border border-[#5ca367] rounded-md outline-none focus:ring-1 focus:ring-[#5ca367] transition-all placeholder:text-gray-400"
                             />
 
                             {/* Icons inside Input (Camera | Search) */}
-                            <div className="absolute right-2 flex items-center gap-2 text-gray-500">
+                            <div className="absolute right-1 sm:right-2 flex items-center gap-1 sm:gap-2 text-gray-500">
                                 <button className="p-1 hover:text-[#5ca367] transition-colors">
-                                    <Camera className="h-5 w-5" />
+                                    <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
                                 </button>
-                                <div className="h-5 w-[1px] bg-gray-300"></div>
+                                <div className="h-4 sm:h-5 w-[1px] bg-gray-300"></div>
                                 <button className="p-1 hover:text-[#5ca367] transition-colors">
-                                    <Search className="h-5 w-5" />
+                                    <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                                 </button>
                             </div>
                         </div>
                     </div>
                 </header>
-
                 {/* UPDATED: Changed md:pt-6 to lg:pt-6 for consistent spacing */}
                 <main className="relative flex-1 p-4 lg:pt-6">
                     {/* --- FLOATING CART BUTTON --- */}
                     <button
                         onClick={changeCheckoutModal}
-                        className="fixed right-4 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
+                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
                     >
                         <div className="flex items-center">
                             <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
@@ -242,7 +237,7 @@ export default function UserLayout() {
                         <Header />
                     </div>
 
-               
+
                     <Cart />
 
                     <LiveChat />

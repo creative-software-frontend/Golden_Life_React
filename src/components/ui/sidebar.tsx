@@ -314,7 +314,6 @@ const SidebarRail = React.forwardRef<
   )
 })
 SidebarRail.displayName = "SidebarRail"
-
 const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"main">
@@ -322,9 +321,9 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-      // UPDATED: Changed all md: prefixes to lg: prefixes
+      // UPDATED: Added w-full and min-w-0 to prevent header/content overflow
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-200 ease-in-out",
+        "relative flex min-h-svh flex-1 w-full min-w-0 flex-col bg-background transition-all duration-200 ease-in-out",
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow",
         className
       )}
@@ -333,7 +332,6 @@ const SidebarInset = React.forwardRef<
   )
 })
 SidebarInset.displayName = "SidebarInset"
-
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
   React.ComponentProps<typeof Input>
