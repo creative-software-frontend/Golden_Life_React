@@ -28,7 +28,7 @@ export default function FeaturedCourse() {
     return (
         <section className="w-full py-12 bg-gray-50/50">
             {/* Width decreased to max-w-6xl to match consistent narrower design */}
-            <div className="mx-auto px-4 max-w-6xl">
+            <div className="mx-auto px-4 max-w-5xl">
                 
                 {/* Header - Aligned and compact */}
                 <div className="text-center mb-10">

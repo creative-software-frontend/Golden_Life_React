@@ -42,7 +42,7 @@ export default function AllCourses2() {
     return (
         <section className="w-full py-6 px-4">
             <motion.div 
-                className="max-w-6xl mx-auto"
+                className="max-w-4xl mx-auto"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.1 }}

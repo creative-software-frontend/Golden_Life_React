@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin, ChevronRight } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Phone, Youtube, Linkedin } from 'lucide-react';
 import playstore from '../../../../public/image/footer/Play Store.png';
 import paywith from '../../../../public/image/footer/Pay-With.png';
 import 'react-phone-number-input/style.css';
@@ -13,9 +13,11 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-gray-100 pt-16 mt-8 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                {/* About Section */}
+        <footer className="bg-gray-100 pt-16 mt-8 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200">
+            
+            {/* --- TOP SECTION (4 Columns) --- */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                {/* 1. About Section */}
                 <div>
                     <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.aboutGoldenLife')}</h3>
                     <ul className="space-y-3">
@@ -26,7 +28,7 @@ const Footer = () => {
                     </ul>
                 </div>
 
-                {/* Customer Service */}
+                {/* 2. Customer Service */}
                 <div>
                     <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.customerService')}</h3>
                     <ul className="space-y-3">
@@ -36,25 +38,15 @@ const Footer = () => {
                     </ul>
                 </div>
 
-                {/* For Business & Payment */}
+                {/* 3. For Business */}
                 <div>
                     <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.forBusiness')}</h3>
                     <ul className="space-y-3">
                         <li><Link to="#" className="text-gray-500 hover:text-emerald-600 transition-colors text-sm">{t('footer.corporate')}</Link></li>
                     </ul>
-                    <div className="mt-12">
-                        {/* Enlarged Heading */}
-                        <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">{t('footer.paymentMethods')}</h3>
-                        {/* Bigger Image: Changed h-12 to h-16/h-20 for more impact */}
-                        <img 
-                            src={paywith} 
-                            alt="Payment Methods" 
-                            className="h-16 md:h-20 w-auto grayscale hover:grayscale-0 transition-all opacity-100 drop-shadow-md" 
-                        />
-                    </div>
                 </div>
 
-                {/* App & Support */}
+                {/* 4. App & Support */}
                 <div className="space-y-8">
                     <h3 className="font-bold text-lg mb-4 text-gray-800 uppercase tracking-wider">{t('footer.getApp')}</h3>
                     <div className="space-y-4">
@@ -72,30 +64,49 @@ const Footer = () => {
                             {t('footer.getApp')}
                         </button>
                     </div>
-                    
-                    <div className="pt-6 border-t border-gray-200">
-                        <div className="flex items-center text-gray-800 mb-2">
-                            <Phone className="h-5 w-5 mr-3 text-emerald-600" />
-                            <p className="text-2xl font-black tracking-tighter">0000000000000</p>
-                        </div>
-                        <p className="text-gray-500 text-sm font-medium italic opacity-80">or support@goldenlife.com</p>
-                    </div>
                 </div>
             </div>
 
-            {/* Bottom Bar */}
+            {/* --- MIDDLE SECTION (Payment Left, Contact Right) --- */}
+            <div className="py-8 border-t border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-8">
+                
+                {/* Payment Methods - Left Side (Takes 3 columns) */}
+                <div className="md:col-span-3">
+                    <h3 className="font-bold text-lg mb-6 text-gray-800 uppercase tracking-wider">
+                        {t('footer.paymentMethods')}
+                    </h3>
+                    <img
+                        src={paywith}
+                        alt="Payment Methods"
+                        className="h-16 md:h-20 w-auto object-contain object-left grayscale hover:grayscale-0 transition-all opacity-100 drop-shadow-md"
+                    />
+                </div>
+
+                {/* Support Contact - Right Side (Takes 1 column) */}
+                <div className="md:col-span-1 flex flex-col justify-center border-t md:border-t-0 pt-6 md:pt-0 border-gray-200">
+                    <div className="flex items-center text-gray-800 mb-2">
+                        <Phone className="h-5 w-5 mr-3 text-emerald-600 shrink-0" />
+                        <p className="text-2xl font-black tracking-tighter">0000000000000</p>
+                    </div>
+                    <p className="text-gray-500 text-sm font-medium italic opacity-80">
+                        or support@goldenlife.com
+                    </p>
+                </div>
+
+            </div>
+
+            {/* --- BOTTOM BAR --- */}
             <div className="border-t border-gray-200 py-10">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                     <p className="text-gray-500 text-sm font-medium order-2 md:order-1">
                         {t('copyright', { year: currentYear })}
                     </p>
-                    
+
                     <div className="flex items-center gap-4 order-1 md:order-2">
-                        {/* Enlarged Social Icons: Increased container w/h and Icon size */}
                         {[Linkedin, Youtube, Facebook, Twitter, Instagram].map((Icon, idx) => (
-                            <Link 
-                                key={idx} 
-                                to="#" 
+                            <Link
+                                key={idx}
+                                to="#"
                                 className="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 rounded-full text-gray-600 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all shadow-md hover:-translate-y-1"
                             >
                                 <Icon size={24} />

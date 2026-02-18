@@ -52,7 +52,7 @@ export default function AllProduct() {
 
     return (
         <section className="w-full py-12 px-4 bg-gray-50/50">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-4xl mx-auto">
                 <header className="flex justify-between items-end mb-10">
                     <div>
                         <h1 className="text-3xl font-black text-gray-900 tracking-tight">{t("labels.freshVegetables")}</h1>

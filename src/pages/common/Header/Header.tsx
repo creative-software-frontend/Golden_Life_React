@@ -111,12 +111,12 @@ const Header: React.FC = () => {
     return (
         // FIXED: Header is now w-full and sticky to ensure it stretches across all devices
         <div className="w-full bg-white shadow-md border-b border-gray-200 z-40 sticky top-0">
-            
+
             {/* =========================================
                 1. DESKTOP HEADER (Large Screens)
                ========================================= */}
             <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-4xl mx-auto h-20 gap-8">
-                
+
                 {/* Search Bar Container */}
                 <div className="flex-1 max-w-4xl relative">
                     <div className="relative w-full group">
@@ -153,13 +153,22 @@ const Header: React.FC = () => {
                 {/* Actions Area */}
                 <div className="flex items-center gap-6 shrink-0">
                     {/* Language Switcher */}
-                    <div className="flex items-center gap-2 bg-gray-100 p-1.5 rounded-xl border border-gray-200">
-                        <button onClick={() => handleChangeLanguage('en')} className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}>EN</button>
-                        <button onClick={() => handleChangeLanguage('bn')} className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}>BN</button>
+                    <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
+                        <button
+                            onClick={() => handleChangeLanguage('en')}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}
+                        >
+                            EN
+                        </button>
+                        <button
+                            onClick={() => handleChangeLanguage('bn')}
+                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}
+                        >
+                            BN
+                        </button>
                     </div>
-
                     {/* FIXED: Removed Login button, added Dashboard Text */}
-                    <Link 
+                    <Link
                         to="/dashboard"
                         className="flex items-center gap-2 bg-primary-default text-white px-6 py-3 rounded-xl text-base font-black hover:bg-primary-dark shadow-lg shadow-primary-default/20 transition-all active:scale-95"
                     >
@@ -202,7 +211,7 @@ const Header: React.FC = () => {
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                             <CameraIcon className="h-6 w-6 text-gray-400" />
+                            <CameraIcon className="h-6 w-6 text-gray-400" />
                         </div>
                     </div>
                 </div>
