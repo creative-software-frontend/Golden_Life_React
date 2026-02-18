@@ -37,7 +37,7 @@ export default function ProductSection() {
 
         {/* Responsive Grid Area */}
         {/* Mobile: grid-cols-2 | Tablet: sm:grid-cols-3 | Desktop: lg:grid-cols-6 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
           {products.map((product) => (
             <Link 
               key={product.id}

@@ -84,7 +84,7 @@ export default function FreshSell() {
                 {/* Responsive Grid Area */}
                 {/* 2 Cols Mobile | 3 Cols Tablet | 6 Cols Desktop */}
                 <div className="p-4 md:p-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
                         {products.map((product) => (
                             <div
                                 key={product.id}
