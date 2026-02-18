@@ -37,53 +37,54 @@ const Coursecatagory2 = () => {
     };
 
     return (
-        <section className="w-full py-8 px-4 overflow-hidden">
+        <section className="w-full py-6 px-4 overflow-hidden">
             <motion.div 
-                className="max-w-4xl mx-auto"
+                className="max-w-5xl mx-auto"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={containerVariants}
             >
-                <motion.div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
                     {grades.map((grade) => (
                         <motion.div
                             key={grade.id}
                             variants={itemVariants}
-                            whileHover={{ y: -8 }} // Lifts card on hover
+                            whileHover={{ y: -4 }} // Reduced lift for smaller cards
                             className="h-full"
                         >
                             <Link
                                 to={grade.path}
-                                className="group relative flex flex-col items-center justify-center p-6 rounded-2xl border border-gray-100 bg-white shadow-sm h-full overflow-hidden"
+                                className="group relative flex flex-col items-center justify-center p-4 sm:p-5 rounded-xl border border-gray-100 bg-white shadow-sm h-full overflow-hidden transition-shadow hover:shadow-md"
                             >
                                 {/* Background Highlight on Hover */}
                                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${grade.color}`} />
 
                                 {/* Icon Container with Framer Motion Animation */}
                                 <motion.div 
-                                    className={`p-4 rounded-2xl ${grade.iconBg} text-white shadow-lg z-10`}
-                                    whileHover={{ rotate: 5, scale: 1.1 }}
+                                    className={`p-2.5 sm:p-3 rounded-xl ${grade.iconBg} text-white shadow-md z-10`}
+                                    whileHover={{ rotate: 5, scale: 1.05 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
                                 >
-                                    <Backpack className="w-6 h-6" />
+                                    <Backpack className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </motion.div>
 
-                                <h3 className="mt-5 text-center font-bold text-gray-800 text-xs sm:text-sm leading-tight group-hover:text-emerald-600 transition-colors z-10">
+                                {/* Shrunk Font Size */}
+                                <h3 className="mt-3 text-center font-bold text-gray-800 text-[10px] sm:text-xs leading-tight group-hover:text-emerald-600 transition-colors z-10 px-1">
                                     {grade.label}
                                 </h3>
 
                                 {/* Arrow Button with Motion */}
                                 <motion.div 
-                                    className="mt-4 flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 group-hover:bg-emerald-500 group-hover:text-white transition-all z-10"
-                                    whileHover={{ x: 3 }}
+                                    className="mt-3 flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-50 text-gray-400 group-hover:bg-emerald-500 group-hover:text-white transition-all z-10"
+                                    whileHover={{ x: 2 }}
                                 >
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight className="w-3 h-3" />
                                 </motion.div>
                             </Link>
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
             </motion.div>
         </section>
     );
