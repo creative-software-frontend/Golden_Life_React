@@ -54,7 +54,7 @@ export default function FreshSell() {
     };
 
     return (
-        <section className="py-8 md:py-12 mt-4 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-8 md:py-12 mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 
                 {/* Header Bar - Responsive Flex */}

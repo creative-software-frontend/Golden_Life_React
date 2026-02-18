@@ -22,7 +22,7 @@ const HeroSection = () => {
                 DESKTOP VIEW (Visible on lg+ screens)
                ========================================= */}
             <section className="hidden lg:block w-full px-4 py-10">
-                <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-2xl">
+                <div className="max-w-4xl mx-auto overflow-hidden rounded-2xl shadow-2xl">
                     <Swiper
                         modules={[Pagination, Autoplay, EffectFade]}
                         effect="fade"

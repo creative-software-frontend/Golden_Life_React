@@ -12,7 +12,7 @@ export default function ProductSection() {
   ];
 
   return (
-    <section className="py-8 md:py-12 mt-4 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-8 md:py-12 mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Container with shadow and background */}
       <div className="bg-primary-default rounded-2xl shadow-xl overflow-hidden p-4 sm:p-6 md:p-8">
         

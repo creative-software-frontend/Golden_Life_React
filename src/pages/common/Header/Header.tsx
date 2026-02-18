@@ -115,7 +115,7 @@ const Header: React.FC = () => {
             {/* =========================================
                 1. DESKTOP HEADER (Large Screens)
                ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-8xl mx-auto h-20 gap-8">
+            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-4xl mx-auto h-20 gap-8">
                 
                 {/* Search Bar Container */}
                 <div className="flex-1 max-w-4xl relative">

@@ -90,19 +90,19 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ onMenuClick }) => {
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-6 shrink-0">
                     {/* Language Switcher Pill */}
-                    <div className="flex items-center gap-2 bg-gray-100 p-1.5 rounded-xl border border-gray-200">
-                        <button
-                            onClick={() => handleChangeLanguage('en')}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                        >
-                            EN
-                        </button>
-                        <button
-                            onClick={() => handleChangeLanguage('bn')}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500'}`}
-                        >
-                            BN
-                        </button>
+                    <div className="flex items-center w-fit gap-0.5 bg-gray-100 p-0.5 rounded-md border border-gray-200">
+                        {['en', 'bn'].map((lang) => (
+                            <button
+                                key={lang}
+                                onClick={() => handleChangeLanguage(lang)}
+                                className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold uppercase transition-all ${i18n.language === lang
+                                        ? 'bg-white text-green-600 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                            >
+                                {lang}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Dashboard Button (Logo Removed) */}
