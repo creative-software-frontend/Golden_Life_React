@@ -70,7 +70,7 @@ export default function Categories() {
 
     return (
         <section className="w-full py-5 px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="container mx-auto">
                 
                 {/* Header Section - Slightly more compact */}
                 <div className="bg-gradient-to-r from-orange-500 via-yellow-600 to-green-600 rounded-t-lg p-3.5 md:p-4 flex flex-col md:flex-row justify-between items-center shadow-lg mb-5">

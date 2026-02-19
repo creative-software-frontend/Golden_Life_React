@@ -64,47 +64,50 @@ export default function UserLayout() {
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                    <div className="flex items-center justify-between p-2">
-                        <img src={logo} alt="logo" className="w-full border-b-2 border-gray pb-2" />
+                   <div className="flex items-center justify-center py-4 border-b h-16">
+                        <img src={logo} alt="logo" className="h-8 w-auto object-contain" />
                     </div>
                 </SidebarHeader>
-                <div className="px-2 py-3 border-b ">
-                    <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
+                <div className="px-2 py-2 border-b">
+                    <div className="flex flex-row justify-between gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-1">
                         {data.categories.map((category) => (
                             <Link
                                 key={category.id}
                                 to={category.path}
                                 onClick={() => setActiveCategory(category.id)}
-                                className={`h-20 w-32 p-3 flex flex-col items-center justify-center rounded ${activeCategory === category.id
-                                    ? "bg-primary-default border border-primary-default text-white"
-                                    : "border border-primary-default text-gray-700"
+                                /* Decreased width (w-20), height (h-16), and padding (p-2) */
+                                className={`h-16 min-w-20 p-2 flex flex-col items-center justify-center rounded transition-colors ${activeCategory === category.id
+                                        ? "bg-primary-default border border-primary-default text-white"
+                                        : "border border-primary-default text-gray-700 hover:bg-gray-50"
                                     }`}
                                 aria-label={category.name}
                             >
-                                <category.icon className="h-6 w-6 mb-1" />
-                                <span className="text-xs">{category.name}</span>
+                                {/* Decreased icon size (h-4 w-4) */}
+                                <category.icon className="h-4 w-4 mb-1" />
+                                {/* Decreased text size using arbitrary value or text-xs with tight leading */}
+                                <span className="text-[11px] leading-tight text-center">{category.name}</span>
                             </Link>
                         ))}
-
                     </div>
                 </div>
                 <SidebarContent>
                     <SidebarGroup>
-                        {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
                             {data.navMain[activeCategory as keyof typeof data.navMain]?.map((item) => (
                                 <Collapsible
                                     key={item.title}
                                     asChild
                                     defaultOpen={item.isActive}
-                                    className="group/collapsible "
+                                    className="group/collapsible"
                                 >
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
                                             <SidebarMenuButton tooltip={item.title}>
+                                                {/* Make sure icons here are also scaled if needed, e.g., using h-4 w-4 inside the component */}
                                                 {item.icon && <item.icon />}
-                                                <Link to={item.url}>{item.title}</Link>
-                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                {/* Decreased font size for main menu items */}
+                                                <Link to={item.url} className="text-sm">{item.title}</Link>
+                                                <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                             </SidebarMenuButton>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent>
@@ -113,7 +116,8 @@ export default function UserLayout() {
                                                     <SidebarMenuSubItem key={subItem.title}>
                                                         <SidebarMenuSubButton asChild>
                                                             <Link to={subItem.url}>
-                                                                <span>{subItem.title}</span>
+                                                                {/* Decreased font size for sub-menu items */}
+                                                                <span className="text-xs">{subItem.title}</span>
                                                             </Link>
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>
@@ -131,25 +135,26 @@ export default function UserLayout() {
                         <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
+                                    {/* Changed size from "lg" to "sm" and reduced padding */}
                                     <SidebarMenuButton
-                                        size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+                                        size="sm"
+                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-2 py-1.5"
                                     >
                                         <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
+                                            <Link to="/help" className="flex items-center gap-1.5">
                                                 <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" />
+                                                    <HelpCircleIcon className="h-3.5 w-3.5 text-white" />
                                                 </div>
-                                                <span className="text-teal-600">{t("help")}</span>
+                                                <span className="text-teal-600 text-xs">{t("help")}</span>
                                             </Link>
                                         </div>
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
+                                        <div className="h-4 w-[1px] bg-gray-300 mx-2"></div>
                                         <div className="flex items-center gap-2">
-                                            <Link className="flex items-center gap-2">
+                                            <Link to="/logout" className="flex items-center gap-1.5">
                                                 <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" />
+                                                    <LogInIcon className="h-3.5 w-3.5 text-white" />
                                                 </div>
-                                                <span className="text-blue-400">logout</span>
+                                                <span className="text-blue-400 text-xs">logout</span>
                                             </Link>
                                         </div>
                                     </SidebarMenuButton>
@@ -213,7 +218,7 @@ export default function UserLayout() {
                     </div>
                 </header>
                 {/* UPDATED: Changed md:pt-6 to lg:pt-6 for consistent spacing */}
-                <main className="relative flex-1 p-4 lg:pt-6">
+                <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
                     {/* --- FLOATING CART BUTTON --- */}
                     <button
                         onClick={changeCheckoutModal}

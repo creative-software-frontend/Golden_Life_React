@@ -43,7 +43,7 @@ export default function Courses() {
 
     return (
         <motion.div 
-            className="py-12 mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+            className="py-12 mt-4 w-full container mx-auto px-4 sm:px-6 lg:px-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}

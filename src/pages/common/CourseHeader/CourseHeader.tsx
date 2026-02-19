@@ -57,7 +57,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ onMenuClick }) => {
             {/* =========================================
                 1. DESKTOP MENU BAR (Single Row)
                ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-4xl mx-auto h-20 gap-8">
+            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-5xl mx-auto h-20 gap-8">
 
                 {/* Search Bar Container - Fills available space */}
                 <div className="flex-1 max-w-4xl relative">

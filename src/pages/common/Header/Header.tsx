@@ -115,7 +115,7 @@ const Header: React.FC = () => {
             {/* =========================================
                 1. DESKTOP HEADER (Large Screens)
                ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-4xl mx-auto h-20 gap-8">
+            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-5xl mx-auto h-20 gap-8">
 
                 {/* Search Bar Container */}
                 <div className="flex-1 max-w-4xl relative">
@@ -170,7 +170,7 @@ const Header: React.FC = () => {
                     {/* FIXED: Removed Login button, added Dashboard Text */}
                     <Link
                         to="/dashboard"
-                        className="flex items-center gap-2 bg-primary-default text-white px-6 py-3 rounded-xl text-base font-black hover:bg-primary-dark shadow-lg shadow-primary-default/20 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-primary-default text-white px-6 py-3 rounded-xl text-base font-black hover:bg-green-600 shadow-lg shadow-primary-default/20 transition-all active:scale-95"
                     >
                         <LayoutDashboard className="h-5 w-5" />
                         <span>{t('header.dashboard') || "Dashboard"}</span>

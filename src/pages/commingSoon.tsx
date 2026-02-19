@@ -29,7 +29,7 @@ const CommingSoon: React.FC = () => {
     return (
         <section className="w-full min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <motion.div
-                className="max-w-6xl w-full mx-auto"
+                className="max-w-5xl w-full mx-auto"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}

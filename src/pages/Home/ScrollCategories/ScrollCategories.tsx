@@ -41,7 +41,7 @@ export default function CompactIconScroll() {
 
     return (
         <section className="w-full py-4 md:py-8 bg-gray-50/30">
-            <div className="max-w-4xl mx-auto px-4">
+            <div className="container mx-auto px-4">
                 <div className="bg-white border border-gray-100 rounded-3xl shadow-sm py-6 md:py-8 relative overflow-hidden">
                     
                     {/* --- MOBILE & TABLET: STATIC GRID (No Scroll) --- */}

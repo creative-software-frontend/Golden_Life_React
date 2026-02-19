@@ -13,16 +13,34 @@ import CourseCategories from "../CoursesCategory/CoursesCategory";
 
 const Home = () => {
   return (
-    <div>
-      <HeroSection />
-      {/* <BannerSection /> */}
-      <AutoScrollIcons />
-      <CourseCategories />
-      <Categories />
-      <ProductCategories />
-      <FreshSell /> 
-      {/* {/* <TrendingCategory /> */}
+ <div >
+        <div className="mx-0 md:mx-8"> {/* Added bottom margin here */}
+
+        <HeroSection />
+
     </div>
+    {/* <BannerSection /> */}
+   <div className="mx-0 md:mx-4 lg:mx-8">
+        <AutoScrollIcons />
+    </div>
+
+    <div className="mx-0 md:mx-4 lg:mx-8">
+        <CourseCategories />
+    </div>
+
+    <div className="mx-0 md:mx-4 lg:mx-8">
+        <Categories />
+    </div>
+
+    <div className="mx-0 md:mx-4 lg:mx-8">
+        <ProductCategories />
+    </div>
+
+    <div className="mx-0 md:mx-4 lg:mx-8">
+        <FreshSell /> 
+    </div>
+    {/* <TrendingCategory /> */}
+</div>
   )
 }
 

@@ -12,7 +12,7 @@ export default function ProductSection() {
   ];
 
   return (
-    <section className="py-8 md:py-12 mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-8 md:py-12 mt-4 w-full conatiner mx-auto px-4 sm:px-6 lg:px-8">
       {/* Container with shadow and background */}
       <div className="bg-primary-default rounded-2xl shadow-xl overflow-hidden p-4 sm:p-6 md:p-8">
         
@@ -37,7 +37,7 @@ export default function ProductSection() {
 
         {/* Responsive Grid Area */}
         {/* Mobile: grid-cols-2 | Tablet: sm:grid-cols-3 | Desktop: lg:grid-cols-6 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
           {products.map((product) => (
             <Link 
               key={product.id}
