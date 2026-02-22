@@ -64,8 +64,9 @@ export default function UserLayout() {
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                   <div className="flex items-center justify-center py-4 border-b h-16">
-                        <img src={logo} alt="logo" className="h-8 w-auto object-contain" />
+                    <div className="flex items-center justify-center py-4 border-b h-16">
+                        {/* Changed h-8 to h-12 */}
+                        <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
                     </div>
                 </SidebarHeader>
                 <div className="px-2 py-2 border-b">
@@ -77,8 +78,8 @@ export default function UserLayout() {
                                 onClick={() => setActiveCategory(category.id)}
                                 /* Decreased width (w-20), height (h-16), and padding (p-2) */
                                 className={`h-16 min-w-20 p-2 flex flex-col items-center justify-center rounded transition-colors ${activeCategory === category.id
-                                        ? "bg-primary-default border border-primary-default text-white"
-                                        : "border border-primary-default text-gray-700 hover:bg-gray-50"
+                                    ? "bg-primary-default border border-primary-default text-white"
+                                    : "border border-primary-default text-gray-700 hover:bg-gray-50"
                                     }`}
                                 aria-label={category.name}
                             >
@@ -222,7 +223,7 @@ export default function UserLayout() {
                     {/* --- FLOATING CART BUTTON --- */}
                     <button
                         onClick={changeCheckoutModal}
-                        className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
+                        className="fixed right-0 top-[60%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
                     >
                         <div className="flex items-center">
                             <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
