@@ -21,10 +21,8 @@ const HeroSection = () => {
             {/* =========================================
                 DESKTOP VIEW (Visible on lg+ screens)
                ========================================= */}
-            {/* Reduced padding from py-10 to py-6 */}
             <section className="hidden lg:block w-full px-4 py-6">
-                {/* Added max-w-6xl to decrease overall width */}
-                <div className="max-w-containe mx-auto overflow-hidden rounded-2xl shadow-xl">
+                <div className="max-w-container mx-auto overflow-hidden rounded-2xl shadow-xl bg-gray-900">
                     <Swiper
                         modules={[Pagination, Autoplay, EffectFade]}
                         effect="fade"
@@ -32,23 +30,15 @@ const HeroSection = () => {
                         slidesPerView={1}
                         pagination={{ clickable: true, dynamicBullets: true }}
                         autoplay={{ delay: 5000, disableOnInteraction: false }}
-                        // Reduced height from h-[600px] to h-[400px]
                         className="h-[400px]"
                     >
                         {banners.map((banner) => (
                             <SwiperSlide key={banner.id} className="relative group">
+                                {/* 1. Removed opacity-80 from the image */}
                                 <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
-                                {/* Reduced padding from p-24 to p-12 */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent flex flex-col justify-center items-start text-left p-12 md:p-16 transition-opacity duration-300">
-                                    {/* Reduced font size from text-6xl to text-4xl */}
-                                    <h2 className="text-white text-4xl md:text-5xl font-extrabold mb-3 drop-shadow-xl">{banner.title}</h2>
-                                    {/* Reduced font size and margin */}
-                                    <p className="text-gray-100 text-lg max-w-lg mb-6 font-medium drop-shadow-md">{banner.description}</p>
-                                    {/* Reduced button size */}
-                                    <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-2.5 rounded-full font-bold text-base shadow-lg transform hover:scale-105 transition-all">
-                                        Get Started
-                                    </button>
-                                </div>
+                                
+                                {/* 2. Added this overlay div to create the "fade" effect safely */}
+                                <div className="absolute inset-0 bg-black/20" />
                             </SwiperSlide>
                         ))}
                     </Swiper>
@@ -62,37 +52,19 @@ const HeroSection = () => {
                 <div className="relative rounded-xl overflow-hidden shadow-lg bg-gray-900">
                     {/* Background Image */}
                     <div className="absolute inset-0">
+                        {/* 1. Removed opacity-80 from the image */}
                         <img 
                             src={banner1} 
                             alt="Welcome" 
-                            className="w-full h-full object-cover opacity-60" 
+                            className="w-full h-full object-cover" 
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                        {/* 2. Added this overlay div to match the desktop fade */}
+                        <div className="absolute inset-0 bg-black/20" />
                     </div>
 
-                    {/* Content */}
-                    {/* Reduced height from h-[400px] to h-[280px] */}
+                    {/* Content (Empty) */}
                     <div className="relative z-10 flex flex-col items-center justify-center text-center h-[280px] px-4">
-                        <span className="inline-block px-2.5 py-0.5 mb-3 text-[10px] font-bold tracking-wider text-emerald-300 uppercase bg-emerald-900/50 rounded-full border border-emerald-500/30">
-                            Welcome
-                        </span>
-                        {/* Reduced title size from text-3xl to text-2xl */}
-                        <h1 className="text-2xl sm:text-3xl font-black text-white mb-2 leading-tight">
-                            Discover Amazing <br /> Features
-                        </h1>
-                        {/* Reduced text size and margin */}
-                        <p className="text-gray-300 text-xs sm:text-sm max-w-xs mb-4 leading-relaxed">
-                            Join thousands of students learning new skills every day.
-                        </p>
-                        <div className="flex flex-row gap-2 w-full justify-center">
-                            {/* Smaller buttons */}
-                            <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg font-bold text-xs shadow-md">
-                                Get Started
-                            </button>
-                            <button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-5 py-2 rounded-lg font-bold text-xs backdrop-blur-sm">
-                                Learn More
-                            </button>
-                        </div>
+                        {/* ALL TEXT AND BUTTONS REMOVED FROM HERE */}
                     </div>
                 </div>
                 

@@ -80,7 +80,7 @@ export default function Cart() {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed right-0 top-[55%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
+                className="fixed right-0 top-[45%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-4 py-2 shadow-lg z-50"
             >
                 <div className="flex items-center">
                     <ShoppingBag className="h-6 w-6 text-red-500" />

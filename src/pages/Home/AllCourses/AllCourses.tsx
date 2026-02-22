@@ -188,8 +188,8 @@ export default function AllCourses() {
   return (
     <>
       <Coursecatagory2 />
-      <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="space-y-12">
+      <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 mt-0">
+        <div className="space-y-2">
           <CourseGrid
             courses={lessons.slice(0, 4)}
             title={t("Popular Courses")}

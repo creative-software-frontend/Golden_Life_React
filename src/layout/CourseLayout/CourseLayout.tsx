@@ -73,8 +73,8 @@ export default function CourseLayout() {
                             to={category.path}
                             onClick={() => { setActiveCategory(category.id); setIsMobileOpen(false); }}
                             className={`shrink-0 h-16 w-20 flex flex-col items-center justify-center rounded-lg border transition-all ${activeCategory === category.id
-                                    ? "bg-primary-default border-primary-default text-white shadow-md"
-                                    : "bg-white border-gray-200 text-gray-500 hover:border-primary-default/50"
+                                ? "bg-primary-default border-primary-default text-white shadow-md"
+                                : "bg-white border-gray-200 text-gray-500 hover:border-primary-default/50"
                                 }`}
                         >
                             <category.icon className="h-5 w-5 mb-1" />
@@ -127,7 +127,8 @@ export default function CourseLayout() {
             <Sidebar collapsible="icon" className="hidden lg:flex border-r bg-white z-40">
                 <SidebarHeader>
                     <div className="flex items-center justify-center py-4 border-b h-16">
-                        <img src={logo} alt="logo" className="h-8 w-auto object-contain" />
+                        {/* Changed h-8 to h-12 */}
+                        <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
                     </div>
                 </SidebarHeader>
 
@@ -142,7 +143,7 @@ export default function CourseLayout() {
                             <span className="text-xs font-bold text-teal-600 group-data-[collapsible=icon]:hidden">Help</span>
                         </Link>
                         <Separator orientation="vertical" className="h-6 mx-1" />
-                        <button  className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
+                        <button className="flex items-center gap-2 text-gray-600 hover:text-primary-default transition-colors">
                             <span className="text-xs font-bold text-blue-500 group-data-[collapsible=icon]:hidden">logout</span>
                             <div className="bg-white p-1.5 rounded-full shadow-sm">
                                 <LogInIcon className="h-4 w-4 text-blue-500" />
@@ -180,28 +181,28 @@ export default function CourseLayout() {
                 <CourseHeader onMenuClick={() => setIsMobileOpen(true)} />
 
                 <main className="flex-1 p-4 lg:p-6 relative w-full max-w-full mx-auto">
-{/* Floating Cart Button */}
-<button
-    onClick={changeCheckoutModal}
-    className="fixed z-50 bg-white border-2 border-primary-default/20 shadow-xl flex items-center gap-2 hover:bg-gray-50 transition-all 
-    bottom-24 right-4 rounded-full p-3 
-    lg:bottom-auto lg:top-[50%] lg:right-0 lg:rounded-l-xl lg:rounded-r-none lg:px-4 lg:py-3 lg:-translate-y-1/2"
->
-    <div className="relative">
-        <ShoppingBag className="h-6 w-6 text-red-500" />
-        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
-            4
-        </span>
-    </div>
-    {/* Only show text on Desktop to prevent mobile overlapping */}
-    <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
-        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">MY CART</div>
-        <div className="text-xs font-bold text-gray-800">৳ 2369</div>
-    </div>
-</button>
+                    {/* Floating Cart Button */}
+                    <button
+                        onClick={changeCheckoutModal}
+                        className="fixed z-50 bg-white border-2 border-primary-default/20 shadow-xl flex items-center gap-2 hover:bg-gray-50 transition-all 
+    bottom-25 right-4 rounded-full p-3 
+    lg:bottom-auto top-[55%]  lg:top-[60%] lg:right-0 lg:rounded-l-xl lg:rounded-r-none lg:px-4 lg:py-3 lg:-translate-y-1/2"
+                    >
+                        <div className="relative">
+                            <ShoppingBag className="h-6 w-6 text-red-500" />
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
+                                4
+                            </span>
+                        </div>
+                        {/* Only show text on Desktop to prevent mobile overlapping */}
+                        <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
+                            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">MY CART</div>
+                            <div className="text-xs font-bold text-gray-800">৳ 2369</div>
+                        </div>
+                    </button>
                     <Outlet />
 
-                    <div className="mt-12">
+                    <div className="mt-4">
                         <Footer />
                     </div>
                 </main>
