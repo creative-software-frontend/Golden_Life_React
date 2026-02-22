@@ -27,7 +27,7 @@ import TopupLayout from "@/layout/TopUplayout/TopUplayout";
 import CommingSoon from "./../pages/commingSoon";
 import OutletLayout from "@/layout/OutletLayout/OutletLayout";
 import DriveLayout from "@/layout/DriveLayout/DriveLayout";
-import Landing from "@/pages/landing/Landing";
+
 import LandingLayout from "@/layout/LandingLayout/LandingLayout";
 
 import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
@@ -42,6 +42,7 @@ import Payments from "@/pages/legal/Payments";
 import TermsConditions from "@/pages/legal/TermsConditions";
 import Login from "@/pages/common/Login/Login";
 import Register from "@/pages/common/Register/Register";
+import Landing from "@/pages/Landing/Landing";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
