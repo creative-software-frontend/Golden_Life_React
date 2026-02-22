@@ -1,22 +1,27 @@
 import React from 'react'; // Updated import
-import Experience from "./sections/Experience";
 
-import Products from "./sections/Products";
-import Features from "./sections/Features";
+
+
+
 import LandingHeader from "../common/LandingHeader/LandingHeader";
-import Reviews from "./sections/Reviews";
-import Services from "./sections/Services";
-import Stats from "./sections/Stats";
-import ProductFAQ from "./sections/ProductFAQ";
 import LandingFooter from '../common/LandingFooter/LandingFooter';
+import Stats from "../Landing/sections/Stats";
+import Features from "../Landing/sections/Features";
+
+import Products from "../Landing/sections/Products";
 
 
+import Services from "../Landing/sections/Services";
+
+import Reviews from "../Landing/sections/Reviews";
+import ProductFAQ from "../Landing/sections/ProductFAQ";
+import Experience from"../Landing/sections/Experience";
 
 const Landing: React.FC = () => {
     return (
         <div className="flex flex-col w-full">
             <LandingHeader/>
-            <Stats/>
+            <Stats></Stats>
             <Features />
             {/* 1. HERO (Full Width) */}
        
@@ -26,9 +31,9 @@ const Landing: React.FC = () => {
             <Services />
             <Reviews />
           <ProductFAQ></ProductFAQ>
-            <Experience />
+        
+             <Experience></Experience>
             <LandingFooter/>
-            
 
         </div>
     );

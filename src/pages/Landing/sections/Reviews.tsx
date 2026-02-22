@@ -5,12 +5,12 @@ import { Navigation, Pagination, A11y, Autoplay } from "swiper/modules";
 // 👇 CORRECTED IMPORT LINE
 import { reviewsData } from "@/data/reviewsData"; 
 
-import ReviewCard from "./ReviewCard";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import ReviewCard from "./ReviewCard";
 
 // Custom styles to override Swiper defaults and implement the center-mode effect
 const swiperStyles = `

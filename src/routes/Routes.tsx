@@ -27,7 +27,7 @@ import TopupLayout from "@/layout/TopUplayout/TopUplayout";
 import CommingSoon from "./../pages/commingSoon";
 import OutletLayout from "@/layout/OutletLayout/OutletLayout";
 import DriveLayout from "@/layout/DriveLayout/DriveLayout";
-import Landing from "@/pages/Landing/Landing";
+import Landing from "@/pages/landing/Landing";
 import LandingLayout from "@/layout/LandingLayout/LandingLayout";
 
 import AllCourses2 from "@/pages/Home/AllCourses2/AllCourses2";
@@ -40,11 +40,22 @@ import SendMoneyConfirm from "@/pages/Dashboard/SendMoneyConfirm/SendMoneyConfir
 import Cookies from "@/pages/legal/Cookies";
 import Payments from "@/pages/legal/Payments";
 import TermsConditions from "@/pages/legal/TermsConditions";
+import Login from "@/pages/common/Login/Login";
+import Register from "@/pages/common/Register/Register";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
 export const routes = createBrowserRouter([
+    // PUBLIC ROUTES (No Layout - Full Screen Pages)
+   {
+        path: '/login',
+        element: <Login />, // Full screen login page
+   },
+   {
+        path: '/register',
+        element: <Register />, // Full screen register page
+   },
    {
         path: '/',
         // REMOVE 'element: <LandingLayout/>' from here to stop it applying to everything
