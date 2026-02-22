@@ -1,8 +1,4 @@
 import React from 'react'; // Updated import
-
-
-
-
 import LandingHeader from "../common/LandingHeader/LandingHeader";
 import LandingFooter from '../common/LandingFooter/LandingFooter';
 import Stats from "../Landing/sections/Stats";
