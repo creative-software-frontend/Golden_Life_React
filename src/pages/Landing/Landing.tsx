@@ -1,6 +1,6 @@
 import React from 'react'; // Updated import
 import Experience from "./sections/Experience";
-import HowItWorks from "./sections/HowItWorks";
+
 import Products from "./sections/Products";
 import Features from "./sections/Features";
 import LandingHeader from "../common/LandingHeader/LandingHeader";
