@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function LandingFooter() {
   return (
     <footer className="bg-white border-t border-gray-100">
-      {/* UPDATE: py-12 এর বদলে pt-12 pb-4 ব্যবহার করা হয়েছে নিচের স্পেস কমানোর জন্য */}
+      
       <div className="container mx-auto px-4 sm:px-5 md:px-8 pt-12 pb-4">
 
         {/* MAIN FOOTER GRID */}

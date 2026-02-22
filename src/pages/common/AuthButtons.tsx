@@ -1,15 +1,16 @@
-import React from "react";
+// src/pages/common/AuthButtons.tsx
+
 import { useNavigate } from "react-router-dom";
 
 export default function AuthButtons() {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    navigate('/dashboard');
+    navigate('/login'); 
   };
 
   const handleRegisterClick = () => {
-    navigate('/dashboard');
+    navigate('/register'); 
   };
 
   return (
