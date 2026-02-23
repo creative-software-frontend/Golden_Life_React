@@ -43,28 +43,34 @@ import TermsConditions from "@/pages/legal/TermsConditions";
 import Login from "@/pages/common/Login/Login";
 import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
+import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
 export const routes = createBrowserRouter([
     // PUBLIC ROUTES (No Layout - Full Screen Pages)
-   {
-        path: '/login',
-        element: <Login />, // Full screen login page
-   },
-   {
-        path: '/register',
-        element: <Register />, // Full screen register page
-   },
-   {
+    {
+        element: <AuthLayout />,
+        children: [
+            {
+                path: '/login',
+                element: <Login />,
+            },
+            {
+                path: '/register',
+                element: <Register />,
+            },
+        ],
+    },
+    {
         path: '/',
         // REMOVE 'element: <LandingLayout/>' from here to stop it applying to everything
         children: [
             // 1. LANDING PAGE (Stays separate, assumes it has its own Header)
             {
-                path: '/', 
-                element: <Landing/> 
+                path: '/',
+                element: <Landing />
             },
 
             // 2. LEGAL PAGES GROUP (Apply LandingLayout ONLY to these)
@@ -80,7 +86,7 @@ export const routes = createBrowserRouter([
                         element: <Payments />
                     },
                     {
-                        path: 'terms', 
+                        path: 'terms',
                         element: <TermsConditions />
                     },
                     // {
@@ -283,7 +289,7 @@ export const routes = createBrowserRouter([
     //             path: 'paymentmethod',  // Separate route for Help page
     //             element: <PaymentMethod />,
     //         },
-           
+
 
     //     ],
     // },

@@ -6,12 +6,12 @@ import Pagination from "./Pagination";
 
 const ITEMS_PER_PAGE = 16;
 
-// Define your color pattern classes
+// UPDATED: Exactly 3 colors. 
+// This guarantees no side-by-side matches in 2, 4, or 8 column grids!
 const cardColors = [
-  "bg-blue-50 border-blue-100",   // Color 1
+  "bg-blue-50 border-blue-100",    // Color 1
   "bg-green-50 border-green-100",  // Color 2
-  "bg-orange-50 border-orange-100", // Color 3
-  "bg-pink-50 border-pink-100",   // Color 4
+  "bg-orange-50 border-orange-100" // Color 3
 ];
 
 const containerVariants = {
@@ -61,7 +61,7 @@ const Products: React.FC = () => {
     }, 400);
   };
 
-  // Helper to get color class based on index
+  // Automatically cycles: 0, 1, 2, 0, 1, 2...
   const getCardColorClass = (index: number) => cardColors[index % cardColors.length];
 
   return (
@@ -112,8 +112,8 @@ const Products: React.FC = () => {
               >
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className={`${getCardColorClass(i)} border rounded-xl p-4 flex flex-col items-center shadow-sm`}>
-                    <div className="w-full aspect-square mb-3 rounded-lg bg-gray-200 animate-pulse" />
-                    <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+                    <div className="w-full aspect-square mb-3 rounded-full bg-white/50 animate-pulse" />
+                    <div className="h-4 w-3/4 bg-gray-200/50 rounded animate-pulse" />
                   </div>
                 ))}
               </motion.div>
@@ -127,7 +127,6 @@ const Products: React.FC = () => {
                 exit="exit"
               >
                 {currentItems.map((product, index) => (
-                  // Pass the color class to the ProductCard component
                   <ProductCard 
                     key={product.id} 
                     product={product} 
