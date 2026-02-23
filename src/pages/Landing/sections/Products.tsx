@@ -6,6 +6,14 @@ import Pagination from "./Pagination";
 
 const ITEMS_PER_PAGE = 16;
 
+// Define your color pattern classes
+const cardColors = [
+  "bg-blue-50 border-blue-100",   // Color 1
+  "bg-green-50 border-green-100",  // Color 2
+  "bg-orange-50 border-orange-100", // Color 3
+  "bg-pink-50 border-pink-100",   // Color 4
+];
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -20,20 +28,17 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 1. Get unique categories dynamically
   const categories = useMemo(() => 
     ["All", ...new Set(productsData.map((p) => p.category))], 
     []
   );
 
-  // 2. Filter data based on category
   const filteredProducts = useMemo(() => {
     return selectedCategory === "All"
       ? productsData
       : productsData.filter((p) => p.category === selectedCategory);
   }, [selectedCategory]);
 
-  // 3. Calculate Pagination based on filtered data
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
@@ -42,7 +47,7 @@ const Products: React.FC = () => {
   const handleCategoryChange = (category: string) => {
     setIsLoading(true);
     setSelectedCategory(category);
-    setCurrentPage(1); // Reset to page 1 on filter
+    setCurrentPage(1);
     setTimeout(() => setIsLoading(false), 500);
   };
 
@@ -55,6 +60,9 @@ const Products: React.FC = () => {
       setIsLoading(false);
     }, 400);
   };
+
+  // Helper to get color class based on index
+  const getCardColorClass = (index: number) => cardColors[index % cardColors.length];
 
   return (
     <section className="py-24 bg-[#FFF8DC] min-h-[800px]">
@@ -103,7 +111,7 @@ const Products: React.FC = () => {
                 className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4"
               >
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 flex flex-col items-center shadow-sm">
+                  <div key={i} className={`${getCardColorClass(i)} border rounded-xl p-4 flex flex-col items-center shadow-sm`}>
                     <div className="w-full aspect-square mb-3 rounded-lg bg-gray-200 animate-pulse" />
                     <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
                   </div>
@@ -111,15 +119,20 @@ const Products: React.FC = () => {
               </motion.div>
             ) : (
               <motion.div 
-                key={selectedCategory + currentPage} // Unique key to trigger animation on change
+                key={selectedCategory + currentPage}
                 className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
               >
-                {currentItems.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {currentItems.map((product, index) => (
+                  // Pass the color class to the ProductCard component
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    bgColorClass={getCardColorClass(index)} 
+                  />
                 ))}
               </motion.div>
             )}

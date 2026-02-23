@@ -12,7 +12,7 @@ const Services: React.FC = () => {
       {/* Background Decorator Blurs */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-200/30 rounded-full filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-yellow-200/30 rounded-full filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-Reviews
+
       <div className="container mx-auto px-4 relative z-10">
         
         {/* Section Header with "Get Started" Button */}

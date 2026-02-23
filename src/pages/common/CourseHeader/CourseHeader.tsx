@@ -107,7 +107,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ onMenuClick }) => {
 
                     {/* Dashboard Button (Logo Removed) */}
                     <Link
-                        to="/admin"
+                        to="/dashboard"
                         className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl text-lg font-black hover:bg-green-700 shadow-lg shadow-green-100 transition-all active:scale-95"
                     >
                         <UserIcon className="h-5 w-5" />

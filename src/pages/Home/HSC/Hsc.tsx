@@ -53,7 +53,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
                     align: "start",
                     loop: true,
                 }}
-                className="w-full max-w-4xl mx-auto"
+                className="w-full container mx-auto"
             >
                 <CarouselContent>
                     {courses.map((lesson, index) => (
@@ -100,7 +100,7 @@ const CourseCarousel: React.FC<{ courses: Lesson[], title: string }> = ({ course
 
 export default function Hsc() {
     return (
-        <div className="w-full md:max-w-[1040px] mx-auto mt-8 mb-4">
+        <div className="w-full md:max-w-container mx-auto mt-8 mb-4">
             <CourseCarousel courses={lessons} title="courses.ssc" />
         </div>
     )
