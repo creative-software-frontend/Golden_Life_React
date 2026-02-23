@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios
 import Logo from '../Logo';
 
 type LoginMethod = 'mobile' | 'email';
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
     email: '',
     password: ''
   });
+  const [apiError, setApiError] = useState(''); // Added to show backend errors
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +27,7 @@ const Login: React.FC = () => {
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    if (apiError) setApiError(''); // Clear global error on typing
   };
 
   const validateForm = () => {
@@ -66,20 +69,63 @@ const Login: React.FC = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setApiError('');
+
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    // Assuming your login endpoint ends with /login. Adjust if it's different!
+    const endpoint = `${baseURL}/api/student/login`; 
+
+    // Create payload based on selected login method
+    const payload = loginMethod === 'mobile' 
+      ? { mobile: formData.mobile, password: formData.password }
+      : { email: formData.email, password: formData.password };
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login data:', loginMethod === 'mobile' ? formData.mobile : formData.email);
-      navigate('/dashboard');
-    } catch (error) {
+      // Make Axios POST request
+      const response = await axios.post(endpoint, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      // Extract token from backend response (adjust 'response.data.token' if your backend structure is different)
+      const token = response.data.token; 
+
+      if (token) {
+        // 1. Save Token to Cookie with 1 Day Expiration
+        const expirationDate = new Date();
+        expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000)); // Current time + 1 Day (in milliseconds)
+        document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
+
+        // 2. Optional: Also save to LocalStorage with an expiry timestamp if you prefer using localStorage over cookies
+        const storageData = {
+          token: token,
+          expiry: expirationDate.getTime()
+        };
+        localStorage.setItem('student_session', JSON.stringify(storageData));
+
+        console.log('Login successful');
+        navigate('/dashboard');
+      } else {
+        throw new Error('No token received from server');
+      }
+
+    } catch (error: any) {
       console.error('Login failed:', error);
+      // Check if it's an Axios error with a response from the backend
+      if (error.response && error.response.data) {
+        setApiError(error.response.data.message || 'Invalid login credentials.');
+      } else {
+        setApiError(error.message || 'A network error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    // WIDTH DECREASED: Added `max-w-md mx-auto` here so it shrinks independently of the AuthLayout
-    <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
       
       {/* Logo Section */}
       <div className="px-8 pt-10 pb-4 text-center">
@@ -96,7 +142,7 @@ const Login: React.FC = () => {
       <div className="mx-8 mb-6 flex bg-gray-100 p-1.5 rounded-xl">
         <button
           type="button"
-          onClick={() => setLoginMethod('mobile')}
+          onClick={() => { setLoginMethod('mobile'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
           className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
             loginMethod === 'mobile'
               ? 'bg-black text-white shadow-md'
@@ -107,7 +153,7 @@ const Login: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => setLoginMethod('email')}
+          onClick={() => { setLoginMethod('email'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
           className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
             loginMethod === 'email'
               ? 'bg-black text-white shadow-md'
@@ -122,6 +168,13 @@ const Login: React.FC = () => {
       <div className="px-8 pb-10">
         <form onSubmit={handleSubmit} className="space-y-5">
           
+          {/* Global API Error Display */}
+          {apiError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 text-center">
+              {apiError}
+            </div>
+          )}
+
           {/* Dynamic Input Field based on selection */}
           {loginMethod === 'mobile' ? (
             <div className="space-y-2">

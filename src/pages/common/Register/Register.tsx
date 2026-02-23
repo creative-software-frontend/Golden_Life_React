@@ -7,11 +7,13 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
   
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '', // Simplified to just email
+    email: '',
+    phone: '', // Added Mobile Phone
     password: '',
     confirmPassword: '',
     acceptTerms: false
@@ -21,6 +23,7 @@ const Register: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phone: '', // Added Mobile Phone error state
     password: '',
     confirmPassword: '',
     acceptTerms: ''
@@ -36,6 +39,7 @@ const Register: React.FC = () => {
     if (errors[name as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    if (apiError) setApiError('');
   };
 
   const validateForm = () => {
@@ -52,12 +56,20 @@ const Register: React.FC = () => {
       isValid = false;
     }
 
-    // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Enter a valid email address';
+      isValid = false;
+    }
+
+    // Phone Validation (11 digits starting with 01 for BD, adjust regex if needed)
+    if (!formData.phone) {
+      newErrors.phone = 'Mobile number is required';
+      isValid = false;
+    } else if (!/^01\d{9}$/.test(formData.phone)) {
+      newErrors.phone = 'Enter a valid mobile number (01XXXXXXXXX)';
       isValid = false;
     }
 
@@ -88,19 +100,51 @@ const Register: React.FC = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setApiError(''); 
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Register data:', formData.email);
-      navigate('/login', { state: { registered: true } });
-    } catch (error) {
-      console.error('Registration failed:', error);
+      const response = await fetch(`${baseURL}/api/student/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          // 1. FIXED: Combine first and last name into the "name" field
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          
+          email: formData.email,
+          
+          // Note: If your backend expects "mobile" instead of "phone", change the key here to: mobile: formData.phone
+          mobile: formData.phone,
+          
+          password: formData.password,
+          
+          // 2. FIXED: Most backends require this to verify the passwords match
+          password_confirmation: formData.confirmPassword, 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Registration failed. Please try again.');
+      }
+
+      console.log('Register successful:', data);
+      navigate('/login', { state: { registered: true, message: 'Registration successful! Please log in.' } });
+      
+    } catch (error: any) {
+      console.error('Registration API error:', error);
+      setApiError(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    // Removed min-h-screen and background since AuthLayout handles that now
     <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
       
       {/* Logo Section */}
@@ -117,9 +161,16 @@ const Register: React.FC = () => {
       {/* Form Section */}
       <div className="px-8 pb-10">
         <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* Global API Error Alert */}
+          {apiError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100">
+              {apiError}
+            </div>
+          )}
+
           {/* Name Fields - Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* First Name */}
             <div className="space-y-2">
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                 First Name
@@ -143,7 +194,6 @@ const Register: React.FC = () => {
               {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
             </div>
 
-            {/* Last Name */}
             <div className="space-y-2">
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
                 Last Name
@@ -168,34 +218,63 @@ const Register: React.FC = () => {
             </div>
           </div>
 
-          {/* Email Field */}
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </span>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="example@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full pl-10 pr-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent`}
-                disabled={isLoading}
-              />
+          {/* Email and Mobile Fields - Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent`}
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
-            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+
+            {/* Mobile Phone Field */}
+            <div className="space-y-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                Mobile Number
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="01XXXXXXXXX"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={`w-full pl-10 pr-4 py-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent`}
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
+            </div>
+
           </div>
 
           {/* Passwords - Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Password Field */}
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
@@ -236,7 +315,6 @@ const Register: React.FC = () => {
               {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
 
-            {/* Confirm Password Field */}
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                 Confirm Password
