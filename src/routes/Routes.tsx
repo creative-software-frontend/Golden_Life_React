@@ -44,6 +44,7 @@ import Login from "@/pages/common/Login/Login";
 import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
 import AuthLayout from "@/layout/AuthLayout/AuthLayout";
+import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -127,6 +128,10 @@ export const routes = createBrowserRouter([
             {
                 path: 'allProducts',  // Separate route for Help page
                 element: <AllProduct />,
+            },
+            {
+                path: 'product/:id',
+                element: <ProductDetails />,
             },
 
 

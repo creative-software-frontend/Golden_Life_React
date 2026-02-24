@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { ChevronRight, ShoppingCart, Timer } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // Ensure Link is imported
 import { Button } from "@/components/ui/button";
 import useModalStore from "@/store/Store";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
-// --- 1. UPDATE INTERFACE TO STORE BOTH LANGUAGES ---
+// --- 1. INTERFACE ---
 interface Product {
     id: number;
-    name_en: string; // Store English Title
-    name_bn: string; // Store Bangla Title
+    name_en: string;
+    name_bn: string;
     image: string;
     stock: number;
     price: number; 
@@ -38,7 +38,6 @@ const ProductSkeleton = () => {
 };
 
 export default function FreshSell() {
-    // --- 2. GET i18n INSTANCE ---
     const { t, i18n } = useTranslation('global'); 
     const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 30, seconds: 0 });
     const [products, setProducts] = useState<Product[]>([]);
@@ -93,11 +92,8 @@ export default function FreshSell() {
 
                 const mappedProducts = rawData.map((item: any) => ({
                     id: item.id,
-                    
-                    // --- 3. MAP BOTH LANGUAGES FROM API ---
                     name_en: item.product_title_english,
-                    name_bn: item.product_title_bangla || item.product_title_english, // Fallback to English if Bangla is missing
-                    
+                    name_bn: item.product_title_bangla || item.product_title_english,
                     image: `${baseURL}/uploads/ecommarce/product_image/${item.product_image}`,
                     stock: parseInt(item.stock) || 0,
                     price: parseFloat(item.offer_price || item.regular_price || item.seller_price || 0),
@@ -120,8 +116,6 @@ export default function FreshSell() {
     const addToCart = (product: Product) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
-
-        // Determine which name to save in cart (optional, usually English is safer for backend)
         const cartProductName = i18n.language === 'bn' ? product.name_bn : product.name_en;
 
         if (existingProductIndex !== -1) {
@@ -182,59 +176,65 @@ export default function FreshSell() {
                         {products.length > 0 ? (
                             products.map((product) => {
                                 const progress = calculateProgress(product.mrp, product.price);
-                                
-                                // --- 4. DYNAMIC LANGUAGE SELECTION ---
                                 const displayName = i18n.language === 'bn' ? product.name_bn : product.name_en;
 
                                 return (
                                     <div key={product.id} className="group flex flex-col bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm hover:shadow-2xl hover:border-orange-100 transition-all duration-500 transform hover:-translate-y-1 h-full">
                                         
-                                        {/* Image */}
-                                        <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
-                                            <img
-                                                src={product.image}
-                                                alt={displayName}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                onError={(e) => { (e.target as HTMLImageElement).src = "../../../../public/image/products/maggi.webp"; }}
-                                            />
-                                            <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-md">
-                                                FLASH
+                                        {/* WRAP IMAGE & TITLE IN LINK */}
+                                        <Link to={`/dashboard/product/${product.id}`} className="block">
+                                            {/* Image */}
+                                            <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
+                                                <img
+                                                    src={product.image}
+                                                    alt={displayName}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    onError={(e) => { (e.target as HTMLImageElement).src = "../../../../public/image/products/maggi.webp"; }}
+                                                />
+                                                <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-md">
+                                                    FLASH
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Info */}
-                                        <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
-                                            <div>
-                                                <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                                                    {/* Display Dynamic Name */}
-                                                    {displayName}
-                                                </h3>
-                                                
-                                                <div className="flex flex-wrap items-baseline gap-2 mt-1">
-                                                    <span className="text-sm md:text-lg font-black text-gray-900">
-                                                        ৳{product.price}
-                                                    </span>
-                                                    {product.mrp > 0 && product.mrp !== product.price && (
-                                                        <span className="text-[10px] md:text-xs text-gray-400 line-through">
-                                                            ৳{product.mrp}
+                                            {/* Info */}
+                                            <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
+                                                <div>
+                                                    <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
+                                                        {displayName}
+                                                    </h3>
+                                                    
+                                                    <div className="flex flex-wrap items-baseline gap-2 mt-1">
+                                                        <span className="text-sm md:text-lg font-black text-gray-900">
+                                                            ৳{product.price}
                                                         </span>
-                                                    )}
-                                                </div>
-
-                                                <div className="mt-2 space-y-1">
-                                                    <div className="h-1 md:h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                                                        {product.mrp > 0 && product.mrp !== product.price && (
+                                                            <span className="text-[10px] md:text-xs text-gray-400 line-through">
+                                                                ৳{product.mrp}
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    <p className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                                                        {progress}% SOLD
-                                                    </p>
+
+                                                    <div className="mt-2 space-y-1">
+                                                        <div className="h-1 md:h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                                                        </div>
+                                                        <p className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                                            {progress}% SOLD
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        </Link> {/* END LINK */}
 
+                                        {/* Button (Outside Link to avoid nested click issues) */}
+                                        <div className="mt-2">
                                             <Button
                                                 size="sm"
-                                                onClick={(e) => { e.preventDefault(); addToCart(product); }}
-                                                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg h-8 md:h-10 text-[10px] md:text-xs transition-all border-none shadow-md active:scale-95 flex items-center justify-center gap-1 md:gap-2 mt-2"
+                                                onClick={(e) => { 
+                                                    e.preventDefault(); 
+                                                    addToCart(product); 
+                                                }}
+                                                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg h-8 md:h-10 text-[10px] md:text-xs transition-all border-none shadow-md active:scale-95 flex items-center justify-center gap-1 md:gap-2"
                                             >
                                                 <ShoppingCart className="h-3 w-3 md:h-4 md:w-4" />
                                                 <span className="hidden sm:inline">{t('buttons.addToCart')}</span>
