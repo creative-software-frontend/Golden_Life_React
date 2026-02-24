@@ -1,31 +1,23 @@
+import { useEffect, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import axios from "axios";
+
+// Define the shape of a Category based on your API
+interface Category {
+    id: number;
+    name_en: string;
+    name_bn: string;
+    icon: string;
+    slug: string;
+}
 
 export default function Categories() {
-    const { t } = useTranslation("global");
-
-    const categories = [
-        { id: 1, name: t("beautyPersonalCare"), icon: "../../../../public/image/categories/c19.png" },
-        { id: 2, name: t("womensApparels"), icon: "../../../../public/image/categories/c2.jpg" },
-        { id: 3, name: t("mensWear"), icon: "../../../../public/image/categories/c4.jpg" },
-        { id: 4, name: t("mobileGadgets"), icon: "../../../../public/image/categories/c5.webp" },
-        { id: 5, name: t("homeDecoration"), icon: "../../../../public/image/categories/c16.png" },
-        { id: 6, name: t("homeAppliances"), icon: "../../../../public/image/categories/c17.png" },
-        { id: 7, name: t("toyKidsBabies"), icon: "../../../../public/image/categories/c18.png" },
-        { id: 8, name: t("kidsFashion"), icon: "../../../../public/image/categories/c18.png" },
-        { id: 9, name: t("jewelleryAccessories"), icon: "../../../../public/image/categories/c1.jpg" },
-        { id: 10, name: t("womensBag"), icon: "../../../../public/image/categories/c20.png" },
-        { id: 11, name: t("mensBag"), icon: "../../../../public/image/categories/c21.png" },
-        { id: 12, name: t("watchesAccessories"), icon: "../../../../public/image/categories/c19.png" },
-        { id: 13, name: t("footwear"), icon: "../../../../public/image/categories/c17.png" },
-        { id: 14, name: t("booksStationery"), icon: "../../../../public/image/categories/c18.png" },
-        { id: 15, name: t("groceries"), icon: "../../../../public/image/categories/c12.png" },
-        { id: 16, name: t("healthWellness"), icon: "../../../../public/image/categories/c1.jpg" },
-        { id: 17, name: t("petSupplies"), icon: "../../../../public/image/categories/c12.png" },
-        { id: 18, name: t("sportsEquipment"), icon: "../../../../public/image/categories/c19.png" },
-    ];
+    const { t, i18n } = useTranslation('global');
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -44,6 +36,98 @@ export default function Categories() {
         }
     };
 
+    // 1. Helper to get Token
+    const getAuthToken = () => {
+        const session = localStorage.getItem("student_session");
+        if (!session) return null;
+        try {
+            const parsedSession = JSON.parse(session);
+            if (new Date().getTime() > parsedSession.expiry) {
+                localStorage.removeItem("student_session");
+                return null;
+            }
+            return parsedSession.token;
+        } catch (e) { return null; }
+    };
+
+    // 2. Fetch Data from API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+                const token = getAuthToken();
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { Authorization: `Bearer ${token}` })
+                    }
+                };
+
+                const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
+                
+                // Debug to confirm we are getting data
+                // console.log("Full Response:", response.data);
+
+                let rawData = [];
+
+                // --- Path: response.data -> data -> categories ---
+                if (response.data?.data?.categories && Array.isArray(response.data.data.categories)) {
+                    rawData = response.data.data.categories;
+                } else {
+                    console.warn("Could not find categories array. Check console for structure.");
+                }
+
+                const mappedCategories = rawData.map((item: any) => {
+                    // Image URL Construction
+                    const imageUrl = `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`;
+
+                    return {
+                        id: item.id,
+                        // Map Names
+                        name_en: item.category_name || "Category", 
+                        name_bn: item.category_name_bangla || item.category_name || "Category", 
+                        
+                        icon: imageUrl,
+                        slug: item.category_slug
+                    };
+                });
+
+                // 3. Set All Categories (Removed .slice limit)
+                setCategories(mappedCategories);
+
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    // Loading Skeleton
+    if (loading) {
+        return (
+            <section className="w-full py-6 px-4">
+                <div className="mx-0 md:mx-4 lg:mx-8">
+                    <div className="container mx-auto">
+                        {/* Skeleton Header */}
+                        <div className="h-16 bg-gray-100 rounded-lg mb-6 animate-pulse"></div>
+                        {/* Skeleton Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // Hide section if no data
+    if (categories.length === 0) return null;
+
     return (
         <section className="w-full py-6 px-4">
             <div className="mx-0 md:mx-4 lg:mx-8">
@@ -60,7 +144,7 @@ export default function Categories() {
                         className="bg-gradient-to-r from-orange-500 via-yellow-600 to-green-600 rounded-t-lg p-4 md:p-5 flex flex-col md:flex-row justify-between items-center shadow-lg mb-6 text-white"
                     >
                         <div className="text-center md:text-left mb-3 md:mb-0">
-                            <h2 className="text-lg md:text-xl font-bold mb-0.5">{t("header.allCategories") || "Product Categories"}</h2>
+                            <h2 className="text-lg md:text-xl font-bold mb-0.5">{t("header.categories") || "Product Categories"}</h2>
                             <p className="text-white/90 text-xs font-medium opacity-90">Find exactly what you are looking for</p>
                         </div>
 
@@ -74,28 +158,37 @@ export default function Categories() {
                     </motion.div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                        {categories.map((category) => (
-                            <motion.div key={category.id} variants={itemVariants}>
-                                <Link
-                                    to={`/category/${category.id}`}
-                                    className="group flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-gray-100 shadow-sm 
-                                hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-green-100
-                                transition-all duration-500 transform hover:-translate-y-1.5 h-full"
-                                >
-                                    <div className="w-12 h-12 mb-2.5 bg-gray-50 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-                                        <img
-                                            src={category.icon}
-                                            alt={category.name}
-                                            className="w-6 h-6 object-contain grayscale group-hover:grayscale-0 transition-all duration-500"
-                                        />
-                                    </div>
+                        {categories.map((category) => {
+                            // Dynamic Name Selection
+                            const displayName = i18n.language === 'bn' ? category.name_bn : category.name_en;
 
-                                    <span className="text-gray-700 font-bold text-center text-[10px] sm:text-xs group-hover:text-green-600 transition-colors duration-300 leading-tight line-clamp-2 px-1">
-                                        {category.name}
-                                    </span>
-                                </Link> {/* This was the fixed closing tag */}
-                            </motion.div>
-                        ))}
+                            return (
+                                <motion.div key={category.id} variants={itemVariants}>
+                                    <Link
+                                        to={`/category/${category.id}`}
+                                        className="group flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-gray-100 shadow-sm 
+                                        hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-green-100
+                                        transition-all duration-500 transform hover:-translate-y-1.5 h-full"
+                                    >
+                                        <div className="w-12 h-12 mb-2.5 bg-gray-50 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 overflow-hidden">
+                                            <img
+                                                src={category.icon}
+                                                alt={displayName}
+                                                className="w-full h-full object-cover transition-all duration-500"
+                                                onError={(e) => { 
+                                                    // Fallback icon
+                                                    (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/1170/1170628.png"; 
+                                                }}
+                                            />
+                                        </div>
+
+                                        <span className="text-gray-700 font-bold text-center text-[10px] sm:text-xs group-hover:text-green-600 transition-colors duration-300 leading-tight line-clamp-2 px-1">
+                                            {displayName}
+                                        </span>
+                                    </Link>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </motion.div>
             </div>

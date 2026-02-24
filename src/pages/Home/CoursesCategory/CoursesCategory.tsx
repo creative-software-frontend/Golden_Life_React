@@ -6,29 +6,27 @@ import { motion } from "framer-motion";
 export default function Courses() {
     const [t] = useTranslation('global');
 
+    // Full list of courses (12 items)
     const courses = [
-        { id: 1, name: t("courseNames.webDevelopment"), icon: "../../../../public/image/courses/c1.avif" },
-        { id: 2, name: t("courseNames.blockchain"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 3, name: t("courseNames.webDevelopment"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 4, name: t("courseNames.dataScience"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 5, name: t("courseNames.graphicDesign"), icon: "../../../../public/image/courses/c2.jpg" },
-        { id: 6, name: t("courseNames.digitalMarketing"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 7, name: t("courseNames.machineLearning"), icon: "../../../../public/image/courses/c4.jpg" },
-        { id: 8, name: t("courseNames.uiUxDesign"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 9, name: t("courseNames.cloudComputing"), icon: "../../../../public/image/courses/c2.jpg" },
-        { id: 10, name: t("courseNames.blockchain"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 11, name: t("courseNames.softwareTesting"), icon: "../../../../public/image/courses/c3.png" },
-        { id: 12, name: t("courseNames.bigData"), icon: "../../../../public/image/courses/c3.png" },
+        { id: 1, name: t("webDev"), icon: "/image/courses/c2.jpg" },
+        { id: 2, name: t("dataSci"), icon: "/image/courses/c3.png" },
+        { id: 3, name: t("digitalMkt"), icon: "/image/courses/c4.jpg" },
+        { id: 4, name: t("graphicDes"), icon: "/image/courses/ai.jpg" },
+        { id: 5, name: t("cyberSec"), icon: "/image/courses/c2.jpg" },
+        { id: 6, name: t("projMgmt"), icon: "/image/courses/cloud.jpg" },
+        { id: 7, name: t("uiUx"), icon: "/image/courses/content.jpg" },
+        { id: 8, name: t("ai"), icon: "/image/courses/ai.jpg" },
+        { id: 9, name: t("cloudComp"), icon: "/image/courses/c3.png" },
+        { id: 10, name: t("photo"), icon: "/image/courses/photo.jpg" },
+        { id: 11, name: t("contentWrite"), icon: "/image/courses/cyber.jpg" },
+        { id: 12, name: t("appDev"), icon: "/image/courses/c3.png" },
     ];
 
-    // Animation Variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
+            transition: { staggerChildren: 0.1 }
         }
     };
 
@@ -71,13 +69,13 @@ export default function Courses() {
 
             {/* Courses Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                {courses.map((course) => (
+                {/* FIX: Changed slice from 8 to 10 */}
+                {courses.slice(0, 10).map((course) => (
                     <motion.div key={course.id} variants={itemVariants}>
                         <Link
-                            to='' // Add your route here
+                            to='' 
                             className="group flex flex-col items-center p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-primary-light/30 transition-all duration-300 hover:-translate-y-1 h-full"
                         >
-                            {/* Icon Container with soft background */}
                             <div className="w-16 h-16 mb-4 p-3 bg-gray-50 rounded-full group-hover:bg-primary-light/10 transition-colors duration-300 flex items-center justify-center">
                                 <img
                                     src={course.icon}
@@ -86,7 +84,6 @@ export default function Courses() {
                                 />
                             </div>
                             
-                            {/* Course Name */}
                             <span className="text-sm font-semibold text-center text-gray-700 group-hover:text-primary-default transition-colors line-clamp-2">
                                 {course.name}
                             </span>

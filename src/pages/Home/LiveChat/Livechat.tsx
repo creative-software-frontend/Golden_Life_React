@@ -103,7 +103,7 @@ export default function LiveChat() {
                     </form>
                 </div>
             </div>
-            <div className="fixed top-[75%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light">
+            <div className="fixed top-[65%]  md:top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light">
                 <button
                     onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
                     className="px-4  text-black-500"

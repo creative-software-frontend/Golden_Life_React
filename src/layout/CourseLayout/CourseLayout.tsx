@@ -182,24 +182,24 @@ export default function CourseLayout() {
 
                 <main className="flex-1 p-4 lg:p-6 relative w-full max-w-full mx-auto">
                     {/* Floating Cart Button */}
-                    <button
+                    {/* <button
                         onClick={changeCheckoutModal}
                         className="fixed z-50 bg-white border-2 border-primary-default/20 shadow-xl flex items-center gap-2 hover:bg-gray-50 transition-all 
     bottom-25 right-4 rounded-full p-3 
     lg:bottom-auto top-[55%]  lg:top-[60%] lg:right-0 lg:rounded-l-xl lg:rounded-r-none lg:px-4 lg:py-3 lg:-translate-y-1/2"
-                    >
-                        <div className="relative">
+                    > */}
+                        {/* <div className="relative">
                             <ShoppingBag className="h-6 w-6 text-red-500" />
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
                                 4
                             </span>
-                        </div>
+                        </div> */}
                         {/* Only show text on Desktop to prevent mobile overlapping */}
-                        <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
+                        {/* <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
                             <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">MY CART</div>
                             <div className="text-xs font-bold text-gray-800">৳ 2369</div>
-                        </div>
-                    </button>
+                        </div> */}
+                    {/* </button> */}
                     <Outlet />
 
                     <div className="mt-4">

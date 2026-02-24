@@ -221,7 +221,7 @@ export default function UserLayout() {
                 {/* UPDATED: Changed md:pt-6 to lg:pt-6 for consistent spacing */}
                 <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
                     {/* --- FLOATING CART BUTTON --- */}
-                    <button
+                    {/* <button
                         onClick={changeCheckoutModal}
                         className="fixed right-0 top-[60%] -translate-y-1/2 bg-white border-2 border-primary-light rounded-l-full px-3 py-2 md:px-4 md:py-2 shadow-lg z-50 transition-all hover:scale-105 active:scale-95"
                     >
@@ -236,7 +236,7 @@ export default function UserLayout() {
                                 0
                             </div>
                         </div>
-                    </button>
+                    </button> */}
 
                     {/* Note: Ensure your main desktop <Header /> also has 'hidden lg:block' so you don't get two headers on tablet */}
                     <div className="hidden lg:block">
