@@ -8,10 +8,11 @@ import useModalStore from "@/store/Store";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
-// --- INTERFACES ---
+// --- 1. UPDATE INTERFACE TO STORE BOTH LANGUAGES ---
 interface Product {
     id: number;
-    name: string;
+    name_en: string; // Store English Title
+    name_bn: string; // Store Bangla Title
     image: string;
     stock: number;
     price: number; 
@@ -19,36 +20,26 @@ interface Product {
     description?: string;
 }
 
-// --- COMPONENT: PRODUCT SKELETON (The "Better" Loading State) ---
 const ProductSkeleton = () => {
     return (
         <div className="bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm h-full flex flex-col animate-pulse">
-            {/* Image Placeholder */}
             <div className="aspect-square bg-gray-200 rounded-lg mb-3 w-full"></div>
-            
-            {/* Content Placeholders */}
             <div className="flex-grow space-y-2">
-                {/* Title */}
                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                {/* Price */}
                 <div className="flex gap-2 mt-2">
                     <div className="h-5 bg-gray-200 rounded w-1/3"></div>
                     <div className="h-4 bg-gray-100 rounded w-1/4"></div>
                 </div>
-                {/* Progress Bar */}
                 <div className="h-2 bg-gray-100 rounded-full w-full mt-3"></div>
-                <div className="h-3 bg-gray-100 rounded w-1/4 mt-1"></div>
             </div>
-
-            {/* Button Placeholder */}
             <div className="h-8 md:h-10 bg-gray-200 rounded-lg w-full mt-4"></div>
         </div>
     );
 };
 
-// --- MAIN COMPONENT ---
 export default function FreshSell() {
-    const [t] = useTranslation('global');
+    // --- 2. GET i18n INSTANCE ---
+    const { t, i18n } = useTranslation('global'); 
     const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 30, seconds: 0 });
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -67,7 +58,6 @@ export default function FreshSell() {
         return () => clearInterval(timer);
     }, []);
 
-    // Auth Token Logic
     const getAuthToken = () => {
         const session = localStorage.getItem("student_session");
         if (!session) return null;
@@ -103,7 +93,11 @@ export default function FreshSell() {
 
                 const mappedProducts = rawData.map((item: any) => ({
                     id: item.id,
-                    name: item.product_title_english,
+                    
+                    // --- 3. MAP BOTH LANGUAGES FROM API ---
+                    name_en: item.product_title_english,
+                    name_bn: item.product_title_bangla || item.product_title_english, // Fallback to English if Bangla is missing
+                    
                     image: `${baseURL}/uploads/ecommarce/product_image/${item.product_image}`,
                     stock: parseInt(item.stock) || 0,
                     price: parseFloat(item.offer_price || item.regular_price || item.seller_price || 0),
@@ -127,10 +121,13 @@ export default function FreshSell() {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
 
+        // Determine which name to save in cart (optional, usually English is safer for backend)
+        const cartProductName = i18n.language === 'bn' ? product.name_bn : product.name_en;
+
         if (existingProductIndex !== -1) {
             existingCart[existingProductIndex].quantity += 1;
         } else {
-            existingCart.push({ ...product, price: product.price, quantity: 1 });
+            existingCart.push({ ...product, name: cartProductName, price: product.price, quantity: 1 });
         }
         localStorage.setItem("cart", JSON.stringify(existingCart));
         toggleClicked();
@@ -142,7 +139,18 @@ export default function FreshSell() {
         return Math.min(Math.round(discount + 40), 95);
     };
 
-    // --- RENDER SECTION ---
+    if (loading) {
+        return (
+            <section className="py-8 md:py-4 mt-4 w-full container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden p-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
+                        {Array.from({ length: 5 }).map((_, index) => <ProductSkeleton key={index} />)}
+                    </div>
+                 </div>
+            </section>
+        );
+    }
+
     return (
         <section className="py-8 md:py-4 mt-4 w-full container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -171,16 +179,13 @@ export default function FreshSell() {
                 {/* Content Area */}
                 <div className="p-4 md:p-6">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
-                        
-                        {/* 1. LOADING STATE: Show Skeletons */}
-                        {loading ? (
-                            Array.from({ length: 5 }).map((_, index) => (
-                                <ProductSkeleton key={index} />
-                            ))
-                        ) : products.length > 0 ? (
-                            /* 2. DATA LOADED: Show Real Products */
+                        {products.length > 0 ? (
                             products.map((product) => {
                                 const progress = calculateProgress(product.mrp, product.price);
+                                
+                                // --- 4. DYNAMIC LANGUAGE SELECTION ---
+                                const displayName = i18n.language === 'bn' ? product.name_bn : product.name_en;
+
                                 return (
                                     <div key={product.id} className="group flex flex-col bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm hover:shadow-2xl hover:border-orange-100 transition-all duration-500 transform hover:-translate-y-1 h-full">
                                         
@@ -188,7 +193,7 @@ export default function FreshSell() {
                                         <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
                                             <img
                                                 src={product.image}
-                                                alt={product.name}
+                                                alt={displayName}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 onError={(e) => { (e.target as HTMLImageElement).src = "../../../../public/image/products/maggi.webp"; }}
                                             />
@@ -201,7 +206,8 @@ export default function FreshSell() {
                                         <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
                                             <div>
                                                 <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                                                    {product.name}
+                                                    {/* Display Dynamic Name */}
+                                                    {displayName}
                                                 </h3>
                                                 
                                                 <div className="flex flex-wrap items-baseline gap-2 mt-1">
@@ -239,7 +245,6 @@ export default function FreshSell() {
                                 );
                             })
                         ) : (
-                            /* 3. EMPTY STATE */
                             <div className="col-span-full py-12 text-center text-gray-400">
                                 <p>No Flash Deals Available.</p>
                             </div>

@@ -6,13 +6,14 @@ import useModalStore from "@/store/Store";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
-// Interface matching your API
+// 1. UPDATE INTERFACE
 interface Product {
     id: number;
-    name: string;
+    name_en: string; // Store English Name
+    name_bn: string; // Store Bangla Name
     image: string;
     stock: number;
-    price: number; 
+    price: number;
     mrp: number;
     description?: string;
 }
@@ -20,16 +21,17 @@ interface Product {
 export default function AllProduct() {
     const { id } = useParams<{ id: string }>();
     const { toggleClicked } = useModalStore();
-    const { t } = useTranslation("global");
+    
+    // 2. GET i18n INSTANCE
+    const { t, i18n } = useTranslation("global");
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // Change this number to show more/less items per page
+    const itemsPerPage = 10; 
 
-    // Helper to get Token
     const getAuthToken = () => {
         const session = localStorage.getItem("student_session");
         if (!session) return null;
@@ -68,7 +70,10 @@ export default function AllProduct() {
 
                     return {
                         id: item.id,
-                        name: item.product_title_english,
+                        // 3. MAP BOTH LANGUAGES
+                        name_en: item.product_title_english,
+                        name_bn: item.product_title_bangla || item.product_title_english, // Fallback
+                        
                         image: imageUrl,
                         stock: parseInt(item.stock) || 0,
                         price: parseFloat(item.offer_price || item.regular_price || item.seller_price || 0),
@@ -93,19 +98,23 @@ export default function AllProduct() {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
 
+        // Save the correct name to cart based on current language
+        const cartProductName = i18n.language === 'bn' ? product.name_bn : product.name_en;
+
         if (existingProductIndex !== -1) {
             existingCart[existingProductIndex].quantity += 1;
         } else {
-            existingCart.push({ ...product, price: product.price, quantity: 1 });
+            // Add name property to cart item
+            existingCart.push({ ...product, name: cartProductName, price: product.price, quantity: 1 });
         }
         localStorage.setItem("cart", JSON.stringify(existingCart));
         toggleClicked();
     };
 
     const calculateProgress = (mrp: number, price: number) => {
-        if(!mrp || mrp <= price) return 20; 
+        if (!mrp || mrp <= price) return 20;
         const discount = ((mrp - price) / mrp) * 100;
-        return Math.min(Math.round(discount + 40), 95); 
+        return Math.min(Math.round(discount + 40), 95);
     };
 
     // --- PAGINATION LOGIC ---
@@ -116,7 +125,6 @@ export default function AllProduct() {
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
-        // Optional: Scroll to top of grid when page changes
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -153,6 +161,10 @@ export default function AllProduct() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5 mb-8">
                                     {currentProducts.map((product) => {
                                         const progress = calculateProgress(product.mrp, product.price);
+                                        
+                                        // 4. DETERMINE DISPLAY NAME
+                                        const displayName = i18n.language === 'bn' ? product.name_bn : product.name_en;
+
                                         return (
                                             <div key={product.id} className="group flex flex-col bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm hover:shadow-2xl hover:border-orange-100 transition-all duration-500 transform hover:-translate-y-1 h-full">
                                                 
@@ -160,7 +172,7 @@ export default function AllProduct() {
                                                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
                                                     <img
                                                         src={product.image}
-                                                        alt={product.name}
+                                                        alt={displayName}
                                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                         onError={(e) => { 
                                                             (e.target as HTMLImageElement).src = "../../../../public/image/products/maggi.webp"; 
@@ -175,7 +187,8 @@ export default function AllProduct() {
                                                 <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
                                                     <div>
                                                         <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                                                            {product.name}
+                                                            {/* 5. SHOW DYNAMIC NAME */}
+                                                            {displayName}
                                                         </h3>
                                                         
                                                         <div className="flex flex-wrap items-baseline gap-2 mt-1">
