@@ -32,9 +32,9 @@ const Home = () => {
         <Categories />
     </div>
 
-    <div className="mx-0 md:mx-4 lg:mx-8">
+    {/* <div className="mx-0 md:mx-4 lg:mx-8">
         <ProductCategories />
-    </div>
+    </div> */}
 
     <div className="mx-0 md:mx-4 lg:mx-8">
         <FreshSell /> 
