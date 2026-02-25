@@ -1,479 +1,128 @@
-'use client'
+'use client';
 
-import useModalStore from "@/store/Store"
-import * as React from "react"
-import { useTranslation } from "react-i18next"
-import { Link, useNavigate } from "react-router-dom"
+import React, { useState, useEffect } from 'react';
+import useModalStore from '@/store/Store';
+import { useNavigate } from "react-router-dom";
 
-interface Address {
-    label: "home" | "work" | "partner" | "other"
-    name: string
-    district: string
-    address: string
-    phone: string
-    notes?: string
-}
+// Sub-components
+import CheckoutSummaryView from './CheckoutSummaryView';
+import AddressListView from './AddressListView';
+import AddAddressFormView from './AddAddressFormView';
 
-interface CartItem {
+// --- Types ---
+export type ViewState = 'CHECKOUT' | 'ADDRESS_LIST' | 'ADD_ADDRESS';
+export type PaymentMethod = 'Wallet' | 'Bkash' | 'Nogod';
+
+export interface Address {
     id: number;
     name: string;
-    price: number;
-    quantity: number;
-    pack: string;
+    address: string;
+    phone: string;
+    label?: string;
+    isDefault?: boolean;
 }
 
-const Icon: React.FC<{ name: string }> = ({ name }) => {
-    const icons: { [key: string]: JSX.Element } = {
-        mapPin: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>,
-        clock: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>,
-        x: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>,
-        home: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>,
-        briefcase: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>,
-        heart: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>,
-        plus: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>,
-        chevronDown: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>,
-    }
-    return icons[name] || null
-}
-
-const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'outline' | 'ghost' }> = ({
-    children,
-    className = '',
-    variant = 'default',
-    ...props
-}) => {
-    const baseStyle = "px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-    const variantStyles = {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-    }
-    return (
-        <button
-            className={`${baseStyle} ${variantStyles[variant]} ${className}`}
-            {...props}
-        >
-            {children}
-        </button>
-    )
-}
-
-const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = ({ children, className = '', ...props }) => (
-    <div className="relative">
-        <select
-            className={`w-full p-2 border rounded appearance-none bg-background ${className}`}
-            {...props}
-        >
-            {children}
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <Icon name="chevronDown" />
-        </div>
-    </div>
-)
-
-const Switch: React.FC<{ checked: boolean; onChange: (checked: boolean) => void; label: string }> = ({ checked, onChange, label }) => (
-    <label className="flex items-center cursor-pointer">
-        <div className="relative">
-            <input
-                type="checkbox"
-                className="sr-only"
-                checked={checked}
-                onChange={e => onChange(e.target.checked)}
-            />
-            <div className={`block w-14 h-8 rounded-full ${checked ? 'bg-primary' : 'bg-gray-300'}`}></div>
-            <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${checked ? 'transform translate-x-6' : ''}`}></div>
-        </div>
-        <div className="ml-3 text-foreground font-medium">
-            {label}
-        </div>
-    </label>
-)
-
-const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => (
-    <input
-        {...props}
-        className={`w-full p-2 border rounded bg-background text-foreground ${props.className || ''}`}
-    />
-)
-
-const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = (props) => (
-    <textarea
-        {...props}
-        className={`w-full p-2 border rounded bg-background text-foreground ${props.className || ''}`}
-    />
-)
-
-const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ children, ...props }) => (
-    <label {...props} className={`block text-sm font-medium text-foreground mb-1 ${props.className || ''}`}>
-        {children}
-    </label>
-)
-
-const AddressManager: React.FC<{ onSaveAddress: (address: Address, isDefault: boolean) => void }> = ({ onSaveAddress }) => {
-    const [currentAddress, setCurrentAddress] = React.useState<Address>({
-        label: "home",
-        name: "",
-        district: "",
-        address: "",
-        phone: "",
-        notes: ""
-    });
-    const [isDefaultAddress, setIsDefaultAddress] = React.useState(false);
-
-    React.useEffect(() => {
-        const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
-        const defaultAddress = localStorage.getItem('defaultAddress');
-        if (defaultAddress) {
-            setCurrentAddress(savedAddresses[defaultAddress]);
-            setIsDefaultAddress(true);
-        } else if (savedAddresses[currentAddress?.label]) {
-            setCurrentAddress(savedAddresses[currentAddress?.label]);
-        }
-    }, [currentAddress?.label]);
-
-    const handleSaveAddress = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const savedAddresses = JSON.parse(localStorage.getItem('addresses') || '{}');
-        savedAddresses[currentAddress?.label] = currentAddress;
-        localStorage.setItem('addresses', JSON.stringify(savedAddresses));
-
-        if (isDefaultAddress) {
-            localStorage.setItem('defaultAddress', currentAddress?.label);
-        } else {
-            const currentDefault = localStorage.getItem('defaultAddress');
-            if (currentDefault === currentAddress?.label) {
-                localStorage.removeItem('defaultAddress');
-            }
-        }
-
-        onSaveAddress(currentAddress, isDefaultAddress);
-    };
-
-    const LabelOptions = () => (
-        <div className="grid grid-cols-4 gap-4 mt-2">
-            {[
-                { icon: "home", label: "home" },
-                { icon: "briefcase", label: "work" },
-                { icon: "heart", label: "partner" },
-                { icon: "plus", label: "other" },
-            ].map(({ icon, label }) => (
-                <Button
-                    key={label}
-                    type="button"
-                    variant={currentAddress?.label === label ? "default" : "outline"}
-                    className="flex flex-col items-center gap-2 py-4"
-                    onClick={() =>
-                        setCurrentAddress((prev) => ({
-                            ...prev,
-                            label: label as Address["label"],
-                        }))
-                    }
-                >
-                    <Icon name={icon} />
-                    <span className="capitalize text-xs">{label}</span>
-                </Button>
-            ))}
-        </div>
-    )
-
-    return (
-        <div className="max-w-sm mx-auto bg-white p-4 rounded-md shadow-lg">
-            <form onSubmit={handleSaveAddress} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            value={currentAddress?.name}
-                            onChange={(e) => setCurrentAddress({ ...currentAddress, name: e.target.value })}
-                            required
-                            placeholder="Name"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="address">Address</Label>
-                        <Input
-                            id="address"
-                            type="text"
-                            value={currentAddress?.address}
-                            onChange={(e) => setCurrentAddress({ ...currentAddress, address: e.target.value })}
-                            placeholder="Address"
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="district">District</Label>
-                        <Select
-                            id="district"
-                            value={currentAddress?.district}
-                            onChange={(e) => setCurrentAddress({ ...currentAddress, district: e.target.value })}
-                            required
-                        >
-                            <option value="">Select a district</option>
-                            <option value="Uttar Badda">Uttar Badda</option>
-                            <option value="Banani">Banani</option>
-                            {/* <option value="Gulshan">Gulshan</option>
-                            <option value="Mirpur">Mirpur</option>
-                            <option value="Dhanmondi">Dhanmondi</option> */}
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                            id="phone"
-                            type="tel"
-                            value={currentAddress?.phone}
-                            onChange={(e) => setCurrentAddress({ ...currentAddress, phone: e.target.value })}
-                            required
-                            placeholder="Phone"
-                        />
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="notes">Delivery Notes</Label>
-                    <Textarea
-                        id="notes"
-                        placeholder="Add any specific delivery instructions"
-                        value={currentAddress?.notes}
-                        onChange={(e) => setCurrentAddress({ ...currentAddress, notes: e.target.value })}
-                    />
-                </div>
-
-                <Label>Add a label</Label>
-                <LabelOptions />
-
-                <div className="space-y-2">
-                    <Switch
-                        checked={isDefaultAddress}
-                        onChange={setIsDefaultAddress}
-                        label="Save as default address"
-                    />
-                </div>
-
-                <div className="flex justify-end">
-                    <Button type="submit" className="bg-primary text-white">
-                        Save Address
-                    </Button>
-                </div>
-            </form>
-        </div>
-    );
-}
-
-export default function CheckoutModal() {
-    const { isCheckoutModalOpen, closeCheckoutModal } = useModalStore();
-    const [currentStep, setCurrentStep] = React.useState<"address" | "delivery">("address")
-    const [currentAddress, setCurrentAddress] = React.useState<Address | null>(null);
-    const [items, setItems] = React.useState<CartItem[]>([]);
+const CheckoutModal = () => {
     const navigate = useNavigate();
-const [t]=useTranslation("global");
+    const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
     
+    const [view, setView] = useState<ViewState>('CHECKOUT');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Wallet');
+    const [cartData, setCartData] = useState({ subTotal: 0, totalItems: 0 });
 
-    // Load cart items from local storage on component mount
-    React.useEffect(() => {
-        const storedItems = localStorage.getItem("cart");
-        if (storedItems) {
-            setItems(JSON.parse(storedItems));
-        }
-    }, []);
+    // --- Dynamic Address State ---
+    const [addresses, setAddresses] = useState<Address[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState<Address | undefined>(undefined);
 
-    const updateQuantity = (id: number, quantity: number) => {
-        const updatedItems = items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + quantity) } : item
-        );
-        setItems(updatedItems);
-
-        localStorage.setItem("cart", JSON.stringify(updatedItems)); // Save updated items to localStorage
-    };
-
-    console.log(items);
-    // calculate total items and total price
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const subtotal = totalPrice;
-
-    const CheckoutContent = () => {
-        const [selectedPayment, setSelectedPayment] = React.useState("wallet");
-        const [termsAccepted, setTermsAccepted] = React.useState(false);
-        const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-
-
-        const handleSubmit = () => {
-            if (!termsAccepted) {
-                setErrorMessage("Please accept the terms and conditions before proceeding.");
-                return;
+    // 1. Load Data (Cart & Addresses) on mount/open
+    useEffect(() => {
+        if (isCheckoutModalOpen) {
+            // Load Cart
+            const storedCart = localStorage.getItem('cart');
+            if (storedCart) {
+                const parsed = JSON.parse(storedCart);
+                const subTotal = parsed.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+                const totalItems = parsed.reduce((acc: number, item: any) => acc + item.quantity, 0);
+                setCartData({ subTotal, totalItems });
             }
 
-            setErrorMessage(null);
+            // Load Saved Addresses
+            const storedAddresses = localStorage.getItem('user_addresses');
+            if (storedAddresses) {
+                const parsedAddresses = JSON.parse(storedAddresses);
+                setAddresses(parsedAddresses);
+                
+                // Automatically select the first address if none selected
+                if (parsedAddresses.length > 0 && !selectedAddress) {
+                    setSelectedAddress(parsedAddresses[0]);
+                }
+            }
+        }
+    }, [isCheckoutModalOpen]);
 
-            // Log the selected payment method
-            console.log("Submitting the checkout with payment method:", selectedPayment);
-
-            // Navigate to the OrderDetails page
-            navigate("/orderdetails"); // Adjust the path based on your routing setup
-        };
-
-        const deliveryCharge = 50;
-        const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const total = subtotal + deliveryCharge;
-
-        return (
-            <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg flex flex-col h-[90vh]">
-                <div className="p-4 border-b flex items-center gap-2 bg-white z-10">
-                    <Icon name="mapPin" />
-                    <div className="flex-1">
-                        <h4 className="font-semibold">{currentAddress?.name}</h4>
-                        <p>{currentAddress?.address}, {currentAddress?.district}</p>
-                    </div>
-                    <button
-                        onClick={() => setCurrentStep("address")}
-                        className="text-primary hover:text-primary-light"
-                    >
-                        Change
-                    </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-1 custom-scrollbar">
-                    <div className="divide-y space-y-4">
-                        {items.map((item, i) => (
-                            <div key={i} className="m-2 flex gap-6">
-                                <div className="w-8 h-8 bg-red-500">
-                                    <img
-                                        alt={item?.name}
-                                        className="h-10 w-10 object-cover"
-                                        src="../../../../public/image/products/maggi.webp"
-                                    />
-                                </div>
-                                <div className="flex-1 flex flex-col">
-                                    <h3 className="font-medium text-sm text-start">
-                                        {item?.name.length > 40 ? `${item?.name.slice(0, 30)}...` : item?.name}
-                                    </h3>
-                                    <p className="text-sm font-medium text-start">
-                                        ৳{item.price} x {item.quantity} = ৳{item.price * item.quantity}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="p-4 space-y-4 bg-white border-t">
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <span>Total Items:</span>
-                            <span>{totalItems}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Subtotal:</span>
-                            <span>৳{subtotal}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Delivery Charge:</span>
-                            <span>৳{deliveryCharge}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold text-lg">
-                            <span>Total Price:</span>
-                            <span>৳{total}</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <h4 className="font-semibold">Payment Option</h4>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setSelectedPayment("wallet")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "wallet" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Wallet
-                            </button>
-                            <button
-                                onClick={() => setSelectedPayment("bkash")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "bkash" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Bkash
-                            </button>
-                            <button
-                                onClick={() => setSelectedPayment("nogod")}
-                                className={`w-1/3 p-2 border rounded text-center ${selectedPayment === "nogod" ? "bg-primary-default text-white" : "bg-gray-200"}`}
-                            >
-                                Nogod
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center mt-4">
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            checked={termsAccepted}
-                            onChange={(e) => setTermsAccepted(e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label htmlFor="terms" className="text-sm space-x-2">
-                            I accept the{" "}
-                            <Link
-                                to="/help/privacy-policy"
-                                target=""
-                                rel="noopener noreferrer"
-                                className="text-primary underline"
-                            >
-                                Privacy Policy,
-                            </Link>
-                            <Link
-                                to="/help/terms"
-                                target=""
-                                rel="noopener noreferrer"
-                                className="text-primary underline"
-                            >
-                                Terms and Conditions.
-                            </Link>
-                        </label>
-                    </div>
-
-                    {errorMessage && (
-                        <div className="text-red-500 text-sm">
-                            {errorMessage}
-                        </div>
-                    )}
-                </div>
-
-                <div className="p-4 border-t bg-white z-10">
-                    <button
-                        onClick={handleSubmit}
-                        className="w-full px-4 py-2 bg-primary-default text-white rounded"
-                    >
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        );
+    // 2. Save New Address Function
+    const handleSaveNewAddress = (newAddr: Address) => {
+        const updatedAddresses = [...addresses, newAddr];
+        setAddresses(updatedAddresses);
+        setSelectedAddress(newAddr); // Auto-select the newly created one
+        
+        // Persist to LocalStorage
+        localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses));
+        
+        // Go back to the summary view
+        setView('CHECKOUT');
     };
 
-    const handleSaveAddress = (address: Address, isDefault: boolean) => {
-        setCurrentAddress(address);
-        setCurrentStep("delivery");
+    if (!isCheckoutModalOpen) return null;
+
+    const handleClose = () => {
+        setView('CHECKOUT');
+        changeCheckoutModal();
     };
 
     return (
-        <div className={`fixed inset-0 z-50 flex items-start justify-end bg-black bg-opacity-50 ${isCheckoutModalOpen ? '' : 'hidden'}`}>
-            <div className="max-w-md w-full h-[680px] mt-2 bg-white p-4 rounded-md shadow-lg">
-                <div className="flex justify-between items-center">
-                    <button onClick={closeCheckoutModal}>
-                        <Icon name="x" />
-                    </button>
-                </div>
-                {currentStep === "address" ? (
-                    <AddressManager onSaveAddress={handleSaveAddress} />
-                ) : (
-                    <CheckoutContent />
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 backdrop-blur-sm">
+            <div className="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                
+                {view === 'CHECKOUT' && (
+                    <CheckoutSummaryView 
+                        data={cartData}
+                        selectedAddress={selectedAddress}
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        onClose={handleClose}
+                        onChangeAddress={() => setView('ADDRESS_LIST')}
+                        onConfirm={() => {
+                            handleClose();
+                            navigate("/orderdetails");
+                        }}
+                    />
+                )}
+
+                {view === 'ADDRESS_LIST' && (
+                    <AddressListView 
+                        addresses={addresses} // Passing the actual state array
+                        selectedId={selectedAddress?.id}
+                        onBack={() => setView('CHECKOUT')}
+                        onClose={handleClose}
+                        onSelect={(addr) => {
+                            setSelectedAddress(addr);
+                            setView('CHECKOUT');
+                        }}
+                        onAddNew={() => setView('ADD_ADDRESS')}
+                    />
+                )}
+
+                {view === 'ADD_ADDRESS' && (
+                    <AddAddressFormView 
+                        onBack={() => setView('ADDRESS_LIST')}
+                        onClose={handleClose}
+                        onSave={handleSaveNewAddress} // Passing the real save function
+                    />
                 )}
             </div>
         </div>
     );
-}
+};
 
+export default CheckoutModal;

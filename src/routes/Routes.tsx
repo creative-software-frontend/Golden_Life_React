@@ -45,13 +45,15 @@ import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
 import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
+import VendorLogin from "@/pages/common/Vendor/VendorLogin";
+import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
 export const routes = createBrowserRouter([
     // PUBLIC ROUTES (No Layout - Full Screen Pages)
-    {
+   {
         element: <AuthLayout />,
         children: [
             {
@@ -63,6 +65,16 @@ export const routes = createBrowserRouter([
                 element: <Register />,
             },
         ],
+    },
+    
+    // 👇 ADD THIS NEW OBJECT HERE (Outside AuthLayout)
+    {
+        path: '/vendor/login',
+        element: <VendorLogin />,
+    },
+    {
+        path: '/vendor/register', // Add this route
+        element: <VendorRegister />,
     },
     {
         path: '/',

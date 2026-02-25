@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronRight, ShoppingCart, Timer } from "lucide-react";
-import { Link } from "react-router-dom"; // Ensure Link is imported
+import { Link } from "react-router-dom"; 
 import { Button } from "@/components/ui/button";
 import useModalStore from "@/store/Store";
 import { useTranslation } from "react-i18next";
@@ -15,8 +15,8 @@ interface Product {
     name_bn: string;
     image: string;
     stock: number;
-    price: number; 
-    mrp: number;    
+    price: number;
+    mrp: number;
     description?: string;
 }
 
@@ -38,11 +38,10 @@ const ProductSkeleton = () => {
 };
 
 export default function FreshSell() {
-    const { t, i18n } = useTranslation('global'); 
+    const { t, i18n } = useTranslation('global');
     const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 30, seconds: 0 });
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const { toggleClicked } = useModalStore();
 
     // Timer Logic
     useEffect(() => {
@@ -84,7 +83,7 @@ export default function FreshSell() {
                 };
 
                 const response = await axios.get(`${baseURL}/api/products`, config);
-                
+
                 let rawData = [];
                 if (response.data?.data?.products && Array.isArray(response.data.data.products)) {
                     rawData = response.data.data.products;
@@ -113,18 +112,28 @@ export default function FreshSell() {
         fetchProducts();
     }, []);
 
+    // FIXED: Corrected addToCart logic to handle localization and events
     const addToCart = (product: Product) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
+        
+        // Ensure name is stored based on the current active language
         const cartProductName = i18n.language === 'bn' ? product.name_bn : product.name_en;
 
         if (existingProductIndex !== -1) {
             existingCart[existingProductIndex].quantity += 1;
         } else {
-            existingCart.push({ ...product, name: cartProductName, price: product.price, quantity: 1 });
+            existingCart.push({ 
+                ...product, 
+                name: cartProductName, // Adding localized name for the cart UI
+                quantity: 1 
+            });
         }
+
         localStorage.setItem("cart", JSON.stringify(existingCart));
-        toggleClicked();
+
+        // DISPATCH CUSTOM EVENT: Updates the floating pill immediately
+        window.dispatchEvent(new Event("cartUpdated"));
     };
 
     const calculateProgress = (mrp: number, price: number) => {
@@ -136,11 +145,11 @@ export default function FreshSell() {
     if (loading) {
         return (
             <section className="py-8 md:py-4 mt-4 w-full container mx-auto px-4 sm:px-6 lg:px-8">
-                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden p-6">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden p-6">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
                         {Array.from({ length: 5 }).map((_, index) => <ProductSkeleton key={index} />)}
                     </div>
-                 </div>
+                </div>
             </section>
         );
     }
@@ -148,7 +157,7 @@ export default function FreshSell() {
     return (
         <section className="py-8 md:py-4 mt-4 w-full container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                
+
                 {/* Header Bar */}
                 <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4 w-full md:w-auto">
@@ -180,34 +189,31 @@ export default function FreshSell() {
 
                                 return (
                                     <div key={product.id} className="group flex flex-col bg-white border border-gray-100 rounded-xl p-2 md:p-3 shadow-sm hover:shadow-2xl hover:border-orange-100 transition-all duration-500 transform hover:-translate-y-1 h-full">
-                                        
-                                        {/* WRAP IMAGE & TITLE IN LINK */}
+
                                         <Link to={`/dashboard/product/${product.id}`} className="block">
-                                            {/* Image */}
                                             <div className="aspect-square rounded-lg overflow-hidden bg-gray-50 relative">
                                                 <img
                                                     src={product.image}
                                                     alt={displayName}
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                    onError={(e) => { (e.target as HTMLImageElement).src = "../../../../public/image/products/maggi.webp"; }}
+                                                    onError={(e) => { (e.target as HTMLImageElement).src = "/image/products/maggi.webp"; }}
                                                 />
-                                                <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-md">
-                                                    FLASH
+                                                <div className="absolute top-1 left-1 md:top-2 md:left-2 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-md uppercase">
+                                                    Flash
                                                 </div>
                                             </div>
 
-                                            {/* Info */}
                                             <div className="mt-3 space-y-2 flex-grow flex flex-col justify-between">
                                                 <div>
                                                     <h3 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors">
                                                         {displayName}
                                                     </h3>
-                                                    
+
                                                     <div className="flex flex-wrap items-baseline gap-2 mt-1">
                                                         <span className="text-sm md:text-lg font-black text-gray-900">
                                                             ৳{product.price}
                                                         </span>
-                                                        {product.mrp > 0 && product.mrp !== product.price && (
+                                                        {product.mrp > product.price && (
                                                             <span className="text-[10px] md:text-xs text-gray-400 line-through">
                                                                 ৳{product.mrp}
                                                             </span>
@@ -224,15 +230,14 @@ export default function FreshSell() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </Link> {/* END LINK */}
+                                        </Link>
 
-                                        {/* Button (Outside Link to avoid nested click issues) */}
                                         <div className="mt-2">
                                             <Button
                                                 size="sm"
-                                                onClick={(e) => { 
-                                                    e.preventDefault(); 
-                                                    addToCart(product); 
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    addToCart(product);
                                                 }}
                                                 className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg h-8 md:h-10 text-[10px] md:text-xs transition-all border-none shadow-md active:scale-95 flex items-center justify-center gap-1 md:gap-2"
                                             >
@@ -245,7 +250,7 @@ export default function FreshSell() {
                                 );
                             })
                         ) : (
-                            <div className="col-span-full py-12 text-center text-gray-400">
+                            <div className="col-span-full py-12 text-center text-gray-400 font-bold uppercase tracking-widest italic">
                                 <p>No Flash Deals Available.</p>
                             </div>
                         )}
