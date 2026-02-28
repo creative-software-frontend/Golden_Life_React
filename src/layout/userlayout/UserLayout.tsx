@@ -65,8 +65,10 @@ export default function UserLayout() {
             <Sidebar collapsible="icon">
                 <SidebarHeader>
                     <div className="flex items-center justify-center py-4 border-b h-16">
-                        {/* Changed h-8 to h-12 */}
-                        <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
+                        <Link to="/dashboard">
+                            {/* Changed h-8 to h-12 */}
+                            <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
+                        </Link>
                     </div>
                 </SidebarHeader>
                 <div className="px-2 py-2 border-b">
@@ -178,7 +180,9 @@ export default function UserLayout() {
                                 <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
                             </SidebarTrigger>
                             <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4" />
-                            <img src={logo} alt="logo" className="h-6 sm:h-8 w-auto" />
+                            <Link to="/dashboard">
+                                <img src={logo} alt="logo" className="h-6 sm:h-8 w-auto" />
+                            </Link>
                         </div>
 
                         <div className="flex items-center gap-1 sm:gap-2">

@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import useModalStore from '@/store/Store';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 // Sub-components
 import CheckoutSummaryView from './CheckoutSummaryView';
 import AddressListView from './AddressListView';
-import AddAddressFormView from './AddAddressFormView';
+import AddAddressForm from './AddAddressFormView';
 
 // --- Types ---
 export type ViewState = 'CHECKOUT' | 'ADDRESS_LIST' | 'ADD_ADDRESS';
@@ -18,58 +19,128 @@ export interface Address {
     name: string;
     address: string;
     phone: string;
-    label?: string;
-    isDefault?: boolean;
+    division_id?: number | string;
+    district_id?: number | string;
+    thana_id?: number | string;
+    is_default?: boolean | number | string;
 }
 
 const CheckoutModal = () => {
     const navigate = useNavigate();
     const { isCheckoutModalOpen, changeCheckoutModal } = useModalStore();
-    
+
+    // Config
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const getAuthToken = () => {
+        const session = localStorage.getItem("student_session");
+        return session ? JSON.parse(session).token : null;
+    };
+
     const [view, setView] = useState<ViewState>('CHECKOUT');
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Wallet');
     const [cartData, setCartData] = useState({ subTotal: 0, totalItems: 0 });
 
-    // --- Dynamic Address State ---
+    // --- State ---
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<Address | undefined>(undefined);
+    const [deliveryFee, setDeliveryFee] = useState<number>(0);
+    const [loadingAddresses, setLoadingAddresses] = useState(false);
 
-    // 1. Load Data (Cart & Addresses) on mount/open
+    // 1. Load Data on Open
     useEffect(() => {
         if (isCheckoutModalOpen) {
-            // Load Cart
-            const storedCart = localStorage.getItem('cart');
-            if (storedCart) {
-                const parsed = JSON.parse(storedCart);
-                const subTotal = parsed.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
-                const totalItems = parsed.reduce((acc: number, item: any) => acc + item.quantity, 0);
-                setCartData({ subTotal, totalItems });
-            }
-
-            // Load Saved Addresses
-            const storedAddresses = localStorage.getItem('user_addresses');
-            if (storedAddresses) {
-                const parsedAddresses = JSON.parse(storedAddresses);
-                setAddresses(parsedAddresses);
-                
-                // Automatically select the first address if none selected
-                if (parsedAddresses.length > 0 && !selectedAddress) {
-                    setSelectedAddress(parsedAddresses[0]);
-                }
-            }
+            loadCart();
+            fetchAddresses();
         }
     }, [isCheckoutModalOpen]);
 
-    // 2. Save New Address Function
+    // 2. Helper: Load Cart 
+    const loadCart = () => {
+        const storedCart = localStorage.getItem('cart');
+        if (storedCart) {
+            const parsed = JSON.parse(storedCart);
+            const subTotal = parsed.reduce((acc: number, item: any) => acc + ((Number(item.price) || 0) * (Number(item.quantity) || 0)), 0);
+            const totalItems = parsed.reduce((acc: number, item: any) => acc + (Number(item.quantity) || 0), 0);
+            setCartData({ subTotal, totalItems });
+        }
+    };
+
+    // 3. API: Fetch Addresses List (GET)
+    const fetchAddresses = async () => {
+        setLoadingAddresses(true);
+        try {
+            const token = getAuthToken();
+            const response = await axios.get(`${baseURL}/api/student/addresses`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // Adjust based on API structure
+            const apiAddresses = response.data?.addresses || [];
+            setAddresses(apiAddresses);
+
+            // Auto-select default logic
+            if (apiAddresses.length > 0 && !selectedAddress) {
+                const defaultAddr = apiAddresses.find((a: any) => Number(a.is_default) === 1 || String(a.is_default).toLowerCase() === 'true');
+                const initialAddr = defaultAddr || apiAddresses[0];
+
+                handleSelectAddress(initialAddr, false); // Select without switching view
+            }
+        } catch (error) {
+            console.error("Failed to load addresses", error);
+        } finally {
+            setLoadingAddresses(false);
+        }
+    };
+
+    // 4. API: Select Address & Fetch Fee
+    const handleSelectAddress = async (addr: Address, switchView: boolean = true) => {
+        setSelectedAddress(addr);
+        if (switchView) setView('CHECKOUT');
+
+        const token = getAuthToken();
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        // ==========================================
+        // CALL 1: Select Address API 
+        // ==========================================
+        try {
+            await axios.post(`${baseURL}/api/student/address/select`, {
+                address_id: addr.id,
+                id: addr.id
+            }, config);
+        } catch (error: any) {
+            console.error("Select Address API Failed (422):", error.response?.data || error.message);
+        }
+
+        // ==========================================
+        // CALL 2: Fetch Delivery Fee API 
+        // ==========================================
+        try {
+            const feeResponse = await axios.post(
+                `${baseURL}/api/getDeliveryCharge?address_id=${addr.id}`,
+                {},
+                config
+            );
+
+            // *** FIX: Extracted correctly from the JSON structure you provided ***
+            // JSON: { status: "success", data: { delivery_charge: 150 } }
+            const charge = feeResponse.data?.data?.delivery_charge;
+
+            if (charge !== undefined && charge !== null) {
+                setDeliveryFee(Number(charge));
+            } else {
+                setDeliveryFee(60); // Fallback if missing
+            }
+
+        } catch (error: any) {
+            console.error("Fetch Fee API Failed:", error.response?.data || error.message);
+            setDeliveryFee(60); // Fallback on hard failure
+        }
+    };
+
+    // 5. Handle New Address Saved
     const handleSaveNewAddress = (newAddr: Address) => {
-        const updatedAddresses = [...addresses, newAddr];
-        setAddresses(updatedAddresses);
-        setSelectedAddress(newAddr); // Auto-select the newly created one
-        
-        // Persist to LocalStorage
-        localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses));
-        
-        // Go back to the summary view
+        fetchAddresses();
         setView('CHECKOUT');
     };
 
@@ -81,11 +152,11 @@ const CheckoutModal = () => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 backdrop-blur-sm">
-            <div className="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-                
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-full max-h-[90dvh] md:h-auto md:max-h-[800px]">
+
                 {view === 'CHECKOUT' && (
-                    <CheckoutSummaryView 
+                    <CheckoutSummaryView
                         data={cartData}
                         selectedAddress={selectedAddress}
                         paymentMethod={paymentMethod}
@@ -96,28 +167,28 @@ const CheckoutModal = () => {
                             handleClose();
                             navigate("/orderdetails");
                         }}
+                        // @ts-ignore
+                        deliveryFee={deliveryFee}
                     />
                 )}
 
                 {view === 'ADDRESS_LIST' && (
-                    <AddressListView 
-                        addresses={addresses} // Passing the actual state array
+                    <AddressListView
+                        addresses={addresses}
                         selectedId={selectedAddress?.id}
                         onBack={() => setView('CHECKOUT')}
                         onClose={handleClose}
-                        onSelect={(addr) => {
-                            setSelectedAddress(addr);
-                            setView('CHECKOUT');
-                        }}
+                        onSelect={(addr) => handleSelectAddress(addr, true)}
                         onAddNew={() => setView('ADD_ADDRESS')}
+                        loading={loadingAddresses}
                     />
                 )}
 
                 {view === 'ADD_ADDRESS' && (
-                    <AddAddressFormView 
-                        onBack={() => setView('ADDRESS_LIST')}
-                        onClose={handleClose}
-                        onSave={handleSaveNewAddress} // Passing the real save function
+                    <AddAddressForm
+                        onBack={() => setView('ADDRESS_LIST')} // Goes back to the list
+                        onClose={handleClose}                  // Closes the entire modal completely
+                        onSave={handleSaveNewAddress}
                     />
                 )}
             </div>

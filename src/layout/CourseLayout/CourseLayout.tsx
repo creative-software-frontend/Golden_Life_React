@@ -127,8 +127,10 @@ export default function CourseLayout() {
             <Sidebar collapsible="icon" className="hidden lg:flex border-r bg-white z-40">
                 <SidebarHeader>
                     <div className="flex items-center justify-center py-4 border-b h-16">
-                        {/* Changed h-8 to h-12 */}
-                        <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
+                        <Link to="/dashboard">
+                            {/* Changed h-8 to h-12 */}
+                            <img src={logo} alt="logo" className="h-12 w-auto object-contain" />
+                        </Link>
                     </div>
                 </SidebarHeader>
 
@@ -158,7 +160,9 @@ export default function CourseLayout() {
             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetContent side="left" className="w-[300px] p-0 flex flex-col z-[100]">
                     <div className="p-4 border-b flex items-center gap-3 bg-gray-50 h-16">
-                        <img src={logo} alt="logo" className="h-8 w-auto" />
+                        <Link to="/dashboard">
+                            <img src={logo} alt="logo" className="h-8 w-auto" />
+                        </Link>
                         <span className="font-bold text-lg text-primary-default">Menu</span>
                     </div>
                     <div className="flex-1 overflow-y-auto">
@@ -188,14 +192,14 @@ export default function CourseLayout() {
     bottom-25 right-4 rounded-full p-3 
     lg:bottom-auto top-[55%]  lg:top-[60%] lg:right-0 lg:rounded-l-xl lg:rounded-r-none lg:px-4 lg:py-3 lg:-translate-y-1/2"
                     > */}
-                        {/* <div className="relative">
+                    {/* <div className="relative">
                             <ShoppingBag className="h-6 w-6 text-red-500" />
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
                                 4
                             </span>
                         </div> */}
-                        {/* Only show text on Desktop to prevent mobile overlapping */}
-                        {/* <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
+                    {/* Only show text on Desktop to prevent mobile overlapping */}
+                    {/* <div className="hidden lg:block text-left border-l border-gray-200 pl-3 h-8">
                             <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">MY CART</div>
                             <div className="text-xs font-bold text-gray-800">৳ 2369</div>
                         </div> */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { X, Plus, Minus, Trash2, ShoppingBag, Gift } from "lucide-react";
+import { X, Plus, Minus, Trash2, ShoppingBag, Gift, AlertCircle } from "lucide-react"; // Added AlertCircle
 import useModalStore from "@/store/Store";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,9 @@ export default function Cart() {
   const { clicked, toggleClicked, changeCheckoutModal } = useModalStore();
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [showCode, setShowCode] = useState(false);
+  
+  // --- NEW: State for custom confirmation modal ---
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Formatter
   const formatBDT = (amount: number) => {
@@ -57,6 +60,17 @@ export default function Cart() {
     saveAndSync(updated);
   };
 
+  // --- UPDATED: Trigger the custom modal instead of window.confirm ---
+  const handleClearClick = () => {
+    setShowClearConfirm(true);
+  };
+
+  // --- NEW: Actual delete logic called by the modal ---
+  const confirmClearCart = () => {
+    saveAndSync([]);
+    setShowClearConfirm(false);
+  };
+
   const saveAndSync = (newList: any[]) => {
     localStorage.setItem("cart", JSON.stringify(newList));
     setCartItems(newList);
@@ -68,12 +82,7 @@ export default function Cart() {
 
   return (
     <>
-      {/* FLOATING TRIGGER BUTTON (GREEN THEME)
-          - Border: Green
-          - Text: Green
-          - Icon: Green
-          - Hover: Light Green Background
-      */}
+      {/* FLOATING TRIGGER BUTTON */}
       {!clicked && (
         <button
           onClick={toggleClicked}
@@ -111,7 +120,7 @@ export default function Cart() {
       <aside className={`fixed right-0 top-0 h-full w-full max-w-md bg-white z-[1000] shadow-2xl transition-transform duration-500 ease-in-out transform ${
         clicked ? "translate-x-0" : "translate-x-full"
       }`}>
-        <div className="flex flex-col h-full font-sans">
+        <div className="flex flex-col h-full font-sans relative">
           
           {/* Header */}
           <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shadow-sm z-10">
@@ -124,9 +133,19 @@ export default function Cart() {
                 <p className="text-xs text-gray-500 font-medium">{totalItems} Items added</p>
               </div>
             </div>
-            <button onClick={toggleClicked} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-900">
-              <X size={24} />
-            </button>
+            <div className="flex items-center gap-2">
+                {cartItems.length > 0 && (
+                    <button 
+                        onClick={handleClearClick} // Changed to open modal
+                        className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide"
+                    >
+                        Clear All
+                    </button>
+                )}
+                <button onClick={toggleClicked} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-900">
+                <X size={24} />
+                </button>
+            </div>
           </div>
 
           {/* Items List */}
@@ -161,7 +180,7 @@ export default function Cart() {
                         <p className="text-[#5C9C72] font-black text-base leading-none">৳{formatBDT(item.price)}</p>
                       </div>
 
-                      {/* Quantity Control (Green) */}
+                      {/* Quantity Control */}
                       <div className="flex items-center border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm h-8">
                         <button 
                             onClick={() => updateQuantity(item.id, -1)} 
@@ -182,7 +201,7 @@ export default function Cart() {
                 </div>
               ))
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
+                <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
                 <div className="bg-white p-8 rounded-full shadow-sm border border-gray-100">
                   <ShoppingBag size={64} strokeWidth={1} className="text-gray-300" />
                 </div>
@@ -226,7 +245,7 @@ export default function Cart() {
                 <span className="text-2xl font-black text-gray-900 tracking-tight">৳{formatBDT(subtotal)}</span>
               </div>
               
-              {/* Place Order Button (Green) */}
+              {/* Place Order Button */}
               <Button 
                 onClick={() => { 
                   toggleClicked(); 
@@ -238,6 +257,36 @@ export default function Cart() {
                 <span className="w-px h-5 bg-white/20"></span>
                 <span>৳{formatBDT(subtotal)}</span>
               </Button>
+            </div>
+          )}
+
+          {/* --- NEW: CUSTOM CLEAR CART CONFIRMATION MODAL --- */}
+          {/* We place it INSIDE the aside div so it appears over the cart content */}
+          {showClearConfirm && (
+            <div className="absolute inset-0 z-[1100] bg-white/80 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
+                <div className="bg-white w-full max-w-sm p-6 rounded-3xl shadow-2xl border border-gray-100 text-center transform animate-in zoom-in-95 duration-200">
+                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                        <AlertCircle size={32} />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 mb-2">Clear Your Cart?</h3>
+                    <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+                        Are you sure you want to remove all items from your cart? This action cannot be undone.
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button 
+                            onClick={() => setShowClearConfirm(false)}
+                            className="py-3 rounded-xl font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={confirmClearCart}
+                            className="py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-200 transition-colors"
+                        >
+                            Yes, Clear It
+                        </button>
+                    </div>
+                </div>
             </div>
           )}
         </div>
