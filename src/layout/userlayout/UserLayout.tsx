@@ -246,7 +246,7 @@ export default function UserLayout() {
                     <div className="hidden lg:block">
                         <Header />
                     </div>
-
+                    
 
                     <Cart />
 

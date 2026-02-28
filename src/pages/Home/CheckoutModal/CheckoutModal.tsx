@@ -151,12 +151,15 @@ const CheckoutModal = () => {
         changeCheckoutModal();
     };
 
-    return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-full max-h-[90dvh] md:h-auto md:max-h-[800px]">
-
+return (
+        // The overlay background with padding so the modal never touches the exact edges of the screen
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
+            
+            {/* The Modal Box: max-h-[90vh] ensures it leaves a 10% gap and doesn't get cut off at the top/bottom */}
+            <div className="bg-white w-full max-w-[420px] rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-auto max-h-[90vh]">
+                
                 {view === 'CHECKOUT' && (
-                    <CheckoutSummaryView
+                    <CheckoutSummaryView 
                         data={cartData}
                         selectedAddress={selectedAddress}
                         paymentMethod={paymentMethod}
@@ -173,8 +176,8 @@ const CheckoutModal = () => {
                 )}
 
                 {view === 'ADDRESS_LIST' && (
-                    <AddressListView
-                        addresses={addresses}
+                    <AddressListView 
+                        addresses={addresses} 
                         selectedId={selectedAddress?.id}
                         onBack={() => setView('CHECKOUT')}
                         onClose={handleClose}
@@ -185,10 +188,10 @@ const CheckoutModal = () => {
                 )}
 
                 {view === 'ADD_ADDRESS' && (
-                    <AddAddressForm
-                        onBack={() => setView('ADDRESS_LIST')} // Goes back to the list
-                        onClose={handleClose}                  // Closes the entire modal completely
-                        onSave={handleSaveNewAddress}
+                    <AddAddressForm 
+                        onClose={() => setView('ADDRESS_LIST')} 
+                        onBack={() => setView('ADDRESS_LIST')} 
+                        onSave={handleSaveNewAddress} 
                     />
                 )}
             </div>
