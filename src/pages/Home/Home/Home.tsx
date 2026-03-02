@@ -1,8 +1,8 @@
-import { useSearchParams } from "react-router-dom"; // <-- IMPORT THIS
-import HeroSection from "../HeroSection/HeroSection"
+import { useSearchParams } from "react-router-dom"; 
+import HeroSection from "../HeroSection/HeroSection";
 import Categories from "../Categories/Categories";
 import ProductCategories from "../ProductCategories/ProductCategories";
-import FreshSell from "../FreshSell/FreshSell"; // <-- This is the smart component we updated!
+import FreshSell from "../FreshSell/FreshSell"; 
 import AutoScrollIcons from "../ScrollCategories/ScrollCategories";
 import CourseCategories from "../CoursesCategory/CoursesCategory";
 
@@ -56,7 +56,7 @@ const Home = () => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default Home;

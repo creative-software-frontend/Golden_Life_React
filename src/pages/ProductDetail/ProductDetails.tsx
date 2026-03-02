@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ShoppingCart, Heart, Minus, Plus, Star, CheckCircle } from 'lucide-react';
+import {
+    ShoppingCart, Heart, Minus, Plus, Star,
+    CheckCircle, ChevronLeft, ChevronRight
+} from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -17,7 +20,7 @@ interface Product {
     id: number;
     product_title_english: string;
     product_title_bangla: string;
-    product_image: string; 
+    product_image: string;
     stock: string;
     seller_price: string;
     regular_price: string;
@@ -41,19 +44,22 @@ const TABS = [
 export default function ProductDetails() {
     const { id } = useParams<{ id: string }>();
     const { t, i18n } = useTranslation("global");
-    
+
     // --- STATE ---
     const [product, setProduct] = useState<Product | null>(null);
     const [gallery, setGallery] = useState<GalleryItem[]>([]);
-    const [mainImage, setMainImage] = useState<string>(""); 
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState("long_desc");
 
+    // Slider State
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+    const [isHovered, setIsHovered] = useState(false); // Used to pause auto-play on hover
+
     // --- API & IMAGE PATHS ---
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
     const mainImgBase = `${baseURL}/uploads/ecommarce/product_image/`;
-    const galleryImgBase = `${baseURL}/uploads/ecommarce/gal_img/`; 
+    const galleryImgBase = `${baseURL}/uploads/ecommarce/gal_img/`;
 
     const getAuthToken = () => {
         const session = localStorage.getItem("student_session");
@@ -66,14 +72,13 @@ export default function ProductDetails() {
         const fetchProduct = async () => {
             try {
                 const token = getAuthToken();
-                const config = { headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) }};
+                const config = { headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) } };
 
                 const response = await axios.get(`${baseURL}/api/products/${id}`, config);
                 const data = response.data?.data;
-                
+
                 if (data?.product) {
                     setProduct(data.product);
-                    setMainImage(`${mainImgBase}${data.product.product_image}`);
                 }
 
                 if (data?.gallery && Array.isArray(data.gallery)) {
@@ -88,7 +93,7 @@ export default function ProductDetails() {
         };
 
         fetchProduct();
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
     }, [id]);
 
     // --- HANDLER ---
@@ -97,7 +102,7 @@ export default function ProductDetails() {
 
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
-        
+
         const displayName = i18n.language === 'bn' ? product.product_title_bangla : product.product_title_english;
         const price = parseFloat(product.offer_price || product.regular_price || product.seller_price);
 
@@ -119,6 +124,39 @@ export default function ProductDetails() {
         window.dispatchEvent(new Event("cartUpdated"));
     };
 
+    // --- DERIVED DATA ---
+    const isBangla = i18n.language === 'bn';
+    const title = product ? (isBangla ? product.product_title_bangla : product.product_title_english) : "";
+    const shortDesc = product ? (isBangla ? product.short_description_bangla : product.short_description_english) : "";
+    const longDesc = product ? (isBangla ? product.long_description_bangla : product.long_description_english) : "";
+
+    const currentPrice = product ? parseFloat(product.offer_price || product.regular_price || product.seller_price) : 0;
+    const regularPrice = product ? parseFloat(product.regular_price) : 0;
+    const hasDiscount = regularPrice > currentPrice;
+    const discountPercent = hasDiscount ? Math.round(((regularPrice - currentPrice) / regularPrice) * 100) : 0;
+    const currentStock = product ? parseInt(product.stock) : 0;
+
+    // Prepare Slider Images Array
+    const allImages = product ? [
+        `${mainImgBase}${product.product_image}`,
+        ...gallery.map(img => `${galleryImgBase}${img.gal_img}`)
+    ] : [];
+
+    const nextSlide = () => setActiveSlideIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+    const prevSlide = () => setActiveSlideIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+
+    // --- AUTO PLAY SLIDER LOGIC ---
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (!isHovered && allImages.length > 1) {
+            interval = setInterval(() => {
+                nextSlide();
+            }, 3000); // Changes image every 3 seconds
+        }
+        return () => clearInterval(interval);
+    }, [isHovered, allImages.length, activeSlideIndex]);
+
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-600"></div>
@@ -132,186 +170,257 @@ export default function ProductDetails() {
         </div>
     );
 
-    const isBangla = i18n.language === 'bn';
-    const title = isBangla ? product.product_title_bangla : product.product_title_english;
-    const shortDesc = isBangla ? product.short_description_bangla : product.short_description_english;
-    const longDesc = isBangla ? product.long_description_bangla : product.long_description_english;
-    
-    const currentPrice = parseFloat(product.offer_price || product.regular_price || product.seller_price);
-    const regularPrice = parseFloat(product.regular_price);
-    const hasDiscount = regularPrice > currentPrice;
-    const discountPercent = hasDiscount ? Math.round(((regularPrice - currentPrice) / regularPrice) * 100) : 0;
-    const currentStock = parseInt(product.stock);
-
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="bg-gray-50 min-h-screen pt-4 pb-8"
+            className="bg-gray-50/50 min-h-screen pt-4 pb-12"
         >
-            <div className="mx-4 md:mx-8">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    
-                    <nav className="flex mb-2 text-sm text-gray-500">
-                        <Link to="/dashboard" className="hover:text-orange-600">Home</Link>
-                        <span className="mx-2">/</span>
-                        <Link to="/dashboard/allProducts" className="hover:text-orange-600">Products</Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-gray-900 font-medium truncate max-w-[200px]">{title}</span>
-                    </nav>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
-                    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-6">
-                        <div className="grid lg:grid-cols-2 gap-0">
-                            
-                            {/* --- IMAGES --- */}
-                            <div className="p-4 md:p-6 bg-gray-50/50 flex flex-col items-center lg:border-r border-gray-100">
-                                <div className="relative w-full aspect-square flex items-center justify-center mb-4 bg-white rounded-2xl border border-gray-200 p-4 group overflow-hidden">
-                                    <img 
-                                        src={mainImage} alt={title} 
-                                        className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110"
+                {/* --- BREADCRUMBS --- */}
+                <nav className="flex mb-6 text-xs sm:text-sm text-gray-500 font-medium overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
+                    <Link to="/dashboard" className="hover:text-orange-600 transition-colors">Home</Link>
+                    <span className="mx-2 text-gray-300">/</span>
+                    <Link to="/dashboard/allProducts" className="hover:text-orange-600 transition-colors">Products</Link>
+                    <span className="mx-2 text-gray-300">/</span>
+                    <span className="text-gray-900 truncate max-w-[150px] sm:max-w-xs">{title}</span>
+                </nav>
+
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+
+                        {/* --- LEFT: IMAGE SLIDER --- */}
+                        {/* --- LEFT: IMAGE SLIDER --- */}
+                        <div className="lg:col-span-5 p-4 sm:p-6 lg:p-8 bg-white flex flex-col items-center lg:border-r border-gray-100">
+
+                            {/* Main Active Image Box - Removed shadow-inner and changed bg to solid white for clarity */}
+                            <div
+                                className="relative w-full aspect-square flex items-center justify-center mb-4 bg-white rounded-2xl border border-gray-100 group overflow-hidden"
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                            >
+                                <AnimatePresence mode="wait">
+                                    <motion.img
+                                        key={activeSlideIndex}
+                                        initial={{ opacity: 0 }} // Removed scale animation to prevent "interpolation blur"
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        src={allImages[activeSlideIndex]}
+                                        alt={title}
+                                        className="max-h-full max-w-full object-contain object-top transition-transform duration-500 group-hover:scale-105"
                                     />
-                                    {hasDiscount && (
-                                        <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-bold">
-                                            -{discountPercent}% OFF
-                                        </span>
-                                    )}
-                                    <button className="absolute top-4 right-4 p-2.5 bg-white/80 rounded-full text-gray-400 hover:text-red-500 shadow-sm">
-                                        <Heart className="w-5 h-5" />
-                                    </button>
-                                </div>
+                                </AnimatePresence>
 
-                                <div className="w-full flex gap-3 overflow-x-auto pb-2 justify-center">
-                                    <button 
-                                        onClick={() => setMainImage(`${mainImgBase}${product.product_image}`)}
-                                        className={`w-16 h-16 rounded-xl overflow-hidden border ${mainImage.includes(product.product_image) ? "ring-2 ring-orange-500" : "opacity-70"}`}
-                                    >
-                                        <img src={`${mainImgBase}${product.product_image}`} className="w-full h-full object-cover" />
-                                    </button>
-                                    {gallery.map((img) => (
-                                        <button 
-                                            key={img.id}
-                                            onClick={() => setMainImage(`${galleryImgBase}${img.gal_img}`)}
-                                            className={`w-16 h-16 rounded-xl overflow-hidden border ${mainImage.includes(img.gal_img) ? "ring-2 ring-orange-500" : "opacity-70"}`}
+                                {/* Slider Arrows */}
+                                {allImages.length > 1 && (
+                                    <>
+                                        <button onClick={prevSlide} className="absolute left-2 sm:left-4 p-2 bg-white hover:bg-gray-50 rounded-full text-gray-700 shadow-md transition-all active:scale-95 z-10">
+                                            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                                        </button>
+                                        <button onClick={nextSlide} className="absolute right-2 sm:right-4 p-2 bg-white hover:bg-gray-50 rounded-full text-gray-700 shadow-md transition-all active:scale-95 z-10">
+                                            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                                        </button>
+                                    </>
+                                )}
+
+                                {/* Discount Badge */}
+                                {hasDiscount && (
+                                    <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm z-10">
+                                        -{discountPercent}% OFF
+                                    </span>
+                                )}
+
+                                {/* Heart Icon Button has been removed from here */}
+                            </div>
+
+                            {/* Thumbnail Row */}
+                            {allImages.length > 1 && (
+                                <div className="w-full flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                                    {allImages.map((img, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setActiveSlideIndex(idx)}
+                                            className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white transition-all ${activeSlideIndex === idx ? "border-2 border-orange-500 shadow-md" : "border border-gray-200 opacity-60 hover:opacity-100"}`}
                                         >
-                                            <img src={`${galleryImgBase}${img.gal_img}`} className="w-full h-full object-cover" />
+                                            <img src={img} className="w-full h-full object-cover p-1" alt={`Thumbnail ${idx + 1}`} />
                                         </button>
                                     ))}
                                 </div>
-                            </div>
-
-                            {/* --- DETAILS --- */}
-                            <div className="p-5 md:p-8 flex flex-col">
-                                <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-4">{title}</h1>
-                                
-                                <div className="flex items-center gap-2 mb-6">
-                                    <div className="flex text-yellow-400">
-                                        {[...Array(4)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-                                        <Star className="w-4 h-4 text-gray-300 fill-current" />
-                                    </div>
-                                    <span className="text-sm text-gray-500">(4.0) 275 Reviews</span>
-                                </div>
-
-                                <div className="mb-8">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-2">About this item</h3>
-                                    <div 
-                                        className="prose prose-sm text-gray-600 leading-snug"
-                                        dangerouslySetInnerHTML={{ __html: shortDesc || "<li>No features listed.</li>" }}
-                                    />
-                                </div>
-
-                                <div className="flex items-end gap-3 mb-8">
-                                    <span className="text-3xl font-extrabold text-gray-900">৳{currentPrice}</span>
-                                    {hasDiscount && <span className="text-lg text-gray-400 line-through">৳{regularPrice}</span>}
-                                </div>
-
-                                <div className="flex flex-col sm:flex-row gap-4 mt-2">
-                                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden w-fit h-12">
-                                        <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="px-4 hover:bg-gray-100"><Minus className="w-4 h-4" /></button>
-                                        <span className="w-12 text-center font-bold">{quantity}</span>
-                                        <button onClick={() => setQuantity(q => (currentStock > quantity ? q + 1 : q))} className="px-4 hover:bg-gray-100"><Plus className="w-4 h-4" /></button>
-                                    </div>
-                                    <Button 
-                                        onClick={addToCart} disabled={currentStock === 0}
-                                        className="flex-1 h-12 bg-orange-600 hover:bg-orange-700 text-white font-bold"
-                                    >
-                                        <ShoppingCart className="mr-2 w-5 h-5" /> {currentStock > 0 ? t('buttons.addToCart') : "Unavailable"}
-                                    </Button>
-                                </div>
-                            </div>
+                            )}
                         </div>
-                    </div>
 
-                    {/* --- TABS --- */}
-                    <div className="bg-white border-t border-gray-200">
-                        <div className="container mx-auto px-6 pt-6 pb-16">
-                            <div className="flex flex-wrap gap-6 border-b border-gray-200 mb-6">
-                                {TABS.map((tab) => (
-                                    <button 
-                                        key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                        className={`pb-3 text-sm font-semibold transition-all relative ${activeTab === tab.id ? "text-sky-500" : "text-gray-500"}`}
-                                    >
-                                        {tab.label} {activeTab === tab.id && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-500" />}
-                                    </button>
-                                ))}
+                        {/* --- RIGHT: PRODUCT DETAILS --- */}
+                        <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 flex flex-col justify-center">
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 leading-tight">{title}</h1>
+
+                            <div className="flex flex-wrap items-center gap-4 mb-6">
+                                <div className="flex items-center gap-1 text-yellow-400 bg-yellow-50 px-2.5 py-1 rounded-md">
+                                    {[...Array(4)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                                    <Star className="w-4 h-4 text-yellow-200 fill-current" />
+                                    <span className="text-sm text-yellow-700 font-bold ml-1">4.0</span>
+                                </div>
+                                <span className="text-sm text-gray-500 hover:text-orange-600 cursor-pointer underline decoration-dotted underline-offset-4">(275 Reviews)</span>
+                                <div className="h-4 w-[1px] bg-gray-300 hidden sm:block"></div>
+                                <div className="flex items-center gap-1.5 text-sm">
+                                    <span className="text-gray-500">SKU:</span>
+                                    <span className="font-semibold text-gray-900">{product.sku}</span>
+                                </div>
                             </div>
-                            
-                            <AnimatePresence mode="wait">
-                                <motion.div 
-                                    key={activeTab} 
-                                    initial={{ opacity: 0, y: 10 }} 
-                                    animate={{ opacity: 1, y: 0 }} 
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="prose prose-sm max-w-none text-gray-600"
+
+                            <div className="mb-8">
+                                <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Product Highlights</h3>
+                                <div
+                                    className="prose prose-sm sm:prose-base text-gray-600 leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: shortDesc || "<p>No highlights provided.</p>" }}
+                                />
+                            </div>
+
+                            {/* Updated Price Section with background removed */}
+                            <div className="flex flex-wrap items-end gap-3 sm:gap-4 mb-8 w-fit">
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Price</span>
+                                    <span className="text-3xl sm:text-4xl font-black text-gray-900">৳{currentPrice}</span>
+                                </div>
+
+                                {hasDiscount && (
+                                    <div className="flex flex-col justify-end pb-1">
+                                        <span className="text-sm sm:text-lg text-gray-400 line-through decoration-red-500/50">
+                                            ৳{regularPrice}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Add to Cart Actions */}
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-auto">
+                                <div className="flex items-center justify-between border-2 border-gray-200 rounded-xl overflow-hidden h-14 w-full sm:w-36 bg-white">
+                                    <button
+                                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                        className="h-full px-4 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                                    >
+                                        <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </button>
+                                    <span className="font-bold text-lg">{quantity}</span>
+                                    <button
+                                        onClick={() => setQuantity(q => (currentStock > quantity ? q + 1 : q))}
+                                        className="h-full px-4 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </button>
+                                </div>
+
+                                <Button
+                                    onClick={addToCart}
+                                    disabled={currentStock === 0}
+                                    className="flex-1 h-14 bg-orange-600 hover:bg-orange-700 text-white font-bold text-base rounded-xl shadow-lg shadow-orange-600/20 transition-all active:scale-[0.98]"
                                 >
-                                    {activeTab === "long_desc" && (
-                                        <div dangerouslySetInnerHTML={{ __html: longDesc || "<p>No detailed description available.</p>" }} />
-                                    )}
+                                    <ShoppingCart className="mr-2 w-5 h-5 sm:w-6 sm:h-6" />
+                                    {currentStock > 0 ? t('buttons.addToCart') : "Out of Stock"}
+                                </Button>
+                            </div>
 
-                                    {activeTab === "short_desc" && (
-                                        <div dangerouslySetInnerHTML={{ __html: shortDesc || "<p>No short description available.</p>" }} />
-                                    )}
-
-                                    {activeTab === "features" && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                                                <CheckCircle className="w-5 h-5 text-green-500" />
-                                                <span className="font-medium text-gray-900">SKU:</span>
-                                                <span>{product.sku}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                                                <CheckCircle className="w-5 h-5 text-green-500" />
-                                                <span className="font-medium text-gray-900">Stock Status:</span>
-                                                <span className={currentStock > 0 ? "text-green-600" : "text-red-600"}>
-                                                    {currentStock > 0 ? "In Stock" : "Out of Stock"} ({currentStock} available)
-                                                </span>
-                                            </div>
-                                            {/* Since 'features' aren't explicitly in the JSON, we display key specs */}
-                                        </div>
-                                    )}
-
-                                    {activeTab === "price" && (
-                                        <div className="bg-white p-6 rounded-xl border border-gray-100 max-w-md">
-                                            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                                                <span className="text-gray-500">Regular Price</span>
-                                                <span className="font-medium line-through">৳{regularPrice}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center py-2 pt-4">
-                                                <span className="text-gray-900 font-bold">Offer Price</span>
-                                                <span className="text-xl font-bold text-orange-600">৳{currentPrice}</span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {activeTab === "reviews" && (
-                                        <div className="text-center py-10 text-gray-400 bg-gray-50 rounded-xl">
-                                            <Star className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                                            <p>No reviews yet for this product.</p>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            </AnimatePresence>
+                            {/* Stock Indicator */}
+                            <div className="mt-4 flex items-center justify-center sm:justify-start gap-2 text-sm">
+                                {currentStock > 0 ? (
+                                    <>
+                                        <CheckCircle className="w-4 h-4 text-green-500" />
+                                        <span className="font-medium text-green-600">{currentStock} items in stock</span>
+                                    </>
+                                ) : (
+                                    <span className="font-medium text-red-500">Currently unavailable</span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {/* --- TABS SECTION --- */}
+                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="px-4 sm:px-8 pt-6">
+                        {/* Scrollable Tabs on Mobile */}
+                        <div className="flex gap-6 sm:gap-8 border-b border-gray-200 overflow-x-auto scrollbar-hide whitespace-nowrap">
+                            {TABS.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`pb-4 text-sm sm:text-base font-bold transition-all relative ${activeTab === tab.id ? "text-orange-600" : "text-gray-500 hover:text-gray-800"}`}
+                                >
+                                    {tab.label}
+                                    {tab.badge && (
+                                        <span className="ml-2 bg-gray-100 text-gray-600 text-xs py-0.5 px-2 rounded-full font-semibold">
+                                            {tab.badge}
+                                        </span>
+                                    )}
+                                    {activeTab === tab.id && (
+                                        <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="p-4 sm:p-8 min-h-[300px]">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="prose prose-sm sm:prose-base max-w-none text-gray-600"
+                            >
+                                {activeTab === "long_desc" && (
+                                    <div dangerouslySetInnerHTML={{ __html: longDesc || "<p>No detailed description available.</p>" }} />
+                                )}
+
+                                {activeTab === "short_desc" && (
+                                    <div dangerouslySetInnerHTML={{ __html: shortDesc || "<p>No short description available.</p>" }} />
+                                )}
+
+                                {activeTab === "features" && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl">
+                                        <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                            <span className="font-semibold text-gray-500">SKU</span>
+                                            <span className="font-bold text-gray-900">{product.sku}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                            <span className="font-semibold text-gray-500">Stock Status</span>
+                                            <span className={`font-bold ${currentStock > 0 ? "text-green-600" : "text-red-600"}`}>
+                                                {currentStock > 0 ? "In Stock" : "Out of Stock"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === "price" && (
+                                    <div className="bg-gray-50 p-6 sm:p-8 rounded-2xl border border-gray-100 max-w-sm">
+                                        <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                                            <span className="text-gray-500 font-medium">Regular Price</span>
+                                            <span className="font-bold line-through text-gray-400">৳{regularPrice}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center py-3 pt-4">
+                                            <span className="text-gray-900 font-bold">Offer Price</span>
+                                            <span className="text-2xl font-black text-orange-600">৳{currentPrice}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === "reviews" && (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                                            <Star className="w-8 h-8 text-gray-400 fill-current" />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-gray-900 mb-1">No reviews yet</h4>
+                                        <p className="text-sm text-gray-500">Be the first to review this product!</p>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </div>
+
             </div>
         </motion.div>
     );

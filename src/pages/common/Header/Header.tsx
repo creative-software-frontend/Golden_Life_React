@@ -10,6 +10,7 @@ import useModalStore from '@/store/Store';
 import { useTranslation } from 'react-i18next';
 import LoginOptionsModal from '@/components/LoginoptionsModal';
 import axios from 'axios';
+import { toast } from 'react-toastify'; // Added react-toastify import
 
 const Header: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
@@ -38,13 +39,18 @@ const Header: React.FC = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     
-    // Search Ref to detect clicks outside
-    const searchRef = useRef<HTMLDivElement>(null);
+    // Split refs for Desktop and Mobile so clicking outside works properly
+    const desktopSearchRef = useRef<HTMLDivElement>(null);
+    const mobileSearchRef = useRef<HTMLDivElement>(null);
 
     // Handle clicks outside the search dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+            const isOutsideDesktop = desktopSearchRef.current && !desktopSearchRef.current.contains(target);
+            const isOutsideMobile = mobileSearchRef.current && !mobileSearchRef.current.contains(target);
+
+            if (isOutsideDesktop && isOutsideMobile) {
                 setShowSuggestions(false);
             }
         };
@@ -57,7 +63,6 @@ const Header: React.FC = () => {
         const delayDebounceFn = setTimeout(async () => {
             if (searchText.trim().length > 0) {
                 setIsSearching(true);
-                setShowSuggestions(true);
                 try {
                     const response = await axios.get(`${baseURL}/api/products/search?keyword=${searchText}`);
                     const results = response.data?.products || [];
@@ -117,14 +122,20 @@ const Header: React.FC = () => {
         }
     };
 
-    // --- UPDATED SEARCH FUNCTION ---
+    // --- UPDATED: Modern Search Handler ---
     const handleSearch = () => {
-        if (searchText) {
-            setShowSuggestions(false);
-            // This triggers the ?q= URL logic in the component above!
-            navigate(`/dashboard?q=${searchText}`);
+        if (searchText.trim()) {
+            const query = searchText.trim(); 
+            setShowSuggestions(false);       
+            setSearchText('');               
+            navigate(`/dashboard?q=${encodeURIComponent(query)}`); 
         } else {
-            alert("Please enter text to search");
+            toast.warning("Please enter text to search", {
+                position: "top-center", 
+                autoClose: 2000,        
+                hideProgressBar: true,  
+                theme: "light",
+            });
         }
     };
 
@@ -135,10 +146,10 @@ const Header: React.FC = () => {
         return product.product_title_english || product.name || 'Unknown Product';
     };
 
-    const handleSelectSuggestion = (product: any) => {
-        setSearchText(getProductTitle(product));
-        setShowSuggestions(false);
-        // navigate(`/product/${product.id}`); 
+    // --- UPDATED: Select Suggestion Handler ---
+    const handleSelectSuggestion = () => {
+        setShowSuggestions(false); 
+        setSearchText(''); 
     };
 
     const handlePhoneLogin = () => {
@@ -161,17 +172,20 @@ const Header: React.FC = () => {
                ========================================= */}
             <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-5xl mx-auto h-20 gap-8">
 
-                <div className="flex-1 max-w-4xl relative" ref={searchRef}>
+                <div className="flex-1 max-w-4xl relative" ref={desktopSearchRef}>
                     <div className="relative w-full group">
                         <input
                             type="text"
                             placeholder={t('header.search') || "Search products..."}
                             className="w-full pl-6 pr-28 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-default focus:ring-4 focus:ring-primary-default/10 text-lg transition-all"
                             value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setShowSuggestions(true);
+                            }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch(); // Added Enter key support
+                                if (e.key === 'Enter') handleSearch(); 
                             }}
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3 pr-2">
@@ -191,24 +205,28 @@ const Header: React.FC = () => {
                             {isSearching ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
                             ) : suggestions.length > 0 ? (
-                                suggestions.map(p => (
-                                    <div 
-                                        key={p.id} 
-                                        className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-4 transition-colors" 
-                                        onClick={() => handleSelectSuggestion(p)}
-                                    >
-                                        <img 
-                                            src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
-                                            className="w-12 h-12 rounded object-cover border border-gray-100" 
-                                            alt={getProductTitle(p)} 
-                                            onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} 
-                                        />
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-gray-800 line-clamp-1">{getProductTitle(p)}</span>
-                                            {p.offer_price && <span className="text-sm font-bold text-primary-default">৳{p.offer_price}</span>}
-                                        </div>
-                                    </div>
-                                ))
+                                suggestions.map(p => {
+                                    const productTitle = getProductTitle(p);
+                                    return (
+                                        <Link 
+                                            key={p.id} 
+                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`} 
+                                            className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-4 transition-colors" 
+                                            onClick={handleSelectSuggestion}
+                                        >
+                                            <img 
+                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
+                                                className="w-12 h-12 rounded object-cover border border-gray-100" 
+                                                alt={productTitle} 
+                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} 
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-gray-800 line-clamp-1">{productTitle}</span>
+                                                {p.offer_price && <span className="text-sm font-bold text-primary-default">৳{p.offer_price}</span>}
+                                            </div>
+                                        </Link>
+                                    );
+                                })
                             ) : (
                                 <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
                             )}
@@ -244,7 +262,7 @@ const Header: React.FC = () => {
             {/* =========================================
                 2. MOBILE HEADER (Small Screens)
                ========================================= */}
-            <div className="lg:hidden flex flex-col w-full bg-white" ref={searchRef}>
+            <div className="lg:hidden flex flex-col w-full bg-white" ref={mobileSearchRef}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                     <button className="p-2 hover:bg-gray-100 rounded-xl text-gray-700">
                         <Menu className="h-7 w-7" />
@@ -268,10 +286,13 @@ const Header: React.FC = () => {
                             placeholder={t('header.search')}
                             className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-base font-medium shadow-inner focus:outline-none focus:bg-white focus:border-primary-default transition-all"
                             value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setShowSuggestions(true);
+                            }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch(); // Added Enter key support
+                                if (e.key === 'Enter') handleSearch(); 
                             }}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -286,24 +307,28 @@ const Header: React.FC = () => {
                             {isSearching ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
                             ) : suggestions.length > 0 ? (
-                                suggestions.map(p => (
-                                    <div 
-                                        key={p.id} 
-                                        className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors" 
-                                        onClick={() => handleSelectSuggestion(p)}
-                                    >
-                                        <img 
-                                            src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
-                                            className="w-10 h-10 rounded object-cover border border-gray-100" 
-                                            alt={getProductTitle(p)}
-                                            onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} 
-                                        />
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-gray-800 text-sm line-clamp-1">{getProductTitle(p)}</span>
-                                            {p.offer_price && <span className="text-xs font-bold text-primary-default">৳{p.offer_price}</span>}
-                                        </div>
-                                    </div>
-                                ))
+                                suggestions.map(p => {
+                                    const productTitle = getProductTitle(p);
+                                    return (
+                                        <Link 
+                                            key={p.id} 
+                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`} 
+                                            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors" 
+                                            onClick={handleSelectSuggestion}
+                                        >
+                                            <img 
+                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
+                                                className="w-10 h-10 rounded object-cover border border-gray-100" 
+                                                alt={productTitle}
+                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} 
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-gray-800 text-sm line-clamp-1">{productTitle}</span>
+                                                {p.offer_price && <span className="text-xs font-bold text-primary-default">৳{p.offer_price}</span>}
+                                            </div>
+                                        </Link>
+                                    );
+                                })
                             ) : (
                                 <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
                             )}

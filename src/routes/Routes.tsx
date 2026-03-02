@@ -47,13 +47,14 @@ import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
+import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
 export const routes = createBrowserRouter([
     // PUBLIC ROUTES (No Layout - Full Screen Pages)
-   {
+    {
         element: <AuthLayout />,
         children: [
             {
@@ -66,7 +67,7 @@ export const routes = createBrowserRouter([
             },
         ],
     },
-    
+
     // 👇 ADD THIS NEW OBJECT HERE (Outside AuthLayout)
     {
         path: '/vendor/login',
@@ -144,6 +145,10 @@ export const routes = createBrowserRouter([
             {
                 path: 'product/:id',
                 element: <ProductDetails />,
+            },
+            {
+                path: "category/:id", // This matches /dashboard/category/1
+                element: <CategoryPage />,
             },
 
 
