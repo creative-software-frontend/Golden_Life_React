@@ -1,11 +1,11 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
-// Define the shape of a Category based on your API
 interface Category {
     id: number;
     name_en: string;
@@ -14,43 +14,38 @@ interface Category {
     slug: string;
 }
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.05 }
+    }
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: "spring", stiffness: 100, damping: 15 }
+    }
+};
+
 export default function Categories() {
     const { t, i18n } = useTranslation('global');
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [hoveredId, setHoveredId] = useState<number | null>(null); // Track which card is hovered
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05 }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: { type: "spring", stiffness: 100, damping: 15 }
-        }
-    };
-
-    // 1. Helper to get Token
     const getAuthToken = () => {
         const session = localStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
-            if (new Date().getTime() > parsedSession.expiry) {
-                localStorage.removeItem("student_session");
-                return null;
-            }
             return parsedSession.token;
         } catch (e) { return null; }
     };
 
-    // 2. Fetch Data from API
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -64,133 +59,126 @@ export default function Categories() {
                 };
 
                 const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
-                
-                // Debug to confirm we are getting data
-                // console.log("Full Response:", response.data);
+                const rawData = response.data?.data?.categories || [];
 
-                let rawData = [];
+                const mappedCategories = rawData.map((item: any) => ({
+                    id: item.id,
+                    name_en: item.category_name || "Category",
+                    name_bn: item.category_name_bangla || item.category_name || "Category",
+                    icon: `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`,
+                    slug: item.category_slug
+                }));
 
-                // --- Path: response.data -> data -> categories ---
-                if (response.data?.data?.categories && Array.isArray(response.data.data.categories)) {
-                    rawData = response.data.data.categories;
-                } else {
-                    console.warn("Could not find categories array. Check console for structure.");
-                }
-
-                const mappedCategories = rawData.map((item: any) => {
-                    // Image URL Construction
-                    const imageUrl = `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`;
-
-                    return {
-                        id: item.id,
-                        // Map Names
-                        name_en: item.category_name || "Category", 
-                        name_bn: item.category_name_bangla || item.category_name || "Category", 
-                        
-                        icon: imageUrl,
-                        slug: item.category_slug
-                    };
-                });
-
-                // 3. Set All Categories (Removed .slice limit)
                 setCategories(mappedCategories);
-
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchCategories();
     }, []);
 
-    // Loading Skeleton
     if (loading) {
         return (
-            <section className="w-full py-6 px-4">
-                <div className="mx-0 md:mx-4 lg:mx-8">
-                    <div className="container mx-auto">
-                        {/* Skeleton Header */}
-                        <div className="h-16 bg-gray-100 rounded-lg mb-6 animate-pulse"></div>
-                        {/* Skeleton Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                            {Array.from({ length: 12 }).map((_, i) => (
-                                <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
-                            ))}
-                        </div>
+            <section className="w-full py-10 px-4">
+                <div className="container mx-auto max-w-[1440px]">
+                    <div className="h-10 w-48 bg-gray-100 rounded-lg mb-8 animate-pulse" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={i} className="h-32 bg-gray-50 rounded-2xl animate-pulse" />
+                        ))}
                     </div>
                 </div>
             </section>
         );
     }
 
-    // Hide section if no data
     if (categories.length === 0) return null;
 
     return (
-        <section className="w-full py-6 px-4">
-            <div className="mx-0 md:mx-4 lg:mx-8">
+        <section className="w-full py-10 px-4 bg-white">
+            <div className="mx-4 md:mx-12">
 
-                <motion.div
-                    className="container mx-auto"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.1 }}
-                    variants={containerVariants}
-                >
+                <div className="container mx-auto max-w-[1440px]">
+
+                    {/* --- HEADER --- */}
                     <motion.div
-                        variants={itemVariants}
-                        className="bg-gradient-to-r from-orange-500 via-yellow-600 to-green-600 rounded-t-lg p-4 md:p-5 flex flex-col md:flex-row justify-between items-center shadow-lg mb-6 text-white"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="mb-8"
                     >
-                        <div className="text-center md:text-left mb-3 md:mb-0">
-                            <h2 className="text-lg md:text-xl font-bold mb-0.5">{t("header.categories") || "Product Categories"}</h2>
-                            <p className="text-white/90 text-xs font-medium opacity-90">Find exactly what you are looking for</p>
-                        </div>
-
-                        <Link
-                            to="/categories"
-                            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 transition-all duration-300 group shadow-sm"
-                        >
-                            {t("viewAll") || "View All"}
-                            <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                        </Link>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-secondary tracking-tight">
+                            {t("header.categories", "Categories")}
+                        </h2>
+                        <div className="h-1 w-12 bg-emerald-500 rounded-full mt-2" />
                     </motion.div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {/* --- CATEGORY GRID --- */}
+                    <motion.div
+                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6"
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                    >
                         {categories.map((category) => {
-                            // Dynamic Name Selection
                             const displayName = i18n.language === 'bn' ? category.name_bn : category.name_en;
 
                             return (
-                                <motion.div key={category.id} variants={itemVariants}>
+                                <motion.div
+                                    key={category.id}
+                                    variants={itemVariants}
+                                    className="relative" // Relative for tooltip positioning
+                                    onMouseEnter={() => setHoveredId(category.id)}
+                                    onMouseLeave={() => setHoveredId(null)}
+                                >
+                                    {/* Tooltip Implementation */}
+                                    <AnimatePresence>
+                                        {hoveredId === category.id && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, x: "-50%" }}
+                                                animate={{ opacity: 1, y: 0, x: "-50%" }}
+                                                exit={{ opacity: 0, y: 5, x: "-50%" }}
+                                                className="absolute -top-10 left-1/2 z-50 pointer-events-none"
+                                            >
+                                                <div className="bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-xl whitespace-nowrap">
+                                                    {displayName}
+                                                    {/* Tooltip Pointer */}
+                                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
                                     <Link
                                         to={`/category/${category.id}`}
-                                        className="group flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-gray-100 shadow-sm 
-                                        hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:border-green-100
-                                        transition-all duration-500 transform hover:-translate-y-1.5 h-full"
+                                        className="group flex flex-col items-center justify-center p-5 bg-white rounded-[20px] border border-slate-100 shadow-sm 
+                                    hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.1)] hover:border-emerald-500/30
+                                    transition-all duration-500 transform hover:-translate-y-1.5 h-full"
                                     >
-                                        <div className="w-12 h-12 mb-2.5 bg-gray-50 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 overflow-hidden">
+                                        <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-slate-50 rounded-full group-hover:bg-emerald-50 group-hover:scale-110 transition-all duration-500" />
+
                                             <img
                                                 src={category.icon}
                                                 alt={displayName}
-                                                className="w-full h-full object-cover transition-all duration-500"
-                                                onError={(e) => { 
-                                                    // Fallback icon
-                                                    (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/1170/1170628.png"; 
+                                                className="relative z-10 w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-110"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/1170/1170628.png";
                                                 }}
                                             />
                                         </div>
 
-                                        <span className="text-gray-700 font-bold text-center text-[10px] sm:text-xs group-hover:text-green-600 transition-colors duration-300 leading-tight line-clamp-2 px-1">
+                                        <span className="text-slate-700 font-bold text-center text-[11px] sm:text-[13px] uppercase tracking-wide group-hover:text-emerald-600 transition-colors duration-300 leading-tight line-clamp-2 px-1">
                                             {displayName}
                                         </span>
                                     </Link>
                                 </motion.div>
                             );
                         })}
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             </div>
         </section>
     );

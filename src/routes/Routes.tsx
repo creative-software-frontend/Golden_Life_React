@@ -48,6 +48,7 @@ import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
+import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -115,48 +116,46 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    {
-        path: '/dashboard',
-        element: <UserLayout />,
-
-
-        children: [
-
-            {
-                path: '',
-                element: <Home />
-            },
-            {
-                path: 'allcategories',
-                element: <AllCategories />
-            },
-            {
-                path: 'all-courses',
-                element: < AllCourses2 />
-            },
-            {
-                path: 'productpage',  // Separate route for Help page
-                element: <ProductPage />,
-            },
-            {
-                path: 'allProducts',  // Separate route for Help page
-                element: <AllProduct />,
-            },
-            {
-                path: 'product/:id',
-                element: <ProductDetails />,
-            },
-            {
-                path: "category/:id", // This matches /dashboard/category/1
-                element: <CategoryPage />,
-            },
-
-
-
-
-        ]
-
-    },
+ // Inside your routes array
+{
+    element: <ProtectedRoute />, // The Gatekeeper
+    children: [
+        {
+            path: '/dashboard',
+            element: <UserLayout />,
+            children: [
+                {
+                    path: '',
+                    element: <Home />
+                },
+                {
+                    path: 'allcategories',
+                    element: <AllCategories />
+                },
+                {
+                    path: 'all-courses',
+                    element: <AllCourses2 />
+                },
+                {
+                    path: 'productpage',
+                    element: <ProductPage />,
+                },
+                {
+                    path: 'allProducts',
+                    element: <AllProduct />,
+                },
+                {
+                    path: 'product/:id',
+                    element: <ProductDetails />,
+                },
+                {
+                    path: "category/:id",
+                    element: <CategoryPage />,
+                },
+            ]
+        }
+    ]
+},
     {
         path: '/courses',
         element: <CourseLayout />,

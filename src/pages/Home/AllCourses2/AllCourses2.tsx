@@ -40,7 +40,7 @@ export default function AllCourses2() {
     };
 
     return (
-        <section className="w-full py-12 px-4 bg-[#f8fcfb]">
+        <section className="w-full py-4 md:py-1 px-4 bg-[#f8fcfb]">
             <div className="mx-0 md:mx-4 lg:mx-8">
                 <motion.div
                     className="container mx-auto"
@@ -77,7 +77,7 @@ export default function AllCourses2() {
                         {courses.map((course) => (
                             <motion.div key={course.id} variants={itemVariants} className="h-full">
                                 <Link
-                                    to={`/course/${course.id}`}
+                                   to={`/dashboard/category/${course.id}`}
                                     className="group isolate flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1.5"
                                 >
                                     {/* Top Image Section - [transform:translateZ(0)] prevents border radius glitch on hover */}

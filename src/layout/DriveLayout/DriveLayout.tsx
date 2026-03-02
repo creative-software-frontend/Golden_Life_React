@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from "react"
-import { Link, Outlet } from "react-router-dom"
+import { Link, Outlet, useNavigate } from "react-router-dom"
 import logo from '../../../public/image/logo/logo.jpg'
-import { ChevronRight, SquareTerminal,  ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
+import { ChevronRight, SquareTerminal, ChefHat, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Package, Truck } from 'lucide-react'
 import {
     Collapsible,
     CollapsibleContent,
@@ -18,7 +18,7 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    
+
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
@@ -43,7 +43,22 @@ export default function DriveLayout() {
     const { changeCheckoutModal, openLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("drive")
     const [t] = useTranslation("global");
+    const navigate = useNavigate();
 
+    // 2. Define the handleLogout function
+    const handleLogout = () => {
+        // Clear the session data
+        localStorage.removeItem("student_session");
+
+        // Optional: Clear other app data like cart or preferences if necessary
+        // localStorage.removeItem("cart"); 
+
+        // Redirect to login or home
+        navigate("/login");
+
+        // Force a reload if you need to reset all React states immediately
+        window.location.reload();
+    };
 
     const data = {
         user: {
@@ -166,25 +181,49 @@ export default function DriveLayout() {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton
                                         size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+                                        className="h-14 w-full p-1.5 flex items-stretch justify-between bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
-                                                <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-teal-600">Help</span>
-                                            </Link>
-                                        </div>
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
-                                        <div className="flex items-center gap-2">
-                                            <Link to=''  className="flex items-center gap-2">
-                                                <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-blue-400">logout</span>
-                                            </Link>
-                                        </div>
+                                        {/* --- HELP SECTION (Priority Focus) --- */}
+                                        <Link
+                                            to="/help"
+                                            className="group flex flex-shrink-0 items-center justify-center gap-2.5 rounded-lg hover:bg-teal-50/50 transition-all duration-300 border border-transparent hover:border-teal-200"
+                                        >
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                                                <HelpCircleIcon className="h-4.5 w-4.5" />
+                                            </div>
+
+                                            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                                                <span className="text-[13px] font-black text-teal-700 uppercase tracking-wider leading-none">
+                                                    {t("help")}
+                                                </span>
+                                                <span className="text-[9px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
+                                                    Support
+                                                </span>
+                                            </div>
+                                        </Link>
+
+                                        {/* --- MINIMAL DIVIDER --- */}
+                                        <div className="w-[1px] bg-slate-100 my-2 group-data-[collapsible=icon]:hidden" />
+
+                                        {/* --- LOGOUT SECTION (Secondary Focus) --- */}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="group flex flex-1 items-center justify-center gap-2 rounded-lg hover:bg-rose-50/50 transition-all duration-300 border border-transparent hover:border-rose-100 outline-none"
+                                        >
+                                            <div className="flex flex-col items-end group-data-[collapsible=icon]:hidden text-right">
+                                                <span className="text-[11px] font-bold text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
+                                                    Logout
+                                                </span>
+                                                <span className="text-[9px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
+                                                    Exit
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center justify-center h-7 w-7 rounded-md bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                                                {/* Added rotate-180 to make the LogIn icon look like a LogOut icon */}
+                                                <LogInIcon className="h-4 w-4 rotate-180" />
+                                            </div>
+                                        </button>
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>
@@ -197,7 +236,7 @@ export default function DriveLayout() {
                 <main className="pt-6 ">
                     <button
                         onClick={changeCheckoutModal}
-                            >
+                    >
                         <div className="flex items-center">
                             <ShoppingBag className="h-6 w-6 text-red-500" />
                             <div className="border-l border-gray-300 h-8 mx-2" />

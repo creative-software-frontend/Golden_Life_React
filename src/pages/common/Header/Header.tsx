@@ -3,7 +3,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import { CameraIcon, UserIcon, Search, Menu, X, LayoutDashboard, Loader2 } from 'lucide-react';
+import { CameraIcon, UserIcon, Search, Menu, X, LayoutDashboard, Loader2, Wallet } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
@@ -15,10 +15,10 @@ import { toast } from 'react-toastify'; // Added react-toastify import
 const Header: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const navigate = useNavigate();
-    
+
     // Config: Dynamic Base URL from Environment Variables
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-    
+
     // Auth & UI States
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -38,11 +38,61 @@ const Header: React.FC = () => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    
+
     // Split refs for Desktop and Mobile so clicking outside works properly
     const desktopSearchRef = useRef<HTMLDivElement>(null);
     const mobileSearchRef = useRef<HTMLDivElement>(null);
+    const [walletBalance, setWalletBalance] = React.useState<string | null>(null);
 
+    const [isLoading, setIsLoading] = React.useState(true); // Consolidating into one loading state
+
+    const getAuthToken = () => {
+        const session = localStorage.getItem("student_session");
+        if (!session) return null;
+        try {
+            const parsedSession = JSON.parse(session);
+            if (new Date().getTime() > parsedSession.expiry) {
+                localStorage.removeItem("student_session");
+                return null;
+            }
+            return parsedSession.token;
+        } catch (e) { return null; }
+    };
+React.useEffect(() => {
+    const fetchWalletBalance = async () => {
+        // Set loading to true at the start of every fetch
+        setIsLoading(true); 
+
+        try {
+            const token = getAuthToken(); 
+            const response = await axios.get(`${baseURL}/api/wallet-balance`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { Authorization: `Bearer ${token}` })
+                }
+            });
+
+            // Corrected Path: response.data.data.balance based on your API structure
+            if (response.data?.success && response.data?.data) {
+                const rawBalance = response.data.data.balance;
+                setWalletBalance(parseFloat(rawBalance).toFixed(2));
+            } else {
+                setWalletBalance("0.00");
+            }
+        } catch (error) {
+            console.error("Wallet Balance Fetch Failed:", error);
+            setWalletBalance("0.00");
+        } finally {
+            // This ensures the skeleton stops pulsing regardless of success or error
+            setIsLoading(false); 
+        }
+    };
+
+    fetchWalletBalance();
+}, [baseURL]);
+
+    // Inside your useEffect
+ 
     // Handle clicks outside the search dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -125,15 +175,15 @@ const Header: React.FC = () => {
     // --- UPDATED: Modern Search Handler ---
     const handleSearch = () => {
         if (searchText.trim()) {
-            const query = searchText.trim(); 
-            setShowSuggestions(false);       
-            setSearchText('');               
-            navigate(`/dashboard?q=${encodeURIComponent(query)}`); 
+            const query = searchText.trim();
+            setShowSuggestions(false);
+            setSearchText('');
+            navigate(`/dashboard?q=${encodeURIComponent(query)}`);
         } else {
             toast.warning("Please enter text to search", {
-                position: "top-center", 
-                autoClose: 2000,        
-                hideProgressBar: true,  
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: true,
                 theme: "light",
             });
         }
@@ -148,8 +198,8 @@ const Header: React.FC = () => {
 
     // --- UPDATED: Select Suggestion Handler ---
     const handleSelectSuggestion = () => {
-        setShowSuggestions(false); 
-        setSearchText(''); 
+        setShowSuggestions(false);
+        setSearchText('');
     };
 
     const handlePhoneLogin = () => {
@@ -171,7 +221,33 @@ const Header: React.FC = () => {
                 1. DESKTOP HEADER (Large Screens)
                ========================================= */}
             <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-5xl mx-auto h-20 gap-8">
+                <div className="flex items-center gap-3 bg-white border border-slate-100 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all group cursor-pointer">
+                    {/* Icon Container */}
+                    <div className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"
+                        }`}>
+                        {!isLoading && <Wallet className="h-5 w-5" />}
+                    </div>
 
+                    <div className="flex flex-col pr-2">
+                        {/* Label */}
+                        <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">
+                            My Balance
+                        </span>
+
+                        {/* Dynamic Balance or Loading Skeleton */}
+                        <div className="mt-1.5 h-4 flex items-center">
+                            {isLoading ? (
+                                /* The Loader: A pulsing bar that mimics the size of the balance */
+                                <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
+                            ) : (
+                                /* The Actual Balance */
+                                <span className="text-[16px] font-black text-slate-900 tracking-tight leading-none">
+                                    ৳{walletBalance}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <div className="flex-1 max-w-4xl relative" ref={desktopSearchRef}>
                     <div className="relative w-full group">
                         <input
@@ -185,7 +261,7 @@ const Header: React.FC = () => {
                             }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch(); 
+                                if (e.key === 'Enter') handleSearch();
                             }}
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3 pr-2">
@@ -208,17 +284,17 @@ const Header: React.FC = () => {
                                 suggestions.map(p => {
                                     const productTitle = getProductTitle(p);
                                     return (
-                                        <Link 
-                                            key={p.id} 
-                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`} 
-                                            className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-4 transition-colors" 
+                                        <Link
+                                            key={p.id}
+                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`}
+                                            className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-4 transition-colors"
                                             onClick={handleSelectSuggestion}
                                         >
-                                            <img 
-                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
-                                                className="w-12 h-12 rounded object-cover border border-gray-100" 
-                                                alt={productTitle} 
-                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} 
+                                            <img
+                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'}
+                                                className="w-12 h-12 rounded object-cover border border-gray-100"
+                                                alt={productTitle}
+                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'}
                                             />
                                             <div className="flex flex-col">
                                                 <span className="font-medium text-gray-800 line-clamp-1">{productTitle}</span>
@@ -292,7 +368,7 @@ const Header: React.FC = () => {
                             }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch(); 
+                                if (e.key === 'Enter') handleSearch();
                             }}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -310,17 +386,17 @@ const Header: React.FC = () => {
                                 suggestions.map(p => {
                                     const productTitle = getProductTitle(p);
                                     return (
-                                        <Link 
-                                            key={p.id} 
-                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`} 
-                                            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors" 
+                                        <Link
+                                            key={p.id}
+                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`}
+                                            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors"
                                             onClick={handleSelectSuggestion}
                                         >
-                                            <img 
-                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} 
-                                                className="w-10 h-10 rounded object-cover border border-gray-100" 
+                                            <img
+                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'}
+                                                className="w-10 h-10 rounded object-cover border border-gray-100"
                                                 alt={productTitle}
-                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} 
+                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'}
                                             />
                                             <div className="flex flex-col">
                                                 <span className="font-medium text-gray-800 text-sm line-clamp-1">{productTitle}</span>
