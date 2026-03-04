@@ -47,13 +47,16 @@ import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
+import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
+import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import ProfileSettings from "@/pages/profile/ProfileSettings";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
 
 export const routes = createBrowserRouter([
     // PUBLIC ROUTES (No Layout - Full Screen Pages)
-   {
+    {
         element: <AuthLayout />,
         children: [
             {
@@ -66,7 +69,7 @@ export const routes = createBrowserRouter([
             },
         ],
     },
-    
+
     // 👇 ADD THIS NEW OBJECT HERE (Outside AuthLayout)
     {
         path: '/vendor/login',
@@ -114,44 +117,47 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    {
-        path: '/dashboard',
-        element: <UserLayout />,
-
-
-        children: [
-
-            {
-                path: '',
-                element: <Home />
-            },
-            {
-                path: 'allcategories',
-                element: <AllCategories />
-            },
-            {
-                path: 'all-courses',
-                element: < AllCourses2 />
-            },
-            {
-                path: 'productpage',  // Separate route for Help page
-                element: <ProductPage />,
-            },
-            {
-                path: 'allProducts',  // Separate route for Help page
-                element: <AllProduct />,
-            },
-            {
-                path: 'product/:id',
-                element: <ProductDetails />,
-            },
-
-
-
-
-        ]
-
-    },
+ // Inside your routes array
+{
+    element: <ProtectedRoute />, // The Gatekeeper
+    children: [
+        {
+            path: '/dashboard',
+            element: <UserLayout />,
+            children: [
+                {
+                    path: '',
+                    element: <Home />
+                },
+                {
+                    path: 'allcategories',
+                    element: <AllCategories />
+                },
+                {
+                    path: 'all-courses',
+                    element: <AllCourses2 />
+                },
+                {
+                    path: 'productpage',
+                    element: <ProductPage />,
+                },
+                {
+                    path: 'allProducts',
+                    element: <AllProduct />,
+                },
+                {
+                    path: 'product/:id',
+                    element: <ProductDetails />,
+                },
+                {
+                    path: "category/:id",
+                    element: <CategoryPage />,
+                },
+                { path: "profile/settings", element: <ProfileSettings /> },
+            ]
+        }
+    ]
+},
     {
         path: '/courses',
         element: <CourseLayout />,

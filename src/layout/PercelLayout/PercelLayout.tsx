@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from '../../../public/image/logo/logo.jpg';
 import { ChevronRight, SquareTerminal, HelpCircleIcon, LogInIcon, ShoppingBag, ShoppingCart, GraduationCap, Pill, ChefHat, Package, Truck } from 'lucide-react';
 import {
@@ -42,7 +42,23 @@ import { useTranslation } from "react-i18next";
 export default function PercelLayout() {
     const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("percel");
-    const [t] = useTranslation("global")
+    const [t] = useTranslation("global");
+    const navigate = useNavigate();
+
+    // 2. Define the handleLogout function
+    const handleLogout = () => {
+        // Clear the session data
+        localStorage.removeItem("student_session");
+
+        // Optional: Clear other app data like cart or preferences if necessary
+        // localStorage.removeItem("cart"); 
+
+        // Redirect to login or home
+        navigate("/login");
+
+        // Force a reload if you need to reset all React states immediately
+        window.location.reload();
+    };
     const data = {
         user: {
             name: "shadcn",
@@ -50,7 +66,7 @@ export default function PercelLayout() {
             avatar: "/avatars/shadcn.jpg",
         },
         categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard"},
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard" },
             { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
@@ -147,25 +163,54 @@ export default function PercelLayout() {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton
                                         size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+                                        className="h-auto min-h-[68px] w-full p-2.5 pr-2 flex items-stretch justify-between bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
-                                                <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-teal-600">Help</span>
-                                            </Link>
-                                        </div>
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
-                                        <div className="flex items-center gap-2">
-                                            <Link to='' onClick={openLoginModal} className="flex items-center gap-2">
-                                                <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" />
-                                                </div>
-                                                <span className="text-blue-400">logout</span>
-                                            </Link>
-                                        </div>
+                                        {/* --- HELP SECTION (Priority Focus) --- */}
+                                        <Link
+                                            to="/help"
+                                            className="group flex flex-1 items-center justify-center gap-2 rounded-xl hover:bg-teal-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-teal-200 px-2 py-1 shadow-sm hover:shadow"
+                                        >
+                                            {/* Shrunk icon box from h-10 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                                                <HelpCircleIcon className="h-5 w-5" />
+                                            </div>
+
+                                            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                                                {/* Decreased font from 14px to 12px */}
+                                                <span className="text-[10px] font-black text-teal-700 uppercase tracking-wider leading-none">
+                                                    {t("help")}
+                                                </span>
+                                                {/* Decreased font from 10px to 9px */}
+                                                <span className="text-[8px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
+                                                    Support
+                                                </span>
+                                            </div>
+                                        </Link>
+
+                                        {/* --- BOLD DIVIDER --- */}
+                                        <div className="w-[2px] bg-slate-100 my-1 mx-1.5 group-data-[collapsible=icon]:hidden" />
+
+                                        {/* --- LOGOUT SECTION (Secondary Focus) --- */}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="group flex flex-1 items-center justify-end gap-2 rounded-xl hover:bg-rose-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-rose-200 px-2 py-1 outline-none shadow-sm hover:shadow"
+                                        >
+                                            <div className="flex flex-col items-end group-data-[collapsible=icon]:hidden text-right">
+                                                {/* Decreased font from 12px to 11px */}
+                                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
+                                                    Logout
+                                                </span>
+                                                {/* Decreased font from 10px to 8px */}
+                                                <span className="text-[8px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
+                                                    Exit
+                                                </span>
+                                            </div>
+
+                                            {/* Shrunk icon box from h-9 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                                                <LogInIcon className="h-5 w-5 rotate-180" />
+                                            </div>
+                                        </button>
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>

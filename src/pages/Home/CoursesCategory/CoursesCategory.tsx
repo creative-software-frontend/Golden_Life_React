@@ -11,8 +11,8 @@ export default function Courses() {
         { id: 1, name: t("webDev"), icon: "/image/courses/c2.jpg", color: "bg-orange-400" },
         { id: 2, name: t("dataSci"), icon: "/image/courses/c3.png", color: "bg-blue-400" },
         { id: 3, name: t("digitalMkt"), icon: "/image/courses/c4.jpg", color: "bg-teal-400" },
-        { id: 4, name: t("graphicDes"), icon: "/image/courses/ai.jpg", color: "bg-purple-400" },
-        { id: 5, name: t("cyberSec"), icon: "/image/courses/c2.jpg", color: "bg-red-400" },
+        { id: 4, name: t("graphicDes"), icon: "/image/courses/graphic.png", color: "bg-purple-400" },
+        { id: 5, name: t("cyberSec"), icon: "/image/courses/cyber.jpg", color: "bg-red-400" },
         { id: 6, name: t("projMgmt"), icon: "/image/courses/cloud.jpg", color: "bg-green-400" },
         { id: 7, name: t("uiUx"), icon: "/image/courses/content.jpg", color: "bg-yellow-400" },
         { id: 8, name: t("ai"), icon: "/image/courses/ai.jpg", color: "bg-indigo-400" },
@@ -75,7 +75,7 @@ export default function Courses() {
                 {courses.slice(0, 10).map((course) => (
                     <motion.div key={course.id} variants={itemVariants} className="h-full">
                         <Link
-                            to='' 
+                            to={`/dashboard/category/${course.id}`}
                             className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                         >
                             {/* Top Image Section - ADDED [transform:translateZ(0)] here to fix the corner bleeding glitch */}

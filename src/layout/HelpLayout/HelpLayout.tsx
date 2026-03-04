@@ -2,184 +2,133 @@
 
 import * as React from "react"
 import logo from '../../../public/image/logo/logo.jpg'
+import axios from "axios"
+import {
+    ChevronRight, ShoppingCart, GraduationCap, Package, Truck, Pill, HelpCircleIcon,
 
-import { BookOpen, Bot, ChevronRight, SquareTerminal, ShoppingCart, Pill, ChefHat, HelpCircleIcon, LogInIcon, XCircle, GraduationCap, Package, Truck, HelpCircle } from 'lucide-react'
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Carrot, Baby, Home, Scissors, Snowflake, Milk, Fish,
+    Coffee, Cookie, Tags
+    , HelpCircle, Loader2, LogInIcon, XCircle
+} from 'lucide-react'
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarInset,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
     SidebarProvider,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import { Link, Outlet, useLocation } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import useModalStore from "@/store/Store"
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 import { useTranslation } from "react-i18next"
 
-
-
-// This is sample data.
-
-const faqs = [
-    {
-        question: "What's the best thing about Switzerland?",
-        answer:
-            "I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
-    },
-    {
-        question: "What's the capital of Switzerland?",
-        answer:
-            "The capital of Switzerland is Bern. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
-    },
-    {
-        question: "What languages are spoken in Switzerland?",
-        answer:
-            "Switzerland has four official languages: German, French, Italian, and Romansh.",
-    },
-    {
-        question: "What is the currency of Switzerland?",
-        answer:
-            "The currency of Switzerland is the Swiss Franc (CHF).",
-    },
-    {
-        question: "What is Swiss cheese?",
-        answer:
-            "Swiss cheese is a generic term for several cheese varieties that are produced in Switzerland.",
-    },
-    {
-        question: "What is the Swiss Alps?",
-        answer:
-            "The Swiss Alps are a mountain range located in Switzerland known for their stunning beauty and skiing opportunities.",
-    },
-];
-
-const tabs = [
-    { name: 'My Account', href: '#', current: false },
-    { name: 'Company', href: '#', current: false },
-    { name: 'Team Members', href: '#', current: true },
-    { name: 'Billing', href: '#', current: false },
-];
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ');
-}
-
-
 export default function HelpLayout() {
-    const [activeCategory, setActiveCategory] = React.useState("help")
+    const { t, i18n } = useTranslation("global")
     const location = useLocation();
-    const { openLoginModal } = useModalStore();
-    const [t] = useTranslation("global")
-    const data = {
-        user: {
-            name: "shadcn",
-            email: "m@example.com",
-            avatar: "/avatars/shadcn.jpg",
-        },
-        categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/" },
-            { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
-            { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
-            { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
-            { id: "drive", name: t("categories2.title4"), icon: Truck, path: "/drive" },
-            { id: "outlet", name: t("categories2.title5"), icon: ChefHat, path: "/outlet" },
-            { id: "help", name: t("categories2.title6"), icon: HelpCircle, path: "/help" },
-        ],
-        navMain: {
-            shopping: [],
-            courses: [],
-            percel: [
-                {
-                    title: t("navMain.title31"),
-                    url: "/percel/services",
-                    icon: SquareTerminal,
-                    isActive: true,
-                    items: [
-                        // { title: "Web Development", url: "" },
-                        // { title: "Mobile App Development", url: "" },
-                        // { title: "Local Delivery", url: "/percel/services/local-delivery" },
-                        // { title: "International Shipping", url: "/percel/services/international-shipping" },
-                        // { title: "Express Services", url: "/percel/services/express" },
-                        // { title: "Tracking", url: "/percel/services/tracking" },
-                    ],
-                },
-            ],
-            topup: [],
-            drive: [],
-            outlet: [],
-            help: []
-        }
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const navigate = useNavigate();
+    // --- STATE ---
+    const [activeCategory, setActiveCategory] = React.useState("help")
+    const [categories, setCategories] = React.useState<any[]>([])
+    const [isLoadingCategories, setIsLoadingCategories] = React.useState(true)
+    const [searchTerm, setSearchTerm] = React.useState('')
+    // 2. Define the handleLogout function
+    const handleLogout = () => {
+        // Clear the session data
+        localStorage.removeItem("student_session");
+
+        // Optional: Clear other app data like cart or preferences if necessary
+        // localStorage.removeItem("cart"); 
+
+        // Redirect to login or home
+        navigate("/login");
+
+        // Force a reload if you need to reset all React states immediately
+        window.location.reload();
+    };
+    // --- AUTH HELPER ---
+    const getAuthToken = () => {
+        const session = localStorage.getItem("student_session");
+        if (!session) return null;
+        try {
+            const parsedSession = JSON.parse(session);
+            return parsedSession.token;
+        } catch (e) { return null; }
     };
 
-    // Function to render the banner based on the current path
+    // --- 1. FIXED: getBannerForPage (Inside Component Body) ---
     const getBannerForPage = () => {
+        const titleStyle = "text-2xl md:text-4xl font-black tracking-tight drop-shadow-sm";
         switch (location.pathname) {
-            case '/help/our-story':
-                return (
-                    <div className="banner our-story-banner">
-                        <h1>{t("Hmenu.story")}</h1>
-                    </div>
-                );
-            case '/help/career':
-                return (
-                    <div className="banner career-banner">
-                        <h1>{t("Hmenu.Career")}</h1>
-                    </div>
-                );
-            case '/help/contact':
-                return (
-                    <div className="banner contact-banner">
-                        <h1>{t("Hmenu.ContactUs")}</h1>
-                    </div>
-                );
-            case '/help/privacy-policy':
-                return (
-                    <div className="banner privacy-policy-banner">
-                        <h1>{t("Hmenu.PrivacyPolicy")}</h1>
-                    </div>
-                );
-            case '/help/terms':
-                return (
-                    <div className="banner terms-banner">
-                        <h1>{t("Hmenu.TermsofUse")}</h1>
-                    </div>
-                );
-            default:
-                return (
-                    <div className="banner default-banner">
-                        <h1>{t("Hmenu.WelcometoHelp")}</h1>
-                    </div>
-                );
+            case '/help/our-story': return <h1 className={titleStyle}>{t("Hmenu.story")}</h1>;
+            case '/help/career': return <h1 className={titleStyle}>{t("Hmenu.Career")}</h1>;
+            case '/help/contact': return <h1 className={titleStyle}>{t("Hmenu.ContactUs")}</h1>;
+            case '/help/privacy-policy': return <h1 className={titleStyle}>{t("Hmenu.PrivacyPolicy")}</h1>;
+            case '/help/terms': return <h1 className={titleStyle}>{t("Hmenu.TermsofUse")}</h1>;
+            default: return <h1 className={titleStyle}>{t("Hmenu.WelcometoHelp")}</h1>;
         }
     };
-    const [searchTerm, setSearchTerm] = React.useState('');
-
-    const handleClear = () => {
-        setSearchTerm('');
+    const getCategoryIcon = (categoryName: string) => {
+        const name = categoryName?.toLowerCase() || "";
+        if (name.includes('fruit') || name.includes('vegetable')) return Carrot;
+        if (name.includes('snack') || name.includes('confectionery')) return ShoppingCart;
+        if (name.includes('dairy') || name.includes('egg')) return Pill;
+        if (name.includes('seafood') && !name.includes('meat')) return Milk;
+        if (name.includes('beverage')) return Fish;
+        if (name.includes('meat') && !name.includes('seafood')) return Coffee;
+        if (name.includes('pantry')) return Cookie;
+        if (name.includes('frozen')) return Package;
+        if (name.includes('personal')) return Snowflake;
+        if (name.includes('household')) return Scissors;
+        if (name.includes('baby')) return Home;
+        if (name.includes('health')) return Baby;
+        if (name.includes('meatseafood')) return ChefHat;
+        if (name.includes('milk')) return ChefHat;
+        return Tags; // Default fallback icon
     };
 
-    const filteredFaqs = faqs.filter(faq =>
-        faq.question.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    console.log(filteredFaqs);
+    // --- FETCH API CATEGORIES ---
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const token = getAuthToken();
+                const config = { headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) } };
+                const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
+                const rawData = response.data?.data?.categories || response.data?.data || [];
+
+                const mapped = rawData.map((item: any) => ({
+                    id: item.id,
+                    name_en: item.category_name || "Category",
+                    name_bn: item.category_name_bangla || item.category_name || "Category",
+                    icon: `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`,
+                }));
+                setCategories(mapped.slice(0, 10));
+            } catch (error) {
+                console.error("API Error:", error);
+            } finally {
+                setIsLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, [baseURL]);
+
+    // --- UI DATA: SERVICE SWITCHER ---
+    const mainServices = [
+        { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard" },
+        { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
+        { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
+        { id: "help", name: t("categories2.title6"), icon: HelpCircle, path: "/help" },
+    ];
     return (
         // <div className="flex h-screen">
         <SidebarProvider className=''>
@@ -192,7 +141,7 @@ export default function HelpLayout() {
                 </SidebarHeader>
                 <div className="px-4 py-3 border-b ">
                     <div className="flex flex-row justify-between gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent p-2  ">
-                        {data.categories.map((category) => (
+                        {mainServices.map((category) => (
                             <Link
                                 key={category.id}
                                 to={category.path}
@@ -213,37 +162,67 @@ export default function HelpLayout() {
                     <SidebarGroup>
                         {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
-                            {data.navMain[activeCategory]?.map((item) => (
-                                <Collapsible
-                                    key={item.title}
-                                    asChild
-                                    defaultOpen={item.isActive}
-                                    className="group/collapsible"
-                                >
-                                    <SidebarMenuItem>
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}>
-                                                {item.icon && <item.icon />}
-                                                <span>{item.title}</span>
-                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <SidebarMenuSub>
-                                                {item.items?.map((subItem) => (
-                                                    <SidebarMenuSubItem key={subItem.title}>
-                                                        <SidebarMenuSubButton asChild>
-                                                            <a href={subItem.url}>
-                                                                <span>{subItem.title}</span>
-                                                            </a>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>
-                                                ))}
-                                            </SidebarMenuSub>
-                                        </CollapsibleContent>
-                                    </SidebarMenuItem>
-                                </Collapsible>
-                            )) || null}
+                            {isLoadingCategories ? (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="h-6 w-6 animate-spin text-[#5ca367]" />
+                                </div>
+                            ) : categories.length > 0 ? (
+                                <div className="flex flex-col gap-1.5 px-3 py-3">
+                                    {categories.map((category) => {
+                                        const categoryName = i18n.language === 'bn' ? category.name_bn : category.name_en;
+                                        const IconComponent = getCategoryIcon(category.name_en);
+                                        const categoryPath = `/dashboard/category/${category.id}`;
+                                        const isActive = location.pathname === categoryPath;
+
+                                        return (
+                                            <SidebarMenuItem key={category.id} className="list-none relative">
+                                                {/* 1. HOVER/ACTIVE INDICATOR LINE */}
+                                                <div className={`absolute left-[-4px] top-[15%] h-[70%] w-1.5 rounded-r-full bg-[#5ca367] transition-all duration-300 ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                                    }`} />
+
+                                                <SidebarMenuButton
+                                                    asChild
+                                                    className={`group relative w-full h-[52px] px-4 rounded-xl transition-all duration-300 ease-out border ${isActive
+                                                        ? "bg-[#5ca367]/10 border-[#5ca367]/20 shadow-sm"
+                                                        : "bg-transparent border-transparent hover:bg-slate-50 hover:shadow-sm active:scale-95"
+                                                        }`}
+                                                >
+                                                    <Link to={categoryPath} className="flex items-center justify-between w-full">
+
+                                                        {/* 2. LEFT CONTENT: Icon + Text (Slides slightly on touch) */}
+                                                        <div className="flex items-center gap-3.5 transform transition-transform duration-300 ease-out group-hover:translate-x-1.5">
+                                                            <div className={`p-1.5 rounded-lg transition-all duration-300 flex items-center justify-center ${isActive ? "bg-white shadow-sm" : "bg-transparent group-hover:bg-white"
+                                                                }`}>
+                                                                <img
+                                                                    src={category.icon}
+                                                                    alt={categoryName}
+                                                                    className="h-[22px] w-[22px] object-contain"
+                                                                    onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/22?text=C'}
+                                                                />
+                                                            </div>
+                                                            <span className={`text-[16px] font-semibold tracking-tight transition-colors duration-300 ${isActive ? "text-[#5ca367]" : "text-slate-600 group-hover:text-slate-900"
+                                                                }`}>
+                                                                {categoryName}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* 3. RIGHT CONTENT: Dynamic Arrow (Slides 20px right on touch) */}
+                                                        <div className={`flex items-center transition-all duration-500 ease-in-out ${isActive
+                                                            ? "opacity-100 translate-x-0"
+                                                            : "opacity-0 group-hover:opacity-100 group-hover:translate-x-5"
+                                                            }`}>
+                                                            <ChevronRight className={`h-5 w-5 ${isActive ? "text-[#5ca367]" : "text-slate-400 group-hover:text-[#5ca367]"}`} />
+                                                        </div>
+
+                                                    </Link>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuItem>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="p-4 text-center text-sm font-medium text-slate-500">No categories found</div>
+                            )}
                         </SidebarMenu>
                     </SidebarGroup>
                 </SidebarContent>
@@ -254,30 +233,54 @@ export default function HelpLayout() {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton
                                         size="lg"
-                                        className="flex justify-between items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground shadow-inner px-4 py-2 "
+                                        className="h-auto min-h-[68px] w-full p-2.5 pr-2 flex items-stretch justify-between bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden"
                                     >
-                                        {/* Left Side: Help Button */}
-                                        <div className="flex items-center gap-2">
-                                            <Link to="/help" className="flex items-center gap-2">
-                                                <div className="bg-teal-500 rounded-full p-1">
-                                                    <HelpCircleIcon className="h-4 w-4 text-white" /> {/* Icon with teal background and white color */}
-                                                </div>
-                                                <span className="text-teal-600">{t("help")}</span>
-                                            </Link>
-                                        </div>
+                                        {/* --- HELP SECTION (Priority Focus) --- */}
+                                        <Link
+                                            to="/help"
+                                            className="group flex flex-1 items-center justify-center gap-2 rounded-xl hover:bg-teal-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-teal-200 px-2 py-1 shadow-sm hover:shadow"
+                                        >
+                                            {/* Shrunk icon box from h-10 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                                                <HelpCircleIcon className="h-5 w-5" />
+                                            </div>
 
-                                        {/* Separator */}
-                                        <div className="h-6 w-[1px] bg-gray-300 mx-4"></div>
+                                            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+                                                {/* Decreased font from 14px to 12px */}
+                                                <span className="text-[10px] font-black text-teal-700 uppercase tracking-wider leading-none">
+                                                    {t("help")}
+                                                </span>
+                                                {/* Decreased font from 10px to 9px */}
+                                                <span className="text-[8px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
+                                                    Support
+                                                </span>
+                                            </div>
+                                        </Link>
 
-                                        {/* Right Side: Login Button */}
-                                        <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-2" >
-                                                <div className="bg-blue-400 rounded-full p-1">
-                                                    <LogInIcon className="h-4 w-4 text-white" /> {/* Icon with blue background and white color */}
-                                                </div>
-                                                <span className="text-blue-400">logout</span>
-                                            </button>
-                                        </div>
+                                        {/* --- BOLD DIVIDER --- */}
+                                        <div className="w-[2px] bg-slate-100 my-1 mx-1.5 group-data-[collapsible=icon]:hidden" />
+
+                                        {/* --- LOGOUT SECTION (Secondary Focus) --- */}
+                                        <button
+                                            onClick={handleLogout}
+                                            className="group flex flex-1 items-center justify-end gap-2 rounded-xl hover:bg-rose-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-rose-200 px-2 py-1 outline-none shadow-sm hover:shadow"
+                                        >
+                                            <div className="flex flex-col items-end group-data-[collapsible=icon]:hidden text-right">
+                                                {/* Decreased font from 12px to 11px */}
+                                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
+                                                    Logout
+                                                </span>
+                                                {/* Decreased font from 10px to 8px */}
+                                                <span className="text-[8px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
+                                                    Exit
+                                                </span>
+                                            </div>
+
+                                            {/* Shrunk icon box from h-9 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                                                <LogInIcon className="h-5 w-5 rotate-180" />
+                                            </div>
+                                        </button>
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>

@@ -34,10 +34,7 @@ const HeroSection = () => {
                     >
                         {banners.map((banner) => (
                             <SwiperSlide key={banner.id} className="relative group">
-                                {/* 1. Removed opacity-80 from the image */}
                                 <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
-                                
-                                {/* 2. Added this overlay div to create the "fade" effect safely */}
                                 <div className="absolute inset-0 bg-black/20" />
                             </SwiperSlide>
                         ))}
@@ -50,22 +47,32 @@ const HeroSection = () => {
                ========================================= */}
             <section className="block lg:hidden w-full px-3 py-3">
                 <div className="relative rounded-xl overflow-hidden shadow-lg bg-gray-900">
-                    {/* Background Image */}
-                    <div className="absolute inset-0">
-                        {/* 1. Removed opacity-80 from the image */}
-                        <img 
-                            src={banner1} 
-                            alt="Welcome" 
-                            className="w-full h-full object-cover" 
-                        />
-                        {/* 2. Added this overlay div to match the desktop fade */}
-                        <div className="absolute inset-0 bg-black/20" />
-                    </div>
-
-                    {/* Content (Empty) */}
-                    <div className="relative z-10 flex flex-col items-center justify-center text-center h-[280px] px-4">
-                        {/* ALL TEXT AND BUTTONS REMOVED FROM HERE */}
-                    </div>
+                    
+                    {/* MOBILE SWIPER ADDED HERE */}
+                    <Swiper
+                        modules={[Pagination, Autoplay, EffectFade]}
+                        effect="fade"
+                        spaceBetween={0}
+                        slidesPerView={1}
+                        pagination={{ clickable: true, dynamicBullets: true }}
+                        autoplay={{ delay: 5000, disableOnInteraction: false }}
+                        className="h-[200px] w-full"
+                    >
+                        {banners.map((banner) => (
+                            <SwiperSlide key={banner.id} className="relative w-full h-full">
+                                {/* Background Image */}
+                                <img 
+                                    src={banner.image} 
+                                    alt={banner.title} 
+                                    className="w-full h-full object-left-top" 
+                                />
+                                {/* Dark overlay to match desktop */}
+                                <div className="absolute inset-0 bg-black/20" />
+                                
+                                {/* If you want to add the middle image back in later, put it right here inside the SwiperSlide */}
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
                 </div>
                 
                 {/* Compact Stats Grid */}

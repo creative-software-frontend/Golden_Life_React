@@ -7,17 +7,17 @@ interface ModalStore {
     isCourseModalOpen: boolean;
     isBuyNowClicked: boolean;
     clicked: boolean;
-
-
-
+    
+    // --- ADDED: Wallet trigger states ---
+    walletUpdateTrigger: number;
 
     // Toggle state methods
     toggleClicked: () => void;
-//methods for buy now
+    
+    //methods for buy now
     openBuyNow: () => void;
     closeBuyNow: () => void;
     toggleBuyNow: () => void;
-
 
     // Methods for Checkout Modal
     openCheckoutModal: () => void;
@@ -41,6 +41,9 @@ interface ModalStore {
 
     // Alternative change method for Checkout Modal
     changeCheckoutModal: () => void;
+    
+    // --- ADDED: Wallet trigger method ---
+    triggerWalletUpdate: () => void;
 }
 
 const useModalStore = create<ModalStore>((set) => ({
@@ -51,6 +54,9 @@ const useModalStore = create<ModalStore>((set) => ({
     isCourseModalOpen: false,
     isBuyNowClicked: false,
     clicked: false,
+    
+    // --- ADDED: Initial state for wallet trigger ---
+    walletUpdateTrigger: 0,
 
     // Toggle clicked state
     toggleClicked: () => set((state) => ({ clicked: !state.clicked })),
@@ -80,6 +86,11 @@ const useModalStore = create<ModalStore>((set) => ({
     openCourseModal: () => set({ isCourseModalOpen: true }),
     closeCourseModal: () => set({ isCourseModalOpen: false }),
     toggleCourseModal: () => set((state) => ({ isCourseModalOpen: !state.isCourseModalOpen })),
+
+    // --- ADDED: Method to trigger wallet update ---
+    triggerWalletUpdate: () => set((state) => ({ 
+        walletUpdateTrigger: state.walletUpdateTrigger + 1 
+    })),
 }));
 
 export default useModalStore;
