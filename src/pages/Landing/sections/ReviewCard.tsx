@@ -8,7 +8,7 @@ interface ReviewCardProps {
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   return (
-    <div className="h-full p-8 rounded-2xl text-white bg-gradient-to-br from-primary to-secondary flex flex-col shadow-xl relative overflow-hidden">
+    <div className="h-full p-8 rounded-2xl text-white bg-gradient-to-br from-primary/50 to-primary flex flex-col shadow-xl relative overflow-hidden">
       {/* Background pattern overlay for texture */}
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
       

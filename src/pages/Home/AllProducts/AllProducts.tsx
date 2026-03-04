@@ -94,14 +94,23 @@ export default function AllProduct() {
     }, [baseURL]);
 
     // --- IDENTICAL CART LOGIC TO PRODUCTLIST ---
-    const handleAddToCart = (product: any) => {
+     const handleAddToCart = (product: any) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingIndex = existingCart.findIndex((item: any) => item.id === product.id);
-        const name = i18n.language === 'bn' ? (product.product_title_bangla || product.product_title_english) : product.product_title_english;
 
-        const rawPrice = product.offer_price || product.price || 0;
-        const numericPrice = parseFloat(String(rawPrice).replace(/[^0-9.-]+/g, "")) || 0;
+        // Safely handle name based on language
+        const name = i18n.language === 'bn'
+            ? (product.product_title_bangla || product.product_title_english)
+            : product.product_title_english;
 
+        // --- 1. Clean and parse BOTH prices ---
+        const rawRegularPrice = product.regular_price || product.price || 0;
+        const regularPrice = parseFloat(String(rawRegularPrice).replace(/[^0-9.-]+/g, "")) || 0;
+
+        const rawOfferPrice = product.offer_price || 0;
+        const offerPrice = parseFloat(String(rawOfferPrice).replace(/[^0-9.-]+/g, "")) || 0;
+
+        // --- 2. Format Image URL ---
         let imageUrl = product.product_image || product.image || "/placeholder.svg";
         if (imageUrl.startsWith("/") && imageUrl !== "/placeholder.svg") {
             imageUrl = `${baseURL}${imageUrl}`;
@@ -110,17 +119,23 @@ export default function AllProduct() {
         if (existingIndex !== -1) {
             existingCart[existingIndex].quantity += 1;
         } else {
-            existingCart.push({ 
-                id: product.id, 
-                name: name, 
-                price: numericPrice, 
-                image: imageUrl, 
-                quantity: 1 
+            // --- 3. Save all required data to the cart ---
+            existingCart.push({
+                id: product.id,
+                name: name,
+                product_title_english: product.product_title_english, // Allows Cart to handle language swaps
+                regular_price: regularPrice,  // Store the original price
+                offer_price: offerPrice,      // Store the discount price
+                price: regularPrice,          // Safety fallback
+                image: imageUrl,
+                quantity: 1
             });
         }
+
         localStorage.setItem("cart", JSON.stringify(existingCart));
         window.dispatchEvent(new Event("cartUpdated"));
     };
+
 
     // --- PAGINATION LOGIC ---
     const indexOfLastItem = currentPage * itemsPerPage;

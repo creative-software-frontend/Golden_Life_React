@@ -50,6 +50,7 @@ import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
+import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -67,6 +68,12 @@ export const routes = createBrowserRouter([
                 path: '/register',
                 element: <Register />,
             },
+            {
+
+                path:"/forgot-password" ,
+                element:<ForgotPassword />
+            }
+                
         ],
     },
 

@@ -76,7 +76,7 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
                         ৳{product.offer_price}
                     </span>
                     {product.regular_price && parseFloat(product.regular_price) > parseFloat(product.offer_price) && (
-                        <span className="text-[11px] sm:text-[12px] font-bold text-slate-300 line-through tracking-tight">
+                        <span className="text-[11px] sm:text-[12px] font-bold text-slate-500 line-through tracking-tight">
                             ৳{product.regular_price}
                         </span>
                     )}

@@ -49,7 +49,7 @@ export default function ProductList() {
             setLoading(true);
             try {
                 const token = getAuthToken();
-                const endpoint = keyword 
+                const endpoint = keyword
                     ? `${baseURL}/api/products/search?keyword=${keyword}`
                     : `${baseURL}/api/products`;
 
@@ -61,7 +61,7 @@ export default function ProductList() {
                 };
 
                 const response = await axios.get(endpoint, config);
-                
+
                 let rawData = [];
                 if (keyword && response.data?.products) {
                     rawData = response.data.products;
@@ -74,7 +74,7 @@ export default function ProductList() {
                 // --- CENTRALIZED URL CLEANUP ---
                 const mappedData = rawData.map((item: any) => {
                     let imgUrl = item.product_image || item.image;
-                    
+
                     if (!imgUrl) {
                         imgUrl = "/placeholder.svg";
                     } else if (!imgUrl.startsWith("http")) {
@@ -111,13 +111,20 @@ export default function ProductList() {
     const handleAddToCart = (product: any) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
         const existingIndex = existingCart.findIndex((item: any) => item.id === product.id);
-        const name = i18n.language === 'bn' ? product.product_title_bangla : product.product_title_english;
 
-        // Force price to be a clean Number
-        const rawPrice = product.offer_price || product.price || 0;
-        const numericPrice = parseFloat(String(rawPrice).replace(/[^0-9.-]+/g, "")) || 0;
+        // Safely handle name based on language
+        const name = i18n.language === 'bn'
+            ? (product.product_title_bangla || product.product_title_english)
+            : product.product_title_english;
 
-        // Image is already absolute from the fetch mapping, but safe fallback applied
+        // --- 1. Clean and parse BOTH prices ---
+        const rawRegularPrice = product.regular_price || product.price || 0;
+        const regularPrice = parseFloat(String(rawRegularPrice).replace(/[^0-9.-]+/g, "")) || 0;
+
+        const rawOfferPrice = product.offer_price || 0;
+        const offerPrice = parseFloat(String(rawOfferPrice).replace(/[^0-9.-]+/g, "")) || 0;
+
+        // --- 2. Format Image URL ---
         let imageUrl = product.product_image || product.image || "/placeholder.svg";
         if (imageUrl.startsWith("/") && imageUrl !== "/placeholder.svg") {
             imageUrl = `${baseURL}${imageUrl}`;
@@ -126,15 +133,19 @@ export default function ProductList() {
         if (existingIndex !== -1) {
             existingCart[existingIndex].quantity += 1;
         } else {
-            // Save exactly the keys the Cart expects
-            existingCart.push({ 
-                id: product.id, 
-                name: name, 
-                price: numericPrice, 
-                image: imageUrl, 
-                quantity: 1 
+            // --- 3. Save all required data to the cart ---
+            existingCart.push({
+                id: product.id,
+                name: name,
+                product_title_english: product.product_title_english, // Allows Cart to handle language swaps
+                regular_price: regularPrice,  // Store the original price
+                offer_price: offerPrice,      // Store the discount price
+                price: regularPrice,          // Safety fallback
+                image: imageUrl,
+                quantity: 1
             });
         }
+
         localStorage.setItem("cart", JSON.stringify(existingCart));
         window.dispatchEvent(new Event("cartUpdated"));
     };
@@ -164,7 +175,7 @@ export default function ProductList() {
                         <div className="bg-white/20 backdrop-blur-md text-white px-5 py-2 rounded-full text-sm font-bold tracking-wide border border-white/20">
                             {keyword ? `Search Results: ${keyword}` : t('sections.freshSell')}
                         </div>
-                        
+
                         {!keyword && (
                             <div className="flex items-center gap-2 text-white bg-black/20 px-4 py-1.5 rounded-xl border border-white/10">
                                 <Timer className="h-4 w-4" />
@@ -176,7 +187,7 @@ export default function ProductList() {
                             </div>
                         )}
                     </div>
-                    
+
                     {!keyword && (
                         <Link to="/dashboard/allProducts" className="group flex items-center gap-1.5 text-sm font-black text-white bg-white/10 hover:bg-white/20 px-5 py-2.5 rounded-xl transition-all border border-white/10">
                             {t('header.allProducts')}
@@ -190,10 +201,10 @@ export default function ProductList() {
                         <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4  gap-6">
                             {products.map((product: any) => (
                                 <ProductCard
-                                    key={product.id} 
-                                    product={product} 
-                                    baseURL={baseURL} 
-                                    onAddToCart={() => handleAddToCart(product)} 
+                                    key={product.id}
+                                    product={product}
+                                    baseURL={baseURL}
+                                    onAddToCart={() => handleAddToCart(product)}
                                 />
                             ))}
                         </div>

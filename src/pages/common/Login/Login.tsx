@@ -205,188 +205,193 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative mt-8 md:mt-12 mb-8">
+      {/* Outer wrapper to center both the Logo and the Card */}
+      <div className="w-full max-w-xl mx-auto flex flex-col items-center mt-8 md:mt-12 mb-8 px-4">
         
-        {/* Logo Section */}
-        <div className="px-8 pt-10 pb-4 text-center">
+        {/* LOGO SECTION - Moved Outside & Increased Size */}
+        <div className="mb-8 transform scale-125 md:scale-150 origin-bottom">
           <Logo />
         </div>
 
-        {/* Welcome Text */}
-        <div className="px-8 pb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
-          <p className="text-gray-500 text-sm mt-2">Log in to your Golden Life account</p>
-        </div>
+        {/* LOGIN CARD */}
+        <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
+          
+          {/* Welcome Text */}
+          <div className="px-8 pt-8 pb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+            <p className="text-gray-500 text-sm mt-2">Log in to your Golden Life account</p>
+          </div>
 
-        {/* Login Method Toggle Buttons */}
-        <div className="mx-8 mb-6 flex bg-gray-100 p-1.5 rounded-xl">
-          <button
-            type="button"
-            onClick={() => { setLoginMethod('mobile'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
-              loginMethod === 'mobile' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            Mobile (OTP)
-          </button>
-          <button
-            type="button"
-            onClick={() => { setLoginMethod('email'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
-              loginMethod === 'email' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
-            }`}
-          >
-            Email (Password)
-          </button>
-        </div>
+          {/* Login Method Toggle Buttons */}
+          <div className="mx-8 mb-6 flex bg-gray-100 p-1.5 rounded-xl">
+            <button
+              type="button"
+              onClick={() => { setLoginMethod('mobile'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
+              className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
+                loginMethod === 'mobile' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
+              }`}
+            >
+              Mobile (OTP)
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLoginMethod('email'); setErrors({mobile:'', email:'', password:''}); setApiError(''); }}
+              className={`flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition-all duration-300 ${
+                loginMethod === 'email' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
+              }`}
+            >
+              Email (Password)
+            </button>
+          </div>
 
-        {/* Form Section */}
-        <div className="px-8 pb-10">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            
-            {/* Global API Error Display */}
-            {apiError && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 text-center">
-                {apiError}
-              </div>
-            )}
-
-            {/* Dynamic Input Field based on selection */}
-            {loginMethod === 'mobile' ? (
-              <div className="space-y-2">
-                <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
-                  Mobile Number
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </span>
-                  <input
-                    id="mobile"
-                    name="mobile"
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
-                    disabled={isLoading}
-                  />
+          {/* Form Section */}
+          <div className="px-8 pb-10">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Global API Error Display */}
+              {apiError && (
+                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 text-center">
+                  {apiError}
                 </div>
-                {errors.mobile && <p className="text-sm text-red-500 mt-1">{errors.mobile}</p>}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </span>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="example@email.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3.5 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
-                    disabled={isLoading}
-                  />
-                </div>
-                {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-              </div>
-            )}
+              )}
 
-            {/* PASSWORD FIELD - ONLY VISIBLE IF EMAIL LOGIN SELECTED */}
-            {loginMethod === 'email' && (
-              <>
+              {/* Dynamic Input Field based on selection */}
+              {loginMethod === 'mobile' ? (
                 <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Password
+                  <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+                    Mobile Number
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                     </span>
                     <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      value={formData.password}
+                      id="mobile"
+                      name="mobile"
+                      type="tel"
+                      placeholder="01XXXXXXXXX"
+                      value={formData.mobile}
                       onChange={handleChange}
-                      className={`w-full pl-10 pr-12 py-3.5 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
+                      className={`w-full pl-10 pr-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
                       disabled={isLoading}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      )}
-                    </button>
                   </div>
-                  {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+                  {errors.mobile && <p className="text-sm text-red-500 mt-1">{errors.mobile}</p>}
                 </div>
-
-                <div className="text-right">
-                  <Link to="/forgot-password" className="text-sm text-[#FF8A00] hover:text-orange-600 font-medium hover:underline transition-colors">
-                    Forgot password?
-                  </Link>
-                </div>
-              </>
-            )}
-
-            {/* Login Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#FF8A00] text-white py-3.5 px-4 rounded-xl font-bold text-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:ring-offset-2 transition-all duration-300 shadow-lg transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </span>
               ) : (
-                <span>{loginMethod === 'mobile' ? 'Login via OTP' : 'Login'}</span>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </span>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="example@email.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-4 py-3.5 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                </div>
               )}
-            </button>
 
-            {/* Register Link */}
-            <p className="text-center text-gray-600 pt-2">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-[#FF8A00] hover:text-orange-600 font-bold hover:underline transition-colors">
-                Register
-              </Link>
-            </p>
-          </form>
+              {/* PASSWORD FIELD - ONLY VISIBLE IF EMAIL LOGIN SELECTED */}
+              {loginMethod === 'email' && (
+                <>
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </span>
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-12 py-3.5 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
+                        disabled={isLoading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-sm text-red-500 mt-1">{errors.password}</p>}
+                  </div>
 
-          {/* Vendor Login Button */}
-          <div className="mt-6 border-t border-gray-100 pt-6">
-            <button
-              onClick={() => navigate('/vendor/login')}
-              className="w-full bg-black text-white py-3 px-4 rounded-xl font-bold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all duration-300 flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              Login as Vendor
-            </button>
+                  <div className="text-right">
+                    <Link to="/forgot-password" className="text-sm text-[#FF8A00] hover:text-orange-600 font-medium hover:underline transition-colors">
+                      Forgot password?
+                    </Link>
+                  </div>
+                </>
+              )}
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-[#FF8A00] text-white py-3.5 px-4 rounded-xl font-bold text-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:ring-offset-2 transition-all duration-300 shadow-lg transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <span>{loginMethod === 'mobile' ? 'Login via OTP' : 'Login'}</span>
+                )}
+              </button>
+
+              {/* Register Link */}
+              <p className="text-center text-gray-600 pt-2">
+                Don't have an account?{' '}
+                <Link to="/register" className="text-[#FF8A00] hover:text-orange-600 font-bold hover:underline transition-colors">
+                  Register
+                </Link>
+              </p>
+            </form>
+
+            {/* Vendor Login Button */}
+            <div className="mt-6 border-t border-gray-100 pt-6">
+              <button
+                onClick={() => navigate('/vendor/login')}
+                className="w-full bg-black text-white py-3 px-4 rounded-xl font-bold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all duration-300 flex items-center justify-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Login as Vendor
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -431,7 +436,7 @@ const Login: React.FC = () => {
                   key={index}
                   type="text"
                   maxLength={1}
-                  // @ts-ignore
+               
                   ref={el => otpInputRefs.current[index] = el}
                   value={data}
                   onChange={e => handleOtpChange(index, e.target.value)}
