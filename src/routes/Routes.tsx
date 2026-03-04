@@ -49,6 +49,7 @@ import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import ProfileSettings from "@/pages/profile/ProfileSettings";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -152,6 +153,7 @@ export const routes = createBrowserRouter([
                     path: "category/:id",
                     element: <CategoryPage />,
                 },
+                { path: "profile/settings", element: <ProfileSettings /> },
             ]
         }
     ]

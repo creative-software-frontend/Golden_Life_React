@@ -120,7 +120,7 @@ const CategoryPage = () => {
                 <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                     <div className="h-20 w-full bg-slate-50 animate-pulse border-b border-gray-100" />
                     <div className="p-4 md:p-8">
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <ProductCard key={index} isSkeleton={true} />
                             ))}
@@ -159,7 +159,7 @@ const CategoryPage = () => {
 
                 <div className="p-6 md:p-8">
                     {products.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-5  gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4  gap-6">
                             {products.map((product) => (
                                 <ProductCard
                                     key={product.id} 

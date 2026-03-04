@@ -27,59 +27,47 @@ export default function CompactIconScroll() {
     const IconItem = ({ item }: { item: typeof items[0] }) => (
         <div className="group relative flex flex-col items-center justify-center w-full cursor-pointer px-1">
             
+            {/* INCREASED container size and added rounding */}
             <div 
-                className="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 
-                           rounded-[20px] overflow-hidden isolate shadow-sm border border-slate-100/50
-                           transition-all duration-300 ease-out 
-                           group-hover:shadow-lg group-hover:shadow-black/5 group-hover:-translate-y-1" 
-                style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }} 
+                className="relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 
+                           rounded-2xl transition-transform duration-300 ease-out group-hover:-translate-y-1 overflow-hidden" 
             >
-                {/* 1. Background Layer: Full opacity on hover for maximum visibility */}
+                {/* NEW: Light background color layer (15% opacity of the icon's base color) */}
                 <div 
-                    className="absolute inset-0 opacity-[0.18] transition-all duration-500 
-                               group-hover:opacity-100 group-hover:scale-100" // Fully visible background
+                    className="absolute inset-0 opacity-[0.15] group-hover:opacity-[0.25] transition-opacity duration-300"
                     style={{ backgroundColor: item.color }}
                 />
 
-                {/* 2. Glassmorphism Highlight: Makes the solid color look "polished" on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* 3. Icon: High contrast White on hover with slightly larger scale */}
+                {/* INCREASED icon size */}
                 <item.icon 
-                    className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 relative z-10 transition-all duration-300 
-                               group-hover:text-white group-hover:scale-110 will-change-transform drop-shadow-sm" 
-                    style={{ color: item.color, transform: 'translateZ(0)' }} 
+                    className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 relative z-10 transition-transform duration-300 
+                               group-hover:scale-110 will-change-transform drop-shadow-sm" 
+                    style={{ color: item.color }} 
                 />
             </div>
 
-            {/* Label: Darkens and bolds on hover */}
-            <span className="mt-2.5 text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-tighter 
+            {/* INCREASED font size and slightly darkened the default text color to slate-500 */}
+            <span className="mt-2 text-[10px] md:text-[12px] font-black text-slate-500 uppercase tracking-tight 
                              group-hover:text-slate-900 transition-colors duration-300 text-center leading-tight">
                 {t(`label.${item.label}`, item.label)}
             </span>
-
-            {/* Enhanced Bottom Glow */}
-            <div 
-                className="w-1/2 h-1 blur-md opacity-0 group-hover:opacity-60 transition-all duration-500 mt-1"
-                style={{ backgroundColor: item.color }}
-            />
         </div>
     );
 
     return (
-        <section className="w-full py-6 md:py-10 bg-white">
+        <section className="w-full py-4 md:py-6 bg-white">
             <div className="container mx-auto px-4 max-w-[1440px]">
-                <div className="bg-slate-50/50 rounded-[32px] p-5 md:p-8 border border-slate-100 shadow-inner">
+                <div className="py-2 md:py-4">
                     
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-y-8 lg:hidden">
+                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-y-6 lg:hidden">
                         {items.map((item, idx) => (
                             <IconItem key={`grid-${idx}`} item={item} />
                         ))}
                     </div>
 
                     <div className="hidden lg:block relative">
-                        <div className="absolute left-0 inset-y-0 w-20 z-20 bg-gradient-to-r from-slate-50 via-slate-50/20 to-transparent pointer-events-none" />
-                        <div className="absolute right-0 inset-y-0 w-20 z-20 bg-gradient-to-l from-slate-50 via-slate-50/20 to-transparent pointer-events-none" />
+                        <div className="absolute left-0 inset-y-0 w-20 z-20 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none" />
+                        <div className="absolute right-0 inset-y-0 w-20 z-20 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none" />
 
                         <Marquee speed={35} gradient={false} pauseOnHover className="overflow-visible">
                             {items.map((item, idx) => (

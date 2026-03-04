@@ -3,20 +3,23 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import { CameraIcon, UserIcon, Search, Menu, X, LayoutDashboard, Loader2, Wallet } from 'lucide-react';
+import { Wallet, Search, Menu, User as UserIcon, Settings, PlusCircle, ChevronDown, Camera as CameraIcon, Loader2, LayoutDashboard, X } from 'lucide-react';
+
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import useModalStore from '@/store/Store';
 import { useTranslation } from 'react-i18next';
 import LoginOptionsModal from '@/components/LoginoptionsModal';
 import axios from 'axios';
-import { toast } from 'react-toastify'; // Added react-toastify import
+import { toast } from 'react-toastify';
 
 const Header: React.FC = () => {
-    const { isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+    // 1. ADDED walletUpdateTrigger HERE
+    const { isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore();
+    
     const navigate = useNavigate();
-
-    // Config: Dynamic Base URL from Environment Variables
+    const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
+    // Config : Dynamic Base URL from Environment Variables
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     // Auth & UI States
@@ -58,41 +61,41 @@ const Header: React.FC = () => {
             return parsedSession.token;
         } catch (e) { return null; }
     };
-React.useEffect(() => {
-    const fetchWalletBalance = async () => {
-        // Set loading to true at the start of every fetch
-        setIsLoading(true); 
 
-        try {
-            const token = getAuthToken(); 
-            const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token && { Authorization: `Bearer ${token}` })
+    React.useEffect(() => {
+        const fetchWalletBalance = async () => {
+            // Set loading to true at the start of every fetch
+            setIsLoading(true);
+
+            try {
+                const token = getAuthToken();
+                const response = await axios.get(`${baseURL}/api/wallet-balance`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { Authorization: `Bearer ${token}` })
+                    }
+                });
+
+                if (response.data?.success && response.data?.data) {
+                    const rawBalance = response.data.data.balance;
+                    setWalletBalance(parseFloat(rawBalance).toFixed(2));
+                } else {
+                    setWalletBalance("0.00");
                 }
-            });
-
-            // Corrected Path: response.data.data.balance based on your API structure
-            if (response.data?.success && response.data?.data) {
-                const rawBalance = response.data.data.balance;
-                setWalletBalance(parseFloat(rawBalance).toFixed(2));
-            } else {
+            } catch (error) {
+                console.error("Wallet Balance Fetch Failed:", error);
                 setWalletBalance("0.00");
+            } finally {
+                // This ensures the skeleton stops pulsing regardless of success or error
+                setIsLoading(false);
             }
-        } catch (error) {
-            console.error("Wallet Balance Fetch Failed:", error);
-            setWalletBalance("0.00");
-        } finally {
-            // This ensures the skeleton stops pulsing regardless of success or error
-            setIsLoading(false); 
-        }
-    };
+        };
 
-    fetchWalletBalance();
-}, [baseURL]);
+        fetchWalletBalance();
+        
+    // 2. ADDED walletUpdateTrigger TO THE DEPENDENCY ARRAY
+    }, [baseURL, walletUpdateTrigger]);
 
-    // Inside your useEffect
- 
     // Handle clicks outside the search dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -218,117 +221,140 @@ React.useEffect(() => {
         <div className="w-full bg-white shadow-md border-b border-gray-200 z-40 sticky top-0">
 
             {/* =========================================
-                1. DESKTOP HEADER (Large Screens)
-               ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-8 py-4 w-full max-w-5xl mx-auto h-20 gap-8">
-                <div className="flex items-center gap-3 bg-white border border-slate-100 px-4 py-2.5 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all group cursor-pointer">
-                    {/* Icon Container */}
-                    <div className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"
-                        }`}>
-                        {!isLoading && <Wallet className="h-5 w-5" />}
+    1. DESKTOP HEADER (Large Screens)
+   ========================================= */}
+            <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-20 gap-5">
+
+                {/* --- LEFT SIDE: PROFILE & WALLET --- */}
+                <div className="flex items-center gap-3 shrink-0">
+
+                    {/* PROFILE MENU */}
+                    <div className="relative group cursor-pointer z-50">
+                        <div className="flex items-center gap-2 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-default/30 transition-all">
+                            {/* Decreased icon wrapper from h-11 to h-9 */}
+                            <div className="h-9 w-9 bg-primary-default/10 text-primary-default rounded-xl flex items-center justify-center group-hover:bg-primary-default group-hover:text-white transition-colors">
+                                {/* Decreased icon from w-5 to w-4.5 */}
+                                <UserIcon className="h-4.5 w-4.5" />
+                            </div>
+                            <div className="flex flex-col pr-1">
+                                {/* Decreased from 11px to 10px */}
+                                <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">Account</span>
+                                {/* Decreased from 15px to 13px */}
+                                <span className="text-[13px] font-bold text-slate-800 leading-none mt-1">Profile</span>
+                            </div>
+                            <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform ml-1" />
+                        </div>
+
+                        {/* Desktop Profile Dropdown */}
+                        <div className="absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
+                            <div className="p-2 flex flex-col gap-1">
+                                {/* Decreased padding and text from text-sm to text-[13px] */}
+                                <Link to="/dashboard/profile/settings" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-primary-default transition-colors">
+                                    <Settings className="h-4 w-4 text-slate-400" />
+                                    Profile Setting
+                                </Link>
+                                <Link to="/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-primary-default transition-colors">
+                                    <PlusCircle className="h-4 w-4 text-slate-400" />
+                                    Add Money
+                                </Link>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col pr-2">
-                        {/* Label */}
-                        <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">
-                            My Balance
-                        </span>
-
-                        {/* Dynamic Balance or Loading Skeleton */}
-                        <div className="mt-1.5 h-4 flex items-center">
-                            {isLoading ? (
-                                /* The Loader: A pulsing bar that mimics the size of the balance */
-                                <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
-                            ) : (
-                                /* The Actual Balance */
-                                <span className="text-[16px] font-black text-slate-900 tracking-tight leading-none">
-                                    ৳{walletBalance}
-                                </span>
-                            )}
+                    {/* EXISTING WALLET */}
+                    <div className="flex items-center gap-3 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all group cursor-pointer">
+                        {/* Decreased icon wrapper from h-11 to h-9 */}
+                        <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
+                            {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                        </div>
+                        <div className="flex flex-col pr-2">
+                            {/* Decreased from 11px to 10px */}
+                            <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
+                            <div className="mt-1.5 h-3.5 flex items-center">
+                                {isLoading ? (
+                                    <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
+                                ) : (
+                                    // Decreased from 18px to 15px
+                                    <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 max-w-4xl relative" ref={desktopSearchRef}>
+
+                {/* --- CENTER: SEARCH --- */}
+                <div className="flex-1 relative mx-4" ref={desktopSearchRef}>
                     <div className="relative w-full group">
                         <input
                             type="text"
-                            placeholder={t('header.search') || "Search products..."}
-                            className="w-full pl-6 pr-28 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-default focus:ring-4 focus:ring-primary-default/10 text-lg transition-all"
+                            placeholder={t('header.search') || "Search for amazing products..."}
+                            /* Decreased height from py-4 to py-3, font size from text-lg to text-base, and pl-7 to pl-5 */
+                            className="w-full pl-5 pr-28 py-3 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-2xl focus:outline-none focus:bg-white focus:border-primary-default focus:ring-4 focus:ring-primary-default/10 text-base font-medium transition-all shadow-inner"
                             value={searchText}
                             onChange={(e) => {
                                 setSearchText(e.target.value);
                                 setShowSuggestions(true);
                             }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch();
-                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3 pr-2">
+
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                            {/* Decreased search inner icons from w-6 to w-5 */}
                             {isSearching && <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />}
-                            <label htmlFor="desktopImageInput" className="cursor-pointer">
-                                <CameraIcon className="h-6 w-6 text-gray-400 hover:text-primary-default transition-colors" />
+
+                            <label htmlFor="desktopImageInput" className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                                <CameraIcon className="h-5 w-5 text-gray-500 hover:text-primary-default transition-colors" />
                                 <input type="file" id="desktopImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
                             </label>
-                            <div className="h-6 w-[1.5px] bg-gray-300"></div>
-                            <Search className="h-6 w-6 text-gray-500 cursor-pointer hover:text-primary-default" onClick={handleSearch} />
+
+                            <div className="h-6 w-[2px] bg-gray-200"></div>
+
+                            <button
+                                onClick={handleSearch}
+                                className="p-1.5 bg-primary-default/10 rounded-lg hover:bg-primary-default hover:text-white text-primary-default transition-colors"
+                            >
+                                <Search className="h-5 w-5" />
+                            </button>
                         </div>
                     </div>
 
                     {/* Desktop Suggestions */}
                     {showSuggestions && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[400px] overflow-y-auto">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] z-50 overflow-hidden max-h-[400px] overflow-y-auto">
                             {isSearching ? (
-                                <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
+                                <div className="p-4 text-center text-gray-500 text-sm">Searching database...</div>
                             ) : suggestions.length > 0 ? (
                                 suggestions.map(p => {
                                     const productTitle = getProductTitle(p);
                                     return (
-                                        <Link
-                                            key={p.id}
-                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`}
-                                            className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-4 transition-colors"
-                                            onClick={handleSelectSuggestion}
-                                        >
-                                            <img
-                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'}
-                                                className="w-12 h-12 rounded object-cover border border-gray-100"
-                                                alt={productTitle}
-                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'}
-                                            />
+                                        <Link key={p.id} to={`/dashboard?q=${encodeURIComponent(productTitle)}`} className="flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 gap-3 transition-colors" onClick={handleSelectSuggestion}>
+                                            {/* Decreased image size from h-14 to h-11 */}
+                                            <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} className="w-11 h-11 rounded-lg object-cover border border-gray-100 shadow-sm" alt={productTitle} onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} />
                                             <div className="flex flex-col">
-                                                <span className="font-medium text-gray-800 line-clamp-1">{productTitle}</span>
-                                                {p.offer_price && <span className="text-sm font-bold text-primary-default">৳{p.offer_price}</span>}
+                                                {/* Decreased font size from text-lg to text-[15px] */}
+                                                <span className="font-bold text-gray-800 text-[15px] line-clamp-1">{productTitle}</span>
+                                                {p.offer_price && <span className="text-[13px] font-black text-primary-default">৳{p.offer_price}</span>}
                                             </div>
                                         </Link>
                                     );
                                 })
                             ) : (
-                                <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
+                                <div className="p-4 text-center text-gray-500 text-sm italic">No products found matching your search.</div>
                             )}
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-6 shrink-0">
-                    <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
-                        <button
-                            onClick={() => handleChangeLanguage('en')}
-                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}
-                        >
-                            EN
-                        </button>
-                        <button
-                            onClick={() => handleChangeLanguage('bn')}
-                            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500'}`}
-                        >
-                            BN
-                        </button>
+                {/* --- RIGHT SIDE: LANG & DASHBOARD --- */}
+                <div className="flex items-center gap-5 shrink-0">
+                    <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200">
+                        {/* Decreased font from text-sm to text-xs */}
+                        <button onClick={() => handleChangeLanguage('en')} className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>EN</button>
+                        <button onClick={() => handleChangeLanguage('bn')} className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>BN</button>
                     </div>
-                    <Link
-                        to="/dashboard"
-                        className="flex items-center gap-2 bg-primary-default text-white px-6 py-3 rounded-xl text-base font-black hover:bg-green-600 shadow-lg shadow-primary-default/20 transition-all active:scale-95"
-                    >
+                    {/* Decreased padding, text size (text-lg to text-sm), and icon size */}
+                    <Link to="/dashboard" className="flex items-center gap-2 bg-primary-default text-white px-5 py-3 rounded-xl text-sm font-black hover:bg-green-600 shadow-md shadow-primary-default/25 transition-all active:scale-95">
                         <LayoutDashboard className="h-5 w-5" />
                         <span>{t('header.dashboard') || "Dashboard"}</span>
                     </Link>
@@ -338,7 +364,7 @@ React.useEffect(() => {
             {/* =========================================
                 2. MOBILE HEADER (Small Screens)
                ========================================= */}
-            <div className="lg:hidden flex flex-col w-full bg-white" ref={mobileSearchRef}>
+            <div className="lg:hidden flex flex-col w-full bg-white z-50" ref={mobileSearchRef}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                     <button className="p-2 hover:bg-gray-100 rounded-xl text-gray-700">
                         <Menu className="h-7 w-7" />
@@ -349,9 +375,44 @@ React.useEffect(() => {
                             <button onClick={() => handleChangeLanguage('en')} className={`px-3 py-1 rounded-md ${i18n.language === 'en' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>EN</button>
                             <button onClick={() => handleChangeLanguage('bn')} className={`px-3 py-1 rounded-md ${i18n.language === 'bn' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>BN</button>
                         </div>
-                        <Link to="/dashboard" className="bg-primary-light/10 p-2.5 rounded-full text-primary-default border border-primary-default/20 active:scale-90 transition-transform">
-                            <UserIcon className="h-6 w-6" />
-                        </Link>
+
+                        {/* MOBILE PROFILE MENU */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
+                                className="bg-primary-default/10 p-2.5 rounded-full text-primary-default border border-primary-default/20 active:scale-90 transition-transform"
+                            >
+                                <UserIcon className="h-6 w-6" />
+                            </button>
+
+                            {/* Mobile Dropdown */}
+                            {isMobileProfileOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsMobileProfileOpen(false)}></div>
+                                    <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="p-2 flex flex-col gap-1">
+                                            <Link
+                                                to="/profile/settings"
+                                                onClick={() => setIsMobileProfileOpen(false)}
+                                                className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                                            >
+                                                <Settings className="h-4.5 w-4.5 text-slate-400" />
+                                                Profile Setting
+                                            </Link>
+                                            <Link
+                                                to="/wallet/add"
+                                                onClick={() => setIsMobileProfileOpen(false)}
+                                                className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                                            >
+                                                <PlusCircle className="h-4.5 w-4.5 text-slate-400" />
+                                                Add Money
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                     </div>
                 </div>
 
@@ -362,14 +423,9 @@ React.useEffect(() => {
                             placeholder={t('header.search')}
                             className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-base font-medium shadow-inner focus:outline-none focus:bg-white focus:border-primary-default transition-all"
                             value={searchText}
-                            onChange={(e) => {
-                                setSearchText(e.target.value);
-                                setShowSuggestions(true);
-                            }}
+                            onChange={(e) => { setSearchText(e.target.value); setShowSuggestions(true); }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSearch();
-                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                             {isSearching && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
@@ -386,18 +442,8 @@ React.useEffect(() => {
                                 suggestions.map(p => {
                                     const productTitle = getProductTitle(p);
                                     return (
-                                        <Link
-                                            key={p.id}
-                                            to={`/dashboard?q=${encodeURIComponent(productTitle)}`}
-                                            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors"
-                                            onClick={handleSelectSuggestion}
-                                        >
-                                            <img
-                                                src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'}
-                                                className="w-10 h-10 rounded object-cover border border-gray-100"
-                                                alt={productTitle}
-                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'}
-                                            />
+                                        <Link key={p.id} to={`/dashboard?q=${encodeURIComponent(productTitle)}`} className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 gap-3 transition-colors" onClick={handleSelectSuggestion}>
+                                            <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} className="w-10 h-10 rounded object-cover border border-gray-100" alt={productTitle} onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/40'} />
                                             <div className="flex flex-col">
                                                 <span className="font-medium text-gray-800 text-sm line-clamp-1">{productTitle}</span>
                                                 {p.offer_price && <span className="text-xs font-bold text-primary-default">৳{p.offer_price}</span>}

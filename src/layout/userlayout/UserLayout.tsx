@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils"
 import { getNavData } from "@/data/navData"
 
 import {
-    ChevronRight, Pill, ChefHat, HelpCircleIcon,
+    ChevronRight, Pill, ChefHat, HelpCircleIcon,UserIcon,Settings,PlusCircle,
     LogInIcon, ShoppingCart, Package,
     Carrot, Baby, Home, Scissors, Snowflake, Milk, Fish,
     Coffee, Cookie, Menu, Search, Camera, Loader2, Tags
@@ -80,7 +80,8 @@ const getAuthToken = () => {
 
 export default function UserLayout() {
     const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
-    const [activeCategory, setActiveCategory] = React.useState("shopping")
+    const [activeCategory, setActiveCategory] = React.useState("shopping");
+    const [isMobileProfileOpen, setIsMobileProfileOpen] = React.useState(false);
     const { t, i18n } = useTranslation("global")
     const navigate = useNavigate();
     const location = useLocation(); // <-- ADD THIS LINE
@@ -398,47 +399,52 @@ export default function UserLayout() {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton
                                         size="lg"
-                                        className="h-14 w-full p-1.5 flex items-stretch justify-between bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                                        className="h-auto min-h-[68px] w-full p-2.5 pr-2 flex items-stretch justify-between bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden"
                                     >
                                         {/* --- HELP SECTION (Priority Focus) --- */}
                                         <Link
                                             to="/help"
-                                            className="group flex flex-shrink-0 items-center justify-center gap-2.5 rounded-lg hover:bg-teal-50/50 transition-all duration-300 border border-transparent hover:border-teal-200"
+                                            className="group flex flex-1 items-center justify-center gap-2 rounded-xl hover:bg-teal-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-teal-200 px-2 py-1 shadow-sm hover:shadow"
                                         >
-                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300 shadow-sm">
-                                                <HelpCircleIcon className="h-4.5 w-4.5" />
+                                            {/* Shrunk icon box from h-10 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                                                <HelpCircleIcon className="h-5 w-5" />
                                             </div>
 
                                             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                                                <span className="text-[13px] font-black text-teal-700 uppercase tracking-wider leading-none">
+                                                {/* Decreased font from 14px to 12px */}
+                                                <span className="text-[10px] font-black text-teal-700 uppercase tracking-wider leading-none">
                                                     {t("help")}
                                                 </span>
-                                                <span className="text-[9px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
+                                                {/* Decreased font from 10px to 9px */}
+                                                <span className="text-[8px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
                                                     Support
                                                 </span>
                                             </div>
                                         </Link>
 
-                                        {/* --- MINIMAL DIVIDER --- */}
-                                        <div className="w-[1px] bg-slate-100 my-2 group-data-[collapsible=icon]:hidden" />
+                                        {/* --- BOLD DIVIDER --- */}
+                                        <div className="w-[2px] bg-slate-100 my-1 mx-1.5 group-data-[collapsible=icon]:hidden" />
 
                                         {/* --- LOGOUT SECTION (Secondary Focus) --- */}
                                         <button
                                             onClick={handleLogout}
-                                            className="group flex flex-1 items-center justify-center gap-2 rounded-lg hover:bg-rose-50/50 transition-all duration-300 border border-transparent hover:border-rose-100 outline-none"
+                                            className="group flex flex-1 items-center justify-end gap-2 rounded-xl hover:bg-rose-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-rose-200 px-2 py-1 outline-none shadow-sm hover:shadow"
                                         >
                                             <div className="flex flex-col items-end group-data-[collapsible=icon]:hidden text-right">
-                                                <span className="text-[11px] font-bold text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
+                                                {/* Decreased font from 12px to 11px */}
+                                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
                                                     Logout
                                                 </span>
-                                                <span className="text-[9px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
+                                                {/* Decreased font from 10px to 8px */}
+                                                <span className="text-[8px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
                                                     Exit
                                                 </span>
                                             </div>
 
-                                            <div className="flex items-center justify-center h-7 w-7 rounded-md bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                                                {/* Added rotate-180 to make the LogIn icon look like a LogOut icon */}
-                                                <LogInIcon className="h-4 w-4 rotate-180" />
+                                            {/* Shrunk icon box from h-9 to h-8 */}
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                                                <LogInIcon className="h-5 w-5 rotate-180" />
                                             </div>
                                         </button>
                                     </SidebarMenuButton>
@@ -453,135 +459,167 @@ export default function UserLayout() {
             <SidebarInset>
                 <header className="flex flex-col sticky top-0 z-40 border-b bg-white lg:hidden">
 
-                    {/* --- ROW 1: Identity & Language --- */}
-                    {/* --- ROW 1: Identity & Language --- */}
-                    <div className="flex h-14 items-center justify-between px-4 border-b border-slate-50">
-                        <div className="flex items-center ">
-                            {/* Increased gap from 2 to 4 for better breathing room */}
+    {/* --- ROW 1: Identity, Language, & Profile --- */}
+    <div className="flex h-14 items-center justify-between px-4 md:px-6 border-b border-slate-50 relative">
+        <div className="flex items-center">
+            {/* Increased gap from 2 to 4 for better breathing room */}
+            <SidebarTrigger className="text-gray-600">
+                <Menu className="h-5.5 w-5.5" />
+            </SidebarTrigger>
 
-                            <SidebarTrigger className=" text-gray-600">
-                                <Menu className="h-5.5 w-5.5" />
-                            </SidebarTrigger>
+            <Separator orientation="vertical" className="h-4 bg-slate-200 mx-2" />
 
-                            <Separator orientation="vertical" className="h-4 bg-slate-200" />
+            <Link to="/dashboard" className="flex items-center">
+                <img
+                    src={logo}
+                    alt="logo"
+                    className="h-7 w-auto object-contain transition-opacity hover:opacity-80"
+                />
+            </Link>
+        </div>
 
-                            <Link to="/dashboard" className="flex items-center ml-4 ">
-                                <img
-                                    src={logo}
-                                    alt="logo"
-                                    className="h-6 w-auto object-contain transition-opacity hover:opacity-80"
-                                /* Decreased height from h-8 to h-6.5 for a sleeker look */
-                                />
+        {/* Right Side: Lang Toggle & Profile */}
+        <div className="flex items-center gap-3 pl-3 pr-1">
+            
+            {/* Compact Language Toggle */}
+            <div className="flex items-center bg-gray-100/80 rounded-lg p-1 border border-slate-200">
+                <button
+                    onClick={() => handleChangeLanguage('en')}
+                    className={cn(
+                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
+                        i18n.language === 'en' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
+                    )}
+                >
+                    EN
+                </button>
+                <button
+                    onClick={() => handleChangeLanguage('bn')}
+                    className={cn(
+                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
+                        i18n.language === 'bn' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
+                    )}
+                >
+                    BN
+                </button>
+            </div>
+
+            {/* MOBILE PROFILE MENU */}
+            <div className="relative">
+                <button 
+                    onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
+                    className="flex items-center justify-center h-8 w-8 bg-primary-default/10 rounded-full text-primary-default border border-primary-default/20 active:scale-90 transition-transform"
+                >
+                    <UserIcon className="h-4.5 w-4.5" />
+                </button>
+
+                {/* Mobile Dropdown Menu */}
+                {isMobileProfileOpen && (
+                    <>
+                        {/* Invisible backdrop to close menu when clicking outside */}
+                        <div className="fixed inset-0 z-40" onClick={() => setIsMobileProfileOpen(false)}></div>
+                        
+                        <div className="absolute top-full right-0 mt-3 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                            <div className="p-2 flex flex-col gap-1">
+                                <Link 
+                                    to="/profile/settings" 
+                                    onClick={() => setIsMobileProfileOpen(false)}
+                                    className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                                >
+                                    <Settings className="h-4 w-4 text-slate-400" />
+                                    Profile Setting
+                                </Link>
+                                <Link 
+                                    to="/wallet/add" 
+                                    onClick={() => setIsMobileProfileOpen(false)}
+                                    className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                                >
+                                    <PlusCircle className="h-4 w-4 text-slate-400" />
+                                    Add Money
+                                </Link>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    </div>
+
+    {/* --- ROW 2: Wallet (Full Width Prominence) --- */}
+    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30">
+        <div className="flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm">
+            <div className="flex items-center gap-3">
+                <div className={cn(
+                    "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
+                    isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
+                )}>
+                    {!isLoading && <Tags className="h-4.5 w-4.5" />}
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
+                    {isLoading ? (
+                        <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
+                    ) : (
+                        <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {/* --- ROW 3: Utility Search --- */}
+    <div className="px-4 pb-3 pt-2" ref={mobileSearchRef}>
+        <div className="relative flex items-center w-full group">
+            <input
+                type="text"
+                value={searchText}
+                placeholder={t('header.search') || "Search products..."}
+                onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setShowSuggestions(true);
+                }}
+                onFocus={() => searchText.trim() && setShowSuggestions(true)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="w-full h-11 pl-4 pr-24 text-sm bg-gray-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-[#5ca367] focus:ring-4 focus:ring-[#5ca367]/5 transition-all shadow-inner"
+            />
+
+            <div className="absolute right-2 flex items-center gap-1 text-gray-400">
+                {isSearching && <Loader2 className="w-4 h-4 animate-spin" />}
+                <label htmlFor="mobileImageInput" className="p-2 hover:text-[#5ca367] cursor-pointer">
+                    <Camera className="h-5 w-5" />
+                    <input type="file" id="mobileImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
+                </label>
+                <div className="h-5 w-[1px] bg-slate-200 mx-0.5"></div>
+                <button className="p-2 hover:text-[#5ca367]" onClick={handleSearch}>
+                    <Search className="h-5 w-5" />
+                </button>
+            </div>
+
+            {/* Mobile Suggestions Dropdown (Floating) */}
+            {showSuggestions && (
+                <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-50 overflow-hidden max-h-[50vh] overflow-y-auto">
+                    {suggestions.length > 0 ? (
+                        suggestions.map(p => (
+                            <Link
+                                key={p.id}
+                                to={`/dashboard?q=${encodeURIComponent(getProductTitle(p))}`}
+                                className="flex items-center p-4 hover:bg-slate-50 border-b border-slate-50 last:border-0 gap-4"
+                                onClick={() => handleSelectSuggestion(getProductTitle(p))}
+                            >
+                                <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder.jpg'} className="w-12 h-12 rounded-xl object-cover" alt="" />
+                                <div className="flex flex-col min-w-0">
+                                    <span className="font-bold text-slate-800 text-sm truncate">{getProductTitle(p)}</span>
+                                    <span className="text-xs font-black text-[#5ca367] mt-0.5">৳{p.offer_price}</span>
+                                </div>
                             </Link>
-                        </div>
-
-                        {/* Compact Language Toggle */}
-                        <div className="flex items-center bg-gray-100/80 rounded-lg p-1 border border-slate-200">
-                            <button
-                                onClick={() => handleChangeLanguage('en')}
-                                className={cn(
-                                    "text-[10px] font-black px-3 py-1 rounded-md transition-all",
-                                    i18n.language === 'en' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
-                                )}
-                            >
-                                EN
-                            </button>
-                            <button
-                                onClick={() => handleChangeLanguage('bn')}
-                                className={cn(
-                                    "text-[10px] font-black px-3 py-1 rounded-md transition-all",
-                                    i18n.language === 'bn' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
-                                )}
-                            >
-                                BN
-                            </button>
-                        </div>
-                    </div>
-                    <div className="px-4 pb-3 pt-1" ref={mobileSearchRef}>
-                        <div className="relative flex items-center w-full group">
-                            <input
-                                type="text"
-                                value={searchText}
-                                placeholder={t('header.search') || "Search products..."}
-                                onChange={(e) => {
-                                    setSearchText(e.target.value);
-                                    setShowSuggestions(true);
-                                }}
-                                onFocus={() => searchText.trim() && setShowSuggestions(true)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                className="w-full h-11 pl-4 pr-24 text-sm bg-gray-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-[#5ca367] focus:ring-4 focus:ring-[#5ca367]/5 transition-all shadow-inner"
-                            />
-
-                            <div className="absolute right-2 flex items-center gap-1 text-gray-400">
-                                {isSearching && <Loader2 className="w-4 h-4 animate-spin" />}
-                                <label htmlFor="mobileImageInput" className="p-2 hover:text-[#5ca367] cursor-pointer">
-                                    <Camera className="h-5 w-5" />
-                                    <input type="file" id="mobileImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
-                                </label>
-                                <div className="h-5 w-[1px] bg-slate-200 mx-0.5"></div>
-                                <button className="p-2 hover:text-[#5ca367]" onClick={handleSearch}>
-                                    <Search className="h-5 w-5" />
-                                </button>
-                            </div>
-
-                            {/* Mobile Suggestions Dropdown (Floating) */}
-                            {showSuggestions && (
-                                <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-50 overflow-hidden max-h-[50vh] overflow-y-auto">
-                                    {suggestions.length > 0 ? (
-                                        suggestions.map(p => (
-                                            <Link
-                                                key={p.id}
-                                                to={`/dashboard?q=${encodeURIComponent(getProductTitle(p))}`}
-                                                className="flex items-center p-4 hover:bg-slate-50 border-b border-slate-50 last:border-0 gap-4"
-                                                onClick={() => handleSelectSuggestion(getProductTitle(p))}
-                                            >
-                                                <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder.jpg'} className="w-12 h-12 rounded-xl object-cover" alt="" />
-                                                <div className="flex flex-col min-w-0">
-                                                    <span className="font-bold text-slate-800 text-sm truncate">{getProductTitle(p)}</span>
-                                                    <span className="text-xs font-black text-[#5ca367] mt-0.5">৳{p.offer_price}</span>
-                                                </div>
-                                            </Link>
-                                        ))
-                                    ) : (
-                                        <div className="p-6 text-center text-slate-400 text-sm italic">No results matching "{searchText}"</div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* --- ROW 2: Wallet (Full Width Prominence) --- */}
-                    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30">
-                        <div className="flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <div className={cn(
-                                    "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
-                                    isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
-                                )}>
-                                    {!isLoading && <Tags className="h-4.5 w-4.5" />}
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
-                                    {isLoading ? (
-                                        <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
-                                    ) : (
-                                        <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Quick action for wallet if needed */}
-                            <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
-                                <ChevronRight size={16} />
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    {/* --- ROW 4: Utility Search --- */}
-
-                </header>
+                        ))
+                    ) : (
+                        <div className="p-6 text-center text-slate-400 text-sm italic">No results matching "{searchText}"</div>
+                    )}
+                </div>
+            )}
+        </div>
+    </div>
+</header>
                 <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
                     <div className="hidden lg:block">
                         <Header />

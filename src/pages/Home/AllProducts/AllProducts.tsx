@@ -140,7 +140,7 @@ export default function AllProduct() {
                 <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                     <div className="h-20 w-full bg-slate-50 animate-pulse border-b border-gray-100" />
                     <div className="p-4 md:p-8">
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <ProductCard key={index} isSkeleton={true} />
                             ))}
@@ -172,7 +172,7 @@ export default function AllProduct() {
                     {currentProducts.length > 0 ? (
                         <>
                             {/* Reusable ProductCard Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4  gap-6 mb-8">
                                 {currentProducts.map((product) => (
                                     <ProductCard
                                         key={product.id} 
