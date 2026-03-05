@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import ErrorPage from "../pages/errorpage/Errorpage";
 import OrderDetails from "@/pages/Home/OrderDetails/OrderDetails";
 import Story from "@/pages/Help/Story/Story";
@@ -51,6 +51,8 @@ import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
 import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
 import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
+import VendorLayout from "@/layout/VendorLayout/VendorLayout";
+import VendorHome from "@/pages/VendorHome/VendorHome";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -163,6 +165,23 @@ export const routes = createBrowserRouter([
                 { path: "profile/settings", element: <ProfileSettings /> },
             ]
         }
+    ]
+},
+{
+    path: '/vendor',
+    element: <VendorLayout />, // VendorLayout now acts as the primary wrapper
+    children: [
+        {
+            // Optional: Redirects '/vendor' to '/vendor/dashboard'
+            index: true, 
+            element: <Navigate to="dashboard" replace /> 
+        },
+        {
+            path: 'dashboard', // This was missing!
+            element: <VendorHome/> 
+        },
+      
+        // Add more vendor-specific sub-routes here as needed
     ]
 },
     {
