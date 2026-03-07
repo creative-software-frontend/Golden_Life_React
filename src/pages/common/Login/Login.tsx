@@ -79,7 +79,7 @@ const Login: React.FC = () => {
   };
 
   // --- 1. HANDLE LOGIN SUBMIT ---
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -123,8 +123,8 @@ const Login: React.FC = () => {
           expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000));
           document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
 
-          // Save Token to LocalStorage
-          localStorage.setItem('student_session', JSON.stringify({ 
+          // Save Token to SessionStorage (Changed from LocalStorage)
+          sessionStorage.setItem('student_session', JSON.stringify({ 
             token: token, 
             expiry: expirationDate.getTime() 
           }));
@@ -193,7 +193,7 @@ const Login: React.FC = () => {
       expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000));
       
       document.cookie = `token=${fakeToken}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
-      localStorage.setItem('student_session', JSON.stringify({ 
+      sessionStorage.setItem('student_session', JSON.stringify({ 
         token: fakeToken, 
         expiry: expirationDate.getTime() 
       }));

@@ -3,7 +3,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import { Wallet, Search, Menu, User as UserIcon, Settings, PlusCircle, ChevronDown, Camera as CameraIcon, Loader2, LayoutDashboard, X } from 'lucide-react';
+import { Wallet, Search, Menu, User as UserIcon, GraduationCap, Settings, PlusCircle, Camera as CameraIcon, Loader2, LayoutDashboard, X, ChevronDown, Send, Download, Landmark } from 'lucide-react';
 
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 const Header: React.FC = () => {
     // 1. ADDED walletUpdateTrigger HERE
     const { isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore();
-    
+
     const navigate = useNavigate();
     const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
     // Config : Dynamic Base URL from Environment Variables
@@ -41,26 +41,73 @@ const Header: React.FC = () => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-
+    const [isMobileWalletOpen, setIsMobileWalletOpen] = useState(false);
     // Split refs for Desktop and Mobile so clicking outside works properly
     const desktopSearchRef = useRef<HTMLDivElement>(null);
     const mobileSearchRef = useRef<HTMLDivElement>(null);
     const [walletBalance, setWalletBalance] = React.useState<string | null>(null);
 
-    const [isLoading, setIsLoading] = React.useState(true); // Consolidating into one loading state
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [studentProfile, setStudentProfile] = React.useState({ name: '', image: '' });
+    // Consolidating into one loading state
 
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
             if (new Date().getTime() > parsedSession.expiry) {
-                localStorage.removeItem("student_session");
+                sessionStorage.removeItem("student_session");
                 return null;
             }
             return parsedSession.token;
         } catch (e) { return null; }
     };
+    React.useEffect(() => {
+        const fetchStudentProfile = async () => {
+            const token = getAuthToken();
+
+            if (!token) {
+                setStudentProfile({
+                    name: "Guest",
+                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
+                });
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${baseURL}/api/student/profile`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                // CHANGE: Check for 'status === success' and the 'student' key
+                if (response.data?.status === "success" && response.data?.student) {
+                    const student = response.data.student;
+                    const userName = student.name || "Student";
+
+                    // Construct the avatar URL or use the student's actual image if available
+                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF8A00&color=fff&bold=true`;
+
+                    setStudentProfile({
+                        name: userName,
+                        // If the API image is just a filename, you might need to prepend a base URL
+                        image: student.image ? `${baseURL}/uploads/profiles/${student.image}` : avatarUrl
+                    });
+                }
+            } catch (error) {
+                console.error("Profile Fetch Failed:", error);
+                setStudentProfile({
+                    name: "Guest",
+                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
+                });
+            }
+        };
+
+        if (baseURL) fetchStudentProfile();
+    }, [baseURL]);
 
     React.useEffect(() => {
         const fetchWalletBalance = async () => {
@@ -92,8 +139,8 @@ const Header: React.FC = () => {
         };
 
         fetchWalletBalance();
-        
-    // 2. ADDED walletUpdateTrigger TO THE DEPENDENCY ARRAY
+
+        // 2. ADDED walletUpdateTrigger TO THE DEPENDENCY ARRAY
     }, [baseURL, walletUpdateTrigger]);
 
     // Handle clicks outside the search dropdown
@@ -225,58 +272,76 @@ const Header: React.FC = () => {
    ========================================= */}
             <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-20 gap-5">
 
-                {/* --- LEFT SIDE: PROFILE & WALLET --- */}
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-4 shrink-0">
 
-                    {/* PROFILE MENU */}
-                    <div className="relative group cursor-pointer z-50">
-                        <div className="flex items-center gap-2 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-default/30 transition-all">
-                            {/* Decreased icon wrapper from h-11 to h-9 */}
-                            <div className="h-9 w-9 bg-primary-default/10 text-primary-default rounded-xl flex items-center justify-center group-hover:bg-primary-default group-hover:text-white transition-colors">
-                                {/* Decreased icon from w-5 to w-4.5 */}
-                                <UserIcon className="h-4.5 w-4.5" />
+
+                    <div className="group flex items-center gap-4 pl-5 pr-2 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 cursor-pointer">
+
+                        {/* Text Info - Better Typography Hierarchy */}
+                        <div className="flex flex-col items-end hidden md:flex">
+                            <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                {studentProfile.name}
+                            </span>
+
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                                <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
+                                    Golden Tier
+                                </span>
+                                <div className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
                             </div>
-                            <div className="flex flex-col pr-1">
-                                {/* Decreased from 11px to 10px */}
-                                <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">Account</span>
-                                {/* Decreased from 15px to 13px */}
-                                <span className="text-[13px] font-bold text-slate-800 leading-none mt-1">Profile</span>
-                            </div>
-                            <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform ml-1" />
                         </div>
 
-                        {/* Desktop Profile Dropdown */}
-                        <div className="absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
-                            <div className="p-2 flex flex-col gap-1">
-                                {/* Decreased padding and text from text-sm to text-[13px] */}
-                                <Link to="/dashboard/profile/settings" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-primary-default transition-colors">
-                                    <Settings className="h-4 w-4 text-slate-400" />
-                                    Profile Setting
-                                </Link>
-                                <Link to="/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-primary-default transition-colors">
-                                    <PlusCircle className="h-4 w-4 text-slate-400" />
-                                    Add Money
-                                </Link>
+                        {/* Modern Avatar Container */}
+                        <div className="relative">
+                            <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
+                                <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                            </div>
+
+                            {/* Floating Badge - Replacing the simple dot */}
+                            <div className="absolute -bottom-1 -left-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
+                                <GraduationCap size={12} className="text-white" />
                             </div>
                         </div>
                     </div>
-
-                    {/* EXISTING WALLET */}
-                    <div className="flex items-center gap-3 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all group cursor-pointer">
-                        {/* Decreased icon wrapper from h-11 to h-9 */}
-                        <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
-                            {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                    {/* WALLET WITH DROPDOWN MENU */}
+                    <div className="relative group z-50">
+                        {/* Wallet Button trigger */}
+                        <div className="flex items-center gap-2.5 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all cursor-pointer">
+                            <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
+                                {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                            </div>
+                            <div className="flex flex-col pr-1">
+                                <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
+                                <div className="mt-1.5 h-3.5 flex items-center">
+                                    {isLoading ? (
+                                        <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
+                                    ) : (
+                                        <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                                    )}
+                                </div>
+                            </div>
+                            <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
                         </div>
-                        <div className="flex flex-col pr-2">
-                            {/* Decreased from 11px to 10px */}
-                            <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
-                            <div className="mt-1.5 h-3.5 flex items-center">
-                                {isLoading ? (
-                                    <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
-                                ) : (
-                                    // Decreased from 18px to 15px
-                                    <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
-                                )}
+
+                        {/* Dropdown Options */}
+                        <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
+                            <div className="p-2 flex flex-col gap-1">
+                                <Link to="/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                    <PlusCircle className="h-4 w-4 text-green-500" />
+                                    Add Money
+                                </Link>
+                                <Link to="/wallet/send" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                    <Send className="h-4 w-4 text-blue-500" />
+                                    Send Money
+                                </Link>
+                                <Link to="/wallet/receive" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                    <Download className="h-4 w-4 text-purple-500" />
+                                    Receive Money
+                                </Link>
+                                <Link to="/wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                    <Landmark className="h-4 w-4 text-orange-500" />
+                                    Withdraw Money
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -365,47 +430,70 @@ const Header: React.FC = () => {
                 2. MOBILE HEADER (Small Screens)
                ========================================= */}
             <div className="lg:hidden flex flex-col w-full bg-white z-50" ref={mobileSearchRef}>
-                <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <button className="p-2 hover:bg-gray-100 rounded-xl text-gray-700">
                         <Menu className="h-7 w-7" />
                     </button>
 
-                    <div className="flex items-center gap-4">
-                        <div className="flex bg-gray-100 p-1 rounded-lg text-[11px] font-black border border-gray-200">
-                            <button onClick={() => handleChangeLanguage('en')} className={`px-3 py-1 rounded-md ${i18n.language === 'en' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>EN</button>
-                            <button onClick={() => handleChangeLanguage('bn')} className={`px-3 py-1 rounded-md ${i18n.language === 'bn' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>BN</button>
+                    <div className="flex items-center gap-2">
+                        {/* Language Toggle */}
+                        <div className="flex bg-gray-100 p-0.5 rounded-lg text-[10px] font-black border border-gray-200 mr-1">
+                            <button onClick={() => handleChangeLanguage('en')} className={`px-2.5 py-1 rounded-md ${i18n.language === 'en' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>EN</button>
+                            <button onClick={() => handleChangeLanguage('bn')} className={`px-2.5 py-1 rounded-md ${i18n.language === 'bn' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>BN</button>
                         </div>
 
-                        {/* MOBILE PROFILE MENU */}
+                        {/* Mobile Profile Image - Always Visible */}
+                        <Link to="/dashboard/profile/settings" className="flex items-center p-0.5 bg-slate-50 rounded-full border border-gray-100">
+                            <img
+                                src={studentProfile.image || "https://ui-avatars.com/api/?name=User"}
+                                alt="Profile"
+                                className="h-8 w-8 rounded-full object-cover border border-white shadow-sm bg-slate-200"
+                            />
+                        </Link>
+
+                        {/* MOBILE WALLET MENU (Click to open dropdown) */}
                         <div className="relative">
                             <button
-                                onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
-                                className="bg-primary-default/10 p-2.5 rounded-full text-primary-default border border-primary-default/20 active:scale-90 transition-transform"
+                                onClick={() => setIsMobileWalletOpen(!isMobileWalletOpen)}
+                                className="flex items-center gap-1.5 bg-white border border-slate-200 px-2 py-1.5 rounded-xl shadow-sm active:scale-95 transition-all"
                             >
-                                <UserIcon className="h-6 w-6" />
+                                <div className={`flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367]"}`}>
+                                    {!isLoading && <Wallet className="h-3.5 w-3.5" />}
+                                </div>
+                                <div className="flex flex-col items-start pr-0.5">
+                                    <span className="text-[8px] font-black text-slate-400 uppercase leading-none tracking-tight">Balance</span>
+                                    <div className="mt-1 h-2.5 flex items-center">
+                                        {isLoading ? (
+                                            <div className="h-2.5 w-10 bg-slate-100 animate-pulse rounded-sm" />
+                                        ) : (
+                                            <span className="text-[11px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${isMobileWalletOpen ? 'rotate-180' : ''}`} />
                             </button>
 
-                            {/* Mobile Dropdown */}
-                            {isMobileProfileOpen && (
+                            {/* Mobile Wallet Dropdown */}
+                            {isMobileWalletOpen && (
                                 <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setIsMobileProfileOpen(false)}></div>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
                                     <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
                                         <div className="p-2 flex flex-col gap-1">
-                                            <Link
-                                                to="/profile/settings"
-                                                onClick={() => setIsMobileProfileOpen(false)}
-                                                className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
-                                            >
-                                                <Settings className="h-4.5 w-4.5 text-slate-400" />
-                                                Profile Setting
-                                            </Link>
-                                            <Link
-                                                to="/wallet/add"
-                                                onClick={() => setIsMobileProfileOpen(false)}
-                                                className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
-                                            >
-                                                <PlusCircle className="h-4.5 w-4.5 text-slate-400" />
+                                            <Link to="/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                                <PlusCircle className="h-4 w-4 text-green-500" />
                                                 Add Money
+                                            </Link>
+                                            <Link to="/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                                <Send className="h-4 w-4 text-blue-500" />
+                                                Send Money
+                                            </Link>
+                                            <Link to="/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                                <Download className="h-4 w-4 text-purple-500" />
+                                                Receive Money
+                                            </Link>
+                                            <Link to="/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                                <Landmark className="h-4 w-4 text-orange-500" />
+                                                Withdraw Money
                                             </Link>
                                         </div>
                                     </div>
@@ -416,12 +504,12 @@ const Header: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="px-5 py-4 bg-white relative">
+                <div className="px-4 py-3 bg-white relative border-b border-gray-50">
                     <div className="relative w-full">
                         <input
                             type="text"
                             placeholder={t('header.search')}
-                            className="w-full pl-5 pr-12 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl text-base font-medium shadow-inner focus:outline-none focus:bg-white focus:border-primary-default transition-all"
+                            className="w-full pl-5 pr-12 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-sm font-medium shadow-inner focus:outline-none focus:bg-white focus:border-primary-default transition-all"
                             value={searchText}
                             onChange={(e) => { setSearchText(e.target.value); setShowSuggestions(true); }}
                             onFocus={() => searchText.trim() && setShowSuggestions(true)}
@@ -429,13 +517,13 @@ const Header: React.FC = () => {
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                             {isSearching && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
-                            <CameraIcon className="h-6 w-6 text-gray-400" />
+                            <CameraIcon className="h-5 w-5 text-gray-400" />
                         </div>
                     </div>
 
                     {/* Mobile Suggestions Dropdown */}
                     {showSuggestions && (
-                        <div className="absolute top-full left-5 right-5 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[300px] overflow-y-auto">
+                        <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[300px] overflow-y-auto">
                             {isSearching ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
                             ) : suggestions.length > 0 ? (
@@ -458,7 +546,6 @@ const Header: React.FC = () => {
                     )}
                 </div>
             </div>
-
             <Transition.Root show={isLoginModalOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-[60]" initialFocus={cancelButtonRef} onClose={closeLoginModal}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">

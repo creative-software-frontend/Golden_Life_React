@@ -39,7 +39,7 @@ const Products: React.FC = () => {
 
   // --- Auth Helper ---
   const getAuthToken = () => {
-    const session = localStorage.getItem("student_session");
+    const session = sessionStorage.getItem("student_session");
     if (!session) return null;
     try {
       const parsedSession = JSON.parse(session);

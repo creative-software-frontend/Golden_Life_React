@@ -47,7 +47,7 @@ export default function OutletLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 

@@ -36,11 +36,41 @@ import { cn } from "@/lib/utils"
 import { getNavData } from "@/data/navData"
 
 import {
-    ChevronRight, Pill, ChefHat, HelpCircleIcon,UserIcon,Settings,PlusCircle,
-    LogInIcon, ShoppingCart, Package,
-    Carrot, Baby, Home, Scissors, Snowflake, Milk, Fish,
-    Coffee, Cookie, Menu, Search, Camera, Loader2, Tags
-} from 'lucide-react'
+    Baby,
+    Camera,
+    Camera as CameraIcon,
+    Settings, HelpCircle, UserCircle, ChevronUp,
+    Carrot,
+    ChefHat,
+    ChevronDown,
+    ChevronRight,
+    Coffee,
+    Cookie,
+    Download,
+    Fish,
+    Sparkles,
+    HelpCircleIcon,
+    Home,
+    Landmark,
+    LayoutDashboard,
+    Loader2,
+    LogInIcon,
+    Menu,
+    Milk,
+    Package,
+    Pill,
+    PlusCircle,
+    Scissors,
+    Search,
+    Send,
+    LogOut,
+    ShoppingCart,
+    Snowflake,
+    Tags,
+    User as UserIcon,
+    Wallet,
+    X
+} from 'lucide-react';
 
 // Helper function to assign icons based on category name
 const getCategoryIcon = (categoryName: string) => {
@@ -64,12 +94,12 @@ const getCategoryIcon = (categoryName: string) => {
 
 // 1. Helper to get Token
 const getAuthToken = () => {
-    const session = localStorage.getItem("student_session");
+    const session = sessionStorage.getItem("student_session");
     if (!session) return null;
     try {
         const parsedSession = JSON.parse(session);
         if (new Date().getTime() > parsedSession.expiry) {
-            localStorage.removeItem("student_session");
+            sessionStorage.removeItem("student_session");
             return null;
         }
         return parsedSession.token;
@@ -81,10 +111,11 @@ const getAuthToken = () => {
 export default function UserLayout() {
     const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("shopping");
-    const [isMobileProfileOpen, setIsMobileProfileOpen] = React.useState(false);
+    const [isMobileWalletOpen, setIsMobileWalletOpen] = React.useState(false)
     const { t, i18n } = useTranslation("global")
     const navigate = useNavigate();
     const location = useLocation(); // <-- ADD THIS LINE
+    const [studentProfile, setStudentProfile] = React.useState({ name: '', image: '' });
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -122,7 +153,7 @@ export default function UserLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 
@@ -178,7 +209,51 @@ export default function UserLayout() {
 
         fetchCategories();
     }, [baseURL]);
+    React.useEffect(() => {
+        const fetchStudentProfile = async () => {
+            const token = getAuthToken();
 
+            if (!token) {
+                setStudentProfile({
+                    name: "Guest",
+                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
+                });
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${baseURL}/api/student/profile`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                // CHANGE: Check for 'status === success' and the 'student' key
+                if (response.data?.status === "success" && response.data?.student) {
+                    const student = response.data.student;
+                    const userName = student.name || "Student";
+
+                    // Construct the avatar URL or use the student's actual image if available
+                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF8A00&color=fff&bold=true`;
+
+                    setStudentProfile({
+                        name: userName,
+                        // If the API image is just a filename, you might need to prepend a base URL
+                        image: student.image ? `${baseURL}/uploads/profiles/${student.image}` : avatarUrl
+                    });
+                }
+            } catch (error) {
+                console.error("Profile Fetch Failed:", error);
+                setStudentProfile({
+                    name: "Guest",
+                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
+                });
+            }
+        };
+
+        if (baseURL) fetchStudentProfile();
+    }, [baseURL]);
     // --- LANGUAGE HANDLER ---
     const handleChangeLanguage = (language: string) => {
         i18n.changeLanguage(language);
@@ -189,9 +264,21 @@ export default function UserLayout() {
     const [suggestions, setSuggestions] = React.useState<any[]>([]);
     const [showSuggestions, setShowSuggestions] = React.useState(false);
     const [isSearching, setIsSearching] = React.useState(false);
-
+    const [isMobileProfileOpen, setIsMobileProfileOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = React.useState(false);
     const mobileSearchRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef(null);
 
+    // Close menu when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)) {
@@ -397,57 +484,80 @@ export default function UserLayout() {
                         <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <SidebarMenuButton
-                                        size="lg"
-                                        className="h-auto min-h-[68px] w-full p-2.5 pr-2 flex items-stretch justify-between bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden"
-                                    >
-                                        {/* --- HELP SECTION (Priority Focus) --- */}
-                                        <Link
-                                            to="/help"
-                                            className="group flex flex-1 items-center justify-center gap-2 rounded-xl hover:bg-teal-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-teal-200 px-2 py-1 shadow-sm hover:shadow"
-                                        >
-                                            {/* Shrunk icon box from h-10 to h-8 */}
-                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
-                                                <HelpCircleIcon className="h-5 w-5" />
-                                            </div>
+                                <div className="relative w-full px-2" ref={containerRef}>
+            {/* --- Floating Menu (Glassmorphism) --- */}
+            <div className={`
+                absolute bottom-[calc(100%+12px)] left-2 right-2 flex flex-col gap-1 p-2 
+                bg-white/90 backdrop-blur-md rounded-[24px] border border-secondary/20 shadow-2xl 
+                transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom z-50
+                ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'}
+            `}>
+                <div className="px-3 py-1 mb-1">
+                    <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Account Hub</span>
+                </div>
 
-                                            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                                                {/* Decreased font from 14px to 12px */}
-                                                <span className="text-[10px] font-black text-teal-700 uppercase tracking-wider leading-none">
-                                                    {t("help")}
-                                                </span>
-                                                {/* Decreased font from 10px to 9px */}
-                                                <span className="text-[8px] font-bold text-teal-600/60 uppercase tracking-widest mt-1">
-                                                    Support
-                                                </span>
-                                            </div>
-                                        </Link>
+                <Link to="/dashboard/profile/settings" className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/10 text-slate-600 hover:text-secondary transition-all group/item">
+                    <div className="p-2 rounded-lg bg-secondary/5 group-hover/item:bg-white shadow-sm"><UserCircle size={18} /></div>
+                    <span className="text-[13px] font-bold">Manage Profile</span>
+                </Link>
 
-                                        {/* --- BOLD DIVIDER --- */}
-                                        <div className="w-[2px] bg-slate-100 my-1 mx-1.5 group-data-[collapsible=icon]:hidden" />
+                <Link to="/help" className="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all group/item">
+                    <div className="p-2 rounded-lg bg-emerald-50/50 group-hover/item:bg-white shadow-sm"><HelpCircle size={18} /></div>
+                    <span className="text-[13px] font-bold">Support Center</span>
+                </Link>
 
-                                        {/* --- LOGOUT SECTION (Secondary Focus) --- */}
-                                        <button
-                                            onClick={handleLogout}
-                                            className="group flex flex-1 items-center justify-end gap-2 rounded-xl hover:bg-rose-50/50 transition-all duration-300 border-2 border-slate-100 hover:border-rose-200 px-2 py-1 outline-none shadow-sm hover:shadow"
-                                        >
-                                            <div className="flex flex-col items-end group-data-[collapsible=icon]:hidden text-right">
-                                                {/* Decreased font from 12px to 11px */}
-                                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest leading-none transition-all duration-300 group-hover:text-rose-600">
-                                                    Logout
-                                                </span>
-                                                {/* Decreased font from 10px to 8px */}
-                                                <span className="text-[8px] font-bold text-rose-400/50 uppercase tracking-tighter mt-1">
-                                                    Exit
-                                                </span>
-                                            </div>
+                <div className="h-[1px] bg-slate-100 my-1 mx-2" />
 
-                                            {/* Shrunk icon box from h-9 to h-8 */}
-                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-rose-50 text-rose-500 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
-                                                <LogInIcon className="h-5 w-5 rotate-180" />
-                                            </div>
-                                        </button>
-                                    </SidebarMenuButton>
+                <button className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-500 text-slate-500 hover:text-white transition-all duration-300 group/logout">
+                    <span className="text-[11px] font-black uppercase tracking-widest pl-1">Sign Out</span>
+                    <LogOut size={16} className="group-hover/logout:translate-x-1 transition-transform" />
+                </button>
+            </div>
+
+            {/* --- Main Sidebar Button --- */}
+            <SidebarMenuButton
+                size="lg"
+                asChild
+                className={`
+                    h-auto min-h-[72px] w-full p-2 pr-4 flex items-center justify-between rounded-[22px] border-2 transition-all duration-300 cursor-pointer 
+                    /* Using !important (!) to ensure background change is forced */
+                    ${isOpen 
+                        ? '!bg-secondary !border-secondary shadow-lg shadow-secondary/20 !text-white' 
+                        : 'bg-white border-slate-100 hover:border-secondary/30 hover:bg-slate-50/50'
+                    }
+                `}
+            >
+                <div onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between w-full group">
+                    <div className="flex items-center gap-3 shrink-0">
+                        {/* The Icon Box from your image */}
+                        <div className={`
+                            flex items-center justify-center h-12 w-12 rounded-[18px] transition-all duration-500
+                            ${isOpen ? 'bg-white/20 text-white rotate-90' : 'bg-secondary/10 text-secondary group-hover:bg-secondary group-hover:text-white'}
+                        `}>
+                            {isOpen ? <Sparkles size={24} /> : <Settings size={24} />}
+                        </div>
+
+                        {/* Text Info */}
+                        <div className="flex flex-col items-start justify-center">
+                            <span className={`text-[14px] font-black uppercase tracking-tight leading-none whitespace-nowrap ${isOpen ? 'text-white' : 'text-slate-800'}`}>
+                                {t("settings")}
+                            </span>
+                            <div className="flex items-center gap-1.5 mt-2">
+                                <div className={`h-1.5 w-1.5 rounded-full ${isOpen ? 'bg-white/60' : 'bg-secondary'} animate-pulse`} />
+                                <span className={`text-[10px] font-bold uppercase tracking-[0.1em] whitespace-nowrap ${isOpen ? 'text-white/80' : 'text-slate-400'}`}>
+                                    Elite Member
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Chevron Indicator */}
+                    <div className={`transition-all duration-500 shrink-0 ${isOpen ? 'rotate-180 translate-x-1' : 'group-hover:translate-y-0.5'}`}>
+                        <ChevronDown size={20} className={`${isOpen ? 'text-white' : 'text-slate-300'}`} />
+                    </div>
+                </div>
+            </SidebarMenuButton>
+        </div>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>
                         </SidebarMenuItem>
@@ -459,167 +569,202 @@ export default function UserLayout() {
             <SidebarInset>
                 <header className="flex flex-col sticky top-0 z-40 border-b bg-white lg:hidden">
 
-    {/* --- ROW 1: Identity, Language, & Profile --- */}
-    <div className="flex h-14 items-center justify-between px-4 md:px-6 border-b border-slate-50 relative">
-        <div className="flex items-center">
-            {/* Increased gap from 2 to 4 for better breathing room */}
-            <SidebarTrigger className="text-gray-600">
-                <Menu className="h-5.5 w-5.5" />
-            </SidebarTrigger>
+                    {/* --- ROW 1: Identity, Language, & Profile --- */}
+                    {/* FIXED: Added z-[60] so the Profile dropdown stays on top of everything */}
+                    <div className="flex h-14 items-center justify-between px-4 md:px-6 border-b border-slate-50 relative z-[60]">
+                        <div className="flex items-center">
+                            <SidebarTrigger className="text-gray-600">
+                                <Menu className="h-5.5 w-5.5" />
+                            </SidebarTrigger>
 
-            <Separator orientation="vertical" className="h-4 bg-slate-200 mx-2" />
+                            <Separator orientation="vertical" className="h-4 bg-slate-200 mx-2" />
 
-            <Link to="/dashboard" className="flex items-center">
-                <img
-                    src={logo}
-                    alt="logo"
-                    className="h-7 w-auto object-contain transition-opacity hover:opacity-80"
-                />
-            </Link>
-        </div>
+                            <Link to="/dashboard" className="flex items-center">
+                                <img
+                                    src={logo}
+                                    alt="logo"
+                                    className="h-10 w-auto object-contain transition-opacity hover:opacity-80"
+                                />
+                            </Link>
+                        </div>
 
-        {/* Right Side: Lang Toggle & Profile */}
-        <div className="flex items-center gap-3 pl-3 pr-1">
-            
-            {/* Compact Language Toggle */}
-            <div className="flex items-center bg-gray-100/80 rounded-lg p-1 border border-slate-200">
-                <button
-                    onClick={() => handleChangeLanguage('en')}
-                    className={cn(
-                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
-                        i18n.language === 'en' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
-                    )}
-                >
-                    EN
-                </button>
-                <button
-                    onClick={() => handleChangeLanguage('bn')}
-                    className={cn(
-                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
-                        i18n.language === 'bn' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
-                    )}
-                >
-                    BN
-                </button>
-            </div>
+                        {/* Right Side: Lang Toggle & Profile Image */}
+                        <div className="flex items-center gap-3 pl-3 pr-1">
 
-            {/* MOBILE PROFILE MENU */}
-            <div className="relative">
-                <button 
-                    onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
-                    className="flex items-center justify-center h-8 w-8 bg-primary-default/10 rounded-full text-primary-default border border-primary-default/20 active:scale-90 transition-transform"
-                >
-                    <UserIcon className="h-4.5 w-4.5" />
-                </button>
-
-                {/* Mobile Dropdown Menu */}
-                {isMobileProfileOpen && (
-                    <>
-                        {/* Invisible backdrop to close menu when clicking outside */}
-                        <div className="fixed inset-0 z-40" onClick={() => setIsMobileProfileOpen(false)}></div>
-                        
-                        <div className="absolute top-full right-0 mt-3 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
-                            <div className="p-2 flex flex-col gap-1">
-                                <Link 
-                                    to="/profile/settings" 
-                                    onClick={() => setIsMobileProfileOpen(false)}
-                                    className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                            {/* Compact Language Toggle */}
+                            <div className="flex items-center bg-gray-100/80 rounded-lg p-1 border border-slate-200">
+                                <button
+                                    onClick={() => handleChangeLanguage('en')}
+                                    className={cn(
+                                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
+                                        i18n.language === 'en' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
+                                    )}
                                 >
-                                    <Settings className="h-4 w-4 text-slate-400" />
-                                    Profile Setting
-                                </Link>
-                                <Link 
-                                    to="/wallet/add" 
-                                    onClick={() => setIsMobileProfileOpen(false)}
-                                    className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 transition-colors"
+                                    EN
+                                </button>
+                                <button
+                                    onClick={() => handleChangeLanguage('bn')}
+                                    className={cn(
+                                        "text-[10px] font-black px-2 py-1 rounded-md transition-all",
+                                        i18n.language === 'bn' ? "bg-white text-[#5ca367] shadow-sm" : "text-gray-400"
+                                    )}
                                 >
-                                    <PlusCircle className="h-4 w-4 text-slate-400" />
-                                    Add Money
-                                </Link>
+                                    BN
+                                </button>
+                            </div>
+
+                            {/* Mobile Profile Menu (Icon Only) */}
+                            <div className="relative shrink-0">
+                                <button
+                                    onClick={() => {
+                                        setIsMobileProfileOpen(!isMobileProfileOpen);
+                                        setIsMobileWalletOpen(false); // FIXED: Closes wallet if open
+                                    }}
+                                    className="flex items-center justify-center bg-slate-50 rounded-full border border-gray-200 hover:bg-slate-100 transition-all active:scale-95 h-9 w-9 shadow-sm"
+                                >
+                                    <UserIcon className="h-5 w-5 text-slate-500" />
+                                </button>
+
+                                {/* Mobile Profile Dropdown Options */}
+                                {isMobileProfileOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setIsMobileProfileOpen(false)}></div>
+
+                                        <div className="absolute top-8 -right-3 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
+                                            <div className="flex flex-col">
+
+                                                {/* Beautiful Dropdown Header (Shows Full Name) */}
+                                                <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                                                    <p className="text-[13px] font-bold text-slate-800 truncate">
+                                                        {studentProfile.name || "Loading..."}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                                                        Golden Tier
+                                                    </p>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
-                    </>
-                )}
-            </div>
-        </div>
-    </div>
+                    </div>
 
-    {/* --- ROW 2: Wallet (Full Width Prominence) --- */}
-    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30">
-        <div className="flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className={cn(
-                    "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
-                    isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
-                )}>
-                    {!isLoading && <Tags className="h-4.5 w-4.5" />}
-                </div>
-                <div className="flex flex-col">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
-                    {isLoading ? (
-                        <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
-                    ) : (
-                        <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
-                    )}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {/* --- ROW 3: Utility Search --- */}
-    <div className="px-4 pb-3 pt-2" ref={mobileSearchRef}>
-        <div className="relative flex items-center w-full group">
-            <input
-                type="text"
-                value={searchText}
-                placeholder={t('header.search') || "Search products..."}
-                onChange={(e) => {
-                    setSearchText(e.target.value);
-                    setShowSuggestions(true);
-                }}
-                onFocus={() => searchText.trim() && setShowSuggestions(true)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full h-11 pl-4 pr-24 text-sm bg-gray-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-[#5ca367] focus:ring-4 focus:ring-[#5ca367]/5 transition-all shadow-inner"
-            />
-
-            <div className="absolute right-2 flex items-center gap-1 text-gray-400">
-                {isSearching && <Loader2 className="w-4 h-4 animate-spin" />}
-                <label htmlFor="mobileImageInput" className="p-2 hover:text-[#5ca367] cursor-pointer">
-                    <Camera className="h-5 w-5" />
-                    <input type="file" id="mobileImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
-                </label>
-                <div className="h-5 w-[1px] bg-slate-200 mx-0.5"></div>
-                <button className="p-2 hover:text-[#5ca367]" onClick={handleSearch}>
-                    <Search className="h-5 w-5" />
-                </button>
-            </div>
-
-            {/* Mobile Suggestions Dropdown (Floating) */}
-            {showSuggestions && (
-                <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-50 overflow-hidden max-h-[50vh] overflow-y-auto">
-                    {suggestions.length > 0 ? (
-                        suggestions.map(p => (
-                            <Link
-                                key={p.id}
-                                to={`/dashboard?q=${encodeURIComponent(getProductTitle(p))}`}
-                                className="flex items-center p-4 hover:bg-slate-50 border-b border-slate-50 last:border-0 gap-4"
-                                onClick={() => handleSelectSuggestion(getProductTitle(p))}
-                            >
-                                <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder.jpg'} className="w-12 h-12 rounded-xl object-cover" alt="" />
-                                <div className="flex flex-col min-w-0">
-                                    <span className="font-bold text-slate-800 text-sm truncate">{getProductTitle(p)}</span>
-                                    <span className="text-xs font-black text-[#5ca367] mt-0.5">৳{p.offer_price}</span>
+                    {/* --- ROW 2: Wallet (Full Width Prominence with Dropdown) --- */}
+                    {/* FIXED: Restored Wallet Row and added z-[50] so it sits above the search bar */}
+                    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30 relative z-[50]">
+                        <button
+                            onClick={() => {
+                                setIsMobileWalletOpen(!isMobileWalletOpen);
+                                setIsMobileProfileOpen(false); // FIXED: Closes profile if open
+                            }}
+                            className="w-full flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm active:scale-[0.98] transition-all cursor-pointer"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={cn(
+                                    "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
+                                    isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
+                                )}>
+                                    {!isLoading && <Wallet className="h-4.5 w-4.5" />}
                                 </div>
-                            </Link>
-                        ))
-                    ) : (
-                        <div className="p-6 text-center text-slate-400 text-sm italic">No results matching "{searchText}"</div>
-                    )}
-                </div>
-            )}
-        </div>
-    </div>
-</header>
+                                <div className="flex flex-col text-left">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
+                                    {isLoading ? (
+                                        <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
+                                    ) : (
+                                        <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
+                                    )}
+                                </div>
+                            </div>
+                            <ChevronDown className={cn("h-5 w-5 text-slate-400 transition-transform", isMobileWalletOpen && "rotate-180")} />
+                        </button>
+
+                        {/* Mobile Wallet Dropdown Options */}
+                        {isMobileWalletOpen && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
+                                <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top animate-in fade-in zoom-in-95 duration-200">
+                                    <div className="p-2 flex flex-col gap-1">
+                                        <Link to="/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                            <PlusCircle className="h-5 w-5 text-green-500" />
+                                            Add Money
+                                        </Link>
+                                        <Link to="/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                            <Send className="h-5 w-5 text-blue-500" />
+                                            Send Money
+                                        </Link>
+                                        <Link to="/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                            <Download className="h-5 w-5 text-purple-500" />
+                                            Receive Money
+                                        </Link>
+                                        <Link to="/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                            <Landmark className="h-5 w-5 text-orange-500" />
+                                            Withdraw Money
+                                        </Link>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* --- ROW 3: Utility Search --- */}
+                    <div className="px-4 pb-3 pt-2" ref={mobileSearchRef}>
+                        <div className="relative flex items-center w-full group">
+                            <input
+                                type="text"
+                                value={searchText}
+                                placeholder={t('header.search') || "Search products..."}
+                                onChange={(e) => {
+                                    setSearchText(e.target.value);
+                                    setShowSuggestions(true);
+                                }}
+                                onFocus={() => searchText.trim() && setShowSuggestions(true)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                className="w-full h-11 pl-4 pr-24 text-sm bg-gray-50 border border-slate-200 rounded-2xl outline-none focus:bg-white focus:border-[#5ca367] focus:ring-4 focus:ring-[#5ca367]/5 transition-all shadow-inner"
+                            />
+
+                            <div className="absolute right-2 flex items-center gap-1 text-gray-400">
+                                {isSearching && <Loader2 className="w-4 h-4 animate-spin" />}
+                                <label htmlFor="mobileImageInput" className="p-2 hover:text-[#5ca367] cursor-pointer">
+                                    <CameraIcon className="h-5 w-5" />
+                                    <input type="file" id="mobileImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                </label>
+                                <div className="h-5 w-[1px] bg-slate-200 mx-0.5"></div>
+                                <button className="p-2 hover:text-[#5ca367]" onClick={handleSearch}>
+                                    <Search className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            {/* Mobile Suggestions Dropdown (Floating) */}
+                            {showSuggestions && (
+                                <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-50 overflow-hidden max-h-[50vh] overflow-y-auto">
+                                    {isSearching ? (
+                                        <div className="p-6 text-center text-slate-400 text-sm">Searching...</div>
+                                    ) : suggestions.length > 0 ? (
+                                        suggestions.map(p => (
+                                            <Link
+                                                key={p.id}
+                                                to={`/dashboard?q=${encodeURIComponent(getProductTitle(p))}`}
+                                                className="flex items-center p-4 hover:bg-slate-50 border-b border-slate-50 last:border-0 gap-4"
+                                                onClick={handleSelectSuggestion}
+                                            >
+                                                <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder.jpg'} className="w-12 h-12 rounded-xl object-cover" alt="" />
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="font-bold text-slate-800 text-sm truncate">{getProductTitle(p)}</span>
+                                                    <span className="text-xs font-black text-[#5ca367] mt-0.5">৳{p.offer_price}</span>
+                                                </div>
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        <div className="p-6 text-center text-slate-400 text-sm italic">No results matching "{searchText}"</div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </header>
                 <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
                     <div className="hidden lg:block">
                         <Header />

@@ -31,7 +31,7 @@ const CategoryPage = () => {
         const fetchCategoryProducts = async () => {
             setLoading(true);
             try {
-                const session = localStorage.getItem("student_session");
+                const session = sessionStorage.getItem("student_session");
                 const token = session ? JSON.parse(session).token : null;
                 
                 const config = {

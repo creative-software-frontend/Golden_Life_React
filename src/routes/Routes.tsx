@@ -48,11 +48,12 @@ import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
-import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import StudentProtectedRoute from "@/components/ProtectedRoute/StudentProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
 import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
 import VendorLayout from "@/layout/VendorLayout/VendorLayout";
 import VendorHome from "@/pages/VendorHome/VendorHome";
+import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -72,10 +73,10 @@ export const routes = createBrowserRouter([
             },
             {
 
-                path:"/forgot-password" ,
-                element:<ForgotPassword />
+                path: "/forgot-password",
+                element: <ForgotPassword />
             }
-                
+
         ],
     },
 
@@ -126,64 +127,68 @@ export const routes = createBrowserRouter([
             }
         ]
     },
- // Inside your routes array
-{
-    element: <ProtectedRoute />, // The Gatekeeper
-    children: [
-        {
-            path: '/dashboard',
-            element: <UserLayout />,
-            children: [
-                {
-                    path: '',
-                    element: <Home />
-                },
-                {
-                    path: 'allcategories',
-                    element: <AllCategories />
-                },
-                {
-                    path: 'all-courses',
-                    element: <AllCourses2 />
-                },
-                {
-                    path: 'productpage',
-                    element: <ProductPage />,
-                },
-                {
-                    path: 'allProducts',
-                    element: <AllProduct />,
-                },
-                {
-                    path: 'product/:id',
-                    element: <ProductDetails />,
-                },
-                {
-                    path: "category/:id",
-                    element: <CategoryPage />,
-                },
-                { path: "profile/settings", element: <ProfileSettings /> },
-            ]
-        }
-    ]
-},
-{
-    path: '/vendor',
-    element: <VendorLayout />, // VendorLayout now acts as the primary wrapper
-    children: [
-        {
-            // Optional: Redirects '/vendor' to '/vendor/dashboard'
-            index: true, 
-            element: <Navigate to="dashboard" replace /> 
-        },
-        {
-            path: 'dashboard', // This was missing!
-            element: <VendorHome/> 
-        },
-      
-        // Add more vendor-specific sub-routes here as needed
-    ]
-},
+    // Inside your routes array
+    {
+        element: <StudentProtectedRoute />, // The Gatekeeper
+        children: [
+            {
+                path: '/dashboard',
+                element: <UserLayout />,
+                children: [
+                    {
+                        path: '',
+                        element: <Home />
+                    },
+                    {
+                        path: 'allcategories',
+                        element: <AllCategories />
+                    },
+                    {
+                        path: 'all-courses',
+                        element: <AllCourses2 />
+                    },
+                    {
+                        path: 'productpage',
+                        element: <ProductPage />,
+                    },
+                    {
+                        path: 'allProducts',
+                        element: <AllProduct />,
+                    },
+                    {
+                        path: 'product/:id',
+                        element: <ProductDetails />,
+                    },
+                    {
+                        path: "category/:id",
+                        element: <CategoryPage />,
+                    },
+                    { path: "profile/settings", element: <ProfileSettings /> },
+                ]
+            }
+        ]
+    },
+    {
+        path: '/vendor',
+        element: <VendorProtectedRoute />, // First, check if the user is logged in
+        children: [
+            {
+                // Now, wrap the authenticated content in the Layout
+                element: <VendorLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="dashboard" replace />
+                    },
+                    {
+                        path: 'dashboard',
+                        element: <VendorHome />
+                    },
+                    // Add more vendor sub-routes here
+                ]
+            }
+        ]
+    },
     {
         path: '/courses',
         element: <CourseLayout />,

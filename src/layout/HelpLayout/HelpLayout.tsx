@@ -1,5 +1,5 @@
 "use client"
-
+import { cn } from "@/lib/utils"
 import * as React from "react"
 import logo from '../../../public/image/logo/logo.jpg'
 import axios from "axios"
@@ -45,7 +45,7 @@ export default function HelpLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 
@@ -58,7 +58,7 @@ export default function HelpLayout() {
     };
     // --- AUTH HELPER ---
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
@@ -163,57 +163,87 @@ export default function HelpLayout() {
                         {/* <SidebarGroupLabel>{data.categories.find(c => c.id === activeCategory)?.name}</SidebarGroupLabel> */}
                         <SidebarMenu>
                             {isLoadingCategories ? (
-                                <div className="flex justify-center py-8">
+                                <div className="flex justify-center py-10">
                                     <Loader2 className="h-6 w-6 animate-spin text-[#5ca367]" />
                                 </div>
                             ) : categories.length > 0 ? (
-                                <div className="flex flex-col gap-1.5 px-3 py-3">
+                                /* 1. WRAPPER SPACING: 
+                                   Using px-6 (24px) creates a substantial gutter on both sides for mobile. 
+                                */
+                                <div className="flex flex-col gap-1 px-1 md:px-3 py-4">
+                                    {/* Reduced gap for a tighter, cleaner list view */}
                                     {categories.map((category) => {
                                         const categoryName = i18n.language === 'bn' ? category.name_bn : category.name_en;
-                                        const IconComponent = getCategoryIcon(category.name_en);
                                         const categoryPath = `/dashboard/category/${category.id}`;
                                         const isActive = location.pathname === categoryPath;
 
                                         return (
-                                            <SidebarMenuItem key={category.id} className="list-none relative">
-                                                {/* 1. HOVER/ACTIVE INDICATOR LINE */}
-                                                <div className={`absolute left-[-4px] top-[15%] h-[70%] w-1.5 rounded-r-full bg-[#5ca367] transition-all duration-300 ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                                                    }`} />
+                                            <SidebarMenuItem key={category.id} className="list-none relative group mx-0">
+
+                                                {/* 1. INDICATOR LINE: 
+                                         Remains the primary visual cue for the active item 
+                                     */}
+                                                <div className={cn(
+                                                    "absolute left-[-12px] top-[30%] h-[40%] w-1 rounded-r-full bg-[#5ca367] transition-all duration-300 z-20",
+                                                    isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 group-hover:opacity-100 group-hover:scale-y-100"
+                                                )} />
 
                                                 <SidebarMenuButton
                                                     asChild
-                                                    className={`group relative w-full h-[52px] px-4 rounded-xl transition-all duration-300 ease-out border ${isActive
-                                                        ? "bg-[#5ca367]/10 border-[#5ca367]/20 shadow-sm"
-                                                        : "bg-transparent border-transparent hover:bg-slate-50 hover:shadow-sm active:scale-95"
-                                                        }`}
+                                                    className={cn(
+                                                        "group relative w-full h-[48px] px-2 rounded-lg transition-all duration-300 ease-out border-none bg-transparent shadow-none",
+                                                        /* --- 1. THE COLORFUL HOVER (Gradient + Shadow) --- */
+                                                        "hover:bg-gradient-to-r hover:from-[#5ca367]/20 hover:to-transparent",
+                                                        "hover:border-[#5ca367]/10 hover:shadow-lg hover:shadow-[#5ca367]/10",
+                                                        isActive ? "translate-x-1" : "hover:translate-x-1"
+                                                    )}
                                                 >
                                                     <Link to={categoryPath} className="flex items-center justify-between w-full">
 
-                                                        {/* 2. LEFT CONTENT: Icon + Text (Slides slightly on touch) */}
-                                                        <div className="flex items-center gap-3.5 transform transition-transform duration-300 ease-out group-hover:translate-x-1.5">
-                                                            <div className={`p-1.5 rounded-lg transition-all duration-300 flex items-center justify-center ${isActive ? "bg-white shadow-sm" : "bg-transparent group-hover:bg-white"
-                                                                }`}>
+                                                        {/* LEFT CONTENT: Icon + Text */}
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Icon container background removed */}
+                                                            <div className="p-1 transition-all duration-300 flex items-center justify-center bg-transparent">
                                                                 <img
                                                                     src={category.icon}
                                                                     alt={categoryName}
-                                                                    className="h-[22px] w-[22px] object-contain"
+                                                                    className={cn(
+                                                                        "h-[17px] w-[17px] object-contain transition-transform duration-300",
+                                                                        isActive ? "scale-110" : "group-hover:scale-110"
+                                                                    )}
                                                                     onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/22?text=C'}
                                                                 />
                                                             </div>
-                                                            <span className={`text-[16px] font-semibold tracking-tight transition-colors duration-300 ${isActive ? "text-[#5ca367]" : "text-slate-600 group-hover:text-slate-900"
-                                                                }`}>
+                                                            <span className={cn(
+                                                                "text-[14px] font-medium tracking-tight transition-colors duration-300",
+                                                                /* Text color is the main indicator of the active state */
+                                                                isActive ? "text-[#5ca367] font-bold" : "text-slate-600 group-hover:text-slate-900"
+                                                            )}>
                                                                 {categoryName}
                                                             </span>
                                                         </div>
 
-                                                        {/* 3. RIGHT CONTENT: Dynamic Arrow (Slides 20px right on touch) */}
-                                                        <div className={`flex items-center transition-all duration-500 ease-in-out ${isActive
-                                                            ? "opacity-100 translate-x-0"
-                                                            : "opacity-0 group-hover:opacity-100 group-hover:translate-x-5"
-                                                            }`}>
-                                                            <ChevronRight className={`h-5 w-5 ${isActive ? "text-[#5ca367]" : "text-slate-400 group-hover:text-[#5ca367]"}`} />
+                                                        {/* RIGHT CONTENT: Arrow (Visible only on hover or active) */}
+                                                        <div className={cn(
+                                                            "flex items-center justify-center transition-all duration-500 ease-in-out",
+                                                            /* 1. POSITIONING: Pushes the arrow slightly right on hover */
+                                                            isActive ? "opacity-100 translate-x-0" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5"
+                                                        )}>
+                                                            {/* 2. THE ICON CONTAINER: Adds a colorful background glow */}
+                                                            <div className={cn(
+                                                                "flex items-center justify-center p-1.5 rounded-full transition-all duration-300",
+                                                                isActive ? "bg-[#5ca367]/20" : "group-hover:bg-slate-100"
+                                                            )}>
+                                                                <ChevronRight
+                                                                    /* 3. SIZE & THICKNESS: Increased to h-5 and strokeWidth 3 for that 'big' feel */
+                                                                    className={cn(
+                                                                        "h-4 w-4 transition-transform duration-300",
+                                                                        isActive ? "text-[#5ca367] scale-110" : "text-slate-400"
+                                                                    )}
+                                                                    strokeWidth={3}
+                                                                />
+                                                            </div>
                                                         </div>
-
                                                     </Link>
                                                 </SidebarMenuButton>
                                             </SidebarMenuItem>
@@ -221,7 +251,9 @@ export default function HelpLayout() {
                                     })}
                                 </div>
                             ) : (
-                                <div className="p-4 text-center text-sm font-medium text-slate-500">No categories found</div>
+                                <div className="p-10 text-center text-sm font-medium text-slate-400 italic">
+                                    No categories found
+                                </div>
                             )}
                         </SidebarMenu>
                     </SidebarGroup>
