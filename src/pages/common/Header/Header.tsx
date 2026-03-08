@@ -278,30 +278,35 @@ const Header: React.FC = () => {
                     <div className="group flex items-center gap-4 pl-5 pr-2 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 cursor-pointer">
 
                         {/* Text Info - Better Typography Hierarchy */}
-                        <div className="flex flex-col items-end hidden md:flex">
-                            <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
-                                {studentProfile.name}
-                            </span>
+                        <div className="hidden md:flex items-center gap-3">
+                            {/* 1st: Icon Container */}
+                            <div className="relative shrink-0">
+                                <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
+                                    <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                                </div>
 
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                                <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
-                                    Golden Tier
+                                {/* Floating Badge - Positioned on the bottom-right of the icon */}
+                                <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
+                                    <GraduationCap size={12} className="text-white" />
+                                </div>
+                            </div>
+
+                            {/* 2nd: Text Info (Name & Tier) */}
+                            <div className="flex flex-col items-start justify-center">
+                                <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                    {studentProfile.name}
                                 </span>
-                                <div className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse" />
+
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
+                                        Golden Tier
+                                    </span>
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                </div>
                             </div>
                         </div>
 
                         {/* Modern Avatar Container */}
-                        <div className="relative">
-                            <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
-                                <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                            </div>
-
-                            {/* Floating Badge - Replacing the simple dot */}
-                            <div className="absolute -bottom-1 -left-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
-                                <GraduationCap size={12} className="text-white" />
-                            </div>
-                        </div>
                     </div>
                     {/* WALLET WITH DROPDOWN MENU */}
                     <div className="relative group z-50">
@@ -326,11 +331,11 @@ const Header: React.FC = () => {
                         {/* Dropdown Options */}
                         <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
                             <div className="p-2 flex flex-col gap-1">
-                                <Link to="/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                <Link to="/dashboard/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-green-600 transition-colors">
                                     <PlusCircle className="h-4 w-4 text-green-500" />
                                     Add Money
                                 </Link>
-                                <Link to="/wallet/send" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                <Link to="/dashboard/wallet/send" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-blue-600 transition-colors">
                                     <Send className="h-4 w-4 text-blue-500" />
                                     Send Money
                                 </Link>
@@ -338,7 +343,7 @@ const Header: React.FC = () => {
                                     <Download className="h-4 w-4 text-purple-500" />
                                     Receive Money
                                 </Link>
-                                <Link to="/wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                <Link to="/dashboard//wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
                                     <Landmark className="h-4 w-4 text-orange-500" />
                                     Withdraw Money
                                 </Link>
@@ -479,11 +484,11 @@ const Header: React.FC = () => {
                                     <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
                                     <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden origin-top-right animate-in fade-in zoom-in-95 duration-200">
                                         <div className="p-2 flex flex-col gap-1">
-                                            <Link to="/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                            <Link to="/dashboard/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-green-600 transition-colors">
                                                 <PlusCircle className="h-4 w-4 text-green-500" />
                                                 Add Money
                                             </Link>
-                                            <Link to="/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                            <Link to="/dashboard//wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
                                                 <Send className="h-4 w-4 text-blue-500" />
                                                 Send Money
                                             </Link>
@@ -491,7 +496,7 @@ const Header: React.FC = () => {
                                                 <Download className="h-4 w-4 text-purple-500" />
                                                 Receive Money
                                             </Link>
-                                            <Link to="/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                            <Link to="/dashboard//wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:text-orange-600 transition-colors">
                                                 <Landmark className="h-4 w-4 text-orange-500" />
                                                 Withdraw Money
                                             </Link>

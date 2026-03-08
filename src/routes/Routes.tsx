@@ -54,6 +54,10 @@ import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
 import VendorLayout from "@/layout/VendorLayout/VendorLayout";
 import VendorHome from "@/pages/VendorHome/VendorHome";
 import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
+import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
+
+import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
+import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -163,7 +167,41 @@ export const routes = createBrowserRouter([
                         path: "category/:id",
                         element: <CategoryPage />,
                     },
+                    {
+                        path: 'wallet/add',
+                        element: <WalletAdd />
+                    },
+                   {
+                        path: 'wallet/send',
+                        element: <WalletSend />
+                    },
+                       {
+                        path: 'wallet/withdraw',
+                        element: <WalletWithdraw/>
+                    },
                     { path: "profile/settings", element: <ProfileSettings /> },
+                    {
+                        path: 'help', // This creates /dashboard/help
+                        element: <HelpLayout />, // Ensure this layout has an <Outlet />
+                        children: [
+                            {
+                                index: true, // Default view: /dashboard/help
+                                element: <Faq />
+                            },
+                            {
+                                path: 'profile/settings', // Becomes /dashboard/help/profile/settings
+                                element: <ProfileSettings />
+                            },
+                            {
+                                path: 'our-story',
+                                element: <Story />,
+                            },
+                            {
+                                path: 'contact',
+                                element: <Contact />,
+                            }
+                        ]
+                    }
                 ]
             }
         ]
@@ -266,43 +304,7 @@ export const routes = createBrowserRouter([
     },
 
 
-    {
-        path: '/help',
-        element: <HelpLayout />,
 
-
-        children: [
-
-            {
-                path: '/help',
-                element: <Faq />
-            },
-            {
-                path: 'our-story',  // Separate route for Help page
-                element: <Story />,
-            },
-            {
-                path: 'career',  // Separate route for Help page
-                element: <Career />,
-            },
-            {
-                path: 'contact',  // Separate route for Help page
-                element: <Contact />,
-            },
-            {
-                path: 'privacy-policy',  // Separate route for Help page
-                element: <PrivacyPolicy />,
-            },
-            {
-                path: 'terms',  // Separate route for Help page
-                element: <TermsOfUse />,
-            },
-
-
-
-        ]
-
-    },
     // {
     //     path: '/dashboard',
     //     element: <AdminLayout />, // Layout for dashboard panel

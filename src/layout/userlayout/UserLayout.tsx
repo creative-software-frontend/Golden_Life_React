@@ -151,19 +151,7 @@ export default function UserLayout() {
 
 
     // 2. Define the handleLogout function
-    const handleLogout = () => {
-        // Clear the session data
-        sessionStorage.removeItem("student_session");
 
-        // Optional: Clear other app data like cart or preferences if necessary
-        // localStorage.removeItem("cart"); 
-
-        // Redirect to login or home
-        navigate("/login");
-
-        // Force a reload if you need to reset all React states immediately
-        window.location.reload();
-    };
     // 2. Fetch Categories from API
     React.useEffect(() => {
         const fetchCategories = async () => {
@@ -268,7 +256,19 @@ export default function UserLayout() {
     const [isOpen, setIsOpen] = React.useState(false);
     const mobileSearchRef = React.useRef<HTMLDivElement>(null);
     const containerRef = React.useRef(null);
+    const handleLogout = () => {
+        // Clear the specific session key used by your app
+        sessionStorage.removeItem("student_session");
 
+        // Optional: Clear other storage if you use it for carts or settings
+        // localStorage.clear(); 
+
+        // Redirect to login
+        navigate("/login");
+
+        // Force a page refresh to clear all React states
+        window.location.reload();
+    };
     // Close menu when clicking outside
     React.useEffect(() => {
         const handleClickOutside = (event) => {
@@ -484,80 +484,88 @@ export default function UserLayout() {
                         <SidebarMenuItem>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                <div className="relative w-full px-2" ref={containerRef}>
-            {/* --- Floating Menu (Glassmorphism) --- */}
-            <div className={`
+                                    <div className="relative w-full px-2" ref={containerRef}>
+                                        {/* --- Floating Menu (Glassmorphism) --- */}
+                                        <div className={`
                 absolute bottom-[calc(100%+12px)] left-2 right-2 flex flex-col gap-1 p-2 
                 bg-white/90 backdrop-blur-md rounded-[24px] border border-secondary/20 shadow-2xl 
                 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom z-50
                 ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'}
             `}>
-                <div className="px-3 py-1 mb-1">
-                    <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Account Hub</span>
-                </div>
+                                            <div className="px-3 py-1 mb-1">
+                                                <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Account Hub</span>
+                                            </div>
 
-                <Link to="/dashboard/profile/settings" className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/10 text-slate-600 hover:text-secondary transition-all group/item">
-                    <div className="p-2 rounded-lg bg-secondary/5 group-hover/item:bg-white shadow-sm"><UserCircle size={18} /></div>
-                    <span className="text-[13px] font-bold">Manage Profile</span>
-                </Link>
+                                            <Link to="/dashboard/profile/settings" className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/10 text-slate-600 hover:text-secondary transition-all group/item">
+                                                <div className="p-2 rounded-lg bg-secondary/5 group-hover/item:bg-white shadow-sm"><UserCircle size={18} /></div>
+                                                <span className="text-[13px] font-bold">Manage Profile</span>
+                                            </Link>
 
-                <Link to="/help" className="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all group/item">
-                    <div className="p-2 rounded-lg bg-emerald-50/50 group-hover/item:bg-white shadow-sm"><HelpCircle size={18} /></div>
-                    <span className="text-[13px] font-bold">Support Center</span>
-                </Link>
+                                            <Link to="/dashboard/help" className="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all group/item">
+                                                <div className="p-2 rounded-lg bg-emerald-50/50 group-hover/item:bg-white shadow-sm"><HelpCircle size={18} /></div>
+                                                <span className="text-[13px] font-bold">Support Center</span>
+                                            </Link>
 
-                <div className="h-[1px] bg-slate-100 my-1 mx-2" />
+                                            <div className="h-[1px] bg-slate-100 my-1 mx-2" />
 
-                <button className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-500 text-slate-500 hover:text-white transition-all duration-300 group/logout">
-                    <span className="text-[11px] font-black uppercase tracking-widest pl-1">Sign Out</span>
-                    <LogOut size={16} className="group-hover/logout:translate-x-1 transition-transform" />
-                </button>
-            </div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="flex items-center justify-between w-full p-3 rounded-xl bg-slate-100 hover:bg-red-500 text-slate-500 hover:text-white transition-all duration-300 group/logout shadow-sm border border-transparent hover:border-red-200"
+                                            >
+                                                <span className="text-[11px] font-black uppercase tracking-widest pl-1">
+                                                    Sign Out
+                                                </span>
+                                                <LogOut
+                                                    size={16}
+                                                    className="group-hover/logout:translate-x-1 transition-transform"
+                                                />
+                                            </button>
+                                        </div>
 
-            {/* --- Main Sidebar Button --- */}
-            <SidebarMenuButton
-                size="lg"
-                asChild
-                className={`
+                                        {/* --- Main Sidebar Button --- */}
+                                        <SidebarMenuButton
+                                            size="lg"
+                                            asChild
+                                            className={`
                     h-auto min-h-[72px] w-full p-2 pr-4 flex items-center justify-between rounded-[22px] border-2 transition-all duration-300 cursor-pointer 
                     /* Using !important (!) to ensure background change is forced */
-                    ${isOpen 
-                        ? '!bg-secondary !border-secondary shadow-lg shadow-secondary/20 !text-white' 
-                        : 'bg-white border-slate-100 hover:border-secondary/30 hover:bg-slate-50/50'
-                    }
+                    ${isOpen
+                                                    ? '!bg-secondary !border-secondary shadow-lg shadow-secondary/20 !text-white'
+                                                    : 'bg-white border-slate-100 hover:border-secondary/30 hover:bg-slate-50/50'
+                                                }
                 `}
-            >
-                <div onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between w-full group">
-                    <div className="flex items-center gap-3 shrink-0">
-                        {/* The Icon Box from your image */}
-                        <div className={`
+                                        >
+                                            <div onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-between w-full group">
+                                                <div className="flex items-center gap-3 shrink-0">
+                                                    {/* The Icon Box from your image */}
+                                                    <div className={`
                             flex items-center justify-center h-12 w-12 rounded-[18px] transition-all duration-500
                             ${isOpen ? 'bg-white/20 text-white rotate-90' : 'bg-secondary/10 text-secondary group-hover:bg-secondary group-hover:text-white'}
                         `}>
-                            {isOpen ? <Sparkles size={24} /> : <Settings size={24} />}
-                        </div>
+                                                        {isOpen ? <Sparkles size={24} /> : <Settings size={24} />}
+                                                    </div>
 
-                        {/* Text Info */}
-                        <div className="flex flex-col items-start justify-center">
-                            <span className={`text-[14px] font-black uppercase tracking-tight leading-none whitespace-nowrap ${isOpen ? 'text-white' : 'text-slate-800'}`}>
-                                {t("settings")}
-                            </span>
-                            <div className="flex items-center gap-1.5 mt-2">
-                                <div className={`h-1.5 w-1.5 rounded-full ${isOpen ? 'bg-white/60' : 'bg-secondary'} animate-pulse`} />
-                                <span className={`text-[10px] font-bold uppercase tracking-[0.1em] whitespace-nowrap ${isOpen ? 'text-white/80' : 'text-slate-400'}`}>
-                                    Elite Member
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                                                    {/* Text Info */}
+                                                    <div className="flex flex-col items-start justify-center">
+                                                        <span className={`text-[14px] font-black uppercase tracking-tight leading-none whitespace-nowrap ${isOpen ? 'text-white' : 'text-slate-800'}`}>
+                                                            {t("settings")}
+                                                        </span>
+                                                        <div className="flex items-center gap-1.5 mt-2">
+                                                            <div className={`h-1.5 w-1.5 rounded-full ${isOpen ? 'bg-white/60' : 'bg-secondary'} animate-pulse`} />
+                                                            <span className={`text-[10px] font-bold uppercase tracking-[0.1em] whitespace-nowrap ${isOpen ? 'text-white/80' : 'text-slate-400'}`}>
+                                                                Elite Member
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                    {/* Chevron Indicator */}
-                    <div className={`transition-all duration-500 shrink-0 ${isOpen ? 'rotate-180 translate-x-1' : 'group-hover:translate-y-0.5'}`}>
-                        <ChevronDown size={20} className={`${isOpen ? 'text-white' : 'text-slate-300'}`} />
-                    </div>
-                </div>
-            </SidebarMenuButton>
-        </div>
+                                                {/* Chevron Indicator */}
+                                                <div className={`transition-all duration-500 shrink-0 ${isOpen ? 'rotate-180 translate-x-1' : 'group-hover:translate-y-0.5'}`}>
+                                                    <ChevronDown size={20} className={`${isOpen ? 'text-white' : 'text-slate-300'}`} />
+                                                </div>
+                                            </div>
+                                        </SidebarMenuButton>
+                                    </div>
                                 </DropdownMenuTrigger>
                             </DropdownMenu>
                         </SidebarMenuItem>
@@ -687,19 +695,19 @@ export default function UserLayout() {
                                 <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
                                 <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top animate-in fade-in zoom-in-95 duration-200">
                                     <div className="p-2 flex flex-col gap-1">
-                                        <Link to="/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                        <Link to="/dashboard/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-green-600 transition-colors">
                                             <PlusCircle className="h-5 w-5 text-green-500" />
                                             Add Money
                                         </Link>
-                                        <Link to="/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                        <Link to="/dashboard/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
                                             <Send className="h-5 w-5 text-blue-500" />
                                             Send Money
                                         </Link>
-                                        <Link to="/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                        <Link to="/dashboard/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
                                             <Download className="h-5 w-5 text-purple-500" />
                                             Receive Money
                                         </Link>
-                                        <Link to="/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                        <Link to="/dashboard/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
                                             <Landmark className="h-5 w-5 text-orange-500" />
                                             Withdraw Money
                                         </Link>
