@@ -206,12 +206,11 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    {
+{
         path: '/vendor',
-        element: <VendorProtectedRoute />, // First, check if the user is logged in
+        element: <VendorProtectedRoute />,
         children: [
             {
-                // Now, wrap the authenticated content in the Layout
                 element: <VendorLayout />,
                 children: [
                     {
@@ -219,10 +218,23 @@ export const routes = createBrowserRouter([
                         element: <Navigate to="dashboard" replace />
                     },
                     {
-                        path: 'dashboard',
-                        element: <VendorHome />
-                    },
-                    // Add more vendor sub-routes here
+                        path: 'dashboard', // <-- Parent path
+                        children: [
+                            {
+                                index: true, // Renders at /vendor/dashboard
+                                element: <VendorHome />
+                            },
+                            {
+                                path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
+                                element: <WalletAdd />
+                            },
+                           
+                            {
+                                path: 'wallet/withdraw', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletWithdraw/>
+                            },
+                        ]
+                    }
                 ]
             }
         ]

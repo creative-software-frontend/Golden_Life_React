@@ -186,7 +186,7 @@ export default function UserLayout() {
                     };
                 });
 
-                setCategories(mappedCategories.slice(0, 10));
+                setCategories(mappedCategories );
 
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
