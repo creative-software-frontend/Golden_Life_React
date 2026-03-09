@@ -66,6 +66,13 @@ export default function WalletAdd() {
     // --- 2. Submit Handler ---
     const handleAddFunds = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        
+        // --- 🔴 FIXED: Prevent 0 or negative numbers ---
+        if (Number(amount) <= 0) {
+            setErrorMessage("Amount must be greater than 0.");
+            return;
+        }
+
         setIsSubmitting(true);
         setErrorMessage('');
         setSuccessMessage('');
@@ -204,6 +211,7 @@ export default function WalletAdd() {
                             <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-2xl md:text-3xl font-black text-muted-foreground group-focus-within:text-foreground transition-colors">৳</span>
                             <input
                                 type="number"
+                                min="1" // --- 🔴 FIXED: Stops browser UI arrows from going below 1 ---
                                 value={amount}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
                                 placeholder="0.00"
@@ -308,7 +316,8 @@ export default function WalletAdd() {
                     <div className="pt-4 md:pt-6">
                         <button 
                             type="submit"
-                            disabled={!amount || !accountNumber || !trxId || isSubmitting}
+                            // --- 🔴 FIXED: Disables button if amount is 0 or less ---
+                            disabled={!amount || Number(amount) <= 0 || !accountNumber || !trxId || isSubmitting}
                             className="w-full group flex items-center justify-center gap-2 md:gap-2.5 py-4 md:py-[18px] bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl md:rounded-2xl font-black text-base md:text-lg tracking-wide shadow-xl shadow-secondary/25 hover:shadow-secondary/40 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none"
                         >
                             {isSubmitting ? (
@@ -316,7 +325,7 @@ export default function WalletAdd() {
                             ) : (
                                 <>
                                     <ShieldCheck className="w-5 h-5 md:w-[22px] md:h-[22px]" strokeWidth={2.5} />
-                                    Submit Request {amount ? `৳${amount}` : ''}
+                                    Submit Request {amount && Number(amount) > 0 ? `৳${amount}` : ''}
                                 </>
                             )}
                         </button>
