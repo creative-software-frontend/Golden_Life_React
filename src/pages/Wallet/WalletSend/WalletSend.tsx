@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { 
     ArrowLeft, Wallet, Send, User, 
-    CheckCircle2, AlertCircle, KeyRound, ArrowRight 
+    CheckCircle2, AlertCircle, KeyRound, ArrowRight, Search, Loader2, Mail, Phone
 } from 'lucide-react';
 
 // Import our newly separated modals
 import SetPinModal from '../SetPinModal/SetPinModal';
 import ConfirmTransferModal from '../ConfirmTransferModal/ConfirmTransferModal';
+
+// --- Interface for the Verified User ---
+interface VerifiedUserData {
+    type: string;
+    name: string;
+    email: string;
+    display_id: string;
+    mobile: string;
+    image: string;
+}
 
 export default function WalletSend() {
     const navigate = useNavigate();
@@ -16,12 +26,19 @@ export default function WalletSend() {
 
     // --- Transfer Form State ---
     const [amount, setAmount] = useState<string>('');
-    const [receiverType, setReceiverType] = useState<string>('student');
     const [affiliateId, setAffiliateId] = useState<string>('');
+    // Receiver type is now determined by the "Find" API
+    const [receiverType, setReceiverType] = useState<string>(''); 
     
+    // --- Verification State ---
+    const [isVerifying, setIsVerifying] = useState<boolean>(false);
+    const [verifiedUser, setVerifiedUser] = useState<VerifiedUserData | null>(null);
+    const [verifyError, setVerifyError] = useState<string>('');
+    const [imageFailed, setImageFailed] = useState<boolean>(false); // <-- FIXED: Added state to track broken images
+
     // --- UI & Modals State ---
     const [currentBalance, setCurrentBalance] = useState<number>(0);
-    const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(true); // <-- Added loading state
+    const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(true);
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [showSetPinModal, setShowSetPinModal] = useState<boolean>(false);
@@ -36,7 +53,7 @@ export default function WalletSend() {
 
     // --- 1. Fetch Current Balance ---
     const fetchBalance = async () => {
-        setIsLoadingBalance(true); // <-- Turn on loader
+        setIsLoadingBalance(true);
         try {
             const token = getAuthToken();
             if (!token) return;
@@ -48,31 +65,98 @@ export default function WalletSend() {
         } catch (error) {
             console.error("Failed to fetch wallet balance:", error);
         } finally {
-            setIsLoadingBalance(false); // <-- Turn off loader
+            setIsLoadingBalance(false);
         }
     };
 
-    // --- 2. Call it when the page first loads ---
     useEffect(() => {
         fetchBalance();
     }, [baseURL]);
 
-    // --- Modal Callback Handlers ---
+    // --- 2. Verify User API Call ---
+    const handleVerifyUser = async () => {
+        if (!affiliateId) {
+            setVerifyError("Please enter an Affiliate ID first.");
+            return;
+        }
+
+        setIsVerifying(true);
+        setVerifyError('');
+        setVerifiedUser(null);
+        setReceiverType('');
+        setImageFailed(false); // <-- FIXED: Reset image failure state on new search
+
+        try {
+            const token = getAuthToken();
+            
+            // Send 'key' instead of 'affiliate_id' based on backend validation
+            const formData = new FormData();
+            formData.append('key', affiliateId);
+
+            const response = await axios.post(`${baseURL}/api/search-receiver`, formData, {
+                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
+            });
+
+            if (response.data?.status === 'success' || response.data?.status === true) {
+                const userData = response.data?.data;
+                const foundName = userData?.name || "Verified User";
+                const foundType = userData?.type || userData?.role || "student"; 
+                
+                setVerifiedUser({
+                    type: foundType,
+                    name: foundName,
+                    email: userData?.email || "",
+                    display_id: userData?.display_id || "",
+                    mobile: userData?.mobile || "",
+                    image: userData?.image || ""
+                });
+                
+                // Automatically set the type for the final Send Money payload
+                setReceiverType(foundType); 
+            } else {
+                setVerifyError(response.data?.message || "User not found.");
+            }
+        } catch (error) {
+            const axiosError = error as AxiosError<any>;
+            // Robust error handling to catch specific Laravel validation messages
+            const backendMessage = axiosError.response?.data?.message;
+            const backendErrors = axiosError.response?.data?.errors;
+            
+            let finalError = "Unable to verify user. Please check the ID.";
+            
+            if (backendErrors && backendErrors.key) {
+                 finalError = backendErrors.key[0];
+            } else if (backendMessage) {
+                 finalError = backendMessage;
+            }
+
+            setVerifyError(finalError);
+        } finally {
+            setIsVerifying(false);
+        }
+    };
+
+    // Reset verification if the user changes the ID after verifying
+    useEffect(() => {
+        setVerifiedUser(null);
+        setVerifyError('');
+        setReceiverType('');
+        setImageFailed(false); // <-- FIXED: Reset image state when user types a new ID
+    }, [affiliateId]);
+
+    // --- 3. Modal Handlers ---
     const handleSuccess = (message: string) => {
         setErrorMessage('');
         setSuccessMessage(message);
     };
 
-    // --- 3. Call fetchBalance() again after a successful transfer ---
     const handleTransferSuccess = async (message: string) => {
         setErrorMessage('');
         setSuccessMessage(message);
-        
-        // This automatically fetches the fresh balance from the database!
         await fetchBalance(); 
-        
         setAmount('');
         setAffiliateId('');
+        setVerifiedUser(null);
     };
 
     const handleError = (message: string) => {
@@ -82,10 +166,23 @@ export default function WalletSend() {
 
     const triggerPinConfirmation = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (Number(amount) <= 0) {
+            setErrorMessage("Amount must be greater than 0.");
+            return;
+        }
+
         if (Number(amount) > currentBalance) {
             setErrorMessage("Insufficient funds!");
             return;
         }
+
+        // Extra check to ensure user is verified before opening modal
+        if (!verifiedUser) {
+            setErrorMessage("Please verify the receiver first.");
+            return;
+        }
+
         setShowConfirmModal(true);
     };
 
@@ -108,7 +205,7 @@ export default function WalletSend() {
                 onSuccess={(msg) => handleTransferSuccess(msg)}
                 onError={handleError}
                 amount={amount}
-                receiverType={receiverType}
+                receiverType={receiverType} // Dynamically populated by the Find button
                 affiliateId={affiliateId}
                 baseURL={baseURL}
                 token={getAuthToken()}
@@ -124,7 +221,6 @@ export default function WalletSend() {
                         <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
                     </button>
                     <div>
-                        {/* Responsive Font Size for Header */}
                         <h1 className="text-xl md:text-3xl font-black text-foreground tracking-tight">Send Money</h1>
                         <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5 md:mt-1 flex items-center gap-1.5 md:gap-2">
                             Wallet <ArrowRight className="w-3 h-3" strokeWidth={3} /> Wallet
@@ -145,14 +241,11 @@ export default function WalletSend() {
                 {/* Modern Balance Header */}
                 <div className="bg-gradient-to-br from-secondary/10 to-background p-5 md:p-8 border-b border-border/50 flex items-center justify-between relative overflow-hidden">
                     <div className="relative z-10 flex items-center gap-4 md:gap-5">
-                        {/* Responsive Icon Box */}
                         <div className="flex items-center justify-center h-12 w-12 md:h-14 md:w-14 rounded-[16px] md:rounded-[20px] bg-secondary text-secondary-foreground shadow-lg shadow-secondary/25">
                             <Wallet className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
                         </div>
                         <div>
                             <p className="text-xs md:text-sm font-bold text-muted-foreground uppercase tracking-wider mb-0.5 md:mb-1">Available Balance</p>
-                            
-                            {/* --- Conditionally Render Loader or Balance --- */}
                             {isLoadingBalance ? (
                                 <div className="h-7 md:h-9 w-28 md:w-36 bg-foreground/10 animate-pulse rounded-md mt-1"></div>
                             ) : (
@@ -160,10 +253,8 @@ export default function WalletSend() {
                                     ৳ {currentBalance.toFixed(2)}
                                 </p>
                             )}
-
                         </div>
                     </div>
-                    {/* Decorative background shape */}
                     <div className="absolute right-0 top-0 w-24 h-24 md:w-32 md:h-32 bg-secondary/10 rounded-full blur-2xl md:blur-3xl -mr-8 -mt-8 md:-mr-10 md:-mt-10"></div>
                 </div>
 
@@ -184,49 +275,100 @@ export default function WalletSend() {
                         </div>
                     )}
 
-                    {/* Receiver Type & ID (Grid) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                        <div className="space-y-2 md:space-y-2.5">
-                            <label className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">Receiver Type</label>
-                            <select 
-                                value={receiverType} 
-                                onChange={(e) => setReceiverType(e.target.value)}
-                                className="w-full px-4 py-3 md:px-5 md:py-4 text-sm md:text-base bg-muted/50 border-2 border-transparent focus:bg-background focus:border-secondary focus:ring-4 focus:ring-secondary/10 rounded-xl md:rounded-2xl outline-none font-bold text-foreground cursor-pointer transition-all appearance-none"
-                                style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 8l5 5 5-5'/%3e%3c/svg%3e")`, backgroundPosition: `right 1rem center`, backgroundRepeat: `no-repeat`, backgroundSize: `1.2em 1.2em` }}
-                            >
-                                <option value="student">Student</option>
-                                <option value="vendor">Vendor</option>
-                                <option value="affiliate">Affiliate</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2 md:space-y-2.5">
-                            <label className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">Receiver ID</label>
-                            <div className="relative">
-                                <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-muted-foreground"><User className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} /></span>
+                    {/* Receiver Affiliate ID & Find Button */}
+                    <div className="space-y-2 md:space-y-2.5">
+                        <label className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center justify-between">
+                            <span>Receiver Affiliate ID</span>
+                            {verifyError && <span className="text-destructive normal-case tracking-normal font-bold">{verifyError}</span>}
+                        </label>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="relative flex-1">
+                                <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                    <User className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} />
+                                </span>
                                 <input 
                                     type="text" 
                                     value={affiliateId} 
                                     onChange={(e) => setAffiliateId(e.target.value)} 
-                                    placeholder="e.g. 20259940" 
+                                    placeholder="e.g. 123456" 
                                     className="w-full pl-11 pr-4 py-3 md:pl-14 md:pr-5 md:py-4 text-sm md:text-base font-bold text-foreground bg-muted/50 border-2 border-transparent rounded-xl md:rounded-2xl focus:bg-background focus:border-secondary focus:ring-4 focus:ring-secondary/10 outline-none transition-all placeholder:text-muted-foreground/40" 
                                     required 
                                 />
                             </div>
+                            <button 
+                                type="button"
+                                onClick={handleVerifyUser}
+                                disabled={!affiliateId || isVerifying}
+                                className="w-full sm:w-auto px-5 md:px-8 py-3 md:py-0 bg-foreground hover:bg-foreground/90 text-background rounded-xl md:rounded-2xl font-bold text-sm md:text-base transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                                {isVerifying ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Search className="w-4 h-4 md:w-5 md:h-5" />}
+                                <span>Find User</span>
+                            </button>
                         </div>
+
+                        {/* Verified User Details Card */}
+                        {verifiedUser && (
+                            <div className="mt-4 p-4 md:p-5 bg-secondary/5 border-2 border-secondary/20 rounded-[20px] flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-5 animate-in fade-in zoom-in-95 relative overflow-hidden">
+                                
+                                {/* Absolute "Verified" Badge */}
+                                <div className="absolute top-0 right-0 bg-secondary text-secondary-foreground text-[9px] md:text-[10px] font-black uppercase px-3 py-1.5 rounded-bl-xl flex items-center gap-1.5 shadow-sm">
+                                    <CheckCircle2 size={12} strokeWidth={3} /> Verified
+                                </div>
+
+                                {/* FIXED: Profile Image with smart fallback */}
+                                <div className="relative shrink-0 pt-2 sm:pt-0">
+                                    {!imageFailed && verifiedUser.image ? (
+                                        <img 
+                                            src={verifiedUser.image} 
+                                            alt={verifiedUser.name} 
+                                            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-4 border-background shadow-md bg-muted"
+                                            onError={() => setImageFailed(true)} // Triggers instantly if the image 404s
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-background shadow-md bg-secondary/10 flex items-center justify-center text-secondary font-black text-2xl md:text-3xl uppercase">
+                                            {verifiedUser.name ? verifiedUser.name.charAt(0) : <User size={24} />}
+                                        </div>
+                                    )}
+                                    
+                                    {/* Green Online Dot */}
+                                    <div className="absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-emerald-500 border-[3px] border-background rounded-full shadow-sm"></div>
+                                </div>
+
+                                {/* User Details */}
+                                <div className="flex-1 text-center sm:text-left pt-1">
+                                    <h4 className="text-lg md:text-xl font-black text-foreground leading-tight">{verifiedUser.name}</h4>
+                                    <p className="text-[11px] md:text-xs font-bold text-secondary uppercase tracking-widest mt-1 mb-2.5">
+                                        {verifiedUser.type} Profile
+                                    </p>
+                                    
+                                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-xs md:text-sm font-medium text-muted-foreground">
+                                        {verifiedUser.mobile && (
+                                            <span className="flex items-center gap-1.5 bg-background px-3 py-1.5 rounded-lg border border-border shadow-sm">
+                                                <Phone size={14} className="text-secondary" /> {verifiedUser.mobile}
+                                            </span>
+                                        )}
+                                        {verifiedUser.email && (
+                                            <span className="flex items-center gap-1.5 bg-background px-3 py-1.5 rounded-lg border border-border shadow-sm">
+                                                <Mail size={14} className="text-secondary" /> <span className="truncate max-w-[150px] md:max-w-[200px]">{verifiedUser.email}</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Amount Section */}
-                    <div className="space-y-2 md:space-y-3 pt-1 md:pt-2">
+                    <div className="space-y-2 md:space-y-3 pt-2 md:pt-4">
                         <div className="flex items-center justify-between px-1">
                             <label className="text-[10px] md:text-[11px] font-black text-muted-foreground uppercase tracking-widest">Transfer Amount</label>
                             {Number(amount) > currentBalance && !isLoadingBalance && <span className="text-[10px] md:text-xs font-black text-destructive animate-pulse">Exceeds Balance</span>}
                         </div>
                         <div className="relative group">
-                            {/* Responsive Currency Symbol */}
                             <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-2xl md:text-3xl font-black text-muted-foreground group-focus-within:text-foreground transition-colors">৳</span>
-                            {/* Responsive Big Input */}
                             <input 
                                 type="number" 
+                                min="1"
                                 value={amount} 
                                 onChange={(e) => setAmount(e.target.value)} 
                                 placeholder="0.00" 
@@ -235,7 +377,6 @@ export default function WalletSend() {
                             />
                         </div>
                         
-                        {/* Modernized Quick Chips - Scaled for Mobile */}
                         <div className="flex flex-wrap gap-2 md:gap-2.5 pt-2 md:pt-3">
                             {presetAmounts.map((preset) => {
                                 const isSelected = Number(amount) === preset;
@@ -263,7 +404,7 @@ export default function WalletSend() {
                     <div className="pt-4 md:pt-6">
                         <button 
                             type="submit" 
-                            disabled={!amount || !affiliateId || isLoadingBalance || Number(amount) > currentBalance} 
+                            disabled={!amount || Number(amount) <= 0 || !verifiedUser || isLoadingBalance || Number(amount) > currentBalance} 
                             className="w-full group flex items-center justify-center gap-2 md:gap-2.5 py-4 md:py-[18px] bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl md:rounded-2xl font-black text-base md:text-lg tracking-wide shadow-xl shadow-secondary/25 hover:shadow-secondary/40 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none"
                         >
                             <Send className="w-5 h-5 md:w-[22px] md:h-[22px] group-hover:translate-x-1 transition-transform" strokeWidth={2.5} /> 

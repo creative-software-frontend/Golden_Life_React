@@ -1,65 +1,71 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { Lock, X, Loader2, ShieldCheck } from 'lucide-react';
+import { Lock, X, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
 
-interface ConfirmTransferModalProps {
+interface ConfirmWithdrawModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: (message: string, amount: string) => void;
+    onSuccess: (message: string) => void;
     onError: (message: string) => void;
     amount: string;
-    receiverType: string;
-    affiliateId: string;
+    accountNumber: string;
+    paymentMethod: string;
+    attachment: File | null;
     baseURL: string;
     token: string | null;
 }
 
-export default function ConfirmTransferModal({ 
-    isOpen, onClose, onSuccess, onError, amount, receiverType, affiliateId, baseURL, token 
-}: ConfirmTransferModalProps) {
+export default function ConfirmWithdrawModal({ 
+    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token 
+}: ConfirmWithdrawModalProps) {
     const [pinCode, setPinCode] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     if (!isOpen) return null;
 
-    const handleSendMoney = async (e: React.FormEvent) => {
+    const handleWithdraw = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         try {
             const formData = new FormData();
-            formData.append('type', 'send');
+            formData.append('type', 'withdraw');
             formData.append('amount', amount);
-            formData.append('receiver_type', receiverType);
-            formData.append('affiliate_id', affiliateId);
-            formData.append('pin_code', pinCode);
+            formData.append('number', accountNumber);
+            formData.append('payment_method', paymentMethod);
+            
+            // Sending as both keys to ensure backend compatibility
+            formData.append('password', pinCode); 
+            formData.append('pin_code', pinCode); 
 
-            const response = await axios.post(`${baseURL}/api/send-money`, formData, {
+            if (attachment) {
+                formData.append('attachment', attachment);
+            }
+
+            const response = await axios.post(`${baseURL}/api/transactions`, formData, {
                 headers: { ...(token && { Authorization: `Bearer ${token}` }) }
             });
 
-            // FIXED: Explicitly check for 'success' or boolean true
             if (response.data?.status === 'success' || response.data?.status === true) {
-                onSuccess(response.data?.message || "Transfer completed successfully!", amount);
+                onSuccess(response.data?.message || "Withdrawal completed successfully!");
                 setPinCode('');
                 onClose();
             } else {
-                // Backend returned 200 OK, but it's a logical error (status: false)
-                onError(String(response.data?.message || "Transfer failed. Please check your details."));
-                onClose();
+                onError(String(response.data?.message || "Withdrawal failed. Please check your details."));
+                setIsSubmitting(false);
             }
         } catch (error) {
             const axiosError = error as AxiosError<any>;
             const responseData = axiosError.response?.data;
             
-            let finalErrorMessage = "Failed to process transfer. Please try again.";
+            let finalErrorMessage = "Failed to process withdrawal. Please try again.";
 
             if (responseData) {
                 if (typeof responseData.message === 'string') {
                     finalErrorMessage = responseData.message;
                 }
                 
-                // Safe extraction of deep Laravel Validation Errors
+                // Extraction of deep Laravel Validation Errors (Prevents crashing)
                 if (responseData.errors && typeof responseData.errors === 'object') {
                     const firstErrorKey = Object.keys(responseData.errors)[0];
                     const firstErrorVal = responseData.errors[firstErrorKey];
@@ -72,12 +78,17 @@ export default function ConfirmTransferModal({
                 }
             }
 
-            // CRITICAL FIX: Force conversion to String to prevent React "Oops" crash screen
+            // Force conversion to String to prevent React render errors
             onError(String(finalErrorMessage));
-            onClose(); 
+            setIsSubmitting(false); 
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleClose = () => {
+        setPinCode('');
+        onClose();
     };
 
     return (
@@ -85,29 +96,33 @@ export default function ConfirmTransferModal({
             <div className="bg-background rounded-[24px] p-6 w-full max-w-sm shadow-2xl border border-border">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-black text-foreground flex items-center gap-2">
-                        <Lock className="text-secondary" /> Verify Transfer
+                        <Lock className="text-secondary" /> Verify Withdrawal
                     </h3>
-                    <button onClick={onClose} className="text-muted-foreground hover:bg-muted p-1.5 rounded-full transition-colors">
+                    <button onClick={handleClose} className="text-muted-foreground hover:bg-muted p-1.5 rounded-full transition-colors">
                         <X size={20}/>
                     </button>
                 </div>
                 
+                {/* Summary Card - Matching Design 2 */}
                 <div className="bg-muted rounded-xl p-4 mb-4 border border-border text-center">
-                    <p className="text-sm font-medium text-muted-foreground">Sending to {receiverType}</p>
-                    <p className="text-xl font-black text-foreground break-all">{affiliateId}</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
+                        Withdrawing to <ArrowRight size={12} strokeWidth={3} /> <span className="text-foreground">{paymentMethod}</span>
+                    </p>
+                    <p className="text-lg font-black text-foreground break-all">{accountNumber}</p>
                     <div className="mt-2 text-3xl font-black text-secondary">৳{amount}</div>
                 </div>
 
-                <form onSubmit={handleSendMoney} className="space-y-4">
+                <form onSubmit={handleWithdraw} className="space-y-4">
                     <div>
                         <label className="text-xs font-bold text-muted-foreground uppercase">Enter Your PIN</label>
                         <input 
                             type="password" 
                             value={pinCode} 
-                            onChange={(e) => setPinCode(e.target.value)} 
+                            onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))} // Numeric only
                             maxLength={6} 
                             placeholder="••••" 
-                            className="w-full mt-1 px-4 py-3 bg-muted border-2 border-border rounded-xl focus:border-secondary focus:ring-4 focus:ring-secondary/20 outline-none text-center text-2xl tracking-[0.5em] font-black text-foreground" 
+                            autoFocus
+                            className="w-full mt-1 px-4 py-3 bg-muted border-2 border-border rounded-xl focus:border-secondary focus:ring-4 focus:ring-secondary/20 outline-none text-center text-2xl tracking-[0.5em] font-black text-foreground transition-all" 
                             required 
                         />
                     </div>
@@ -116,7 +131,13 @@ export default function ConfirmTransferModal({
                         disabled={isSubmitting || pinCode.length < 4} 
                         className="w-full flex justify-center items-center gap-2 py-3 bg-secondary hover:opacity-90 text-secondary-foreground rounded-xl font-black tracking-wide transition-all disabled:opacity-50"
                     >
-                        {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : <><ShieldCheck size={20}/> Confirm & Send</>}
+                        {isSubmitting ? (
+                            <Loader2 className="animate-spin mx-auto" />
+                        ) : (
+                            <>
+                                <ShieldCheck size={20}/> Confirm & Withdraw
+                            </>
+                        )}
                     </button>
                 </form>
             </div>

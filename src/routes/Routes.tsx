@@ -233,6 +233,10 @@ export const routes = createBrowserRouter([
                                 path: 'wallet/withdraw', // Renders at /vendor/dashboard/wallet/withdraw
                                 element: <WalletWithdraw/>
                             },
+                                {
+                                path: 'wallet/send', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletSend />
+                            },
                         ]
                     }
                 ]
