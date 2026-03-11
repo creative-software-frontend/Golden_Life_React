@@ -711,6 +711,16 @@ export default function UserLayout() {
                                             <Landmark className="h-5 w-5 text-orange-500" />
                                             Withdraw Money
                                         </Link>
+                                         <Link to="/dashboard/wallet/purchase" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                            <Landmark className="h-5 w-5 text-orange-500" />
+                                            Purchase History
+                                        </Link>
+                                          <Link to="/dashboard/wallet/all" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                            <Landmark className="h-5 w-5 text-orange-500" />
+                                           All Transaction
+                                        </Link>
+                                        
+
                                     </div>
                                 </div>
                             </>

@@ -339,13 +339,18 @@ const Header: React.FC = () => {
                                     <Send className="h-4 w-4 text-blue-500" />
                                     Send Money
                                 </Link>
-                                <Link to="/wallet/receive" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
-                                    <Download className="h-4 w-4 text-purple-500" />
-                                    Receive Money
-                                </Link>
-                                <Link to="/dashboard//wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                
+                                <Link to="/dashboard/wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
                                     <Landmark className="h-4 w-4 text-orange-500" />
                                     Withdraw Money
+                                </Link>
+                                <Link to="/dashboard/wallet/purchase" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                    <Download className="h-4 w-4 text-purple-500" />
+                                     Purchase History
+                                </Link>
+                                 <Link to="/dashboard/wallet/all" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                    <Download className="h-4 w-4 text-purple-500" />
+                                    All Transaction
                                 </Link>
                             </div>
                         </div>

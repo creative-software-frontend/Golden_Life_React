@@ -58,6 +58,8 @@ import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
+import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
+import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -171,13 +173,21 @@ export const routes = createBrowserRouter([
                         path: 'wallet/add',
                         element: <WalletAdd />
                     },
-                   {
+                    {
                         path: 'wallet/send',
                         element: <WalletSend />
                     },
-                       {
+                    {
                         path: 'wallet/withdraw',
-                        element: <WalletWithdraw/>
+                        element: <WalletWithdraw />
+                    },
+                      {
+                        path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <WalletPurchase/>
+                    },
+                    {
+                        path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <TransactionHistory />
                     },
                     { path: "profile/settings", element: <ProfileSettings /> },
                     {
@@ -206,7 +216,7 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-{
+    {
         path: '/vendor',
         element: <VendorProtectedRoute />,
         children: [
@@ -228,15 +238,23 @@ export const routes = createBrowserRouter([
                                 path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
                                 element: <WalletAdd />
                             },
-                           
+
                             {
                                 path: 'wallet/withdraw', // Renders at /vendor/dashboard/wallet/withdraw
-                                element: <WalletWithdraw/>
+                                element: <WalletWithdraw />
                             },
-                                {
+                            {
                                 path: 'wallet/send', // Renders at /vendor/dashboard/wallet/withdraw
                                 element: <WalletSend />
                             },
+                            {
+                                path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <TransactionHistory />
+                            },
+                            //  {
+                            //     path: 'wallet/receiveHistory', // Renders at /vendor/dashboard/wallet/withdraw
+                            //     element: <WalletReceiveHistory />
+                            // },
                         ]
                     }
                 ]
