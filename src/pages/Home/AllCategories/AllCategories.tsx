@@ -38,7 +38,7 @@ export default function Categories() {
     const [hoveredId, setHoveredId] = useState<number | null>(null); // Track which card is hovered
 
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);

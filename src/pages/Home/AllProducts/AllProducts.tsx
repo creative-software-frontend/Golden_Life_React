@@ -22,12 +22,12 @@ export default function AllProduct() {
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session =   sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
             if (new Date().getTime() > parsedSession.expiry) {
-                localStorage.removeItem("student_session");
+                  sessionStorage.removeItem("student_session");
                 return null;
             }
             return parsedSession.token;

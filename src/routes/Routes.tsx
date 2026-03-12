@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import ErrorPage from "../pages/errorpage/Errorpage";
 import OrderDetails from "@/pages/Home/OrderDetails/OrderDetails";
 import Story from "@/pages/Help/Story/Story";
@@ -16,6 +16,7 @@ import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
 // import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 // import Overview from "@/pages/Dashboard/Overview/Overview";
+import SearchResults from "@/pages/Home/Search/SearchResults";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 import CourseLayout from "@/layout/CourseLayout/CourseLayout";
@@ -48,9 +49,18 @@ import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
-import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import StudentProtectedRoute from "@/components/ProtectedRoute/StudentProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
 import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
+import VendorLayout from "@/layout/VendorLayout/VendorLayout";
+import VendorHome from "@/pages/VendorHome/VendorHome";
+import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
+import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
+
+import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
+import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
+import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
+import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -70,10 +80,10 @@ export const routes = createBrowserRouter([
             },
             {
 
-                path:"/forgot-password" ,
-                element:<ForgotPassword />
+                path: "/forgot-password",
+                element: <ForgotPassword />
             }
-                
+
         ],
     },
 
@@ -124,47 +134,138 @@ export const routes = createBrowserRouter([
             }
         ]
     },
- // Inside your routes array
-{
-    element: <ProtectedRoute />, // The Gatekeeper
-    children: [
-        {
-            path: '/dashboard',
-            element: <UserLayout />,
-            children: [
-                {
-                    path: '',
-                    element: <Home />
-                },
-                {
-                    path: 'allcategories',
-                    element: <AllCategories />
-                },
-                {
-                    path: 'all-courses',
-                    element: <AllCourses2 />
-                },
-                {
-                    path: 'productpage',
-                    element: <ProductPage />,
-                },
-                {
-                    path: 'allProducts',
-                    element: <AllProduct />,
-                },
-                {
-                    path: 'product/:id',
-                    element: <ProductDetails />,
-                },
-                {
-                    path: "category/:id",
-                    element: <CategoryPage />,
-                },
-                { path: "profile/settings", element: <ProfileSettings /> },
-            ]
-        }
-    ]
-},
+    // Inside your routes array
+    {
+        element: <StudentProtectedRoute />, // The Gatekeeper
+        children: [
+            {
+                path: '/dashboard',
+                element: <UserLayout />,
+                children: [
+                    {
+                        path: '',
+                        element: <Home />
+                    },
+                    {
+                        path: 'allcategories',
+                        element: <AllCategories />
+                    },
+                    {
+                        path: 'all-courses',
+                        element: <AllCourses2 />
+                    },
+                    {
+                        path: 'productpage',
+                        element: <ProductPage />,
+                    },
+                    {
+                        path: 'allProducts',
+                        element: <AllProduct />,
+                    },
+                    {
+                        path: 'product/:id',
+                        element: <ProductDetails />,
+                    },
+                    {
+                        path: "category/:id",
+                        element: <CategoryPage />,
+                    },
+                    {
+                        path: 'wallet/add',
+                        element: <WalletAdd />
+                    },
+                    {
+                        path: 'wallet/send',
+                        element: <WalletSend />
+                    },
+                    {
+                        path: 'wallet/withdraw',
+                        element: <WalletWithdraw />
+                    },
+                      {
+                        path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <WalletPurchase/>
+                    },
+                    {
+                        path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <TransactionHistory />
+                    },
+                    { path: "profile/settings", element: <ProfileSettings /> },
+                    {
+                        path: 'help', // This creates /dashboard/help
+                        element: <HelpLayout />, // Ensure this layout has an <Outlet />
+                        children: [
+                            {
+                                index: true, // Default view: /dashboard/help
+                                element: <Faq />
+                            },
+                            {
+                                path: 'profile/settings', // Becomes /dashboard/help/profile/settings
+                                element: <ProfileSettings />
+                            },
+                            {
+                                path: 'our-story',
+                                element: <Story />,
+                            },
+                            {
+                                path: 'contact',
+                                element: <Contact />,
+                            }
+                        ]
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchResults />
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        path: '/vendor',
+        element: <VendorProtectedRoute />,
+        children: [
+            {
+                element: <VendorLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="dashboard" replace />
+                    },
+                    {
+                        path: 'dashboard', // <-- Parent path
+                        children: [
+                            {
+                                index: true, // Renders at /vendor/dashboard
+                                element: <VendorHome />
+                            },
+                            {
+                                path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
+                                element: <WalletAdd />
+                            },
+
+                            {
+                                path: 'wallet/withdraw', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletWithdraw />
+                            },
+                            {
+                                path: 'wallet/send', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletSend />
+                            },
+                            {
+                                path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <TransactionHistory />
+                            },
+                            //  {
+                            //     path: 'wallet/receiveHistory', // Renders at /vendor/dashboard/wallet/withdraw
+                            //     element: <WalletReceiveHistory />
+                            // },
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
     {
         path: '/courses',
         element: <CourseLayout />,
@@ -242,43 +343,7 @@ export const routes = createBrowserRouter([
     },
 
 
-    {
-        path: '/help',
-        element: <HelpLayout />,
 
-
-        children: [
-
-            {
-                path: '/help',
-                element: <Faq />
-            },
-            {
-                path: 'our-story',  // Separate route for Help page
-                element: <Story />,
-            },
-            {
-                path: 'career',  // Separate route for Help page
-                element: <Career />,
-            },
-            {
-                path: 'contact',  // Separate route for Help page
-                element: <Contact />,
-            },
-            {
-                path: 'privacy-policy',  // Separate route for Help page
-                element: <PrivacyPolicy />,
-            },
-            {
-                path: 'terms',  // Separate route for Help page
-                element: <TermsOfUse />,
-            },
-
-
-
-        ]
-
-    },
     // {
     //     path: '/dashboard',
     //     element: <AdminLayout />, // Layout for dashboard panel

@@ -38,12 +38,12 @@ export default function Categories() {
     const [loading, setLoading] = useState(true);
 
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
             if (new Date().getTime() > parsedSession.expiry) {
-                localStorage.removeItem("student_session");
+                sessionStorage.removeItem("student_session");
                 return null;
             }
             return parsedSession.token;

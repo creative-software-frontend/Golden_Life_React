@@ -694,5 +694,94 @@
     "en": "EN",
     "bn": "BN"
   },
-  "copyright": "© {{year}} Golden Life Shopping."
+  "copyright": "© {{year}} Golden Life Shopping.",
+
+  "walletAdd": {
+    "brands": {
+      "bkash": "bKash",
+      "nagad": "Nagad",
+      "bank": "Bank"
+    },
+    "guide": {
+      "tooltip": "Open payment guide",
+      "open": "Open guide",
+      "modalTitle": "Payment guideline",
+      "modalSubtitle": "Check the visual flow and written instructions before making the payment.",
+      "tabs": {
+        "steps": "Step guide",
+        "instructions": "Instructions"
+      },
+      "stepsHeading": "How to make the payment",
+      "stepsSubtitle": "Follow the verified merchant-payment flow before submitting your top-up request.",
+      "stepsNote": "You will receive a confirmation SMS after successful payment.",
+      "step1": {
+        "title": "Dial USSD to start"
+      },
+      "step2": {
+        "title": "Select Payment",
+        "value": "3 / Payment"
+      },
+      "step3": {
+        "title": "Enter merchant wallet number",
+        "value": "01XXXXXXXXX"
+      },
+      "step4": {
+        "title": "Enter amount",
+        "value": "XXXX"
+      },
+      "step5": {
+        "title": "Enter reference",
+        "value": "Invoice No"
+      },
+      "step6": {
+        "title": "Enter counter number",
+        "value": "1"
+      },
+      "step7": {
+        "title": "Enter PIN to confirm",
+        "value": "Your PIN"
+      },
+      "instructions": {
+        "intro": "With the payment service, you can pay any merchant that accepts {{methodName}} from your {{methodName}} account. You can now use {{methodName}} to pay at more than 47,000 shops nationwide.",
+        "heading": "Follow these steps to complete the payment:",
+        "item1": "Dial {{ussdCode}} to open the {{methodName}} mobile menu.",
+        "item2": "Select “Payment”.",
+        "item3": "Enter the merchant {{methodName}} wallet number you want to pay.",
+        "item4": "Type the amount you want to pay.",
+        "item5": "Enter a reference for the purchase, for example: Bill.",
+        "item6": "Enter the counter number provided by the seller.",
+        "item7": "Complete the payment using your {{methodName}} PIN.",
+        "confirmation": "You will receive a confirmation message from {{methodName}}.",
+        "note": "If the reference or counter number is not required, enter “0” in those steps and continue."
+      },
+      "bank": {
+        "heading": "Bank transfer guide",
+        "subtitle": "Use these details when bank transfer support is enabled.",
+        "note": "Please include your student ID in the transfer reference for faster approval.",
+        "step1": {
+          "title": "Transfer to the bank account"
+        },
+        "step2": {
+          "title": "Account name"
+        },
+        "step3": {
+          "title": "Bank and branch"
+        },
+        "step4": {
+          "title": "Keep your transfer reference",
+          "value": "Reference / Transaction ID"
+        },
+        "instructions": {
+          "intro": "You can also top up using a bank transfer. Keep the transfer reference ready before submitting your request from this page.",
+          "heading": "Bank transfer steps:",
+          "item1": "Transfer the exact amount to the academy bank account.",
+          "item2": "Add your student ID or full name in the reference field if your bank supports it.",
+          "item3": "After the transfer, submit the sender/account number and transaction reference from this form.",
+          "item4": "Approval may take a little longer outside banking hours.",
+          "note": "Keep the transfer slip or screenshot until the balance is approved."
+        }
+      }
+    }
+  }
+
 }

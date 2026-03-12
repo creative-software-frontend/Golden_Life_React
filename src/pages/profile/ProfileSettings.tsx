@@ -6,12 +6,12 @@ import axios from 'axios';
 
 // Helper to get Token
 const getAuthToken = () => {
-    const session = localStorage.getItem("student_session");
+    const session = sessionStorage.getItem("student_session");
     if (!session) return null;
     try {
         const parsedSession = JSON.parse(session);
         if (new Date().getTime() > parsedSession.expiry) {
-            localStorage.removeItem("student_session");
+            sessionStorage.removeItem("student_session");
             return null;
         }
         return parsedSession.token;
@@ -173,7 +173,7 @@ export default function ProfileSettings() {
 
     return (
         <div className="min-h-screen bg-slate-50/50 py-6 md:py-10 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-container mx-auto space-y-6">
                 
                 {/* --- HEADER --- */}
                 <div className="flex items-center gap-4">

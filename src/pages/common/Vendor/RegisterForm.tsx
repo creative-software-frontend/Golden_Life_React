@@ -1,14 +1,14 @@
 // src/components/vendor/RegisterForm.tsx
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import React, { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, Store, Loader2, ArrowLeft, 
-  User, Phone, MapPin, Building2 
+  User, Phone, MapPin, Building2, AlertCircle, CheckCircle2, Smartphone, X 
 } from "lucide-react";
 import Logo from "../Logo";
 
-// Scroll Animation Variants 
+// Scroll Animation Variants
 const scrollVariant = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
@@ -19,357 +19,460 @@ const scrollVariant = {
 };
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // OTP & Auth States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", ""]); // 4-digit OTP
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [apiToken, setApiToken] = useState(""); // <-- State to hold the API token
+  const [otpError, setOtpError] = useState("");
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // API Feedback States
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); // Added for Toast
+  
+  // Inline Field Errors State
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   const [formData, setFormData] = useState({
     name: "",
     shopName: "",
     businessType: "",
     address: "",
-    phone: "",
+    mobile: "",
     email: "",
     password: "",
     confirmPassword: "",
+    acceptTerms: false
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: "" }));
+    }
+    if (errorMessage) setErrorMessage("");
   };
 
+  // --- VALIDATION LOGIC ---
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Owner name is required.";
+    if (!formData.shopName.trim()) newErrors.shopName = "Shop name is required.";
+    if (!formData.businessType) newErrors.businessType = "Please select a business type.";
+    if (!formData.address.trim()) newErrors.address = "Business address is required.";
+
+    const mobileRegex = /^01[3-9]\d{8}$/;
+    if (!formData.mobile.trim()) {
+      newErrors.mobile = "Mobile number is required.";
+    } else if (!mobileRegex.test(formData.mobile)) {
+      newErrors.mobile = "Enter a valid 11-digit mobile number (e.g., 017XXXXXXXX).";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required.";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Enter a valid email address.";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long.";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = "You must accept the terms";
+    }
+
+    setFieldErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // --- SUBMIT REGISTRATION ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+
     setIsLoading(true);
-    setTimeout(() => {
-      console.log("Register Data:", formData);
+    setErrorMessage("");
+
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const endpoint = `${baseUrl}/api/vendor/register`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          shop_name: formData.shopName,       
+          business_type: formData.businessType, 
+          address: formData.address,
+          mobile: formData.mobile,
+          email: formData.email,
+          password: formData.password,
+          password_confirmation: formData.confirmPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.status === 403 || response.status === 429) {
+        throw new Error("Too many attempts. Your IP is temporarily blocked.");
+      }
+
+      if (!response.ok) {
+        if (data.errors) {
+          const firstErrorKey = Object.keys(data.errors)[0];
+          throw new Error(data.errors[firstErrorKey][0]);
+        }
+        throw new Error(data.message || "Failed to register. Please try again.");
+      }
+
+      // Capture the token if the backend returns it immediately upon registration
+      if (data.token) {
+        setApiToken(data.token);
+      }
+
+      setSuccessMessage("Account created successfully! OTP sent.");
+      setTimeout(() => setSuccessMessage(""), 4000);
+
+      // Show the OTP modal!
+      setShowOtpModal(true);
+
+    } catch (error: any) {
+      console.error("Registration Error:", error);
+      setErrorMessage(error.message);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
+  };
+
+  // --- OTP HANDLERS ---
+  const handleOtpChange = (index: number, value: string) => {
+    if (isNaN(Number(value))) return; 
+    
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    
+    if (value && index < 3) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // --- VERIFY OTP & SAVE TO SESSION STORAGE ---
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const otpCode = otp.join("");
+    if (otpCode.length !== 4) {
+        setOtpError("Enter the complete 4-digit OTP.");
+        return;
+    }
+
+    setIsVerifying(true);
+    setOtpError("");
+    
+    // Simulate API call for OTP Verification
+    setTimeout(() => {
+      // 1. Determine the token to save
+      const finalToken = apiToken || "demo_vendor_session_token_xyz";
+      
+      // 2. Save to SessionStorage instead of LocalStorage
+      sessionStorage.setItem("vendor_token", finalToken);
+      sessionStorage.setItem("vendor_session", JSON.stringify({
+        token: finalToken,
+        isVerified: true,
+        expiry: new Date().getTime() + 86400000 // Expires in 24 hours
+      }));
+
+      // 3. Save to Browser Cookies (Optional, but good for backend requests)
+      document.cookie = `vendor_token=${finalToken}; path=/; max-age=86400; SameSite=Strict; Secure`;
+
+      setIsVerifying(false);
+      setShowOtpModal(false);
+      
+      // 4. Redirect to dashboard securely!
+      navigate("/vendor/dashboard");
+    }, 1500);
   };
 
   const businessTypes = [
-    "Electronics",
-    "Fashion",
-    "Home & Living",
-    "Food & Beverage",
-    "Health & Beauty",
-    "Other"
+    "Electronics", "Fashion", "Home & Living", 
+    "Food & Beverage", "Health & Beauty", "Other"
   ];
 
+  const getInputClass = (fieldName: string) => {
+    const baseClass = "w-full pl-10 pr-4 py-3.5 border rounded-xl outline-none transition-all shadow-sm ";
+    return fieldErrors[fieldName] 
+      ? baseClass + "border-red-500 focus:ring-2 focus:ring-red-200 bg-red-50/50" 
+      : baseClass + "border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200";
+  };
+
   return (
-    <div className="min-h-full flex flex-col justify-center p-8 sm:p-12 lg:p-16">
-      
-      {/* Back Button */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-8"
-      >
-        <Link 
-          to="/" 
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Link>
-      </motion.div>
-
-      <div className="w-full max-w-md mx-auto">
-        
-        {/* Logo */}
-        <motion.div 
-          variants={scrollVariant}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="mb-8"
-        >
-          <Link to="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Store className="w-6 h-6 text-orange-600" />
-            </div>
-            <Logo />
-          </Link>
-        </motion.div>
-
-        {/* Header */}
-        <motion.div 
-          variants={scrollVariant}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-500">Start selling to millions of customers</p>
-        </motion.div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          {/* Owner Name */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Owner Name *
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                name="name"
-                required
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-            </div>
-          </motion.div>
-
-          {/* Shop Name */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Shop / Business Name *
-            </label>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                name="shopName"
-                required
-                placeholder="My Awesome Store"
-                value={formData.shopName}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-            </div>
-          </motion.div>
-
-          {/* Business Type */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Business Type *
-            </label>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <select
-                name="businessType"
-                required
-                value={formData.businessType}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition appearance-none bg-white"
-              >
-                <option value="">Select business type</option>
-                {businessTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-
-          {/* Address */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Business Address *
-            </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-              <textarea
-                name="address"
-                required
-                rows={2}
-                placeholder="Street, City, State, ZIP"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition resize-none"
-              />
-            </div>
-          </motion.div>
-
-          {/* Phone */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Phone Number *
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="tel"
-                name="phone"
-                required
-                placeholder="+8801XXXXXXXXX"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-            </div>
-          </motion.div>
-
-          {/* Email */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Email Address *
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-            </div>
-          </motion.div>
-
-          {/* Password */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Password *
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                required
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Confirm Password */}
-          <motion.div 
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Confirm Password *
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                required
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-            
-            {/* Password Match Indicator */}
-            {formData.password && formData.confirmPassword && (
-              <p className={`text-xs mt-1 ${
-                formData.password === formData.confirmPassword 
-                  ? 'text-green-600' 
-                  : 'text-red-600'
-              }`}>
-                {formData.password === formData.confirmPassword 
-                  ? '✓ Passwords match' 
-                  : '✗ Passwords do not match'}
-              </p>
-            )}
-          </motion.div>
-
-          {/* Submit Button */}
+    <>
+      {/* --- SUCCESS TOAST OVERLAY --- */}
+      <AnimatePresence>
+        {successMessage && (
           <motion.div
-            variants={scrollVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="pt-2"
+            initial={{ opacity: 0, y: -50, x: "-50%" }}
+            animate={{ opacity: 1, y: 24, x: "-50%" }}
+            exit={{ opacity: 0, y: -50, x: "-50%" }}
+            className="fixed top-0 left-1/2 z-[200] flex items-center gap-3 bg-gray-900 text-white px-6 py-3.5 rounded-full shadow-2xl"
           >
-            <button
-              type="submit"
-              disabled={isLoading || formData.password !== formData.confirmPassword}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2.5 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  Register Shop
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <span className="font-medium text-sm tracking-wide">{successMessage}</span>
           </motion.div>
-        </form>
+        )}
+      </AnimatePresence>
 
-        {/* Footer */}
-        <motion.p 
-          variants={scrollVariant}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="text-center text-sm text-gray-500 mt-6"
-        >
-          Already have an account?{" "}
-          <Link to="/vendor/login" className="text-orange-600 hover:text-orange-700 font-medium">
-            Sign In
-          </Link>
-        </motion.p>
+      <div className="min-h-screen w-full bg-gray-50/50 py-10 px-4 overflow-y-auto">
+        <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+          
+          {/* LOGO SECTION */}
+          <div className="mb-10 transform scale-150">
+            <Link to="/">
+              <Logo />
+            </Link>
+          </div>
+
+          {/* REGISTRATION CARD */}
+          <div className="w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative">
+            <div className="px-8 pt-10 pb-6 text-center">
+              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Create Vendor Account</h2>
+              <p className="text-gray-500 text-sm mt-2">Join Golden Life and start selling today</p>
+            </div>
+
+            <div className="px-6 sm:px-10 pb-12">
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                
+                {errorMessage && (
+                  <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 font-medium text-center">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Row 1: Owner Name & Shop Name */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Owner Name *</label>
+                    <div className="relative">
+                      <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.name ? 'text-red-400' : 'text-gray-400'}`} />
+                      <input type="text" name="name" placeholder="John Doe" value={formData.name} onChange={handleChange} className={getInputClass('name')} />
+                    </div>
+                    {fieldErrors.name && <p className="text-xs text-red-500 font-medium mt-1.5 ml-1">{fieldErrors.name}</p>}
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Shop / Business Name *</label>
+                    <div className="relative">
+                      <Building2 className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.shopName ? 'text-red-400' : 'text-gray-400'}`} />
+                      <input type="text" name="shopName" placeholder="My Awesome Store" value={formData.shopName} onChange={handleChange} className={getInputClass('shopName')} />
+                    </div>
+                    {fieldErrors.shopName && <p className="text-xs text-red-500 font-medium mt-1.5 ml-1">{fieldErrors.shopName}</p>}
+                  </div>
+                </div>
+
+                {/* Row 2: Business Type & Mobile Number */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Business Type *</label>
+                    <div className="relative">
+                      <Building2 className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.businessType ? 'text-red-400' : 'text-gray-400'}`} />
+                      <select name="businessType" value={formData.businessType} onChange={handleChange} className={`${getInputClass('businessType')} appearance-none ${!formData.businessType ? 'text-gray-500' : 'text-gray-900'}`}>
+                        <option value="" disabled>Select business type</option>
+                        {businessTypes.map(type => (
+                          <option key={type} value={type} className="text-gray-900">{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {fieldErrors.businessType && <p className="text-red-500 text-xs font-medium mt-1.5 ml-1">{fieldErrors.businessType}</p>}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Mobile Number *</label>
+                    <div className="relative">
+                      <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.mobile ? 'text-red-400' : 'text-gray-400'}`} />
+                      <input type="tel" name="mobile" placeholder="017XXXXXXXX" value={formData.mobile} onChange={handleChange} className={getInputClass('mobile')} />
+                    </div>
+                    {fieldErrors.mobile && <p className="text-red-500 text-xs font-medium mt-1.5 ml-1">{fieldErrors.mobile}</p>}
+                  </div>
+                </div>
+
+                {/* Full Width: Email Address */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">Email Address *</label>
+                  <div className="relative">
+                    <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.email ? 'text-red-400' : 'text-gray-400'}`} />
+                    <input type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} className={getInputClass('email')} />
+                  </div>
+                  {fieldErrors.email && <p className="text-red-500 text-xs font-medium mt-1.5 ml-1">{fieldErrors.email}</p>}
+                </div>
+
+                {/* Full Width: Address */}
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700">Business Address *</label>
+                  <div className="relative">
+                    <MapPin className={`absolute left-3 top-3 w-5 h-5 ${fieldErrors.address ? 'text-red-400' : 'text-gray-400'}`} />
+                    <textarea name="address" rows={2} placeholder="Street, City, State, ZIP" value={formData.address} onChange={handleChange} className={`${getInputClass('address')} resize-none`} />
+                  </div>
+                  {fieldErrors.address && <p className="text-red-500 text-xs font-medium mt-1 ml-1">{fieldErrors.address}</p>}
+                </div>
+
+                {/* Row 3: Passwords */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Password *</label>
+                    <div className="relative">
+                      <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.password ? 'text-red-400' : 'text-gray-400'}`} />
+                      <input type={showPassword ? "text" : "password"} name="password" placeholder="••••••••" value={formData.password} onChange={handleChange} className={`${getInputClass('password')} pr-12`} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 outline-none">
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    {fieldErrors.password && <p className="text-red-500 text-xs font-medium mt-1.5 ml-1">{fieldErrors.password}</p>}
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-sm font-medium text-gray-700">Confirm Password *</label>
+                    <div className="relative">
+                      <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${fieldErrors.confirmPassword ? 'text-red-400' : 'text-gray-400'}`} />
+                      <input type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} className={`${getInputClass('confirmPassword')} pr-12`} />
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 outline-none">
+                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    {fieldErrors.confirmPassword ? (
+                      <p className="text-red-500 text-xs font-medium mt-1.5 ml-1">{fieldErrors.confirmPassword}</p>
+                    ) : (
+                      formData.password && formData.confirmPassword && (
+                        <p className={`text-xs font-medium mt-2 ml-1 ${formData.password === formData.confirmPassword ? 'text-green-600' : 'text-red-600'}`}>
+                          {formData.password === formData.confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                        </p>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Terms Checkbox */}
+                <div className="pt-2">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox" name="acceptTerms" id="acceptTerms"
+                      checked={formData.acceptTerms} onChange={handleChange} disabled={isLoading}
+                      className="h-5 w-5 text-[#FF8A00] border-gray-300 rounded focus:ring-[#FF8A00] cursor-pointer"
+                    />
+                    <label htmlFor="acceptTerms" className="text-sm text-gray-600 cursor-pointer select-none">
+                      I accept the <span className="text-[#FF8A00] font-medium hover:underline">Terms & Conditions</span>
+                    </label>
+                  </div>
+                  {fieldErrors.acceptTerms && <p className="text-xs text-red-500 font-medium mt-1.5">{fieldErrors.acceptTerms}</p>}
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit" disabled={isLoading}
+                    className="w-full bg-[#FF8A00] text-white py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/30 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Register Account <ArrowRight className="w-5 h-5" /></>}
+                  </button>
+                </div>
+              </form>
+
+              <p className="text-center text-gray-600 mt-6">
+                Already have a vendor account? <Link to="/vendor/login" className="text-[#FF8A00] font-bold hover:underline transition-all">Sign In</Link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* --- OTP MODAL OVERLAY --- */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-md rounded-3xl p-8 sm:p-10 relative shadow-2xl animate-in zoom-in-95 duration-200">
+              
+              <div className="p-2 text-center relative">
+                <button onClick={() => setShowOtpModal(false)} className="absolute right-0 top-0 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="w-8 h-8" />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Verify Mobile</h2>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Enter the 4-digit code sent to <br />
+                  <span className="font-bold text-gray-800">{formData.mobile || "+8801XXXXXXXXX"}</span>
+                </p>
+              </div>
+
+              <form onSubmit={handleVerifyOtp} className="pt-6">
+                {otpError && <div className="mb-6 bg-red-50 text-red-600 p-3 rounded-xl text-center text-sm font-medium border border-red-100">{otpError}</div>}
+                
+                <div className="flex justify-center gap-3 sm:gap-4 mb-8">
+                  {otp.map((data, index) => (
+                    <input
+                      key={index} type="text" maxLength={1}
+                      ref={el => otpInputRefs.current[index] = el}
+                      value={data} 
+                      onChange={e => handleOtpChange(index, e.target.value)}
+                      onKeyDown={e => handleOtpKeyDown(index, e)}
+                      className="w-14 h-16 sm:w-16 sm:h-18 text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FF8A00] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,138,0,0.1)] outline-none transition-all"
+                      required autoFocus={index === 0}
+                    />
+                  ))}
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={isVerifying || otp.join("").length !== 4}
+                  className="w-full bg-[#FF8A00] text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-orange-500/30 active:scale-[0.98] flex items-center justify-center gap-2 text-lg disabled:opacity-70 disabled:active:scale-100"
+                >
+                  {isVerifying ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Verify & Proceed <CheckCircle2 className="w-5 h-5" /></>}
+                </button>
+                
+                <p className="text-center text-sm text-gray-500 mt-6 font-medium">
+                  Didn't receive the code? <button type="button" className="text-[#FF8A00] hover:underline hover:text-orange-700 transition-colors">Resend in 30s</button>
+                </p>
+              </form>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

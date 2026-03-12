@@ -62,7 +62,7 @@ export default function ProductDetails() {
     const galleryImgBase = `${baseURL}/uploads/ecommarce/gal_img/`;
 
     const getAuthToken = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try { return JSON.parse(session).token; } catch (e) { return null; }
     };
