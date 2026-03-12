@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Logo from "../Logo";
 
-// Scroll Animation Variants - এরর ফ্রি
+// Scroll Animation Variants 
 const scrollVariant = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
