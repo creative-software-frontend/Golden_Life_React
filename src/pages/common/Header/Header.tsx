@@ -3,7 +3,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import { Wallet, Search, Menu, User as UserIcon, GraduationCap, Settings, PlusCircle, Camera as CameraIcon, Loader2, LayoutDashboard, X, ChevronDown, Send, Download, Landmark } from 'lucide-react';
+import { Wallet, Search, Menu, User as UserIcon, Bell,GraduationCap,Package, Settings, PlusCircle, Camera as CameraIcon, Loader2, LayoutDashboard, X, ChevronDown, Send, Download, Landmark } from 'lucide-react';
 
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -12,11 +12,12 @@ import { useTranslation } from 'react-i18next';
 import LoginOptionsModal from '@/components/LoginoptionsModal';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import NotificationBell from '@/components/ui/NotificationBell';
 
 const Header: React.FC = () => {
     // 1. ADDED walletUpdateTrigger HERE
     const { isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore();
-
+    
     const navigate = useNavigate();
     const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
     // Config : Dynamic Base URL from Environment Variables
@@ -263,6 +264,20 @@ const Header: React.FC = () => {
         setIsLoginOptionsModalOpen(false);
         openLoginModal();
     };
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+            setIsProfileOpen(false);
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
+// Optional: Add the click-outside useEffect here if you want it to close when clicking away
 
     return (
         <div className="w-full bg-white shadow-md border-b border-gray-200 z-40 sticky top-0">
@@ -270,171 +285,204 @@ const Header: React.FC = () => {
             {/* =========================================
     1. DESKTOP HEADER (Large Screens)
    ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-20 gap-5">
-
-                <div className="flex items-center gap-4 shrink-0">
-
-
-                    <div className="group flex items-center gap-4 pl-5 pr-2 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 cursor-pointer">
-
-                        {/* Text Info - Better Typography Hierarchy */}
-                        <div className="hidden md:flex items-center gap-3">
-                            {/* 1st: Icon Container */}
-                            <div className="relative shrink-0">
-                                <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
-                                    <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
-                                </div>
-
-                                {/* Floating Badge - Positioned on the bottom-right of the icon */}
-                                <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
-                                    <GraduationCap size={12} className="text-white" />
-                                </div>
-                            </div>
-
-                            {/* 2nd: Text Info (Name & Tier) */}
-                            <div className="flex flex-col items-start justify-center">
-                                <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
-                                    {studentProfile.name}
-                                </span>
-
-                                <div className="flex items-center gap-1.5 mt-1.5">
-                                    <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
-                                        Golden Tier
-                                    </span>
-                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Modern Avatar Container */}
+  <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-20 gap-5">
+    {/* --- LEFT: USER & WALLET --- */}
+    <div className="flex items-center gap-4 shrink-0">
+        
+        {/* --- USER PROFILE DROPDOWN (NEW) --- */}
+        <div className="relative inline-block z-50" ref={profileDropdownRef}>
+            {/* Trigger Button */}
+            <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="group flex items-center gap-3 pl-4 pr-3 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300"
+            >
+                {/* 1st: Icon Container */}
+                <div className="relative shrink-0">
+                    <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
+                        <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
                     </div>
-                    {/* WALLET WITH DROPDOWN MENU */}
-                    <div className="relative group z-50">
-                        {/* Wallet Button trigger */}
-                        <div className="flex items-center gap-2.5 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all cursor-pointer">
-                            <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
-                                {!isLoading && <Wallet className="h-4.5 w-4.5" />}
-                            </div>
-                            <div className="flex flex-col pr-1">
-                                <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
-                                <div className="mt-1.5 h-3.5 flex items-center">
-                                    {isLoading ? (
-                                        <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
-                                    ) : (
-                                        <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
-                                    )}
-                                </div>
-                            </div>
-                            <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
-                        </div>
 
-                        {/* Dropdown Options */}
-                        <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
-                            <div className="p-2 flex flex-col gap-1">
-                                <Link to="/dashboard/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-green-600 transition-colors">
-                                    <PlusCircle className="h-4 w-4 text-green-500" />
-                                    Add Money
-                                </Link>
-                                <Link to="/dashboard/wallet/send" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-blue-600 transition-colors">
-                                    <Send className="h-4 w-4 text-blue-500" />
-                                    Send Money
-                                </Link>
-                                
-                                <Link to="/dashboard/wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
-                                    <Landmark className="h-4 w-4 text-orange-500" />
-                                    Withdraw Money
-                                </Link>
-                                <Link to="/dashboard/wallet/purchase" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
-                                    <Download className="h-4 w-4 text-purple-500" />
-                                     Purchase History
-                                </Link>
-                                 <Link to="/dashboard/wallet/all" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
-                                    <Download className="h-4 w-4 text-purple-500" />
-                                    All Transaction
-                                </Link>
-                            </div>
-                        </div>
+                    {/* Floating Badge */}
+                    <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
+                        <GraduationCap size={12} className="text-white" />
                     </div>
                 </div>
 
-                {/* --- CENTER: SEARCH --- */}
-                <div className="flex-1 relative mx-4" ref={desktopSearchRef}>
-                    <div className="relative w-full group">
-                        <input
-                            type="text"
-                            placeholder={t('header.search') || "Search for amazing products..."}
-                            /* Decreased height from py-4 to py-3, font size from text-lg to text-base, and pl-7 to pl-5 */
-                            className="w-full pl-5 pr-28 py-3 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-2xl focus:outline-none focus:bg-white focus:border-primary-default focus:ring-4 focus:ring-primary-default/10 text-base font-medium transition-all shadow-inner"
-                            value={searchText}
-                            onChange={(e) => {
-                                setSearchText(e.target.value);
-                                setShowSuggestions(true);
-                            }}
-                            onFocus={() => searchText.trim() && setShowSuggestions(true)}
-                            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-                        />
+                {/* 2nd: Text Info (Name & Tier) */}
+                <div className="flex flex-col items-start justify-center text-left hidden md:flex">
+                    <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                        {studentProfile?.name || "Student"}
+                    </span>
 
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3">
-                            {/* Decreased search inner icons from w-6 to w-5 */}
-                            {isSearching && <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />}
-
-                            <label htmlFor="desktopImageInput" className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                                <CameraIcon className="h-5 w-5 text-gray-500 hover:text-primary-default transition-colors" />
-                                <input type="file" id="desktopImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
-                            </label>
-
-                            <div className="h-6 w-[2px] bg-gray-200"></div>
-
-                            <button
-                                onClick={handleSearch}
-                                className="p-1.5 bg-primary-default/10 rounded-lg hover:bg-primary-default hover:text-white text-primary-default transition-colors"
-                            >
-                                <Search className="h-5 w-5" />
-                            </button>
-                        </div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
+                            Golden Tier
+                        </span>
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     </div>
-
-                    {/* Desktop Suggestions */}
-                    {showSuggestions && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] z-50 overflow-hidden max-h-[400px] overflow-y-auto">
-                            {isSearching ? (
-                                <div className="p-4 text-center text-gray-500 text-sm">Searching database...</div>
-                            ) : suggestions.length > 0 ? (
-                                suggestions.map(p => {
-                                    const productTitle = getProductTitle(p);
-                                    return (
-                                        <Link key={p.id} to={`/dashboard?q=${encodeURIComponent(productTitle)}`} className="flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 gap-3 transition-colors" onClick={handleSelectSuggestion}>
-                                            {/* Decreased image size from h-14 to h-11 */}
-                                            <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} className="w-11 h-11 rounded-lg object-cover border border-gray-100 shadow-sm" alt={productTitle} onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} />
-                                            <div className="flex flex-col">
-                                                {/* Decreased font size from text-lg to text-[15px] */}
-                                                <span className="font-bold text-gray-800 text-[15px] line-clamp-1">{productTitle}</span>
-                                                {p.offer_price && <span className="text-[13px] font-black text-primary-default">৳{p.offer_price}</span>}
-                                            </div>
-                                        </Link>
-                                    );
-                                })
-                            ) : (
-                                <div className="p-4 text-center text-gray-500 text-sm italic">No products found matching your search.</div>
-                            )}
-                        </div>
-                    )}
                 </div>
 
-                {/* --- RIGHT SIDE: LANG & DASHBOARD --- */}
-                <div className="flex items-center gap-5 shrink-0">
-                    <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200">
-                        {/* Decreased font from text-sm to text-xs */}
-                        <button onClick={() => handleChangeLanguage('en')} className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${i18n.language === 'en' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>EN</button>
-                        <button onClick={() => handleChangeLanguage('bn')} className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${i18n.language === 'bn' ? 'bg-white text-primary-default shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>BN</button>
+                {/* Dropdown Indicator Arrow */}
+                <ChevronDown className={`w-4 h-4 text-slate-400 ml-1 transition-transform duration-300 ${isProfileOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+           {isProfileOpen && (
+        <div className="absolute left-0 mt-3 w-48 bg-white/90 backdrop-blur-2xl rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-left z-[999]">
+            <div className="p-1.5">
+                <Link
+                    to="/dashboard/order"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="group flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
+                >
+                    <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-slate-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-emerald-100 transition-all duration-200">
+                        <Package className="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
                     </div>
-                    {/* Decreased padding, text size (text-lg to text-sm), and icon size */}
-                    <Link to="/dashboard" className="flex items-center gap-2 bg-primary-default text-white px-5 py-3 rounded-xl text-sm font-black hover:bg-green-600 shadow-md shadow-primary-default/25 transition-all active:scale-95">
-                        <LayoutDashboard className="h-5 w-5" />
-                        <span>{t('header.dashboard') || "Dashboard"}</span>
+                    <span>Order History</span>
+                </Link>
+            </div>
+        </div>
+    )}
+        </div>
+
+        {/* --- WALLET WITH DROPDOWN MENU --- */}
+        <div className="relative group z-40">
+            {/* Wallet Button trigger */}
+            <div className="flex items-center gap-2.5 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all cursor-pointer">
+                <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
+                    {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                </div>
+                <div className="flex flex-col pr-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
+                    <div className="mt-1.5 h-3.5 flex items-center">
+                        {isLoading ? (
+                            <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
+                        ) : (
+                            <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                        )}
+                    </div>
+                </div>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
+            </div>
+
+            {/* Dropdown Options */}
+            <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all translate-y-2 group-hover:translate-y-0 overflow-hidden">
+                <div className="p-2 flex flex-col gap-1">
+                    <Link to="/dashboard/wallet/add" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-green-600 transition-colors">
+                        <PlusCircle className="h-4 w-4 text-green-500" />
+                        Add Money
+                    </Link>
+                    <Link to="/dashboard/wallet/send" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                        <Send className="h-4 w-4 text-blue-500" />
+                        Send Money
+                    </Link>
+                    <Link to="/dashboard/wallet/withdraw" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                        <Landmark className="h-4 w-4 text-orange-500" />
+                        Withdraw Money
+                    </Link>
+                    <Link to="/dashboard/wallet/purchase" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                        <Download className="h-4 w-4 text-purple-500" />
+                        Purchase History
+                    </Link>
+                    <Link to="/dashboard/wallet/all" className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-[13px] font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                        <Download className="h-4 w-4 text-purple-500" />
+                        All Transaction
                     </Link>
                 </div>
-            </header>
+            </div>
+        </div>
+    </div>
+
+    {/* --- CENTER: SEARCH --- */}
+    <div className="flex-1 relative mx-4" ref={desktopSearchRef}>
+        <div className="relative w-full group">
+            <input
+                type="text"
+                placeholder={t('header.search') || "Search for amazing products..."}
+                className="w-full pl-5 pr-28 py-3 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-2xl focus:outline-none focus:bg-white focus:border-primary-default focus:ring-4 focus:ring-primary-default/10 text-base font-medium transition-all shadow-inner"
+                value={searchText}
+                onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setShowSuggestions(true);
+                }}
+                onFocus={() => searchText.trim() && setShowSuggestions(true)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            />
+
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                {isSearching && <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />}
+
+                <label htmlFor="desktopImageInput" className="cursor-pointer p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <CameraIcon className="h-5 w-5 text-gray-500 hover:text-primary-default transition-colors" />
+                    <input type="file" id="desktopImageInput" className="hidden" accept="image/*" onChange={handleImageChange} />
+                </label>
+
+                <div className="h-6 w-[2px] bg-gray-200"></div>
+
+                <button
+                    onClick={handleSearch}
+                    className="p-1.5 bg-primary-default/10 rounded-lg hover:bg-primary-default hover:text-white text-primary-default transition-colors"
+                >
+                    <Search className="h-5 w-5" />
+                </button>
+            </div>
+        </div>
+
+        {/* Desktop Suggestions */}
+        {showSuggestions && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] z-50 overflow-hidden max-h-[400px] overflow-y-auto">
+                {isSearching ? (
+                    <div className="p-4 text-center text-gray-500 text-sm">Searching database...</div>
+                ) : suggestions.length > 0 ? (
+                    suggestions.map(p => {
+                        const productTitle = getProductTitle(p);
+                        return (
+                            <Link key={p.id} to={`/dashboard?q=${encodeURIComponent(productTitle)}`} className="flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 gap-3 transition-colors" onClick={handleSelectSuggestion}>
+                                <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder-image.jpg'} className="w-11 h-11 rounded-lg object-cover border border-gray-100 shadow-sm" alt={productTitle} onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50'} />
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-gray-800 text-[15px] line-clamp-1">{productTitle}</span>
+                                    {p.offer_price && <span className="text-[13px] font-black text-primary-default">৳{p.offer_price}</span>}
+                                </div>
+                            </Link>
+                        );
+                    })
+                ) : (
+                    <div className="p-4 text-center text-gray-500 text-sm italic">No products found matching your search.</div>
+                )}
+            </div>
+        )}
+    </div>
+
+    {/* --- RIGHT SIDE: NOTIFICATION, LANG & DASHBOARD --- */}
+    <div className="flex items-center gap-5 shrink-0">
+
+        {/* Notification Bell */}
+        <NotificationBell baseURL={baseURL} token={getAuthToken()} />
+
+        {/* Modern Language Toggle */}
+        <div className="flex items-center bg-white rounded-lg border border-gray-200 px-2 py-1.5 shadow-sm">
+            <button
+                onClick={() => handleChangeLanguage('en')}
+                className={`px-2 text-sm font-bold transition-all ${i18n.language === 'en' ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+                EN
+            </button>
+            <div className="w-[1px] h-4 bg-gray-200 mx-1"></div>
+            <button
+                onClick={() => handleChangeLanguage('bn')}
+                className={`px-2 text-sm font-bold transition-all ${i18n.language === 'bn' ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+                BN
+            </button>
+        </div>
+
+        {/* Dashboard Button */}
+        <Link to="/dashboard" className="flex items-center gap-2 bg-primary-default text-white px-5 py-3 rounded-xl text-sm font-black hover:bg-green-600 shadow-md shadow-primary-default/25 transition-all active:scale-95">
+            <LayoutDashboard className="h-5 w-5" />
+            <span>{t('header.dashboard') || "Dashboard"}</span>
+        </Link>
+    </div>
+</header>
 
             {/* =========================================
                 2. MOBILE HEADER (Small Screens)

@@ -61,39 +61,8 @@ export default function WalletPurchase() {
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto bg-slate-50/30 min-h-screen pb-10 font-sans">
-            {/* Header Navigation */}
-            <div className="flex items-center gap-3 md:gap-4 p-4 md:p-6 bg-white border-b sticky top-0 z-20">
-                <button onClick={() => navigate(-1)} className="text-blue-500 hover:bg-blue-50 p-1 md:p-2 rounded-full transition-all">
-                    <ChevronLeft size={24} className="md:w-7 md:h-7" />
-                </button>
-                <h1 className="text-lg md:text-2xl font-black text-slate-800 tracking-tight">Wallet Store</h1>
-            </div>
-
-            {/* 1. Top-up Section */}
-            <div className="p-4 md:p-6">
-                <div className="flex items-center gap-2 mb-4 md:mb-6">
-                    <CreditCard className="text-blue-500" size={16} />
-                    <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-slate-400">Add Credits</h2>
-                </div>
-                {/* Responsive Grid: 2 columns on mobile, 4 on desktop */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                    {[100, 200, 500, 1000].map((amount) => (
-                        <Card key={amount} className="relative overflow-hidden cursor-pointer group border-none shadow-md active:scale-95 transition-all">
-                            <div className="absolute inset-0 bg-blue-600 opacity-90 group-hover:bg-blue-700 transition-colors" />
-                            <div className="relative p-4 md:p-6 flex flex-col items-center text-center gap-2 md:gap-3">
-                                <div className="p-2 md:p-3 bg-white/10 rounded-xl md:rounded-2xl backdrop-blur-sm">
-                                    <Plus className="text-white" size={16} md:size={20} />
-                                </div>
-                                <div>
-                                    <p className="text-[8px] md:text-[10px] font-bold text-blue-100 uppercase tracking-widest">Amount</p>
-                                    <p className="text-lg md:text-2xl font-black text-white">৳{amount}</p>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
-                </div>
-            </div>
+        <div className="w-full max-w-5xl mx-auto bg-slate-50/30 min-h-screen pb-10 py-12 font-sans">
+        
 
             {/* 2. Transaction History Section */}
             <div className="px-4 md:px-6 mt-2">

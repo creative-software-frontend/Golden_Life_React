@@ -63,7 +63,8 @@ const CheckoutSummaryView = ({
     const total = safeSubTotal + safeDeliveryFee;
     const remainingBalance = walletBalance - total;
     
-    const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && total > walletBalance;
+    // Cleaned up unused variable by applying it here
+    const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
 
     // Fetch Wallet Balance & Calculate Savings
     useEffect(() => {
@@ -84,7 +85,6 @@ const CheckoutSummaryView = ({
                 console.error("Wallet Fetch Error:", error);
                 setWalletBalance(0);
             } finally {
-                // Add a tiny delay to ensure a smooth loading transition
                 setTimeout(() => setIsFetchingBalance(false), 300);
             }
         };
@@ -123,130 +123,105 @@ const CheckoutSummaryView = ({
     }, []);
 
     // --- INTEGRATED ORDER PLACEMENT API ---
-const handleConfirm = async () => {
-    if (!termsAccepted) {
-        setError(true);
-        toast.error("Please accept the terms and conditions.");
-        return;
-    }
+    const handleConfirm = async () => {
+        if (!termsAccepted) {
+            setError(true);
+            toast.error("Please accept the terms and conditions.");
+            return;
+        }
 
-    if (!selectedAddress?.id) {
-        toast.error("Please select a delivery address.");
-        return;
-    }
+        if (!selectedAddress?.id) {
+            toast.error("Please select a delivery address.");
+            return;
+        }
 
-    setIsPlacingOrder(true);
-
-    try {
-        const token = getAuthToken();
-        if (!token) throw new Error("No authentication token");
-
-        const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-        if (cartItems.length === 0) throw new Error("Cart is empty");
-
-        // Prepare parallel arrays (backend expects this format)
-        const product_ids: number[] = [];
-        const service_types: string[] = [];
-        const quantities: number[] = [];
-        const item_totals: number[] = [];
-
-        let calculatedSubTotal = 0;
-
-        cartItems.forEach((item: any) => {
-            const price = Number(
-                item.offer_price && item.offer_price < (item.regular_price || item.price)
-                    ? item.offer_price
-                    : item.regular_price || item.price || 0
-            );
-            const qty = Number(item.quantity) || 1;
-            const itemTotal = price * qty;
-
-            calculatedSubTotal += itemTotal;
-
-            product_ids.push(Number(item.id));
-            service_types.push("product");           // or "course" if needed — match your items
-            quantities.push(qty);
-            item_totals.push(itemTotal);
-        });
-
-        const delivery = Number(deliveryFee) || 0;
-        const finalTotal = calculatedSubTotal + delivery;
-
-        if (paymentMethod === 'Wallet' && walletBalance < finalTotal) {
+        if (isInsufficientBalance) {
             toast.error("Insufficient wallet balance.");
             return;
         }
 
-        // Build payload matching backend expectation
-        const payload: Record<string, any> = {
-            address_id: selectedAddress.id,
-            payment_method: paymentMethod.toLowerCase(), // try "wallet" lowercase
-            order_total: finalTotal.toFixed(2),          // ← this is likely the key for total
-            // sub_total: calculatedSubTotal.toFixed(2), // optional — add if needed
+        setIsPlacingOrder(true);
 
-            // Add delivery only if you want to override hardcoded value
-            delivery_charge: delivery.toFixed(2),
+        try {
+            const token = getAuthToken();
+            if (!token) throw new Error("No authentication token");
 
-            // Parallel arrays for items
-            "product_id[]": product_ids,
-            "service_type[]": service_types,
-            "quantity[]": quantities,
-            "item_total[]": item_totals,
-        };
+            const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cartItems.length === 0) throw new Error("Cart is empty");
 
-        console.log("→ Sending fixed payload:", payload);
+            let calculatedSubTotal = 0;
+            const delivery = Number(deliveryFee) || 0;
 
-        const response = await axios.post(
-            `${baseURL}/api/student/Orderstore`,
-            payload,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+            const formData = new FormData();
+            formData.append('address_id', String(selectedAddress.id));
+            formData.append('payment_method', paymentMethod.toLowerCase());
+            formData.append('delivery_charge', delivery.toFixed(2));
+
+            cartItems.forEach((item: any) => {
+                const offerPrice = Number(item.offer_price) || 0;
+                const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
+                const price = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
+                const qty = Number(item.quantity) || 1;
+                const itemTotal = price * qty;
+
+                calculatedSubTotal += itemTotal;
+
+                formData.append('product_id[]', String(item.id));
+                formData.append('service_type[]', "product"); 
+                formData.append('quantity[]', String(qty));
+                formData.append('item_total[]', String(itemTotal));
+            });
+
+            const finalTotal = calculatedSubTotal + delivery;
+            formData.append('order_total', finalTotal.toFixed(2));
+
+            const response = await axios.post(
+                `${baseURL}/api/student/Orderstore`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.data?.status === 'success' || response.data?.success) {
+                toast.success(response.data?.message || "Order placed successfully!");
+
+                localStorage.removeItem("cart");
+                window.dispatchEvent(new Event("cartUpdated"));
+
+                if (paymentMethod.toLowerCase() === 'wallet') {
+                    triggerWalletUpdate?.();
+                }
+
+                changeCheckoutModal();
+                onConfirm();
+            } else {
+                throw new Error(response.data?.message || "Order failed");
             }
-        );
+        } catch (err: any) {
+            console.error("Order placement failed:", err);
 
-        if (response.data?.status === 'success' || response.data?.success) {
-            toast.success(response.data?.message || "Order placed successfully!");
-
-            localStorage.removeItem("cart");
-            window.dispatchEvent(new Event("cartUpdated"));
-
-            if (paymentMethod.toLowerCase() === 'wallet') {
-                triggerWalletUpdate?.();
+            let msg = "Failed to place order. Please try again.";
+            if (err.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err.response?.data?.errors) {
+                const firstKey = Object.keys(err.response.data.errors)[0];
+                msg = err.response.data.errors[firstKey][0];
             }
 
-            changeCheckoutModal();
-            onConfirm();
-        } else {
-            throw new Error(response.data?.message || "Order failed");
+            toast.error(msg);
+        } finally {
+            setIsPlacingOrder(false);
         }
-    } catch (err: any) {
-        console.error("Order placement failed:", err);
-
-        let msg = "Failed to place order. Please try again.";
-
-        if (err.response?.data?.message) {
-            msg = err.response.data.message;
-        } else if (err.response?.data?.errors) {
-            // Show first validation error
-            const firstKey = Object.keys(err.response.data.errors)[0];
-            msg = err.response.data.errors[firstKey][0];
-        }
-
-        toast.error(msg);
-    } finally {
-        setIsPlacingOrder(false);
-    }
-};
+    };
 
     const handleBackToCart = () => {
         changeCheckoutModal();
         toggleClicked();
     };
 
-    // 🟢 FULL SCREEN LOADING ADDED HERE
     if (isFetchingBalance) {
         return (
             <div className="flex flex-col h-[100dvh] w-full bg-white items-center justify-center z-[100]">
@@ -312,7 +287,7 @@ const handleConfirm = async () => {
                         <span className="text-gray-900">৳{safeDeliveryFee.toFixed(2)}</span>
                     </div>
 
-                    {/* DISCOUNT ROW ADDED */}
+                    {/* DISCOUNT ROW */}
                     {totalSavings > 0 && (
                         <div className="flex justify-between text-[13px] font-bold text-[#5C9C72] bg-[#5C9C72]/10 p-1.5 -mx-1.5 rounded-lg">
                             <span>Discount / Savings:</span>
@@ -325,22 +300,21 @@ const handleConfirm = async () => {
                         <span className="text-2xl font-black text-[#5C9C72] tracking-tight">৳{total.toFixed(2)}</span>
                     </div>
                     
-                    {/* DISPLAY WALLET BALANCE & DECREASE PREVIEW */}
+                    {/* DISPLAY WALLET BALANCE */}
                     <div className="pt-3 mt-3 border-t border-dashed border-gray-200 flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-gray-500 uppercase">Your Account Balance:</span>
-                            <span className={`text-[14px] font-black ${walletBalance < total ? 'text-red-500' : 'text-gray-900'}`}>
+                            <span className={`text-[14px] font-black ${isInsufficientBalance ? 'text-red-500' : 'text-gray-900'}`}>
                                 ৳{walletBalance.toFixed(2)}
                             </span>
                         </div>
-                        
-              
                     </div>
                 </div>
             </div>
 
             {/* --- FIXED FOOTER --- */}
             <div className="p-4 border-t border-gray-200 bg-white space-y-4 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.08)] z-20">
+                
                 {/* 3. Payment Option */}
                 <div>
                     <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5 px-1">Choose Payment Method</h4>
@@ -367,7 +341,7 @@ const handleConfirm = async () => {
                 </div>
 
                 {/* 4. INSUFFICIENT BALANCE WARNING */}
-                {paymentMethod === 'Wallet' && walletBalance < total && (
+                {isInsufficientBalance && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                         <div className="flex flex-col">
@@ -402,9 +376,9 @@ const handleConfirm = async () => {
                 <div className="flex flex-col gap-3">
                     <button
                         onClick={handleConfirm}
-                        disabled={isPlacingOrder || (paymentMethod === 'Wallet' && walletBalance < total)}
+                        disabled={isPlacingOrder || isInsufficientBalance}
                         className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                            (isPlacingOrder || (paymentMethod === 'Wallet' && walletBalance < total))
+                            (isPlacingOrder || isInsufficientBalance)
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
                                 : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
                         }`}

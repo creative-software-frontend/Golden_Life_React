@@ -71,6 +71,7 @@ import {
     Wallet,
     X
 } from 'lucide-react';
+import NotificationBell from "@/components/ui/NotificationBell"
 
 // Helper function to assign icons based on category name
 const getCategoryIcon = (categoryName: string) => {
@@ -186,7 +187,7 @@ export default function UserLayout() {
                     };
                 });
 
-                setCategories(mappedCategories );
+                setCategories(mappedCategories);
 
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
@@ -662,69 +663,78 @@ export default function UserLayout() {
 
                     {/* --- ROW 2: Wallet (Full Width Prominence with Dropdown) --- */}
                     {/* FIXED: Restored Wallet Row and added z-[50] so it sits above the search bar */}
-                    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30 relative z-[50]">
-                        <button
-                            onClick={() => {
-                                setIsMobileWalletOpen(!isMobileWalletOpen);
-                                setIsMobileProfileOpen(false); // FIXED: Closes profile if open
-                            }}
-                            className="w-full flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm active:scale-[0.98] transition-all cursor-pointer"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={cn(
-                                    "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
-                                    isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
-                                )}>
-                                    {!isLoading && <Wallet className="h-4.5 w-4.5" />}
-                                </div>
-                                <div className="flex flex-col text-left">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
-                                    {isLoading ? (
-                                        <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
-                                    ) : (
-                                        <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
-                                    )}
-                                </div>
-                            </div>
-                            <ChevronDown className={cn("h-5 w-5 text-slate-400 transition-transform", isMobileWalletOpen && "rotate-180")} />
-                        </button>
+                    <div className="px-4 py-2 border-b border-slate-50 bg-slate-50/30 relative z-[50] flex items-center gap-3">
 
-                        {/* Mobile Wallet Dropdown Options */}
-                        {isMobileWalletOpen && (
-                            <>
-                                <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
-                                <div className="absolute top-full left-4 right-4 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top animate-in fade-in zoom-in-95 duration-200">
-                                    <div className="p-2 flex flex-col gap-1">
-                                        <Link to="/dashboard/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-green-600 transition-colors">
-                                            <PlusCircle className="h-5 w-5 text-green-500" />
-                                            Add Money
-                                        </Link>
-                                        <Link to="/dashboard/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
-                                            <Send className="h-5 w-5 text-blue-500" />
-                                            Send Money
-                                        </Link>
-                                        <Link to="/dashboard/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
-                                            <Download className="h-5 w-5 text-purple-500" />
-                                            Receive Money
-                                        </Link>
-                                        <Link to="/dashboard/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
-                                            <Landmark className="h-5 w-5 text-orange-500" />
-                                            Withdraw Money
-                                        </Link>
-                                         <Link to="/dashboard/wallet/purchase" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
-                                            <Landmark className="h-5 w-5 text-orange-500" />
-                                            Purchase History
-                                        </Link>
-                                          <Link to="/dashboard/wallet/all" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
-                                            <Landmark className="h-5 w-5 text-orange-500" />
-                                           All Transaction
-                                        </Link>
-                                        
-
+                        {/* 1. Mobile Wallet Wrapper (Flex-1 allows it to take up available space) */}
+                        <div className="relative flex-1">
+                            <button
+                                onClick={() => {
+                                    setIsMobileWalletOpen(!isMobileWalletOpen);
+                                    setIsMobileProfileOpen(false); // FIXED: Closes profile if open
+                                }}
+                                className="w-full flex items-center justify-between bg-white border border-slate-200 px-4 py-2.5 rounded-2xl shadow-sm active:scale-[0.98] transition-all cursor-pointer"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                        "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
+                                        isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
+                                    )}>
+                                        {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                                    </div>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
+                                        {isLoading ? (
+                                            <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
+                                        ) : (
+                                            <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
+                                        )}
                                     </div>
                                 </div>
-                            </>
-                        )}
+                                <ChevronDown className={cn("h-5 w-5 text-slate-400 transition-transform", isMobileWalletOpen && "rotate-180")} />
+                            </button>
+
+                            {/* Mobile Wallet Dropdown Options */}
+                            {isMobileWalletOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setIsMobileWalletOpen(false)}></div>
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden origin-top animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="p-2 flex flex-col gap-1">
+                                            <Link to="/dashboard/wallet/add" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-green-600 transition-colors">
+                                                <PlusCircle className="h-5 w-5 text-green-500" />
+                                                Add Money
+                                            </Link>
+                                            <Link to="/dashboard/wallet/send" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">
+                                                <Send className="h-5 w-5 text-blue-500" />
+                                                Send Money
+                                            </Link>
+                                            <Link to="/dashboard/wallet/receive" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-purple-600 transition-colors">
+                                                <Download className="h-5 w-5 text-purple-500" />
+                                                Receive Money
+                                            </Link>
+                                            <Link to="/dashboard/wallet/withdraw" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                                <Landmark className="h-5 w-5 text-orange-500" />
+                                                Withdraw Money
+                                            </Link>
+                                            <Link to="/dashboard/wallet/purchase" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                                <Landmark className="h-5 w-5 text-orange-500" />
+                                                Purchase History
+                                            </Link>
+                                            <Link to="/dashboard/wallet/all" onClick={() => setIsMobileWalletOpen(false)} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50 rounded-xl text-sm font-bold text-slate-700 hover:text-orange-600 transition-colors">
+                                                <Landmark className="h-5 w-5 text-orange-500" />
+                                                All Transaction
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* 2. Mobile/Tablet Notification Bell */}
+                        <div className="shrink-0 z-50">
+                            {/* Pass your actual baseURL and token here */}
+                            <NotificationBell baseURL={baseURL} token={getAuthToken()} />
+                        </div>
+
                     </div>
 
                     {/* --- ROW 3: Utility Search --- */}

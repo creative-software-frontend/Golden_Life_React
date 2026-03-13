@@ -60,6 +60,7 @@ import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
 import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
 import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
+import OrderHistory from "@/pages/common/Orders/OrderHistory";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -181,13 +182,21 @@ export const routes = createBrowserRouter([
                         path: 'wallet/withdraw',
                         element: <WalletWithdraw />
                     },
-                      {
+                    {
                         path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
-                        element: <WalletPurchase/>
+                        element: <WalletPurchase />
                     },
                     {
                         path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
                         element: <TransactionHistory />
+                    },
+                    {
+                        path: 'order', // REMOVED THE SLASH HERE
+                        element: <OrderHistory />
+                    },
+                    {
+                        path: 'order-details',  // Separate route for Help page
+                        element: <OrderDetails />,
                     },
                     { path: "profile/settings", element: <ProfileSettings /> },
                     {

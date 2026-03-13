@@ -18,6 +18,7 @@ interface ConfirmWithdrawModalProps {
 export default function ConfirmWithdrawModal({ 
     isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token 
 }: ConfirmWithdrawModalProps) {
+    
     const [pinCode, setPinCode] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -25,6 +26,8 @@ export default function ConfirmWithdrawModal({
 
     const handleWithdraw = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (pinCode.length !== 4) return;   // ← Enforce exactly 4 digits
+
         setIsSubmitting(true);
 
         try {
@@ -34,7 +37,6 @@ export default function ConfirmWithdrawModal({
             formData.append('number', accountNumber);
             formData.append('payment_method', paymentMethod);
             
-            // Sending as both keys to ensure backend compatibility
             formData.append('password', pinCode); 
             formData.append('pin_code', pinCode); 
 
@@ -65,7 +67,6 @@ export default function ConfirmWithdrawModal({
                     finalErrorMessage = responseData.message;
                 }
                 
-                // Extraction of deep Laravel Validation Errors (Prevents crashing)
                 if (responseData.errors && typeof responseData.errors === 'object') {
                     const firstErrorKey = Object.keys(responseData.errors)[0];
                     const firstErrorVal = responseData.errors[firstErrorKey];
@@ -78,7 +79,6 @@ export default function ConfirmWithdrawModal({
                 }
             }
 
-            // Force conversion to String to prevent React render errors
             onError(String(finalErrorMessage));
             setIsSubmitting(false); 
         } finally {
@@ -103,7 +103,7 @@ export default function ConfirmWithdrawModal({
                     </button>
                 </div>
                 
-                {/* Summary Card - Matching Design 2 */}
+                {/* Summary Card */}
                 <div className="bg-muted rounded-xl p-4 mb-4 border border-border text-center">
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
                         Withdrawing to <ArrowRight size={12} strokeWidth={3} /> <span className="text-foreground">{paymentMethod}</span>
@@ -114,21 +114,35 @@ export default function ConfirmWithdrawModal({
 
                 <form onSubmit={handleWithdraw} className="space-y-4">
                     <div>
-                        <label className="text-xs font-bold text-muted-foreground uppercase">Enter Your PIN</label>
+                        <label className="text-xs font-bold text-muted-foreground uppercase">
+                            Enter Your 4-Digit PIN
+                        </label>
                         <input 
                             type="password" 
                             value={pinCode} 
-                            onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))} // Numeric only
-                            maxLength={6} 
+                            onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))} 
+                            maxLength={4} 
                             placeholder="••••" 
                             autoFocus
                             className="w-full mt-1 px-4 py-3 bg-muted border-2 border-border rounded-xl focus:border-secondary focus:ring-4 focus:ring-secondary/20 outline-none text-center text-2xl tracking-[0.5em] font-black text-foreground transition-all" 
                             required 
                         />
+
+                        {/* Live Length Indicator */}
+                        <div className="flex justify-center items-center gap-2 mt-2 text-[11px] font-bold text-muted-foreground">
+                            <span>{pinCode.length} / 4 digits</span>
+                            {pinCode.length > 0 && pinCode.length !== 4 && (
+                                <span className="text-amber-500">• Must be exactly 4</span>
+                            )}
+                            {pinCode.length === 4 && (
+                                <span className="text-emerald-500">✓ Perfect</span>
+                            )}
+                        </div>
                     </div>
+
                     <button 
                         type="submit" 
-                        disabled={isSubmitting || pinCode.length < 4} 
+                        disabled={isSubmitting || pinCode.length !== 4} 
                         className="w-full flex justify-center items-center gap-2 py-3 bg-secondary hover:opacity-90 text-secondary-foreground rounded-xl font-black tracking-wide transition-all disabled:opacity-50"
                     >
                         {isSubmitting ? (

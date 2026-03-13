@@ -26,7 +26,7 @@ export default function ConfirmWithdrawModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (pinCode.length < 4) return;
+        if (pinCode.length !== 4) return;   // ← Strictly 4 digits only
 
         setIsSubmitting(true);
 
@@ -93,22 +93,35 @@ export default function ConfirmWithdrawModal({
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Enter Your PIN</label>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+                            Enter Your 4-Digit PIN
+                        </label>
                         <input 
                             type="password" 
                             value={pinCode} 
                             onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))} 
-                            maxLength={6} 
+                            maxLength={4} 
                             placeholder="••••" 
                             autoFocus
                             className="w-full mt-1 px-4 py-3 bg-muted border-2 border-border rounded-xl focus:border-secondary outline-none text-center text-2xl tracking-[0.5em] font-black text-foreground transition-all" 
                             required 
                         />
+
+                        {/* Live length indicator */}
+                        <div className="flex justify-center items-center gap-2 mt-2 text-[11px] font-bold text-muted-foreground">
+                            <span>{pinCode.length} / 4 digits</span>
+                            {pinCode.length > 0 && pinCode.length !== 4 && (
+                                <span className="text-amber-500">• Must be exactly 4</span>
+                            )}
+                            {pinCode.length === 4 && (
+                                <span className="text-emerald-500">✓ Perfect</span>
+                            )}
+                        </div>
                     </div>
 
                     <button 
                         type="submit" 
-                        disabled={isSubmitting || pinCode.length < 4} 
+                        disabled={isSubmitting || pinCode.length !== 4} 
                         className="w-full flex justify-center items-center gap-2 py-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl font-black tracking-wide shadow-lg shadow-secondary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (

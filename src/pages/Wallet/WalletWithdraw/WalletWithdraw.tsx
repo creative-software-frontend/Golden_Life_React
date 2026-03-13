@@ -97,6 +97,7 @@ export default function WalletWithdraw() {
     const [amount, setAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('bkash');
     const [attachment, setAttachment] = useState<File | null>(null);
+    const [guideTab, setGuideTab] = useState<'bkash' | 'nagad'>('bkash');
 
     // Gateway-Specific States
     const [mfsNumber, setMfsNumber] = useState('');
@@ -256,95 +257,114 @@ export default function WalletWithdraw() {
                 baseURL={baseURL}
                 token={getAuthToken()}
             />
-{/* --- Instruction Modal --- */}
+            {/* --- Instruction Modal --- */}
             {showGuideModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-                    
-                    {/* UPDATED: Added max-h-[95vh] and flex-col for 125% zoom responsiveness */}
-                    <div className="bg-white rounded-3xl w-full max-w-md max-h-[95vh] flex flex-col overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2rem] w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] relative animate-in zoom-in-95 duration-300">
 
+                        {/* TOP DRAG HANDLE */}
+                        <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-4 mb-2 shrink-0" />
+
+                        {/* CLOSE BUTTON */}
                         <button
                             onClick={() => setShowGuideModal(false)}
-                            className="absolute top-4 right-4 z-10 p-2 bg-black/10 hover:bg-black/20 rounded-full text-white transition-colors"
+                            className="absolute top-6 right-6 z-20 p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all active:scale-95"
                         >
                             <X className="w-5 h-5" />
                         </button>
 
-                        {/* UPDATED: Added flex-1, overflow-y-auto, and scrollbar hiding classes */}
-                        <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                            {paymentMethod === 'bank' ? (
-                                <div className="p-6">
-                                    <div className={cn("flex flex-col mb-6 -mx-6 -mt-6 p-6 text-white text-center shadow-sm rounded-t-3xl", instructionConfig.bg)}>
-                                        <h3 className="font-bold text-xl mb-1">How to make the Payment</h3>
-                                        <p className="text-xs text-blue-100 uppercase font-bold tracking-widest">Bank Transfer Guide</p>
-                                    </div>
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            {/* HEADER */}
+                            <div className="px-8 pt-4 pb-6">
+                                <h3 className="font-extrabold text-2xl text-slate-900 tracking-tight">
+                                    How to Pay
+                                </h3>
+                                <p className="text-sm text-slate-500 mt-1 font-medium">
+                                    Follow these simple steps
+                                </p>
+                            </div>
 
-                                    <div className="p-4 bg-blue-50 rounded-2xl space-y-4 text-sm mt-4 border border-blue-100">
-                                        <div>
-                                            <p className="text-blue-600 font-black text-[10px] uppercase">Bank Name</p>
-                                            <p className="font-bold text-blue-900 text-lg">{BANK_DETAILS.bankName}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-blue-600 font-black text-[10px] uppercase">Account Number</p>
-                                            <p className="font-bold text-blue-900 text-lg">{BANK_DETAILS.accountNumber}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-blue-600 font-black text-[10px] uppercase">Account Name</p>
-                                            <p className="font-bold text-blue-900">{BANK_DETAILS.accountName}</p>
-                                        </div>
-                                    </div>
-                                    <p className="text-xs text-slate-500 italic mt-6 text-center">Please include your student ID in the transfer reference for faster approval.</p>
+                            {/* TAB SWITCHER */}
+                            <div className="px-8 mb-6">
+                                <div className="flex p-1 bg-slate-100/80 rounded-2xl relative">
+                                    <button
+                                        onClick={() => setGuideTab('bkash')}
+                                        className={cn(
+                                            "relative z-10 flex-1 py-3 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300",
+                                            guideTab === 'bkash' ? "text-[#e2136e]" : "text-slate-500 hover:text-slate-700"
+                                        )}
+                                    >
+                                        {guideTab === 'bkash' && (
+                                            <div className="absolute inset-0 bg-white rounded-xl shadow-sm animate-in fade-in zoom-in-95 duration-200" />
+                                        )}
+                                        <span className="relative z-20">bKash</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setGuideTab('nagad')}
+                                        className={cn(
+                                            "relative z-10 flex-1 py-3 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300",
+                                            guideTab === 'nagad' ? "text-[#ed1c24]" : "text-slate-500 hover:text-slate-700"
+                                        )}
+                                    >
+                                        {guideTab === 'nagad' && (
+                                            <div className="absolute inset-0 bg-white rounded-xl shadow-sm animate-in fade-in zoom-in-95 duration-200" />
+                                        )}
+                                        <span className="relative z-20">Nagad</span>
+                                    </button>
                                 </div>
-                            ) : (
-                                <div className="p-6">
-                                    <div className={cn("flex flex-col mb-6 -mx-6 -mt-6 p-6 text-white text-center shadow-sm rounded-t-3xl", instructionConfig.bg)}>
-                                        <h3 className="font-bold text-xl mb-1">How to make the Payment</h3>
-                                        <p className="text-xs uppercase font-bold tracking-widest opacity-90">{instructionConfig.name} USSD Guide</p>
-                                    </div>
+                            </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {ussdSteps.map((step: any) => (
-                                            <div key={step.id} className={cn(
-                                                "relative border-2 rounded-xl p-3 flex flex-col items-center justify-center text-center bg-slate-50 border-slate-100",
-                                                step.id === 7 ? "col-span-2" : "col-span-1"
-                                            )}>
-                                                <div className="absolute -top-3 -right-2 w-6 h-6 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded flex items-center justify-center text-[10px] shadow-sm">
-                                                    {step.id}
-                                                </div>
-
-                                                <p className="text-[10px] font-medium text-slate-600 leading-tight mb-2 min-h-[24px] flex items-center justify-center">
-                                                    {step.text}
-                                                </p>
-
-                                                <div className="w-full bg-white border border-slate-200 rounded p-1.5 text-center shadow-inner">
-                                                    <span className={cn("font-bold text-xs tracking-tight", instructionConfig.text)}>
-                                                        {step.highlight}
-                                                    </span>
-                                                </div>
+                            {/* SCROLLABLE IMAGE CONTENT */}
+                            <div className="flex-1 overflow-y-auto px-8 pb-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                <div className="relative">
+                                    {guideTab === 'bkash' ? (
+                                        <div key="bkash-img" className="animate-in slide-in-from-right-4 fade-in duration-500">
+                                            <div className="rounded-[1.5rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50">
+                                                <img
+                                                    src="/image/payment/bikash_pay.png"
+                                                    alt="bKash Guide"
+                                                    className="w-full h-auto"
+                                                />
                                             </div>
-                                        ))}
-                                    </div>
-                                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-medium text-center">
-                                        <ShieldCheck className="w-4 h-4 text-green-500 shrink-0" />
-                                        You will receive a confirmation SMS after successful payment.
-                                    </div>
+                                        </div>
+                                    ) : (
+                                        <div key="nagad-img" className="animate-in slide-in-from-right-4 fade-in duration-500">
+                                            <div className="rounded-[1.5rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/50">
+                                                <img
+                                                    src="/image/payment/nogod_pay.png"
+                                                    alt="Nagad Guide"
+                                                    className="w-full h-auto"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+
+                                {/* SECURITY BADGE */}
+                                <div className="mt-8 py-4 px-6 bg-green-50/50 rounded-2xl flex items-center gap-3">
+                                    <div className="bg-green-500 p-1.5 rounded-full">
+                                        <ShieldCheck className="w-4 h-4 text-white" />
+                                    </div>
+                                    <p className="text-[11px] text-green-700 font-bold leading-tight">
+                                        Secure End-to-End Payment Connection
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* UPDATED: Added shrink-0 to prevent the bottom button from squishing on zoomed screens */}
-                        <div className="p-4 bg-slate-50 border-t border-slate-100 shrink-0">
+                        {/* ACTION FOOTER */}
+                        <div className="p-6 bg-white border-t border-slate-50 shrink-0">
                             <button
                                 onClick={() => setShowGuideModal(false)}
-                                className="w-full py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-colors"
+                                className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-lg shadow-slate-200"
                             >
-                                Close
+                                Got it, Thanks!
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-
             {/* --- Page Header --- */}
             <div className="flex items-center justify-between mb-6 md:mb-8">
                 <div className="flex items-center gap-3">
@@ -408,6 +428,8 @@ export default function WalletWithdraw() {
 
                 {/* --- Withdraw Tab Content --- */}
                 {activeTab === 'withdraw' && (
+
+
                     <form onSubmit={handleOpenConfirmation} className="p-6 md:p-10 space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
                         {successMessage && <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 font-bold text-sm"><CheckCircle2 className="w-5 h-5" />{successMessage}</div>}
                         {errorMessage && <div className="flex items-center gap-3 p-4 bg-destructive/10 text-destructive rounded-2xl border border-destructive/20 font-bold text-sm"><AlertCircle className="w-5 h-5" />{errorMessage}</div>}
@@ -417,23 +439,56 @@ export default function WalletWithdraw() {
                             <label className="text-sm font-bold text-slate-700">Withdraw Amount</label>
                             <div className="relative">
                                 <span className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-bold text-slate-400">৳</span>
-                                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full pl-14 pr-6 py-6 text-5xl font-bold bg-slate-50 border-2 border-transparent rounded-3xl focus:bg-white outline-none focus:border-secondary transition-all" required />
+                                <input
+                                    type="number"
+                                    value={amount}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        // Allow empty string (for clearing) or numbers 0 and above
+                                        if (val === "" || Number(val) >= 0) {
+                                            setAmount(val);
+                                        }
+                                    }}
+                                    placeholder="0.00"
+                                    min="0" /* Prevents browser step arrows from going below 0 */
+                                    className="w-full pl-14 pr-6 py-6 text-5xl font-bold bg-slate-50 border-2 border-transparent rounded-3xl focus:bg-white outline-none focus:border-secondary transition-all"
+                                    required
+                                />
                             </div>
                             <div className="flex flex-wrap gap-2 pt-2">
                                 {presetAmounts.map((preset) => (
-                                    <button key={preset} type="button" onClick={() => setAmount(preset.toString())} disabled={isLoadingBalance || preset > currentBalance} className={cn("px-5 py-2 rounded-xl font-bold text-xs transition-all border", Number(amount) === preset ? 'bg-secondary text-white border-secondary' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50')}>৳{preset}</button>
+                                    <button
+                                        key={preset}
+                                        type="button"
+                                        onClick={() => setAmount(preset.toString())}
+                                        disabled={isLoadingBalance || preset > currentBalance}
+                                        className={cn(
+                                            "px-5 py-2 rounded-xl font-bold text-xs transition-all border",
+                                            Number(amount) === preset
+                                                ? 'bg-secondary text-white border-secondary'
+                                                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                        )}
+                                    >
+                                        ৳{preset}
+                                    </button>
                                 ))}
                             </div>
                         </div>
-
                         {/* Gateway Selection */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <label className="text-sm font-bold text-slate-700">Select Gateway</label>
                                 <button
                                     type="button"
-                                    onClick={() => setShowGuideModal(true)}
-                                    className="flex items-center gap-1.5 text-xs font-bold text-secondary hover:text-secondary/80 transition-colors"
+                                    onClick={() => {
+                                        if (paymentMethod === 'nagad') {
+                                            setGuideTab('nagad');
+                                        } else {
+                                            setGuideTab('bkash');
+                                        }
+                                        setShowGuideModal(true);
+                                    }}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors"
                                 >
                                     <HelpCircle className="w-4 h-4" />
                                     How to Pay?
@@ -566,97 +621,97 @@ export default function WalletWithdraw() {
                 )}
 
                 {/* --- History Tab Content --- */}
-    {activeTab === 'history' && (
-    <div className="animate-in fade-in slide-in-from-left-4 duration-300 w-full">
-        {isLoadingHistory ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                <p className="text-sm font-medium">Loading history...</p>
-            </div>
-        ) : transactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 m-4 md:m-6 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                <Clock className="w-12 h-12 mb-4 text-slate-300" />
-                <p className="text-sm font-medium">No transactions found.</p>
-            </div>
-        ) : (
-            <div className="bg-white rounded-[24px] md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                
-                {/* Header Section */}
-                <div className="flex flex-row items-center justify-between md:justify-start gap-4 px-5 py-5 md:px-8 md:py-6 border-b border-slate-100">
-                    <h2 className="text-sm font-black text-slate-600 tracking-wider uppercase">Withdrawal History</h2>
-                    <span className="px-3 py-1 bg-[#eef7f2] text-[#6cb28d] text-[10px] font-bold rounded-full tracking-wider uppercase shrink-0">
-                        {transactions.length} Records
-                    </span>
-                </div>
+                {activeTab === 'history' && (
+                    <div className="animate-in fade-in slide-in-from-left-4 duration-300 w-full">
+                        {isLoadingHistory ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                                <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                                <p className="text-sm font-medium">Loading history...</p>
+                            </div>
+                        ) : transactions.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 m-4 md:m-6 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                <Clock className="w-12 h-12 mb-4 text-slate-300" />
+                                <p className="text-sm font-medium">No transactions found.</p>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-[24px] md:rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
 
-                {/* Table Column Headers - Hidden on Mobile */}
-                <div className="hidden md:grid grid-cols-4 gap-4 px-8 py-4 border-b border-slate-100 bg-white text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-                    <div>Details</div>
-                    <div className="text-center">Method</div>
-                    <div className="text-center">Status</div>
-                    <div className="text-right">Timestamp</div>
-                </div>
-
-                {/* Transactions List */}
-                <div className="p-4 md:p-6 space-y-3 md:space-y-4 bg-[#f8fafc]">
-                    {transactions.map((trx, idx) => (
-                        <div key={trx.id || idx} className="grid grid-cols-2 md:grid-cols-4 items-center gap-y-4 gap-x-2 md:gap-4 p-4 border border-slate-100 rounded-[20px] bg-white shadow-sm hover:shadow-md transition-shadow">
-                            
-                            {/* 1. Details Column (Top Left on Mobile) */}
-                            <div className="order-1 flex items-center gap-3 md:gap-4">
-                                <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-[14px] md:rounded-2xl bg-[#fff4eb] flex items-center justify-center text-[#f48120]">
-                                    <Minus className="w-4 h-4 md:w-5 md:h-5 stroke-[3]" /> 
+                                {/* Header Section */}
+                                <div className="flex flex-row items-center justify-between md:justify-start gap-4 px-5 py-5 md:px-8 md:py-6 border-b border-slate-100">
+                                    <h2 className="text-sm font-black text-slate-600 tracking-wider uppercase">Withdrawal History</h2>
+                                    <span className="px-3 py-1 bg-[#eef7f2] text-[#6cb28d] text-[10px] font-bold rounded-full tracking-wider uppercase shrink-0">
+                                        {transactions.length} Records
+                                    </span>
                                 </div>
-                                <div>
-                                    <p className="text-base md:text-lg font-black text-[#0f172a] leading-none mb-1 md:mb-1.5">
-                                        ৳{Number(trx.amount).toFixed(2)}
-                                    </p>
-                                    <p className="text-[10px] md:text-[11px] font-medium text-slate-400 uppercase line-clamp-1">
-                                        ID: {trx.invoice_number || `WTD${idx.toString().padStart(3, '0')}`}
-                                    </p>
+
+                                {/* Table Column Headers - Hidden on Mobile */}
+                                <div className="hidden md:grid grid-cols-4 gap-4 px-8 py-4 border-b border-slate-100 bg-white text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+                                    <div>Details</div>
+                                    <div className="text-center">Method</div>
+                                    <div className="text-center">Status</div>
+                                    <div className="text-right">Timestamp</div>
                                 </div>
-                            </div>
 
-                            {/* 3. Status Column (Moved to Top Right on Mobile via order-2) */}
-                            <div className="order-2 md:order-3 flex items-center justify-end md:justify-center">
-                                <span className={cn(
-                                    "px-3 py-1 md:px-4 md:py-1.5 text-[10px] font-bold text-white rounded-full uppercase tracking-wider",
-                                    trx.status === 'completed' || trx.status === 'success' ? "bg-[#10b981]" :
-                                    trx.status === 'pending' ? "bg-[#f48120]" : "bg-[#ef4444]"
-                                )}>
-                                    {trx.status}
-                                </span>
-                            </div>
+                                {/* Transactions List */}
+                                <div className="p-4 md:p-6 space-y-3 md:space-y-4 bg-[#f8fafc]">
+                                    {transactions.map((trx, idx) => (
+                                        <div key={trx.id || idx} className="grid grid-cols-2 md:grid-cols-4 items-center gap-y-4 gap-x-2 md:gap-4 p-4 border border-slate-100 rounded-[20px] bg-white shadow-sm hover:shadow-md transition-shadow">
 
-                            {/* 2. Method Column (Moved to Bottom Left on Mobile via order-3) */}
-                            <div className="order-3 md:order-2 flex flex-col items-start md:items-center justify-center">
-                                <span className="px-2.5 py-1 bg-[#f1f5f9] text-[#334155] text-[10px] font-bold rounded-md uppercase mb-1 md:mb-1.5">
-                                    {trx.payment_method}
-                                </span>
-                                <span className="text-[11px] md:text-[12px] font-medium text-[#64748b] truncate max-w-full">
-                                    {trx.number || 'N/A'}
-                                </span>
-                            </div>
+                                            {/* 1. Details Column (Top Left on Mobile) */}
+                                            <div className="order-1 flex items-center gap-3 md:gap-4">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-[14px] md:rounded-2xl bg-[#fff4eb] flex items-center justify-center text-[#f48120]">
+                                                    <Minus className="w-4 h-4 md:w-5 md:h-5 stroke-[3]" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-base md:text-lg font-black text-[#0f172a] leading-none mb-1 md:mb-1.5">
+                                                        ৳{Number(trx.amount).toFixed(2)}
+                                                    </p>
+                                                    <p className="text-[10px] md:text-[11px] font-medium text-slate-400 uppercase line-clamp-1">
+                                                        ID: {trx.invoice_number || `WTD${idx.toString().padStart(3, '0')}`}
+                                                    </p>
+                                                </div>
+                                            </div>
 
-                            {/* 4. Timestamp Column (Bottom Right on Mobile) */}
-                            <div className="order-4 flex flex-col items-end text-right">
-                                <p className="text-[13px] md:text-sm font-bold text-[#0f172a] mb-1 md:mb-1.5">
-                                    {new Date(trx.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
-                                </p>
-                                <div className="flex items-center gap-1 md:gap-1.5 text-[11px] md:text-[12px] font-medium text-slate-400">
-                                    <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                                    {new Date(trx.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                            {/* 3. Status Column (Moved to Top Right on Mobile via order-2) */}
+                                            <div className="order-2 md:order-3 flex items-center justify-end md:justify-center">
+                                                <span className={cn(
+                                                    "px-3 py-1 md:px-4 md:py-1.5 text-[10px] font-bold text-white rounded-full uppercase tracking-wider",
+                                                    trx.status === 'completed' || trx.status === 'success' ? "bg-[#10b981]" :
+                                                        trx.status === 'pending' ? "bg-[#f48120]" : "bg-[#ef4444]"
+                                                )}>
+                                                    {trx.status}
+                                                </span>
+                                            </div>
+
+                                            {/* 2. Method Column (Moved to Bottom Left on Mobile via order-3) */}
+                                            <div className="order-3 md:order-2 flex flex-col items-start md:items-center justify-center">
+                                                <span className="px-2.5 py-1 bg-[#f1f5f9] text-[#334155] text-[10px] font-bold rounded-md uppercase mb-1 md:mb-1.5">
+                                                    {trx.payment_method}
+                                                </span>
+                                                <span className="text-[11px] md:text-[12px] font-medium text-[#64748b] truncate max-w-full">
+                                                    {trx.number || 'N/A'}
+                                                </span>
+                                            </div>
+
+                                            {/* 4. Timestamp Column (Bottom Right on Mobile) */}
+                                            <div className="order-4 flex flex-col items-end text-right">
+                                                <p className="text-[13px] md:text-sm font-bold text-[#0f172a] mb-1 md:mb-1.5">
+                                                    {new Date(trx.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                                                </p>
+                                                <div className="flex items-center gap-1 md:gap-1.5 text-[11px] md:text-[12px] font-medium text-slate-400">
+                                                    <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                                    {new Date(trx.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
 
-                        </div>
-                    ))}
-                </div>
-                
-            </div>
-        )}
-    </div>
-)}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
