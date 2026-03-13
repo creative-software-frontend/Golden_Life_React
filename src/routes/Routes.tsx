@@ -16,6 +16,7 @@ import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
 // import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 // import Overview from "@/pages/Dashboard/Overview/Overview";
+import SearchResults from "@/pages/Home/Search/SearchResults";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 import CourseLayout from "@/layout/CourseLayout/CourseLayout";
@@ -220,6 +221,10 @@ export const routes = createBrowserRouter([
                                 element: <Contact />,
                             }
                         ]
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchResults />
                     }
                 ]
             }

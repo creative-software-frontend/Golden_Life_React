@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
     Search, Bell, MapPin, User, ChevronDown, ArrowLeft, 
-    Wallet, PlusCircle, Send, Download, Landmark 
+    Wallet, PlusCircle, Send, Download, Landmark, Camera
 } from 'lucide-react';
+import ImageUploadModal from '@/components/shared/ImageUploadModal';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -27,6 +28,7 @@ const MenuFoldRightIcon = ({ size = 24, className = "" }) => (
 
 const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ toggleSidebar, isOpen }) => {
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const [isImageSearchOpen, setIsImageSearchOpen] = useState(false);
     
     // --- State for Wallet ---
     const [isLoading, setIsLoading] = useState(true);
@@ -184,6 +186,13 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                             placeholder="Search orders, customers..."
                             className="bg-transparent border-none focus:ring-0 text-sm lg:text-base text-foreground ml-2 lg:ml-3 w-full min-w-0 placeholder:text-muted-foreground outline-none text-ellipsis"
                         />
+                        <button
+                            onClick={() => setIsImageSearchOpen(true)}
+                            className="p-1.5 hover:bg-yellow-50 rounded-lg transition ml-1"
+                            title="Search by image"
+                        >
+                            <Camera size={20} className="text-gray-700 hover:text-yellow-600 transition" />
+                        </button>
                     </div>
                 </div>
 
@@ -195,6 +204,35 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                     >
                         <Search size={22} />
                     </button>
+
+                    {/* Mobile/Tablet Search Overlay with Camera */}
+                    {isMobileSearchOpen && (
+                        <div className={`absolute top-0 left-0 right-0 h-16 sm:h-20 bg-background z-50 flex items-center px-4 ${isOpen ? 'xl:hidden' : 'lg:hidden'} animate-in fade-in slide-in-from-top-2 duration-200`}>
+                            <button
+                                onClick={() => setIsMobileSearchOpen(false)}
+                                className="p-2 mr-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
+                                aria-label="Close search"
+                            >
+                                <ArrowLeft size={22} />
+                            </button>
+                            <div className="flex-1 flex items-center bg-muted/50 border border-border rounded-xl px-4 py-2.5 focus-within:ring-1 focus-within:ring-secondary focus-within:border-secondary transition-all shadow-sm">
+                                <Search size={22} className="text-muted-foreground flex-shrink-0" />
+                                <input
+                                    type="text"
+                                    autoFocus
+                                    placeholder="Search orders, customers..."
+                                    className="bg-transparent border-none focus:ring-0 text-base text-foreground ml-3 w-full placeholder:text-muted-foreground outline-none min-w-0"
+                                />
+                                <button
+                                    onClick={() => setIsImageSearchOpen(true)}
+                                    className="p-1.5 hover:bg-yellow-50 rounded-lg transition ml-2"
+                                    title="Search by image"
+                                >
+                                    <Camera size={20} className="text-gray-700 hover:text-yellow-600 transition" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="hidden lg:flex items-center gap-1.5 text-muted-foreground text-sm xl:text-base cursor-pointer hover:text-foreground transition-colors">
                         <MapPin size={20} />
@@ -226,6 +264,12 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                     {renderWalletDropdown(true, walletRefMobile)}
                 </div>
             )}
+
+            {/* Image Upload Modal */}
+            <ImageUploadModal
+                isOpen={isImageSearchOpen}
+                onClose={() => setIsImageSearchOpen(false)}
+            />
 
         </header>
     );
