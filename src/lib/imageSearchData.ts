@@ -390,7 +390,8 @@ export function simulateImageSearch(imageData: string | null): Promise<{
 }
 
 // Keep the specific type function for backward compatibility
-export function simulateImageSearchWithSpecificType(imageData: string | null, specificCategory: string): Promise<{
+// Note: imageData parameter is kept for API compatibility but not used in simulation
+export function simulateImageSearchWithSpecificType(_imageData: string | null, specificCategory: string): Promise<{
   detectedTags: string[];
   detectedCategory: string;
   detectedColors: string[];
