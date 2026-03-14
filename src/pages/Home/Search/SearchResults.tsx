@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Filter, Grid, List } from 'lucide-react';
+import { Search, Grid, List } from 'lucide-react';
 import { fakeProducts } from '@/lib/imageSearchData';
 
 interface Product {

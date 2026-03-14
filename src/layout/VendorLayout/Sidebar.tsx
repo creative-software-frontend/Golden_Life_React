@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Package, Truck,
     ArrowRightLeft, Undo2, CalendarClock,
-    BarChart3, LogOut, Store, X
+    BarChart3, LogOut, Store, X, User
 } from 'lucide-react';
 
 interface SidebarProps { 
@@ -17,6 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
     const menuItems = [
         { name: 'Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
+        { name: 'Profile', path: '/vendor/dashboard/profile', icon: User },
         { name: 'Pickup Parcel', path: '/vendor/pickup', icon: Package },
         { name: 'Delivery Parcel', path: '/vendor/delivery', icon: Truck },
         { name: 'Transfer Order', path: '/vendor/transfer', icon: ArrowRightLeft },

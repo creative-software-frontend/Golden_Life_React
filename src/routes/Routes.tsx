@@ -57,6 +57,9 @@ import VendorHome from "@/pages/VendorHome/VendorHome";
 import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
 import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 
+// Vendor Profile
+import VendorProfile from "@/pages/Vendor/Profile/index";
+
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
 import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
@@ -248,6 +251,14 @@ export const routes = createBrowserRouter([
                                 index: true, // Renders at /vendor/dashboard
                                 element: <VendorHome />
                             },
+                            
+                            // Vendor Profile Route
+                            {
+                                path: 'profile',
+                                element: <VendorProfile />
+                            },
+                            
+                            // Existing wallet routes
                             {
                                 path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
                                 element: <WalletAdd />
