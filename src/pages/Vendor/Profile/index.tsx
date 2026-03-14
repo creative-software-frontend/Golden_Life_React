@@ -100,20 +100,7 @@ export default function VendorProfile() {
     }
     
     // Otherwise, assume it's just a filename and construct full URL
-    // Try multiple common paths
-    const possiblePaths = [
-      `${baseURL}/uploads/profiles/${imagePath}`,
-      `${baseURL}/uploads/${imagePath}`,
-      `${baseURL}/public/images/${imagePath}`,
-      `${baseURL}/storage/app/public/${imagePath}`,
-      `${baseURL}/${imagePath}`,  // Direct access
-    ];
-    
-    console.log('Trying possible image paths:', possiblePaths);
-    
-    // Return the first path (you can customize based on your backend structure)
-    // For now, assuming backend stores in uploads/profiles/
-    return possiblePaths[0];
+    return `${baseURL}/uploads/profiles/${imagePath}`;
   };
 
   const handleSubmit = async (formData: any) => {
@@ -164,34 +151,6 @@ export default function VendorProfile() {
           sellerId={vendor.seller_id}
           imageUrl={getImageUrl(vendor.image || vendor.profile_image || user.image || user.profile_image)}
         />
-        
-        {/* Debug: Show what we're getting */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-            <h4 className="text-sm font-semibold text-yellow-800 mb-2">Debug Info:</h4>
-            <p className="text-xs text-yellow-700">Vendor Image: {vendor.image || 'undefined'}</p>
-            <p className="text-xs text-yellow-700">Vendor Profile Image: {vendor.profile_image || 'undefined'}</p>
-            <p className="text-xs text-yellow-700">User Image: {user.image || 'undefined'}</p>
-            <p className="text-xs text-yellow-700">User Profile Image: {user.profile_image || 'undefined'}</p>
-            <p className="text-xs text-yellow-700">Displaying: {vendor.image || vendor.profile_image || user.image || user.profile_image || 'none'}</p>
-            <p className="text-xs text-yellow-700 mt-2">
-              Constructed URL: {getImageUrl(vendor.image || vendor.profile_image || user.image || user.profile_image)}
-            </p>
-            <div className="mt-3">
-              <p className="text-xs font-semibold text-yellow-800 mb-1">Test Image Display:</p>
-              <img 
-                src={getImageUrl(vendor.image || vendor.profile_image || user.image || user.profile_image)} 
-                alt="Test" 
-                className="w-20 h-20 rounded-lg object-cover border-2 border-yellow-300"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).alt = 'Failed to load';
-                  (e.target as HTMLImageElement).className = 'w-20 h-20 bg-red-100';
-                }}
-              />
-              <p className="text-xs text-yellow-600 mt-1">If image shows above, the URL is correct!</p>
-            </div>
-          </div>
-        )}
 
         {/* Stats Cards */}
         <StatsCard 

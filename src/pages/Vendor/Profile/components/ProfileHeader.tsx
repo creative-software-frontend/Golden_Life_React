@@ -27,12 +27,6 @@ export function ProfileHeader({
     displayImageUrl.startsWith('https://') ||
     displayImageUrl.startsWith('/')
   );
-  
-  // Debug log in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('ProfileHeader - Image URL:', displayImageUrl);
-    console.log('ProfileHeader - Is Valid URL:', isValidUrl);
-  }
   return (
     <div className="relative mb-6">
       {/* Cover Background */}
