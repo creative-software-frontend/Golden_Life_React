@@ -129,105 +129,110 @@ const CheckoutSummaryView = ({
     }, []);
 
     // --- INTEGRATED ORDER PLACEMENT API ---
-    const handleConfirm = async () => {
-        if (!termsAccepted) {
-            setError(true);
-            toast.error("Please accept the terms and conditions.");
-            return;
-        }
+const handleConfirm = async () => {
+    if (!termsAccepted) {
+        setError(true);
+        toast.error("Please accept the terms and conditions.");
+        return;
+    }
 
-        if (!selectedAddress?.id) {
-            toast.error("Please select a delivery address.");
-            return;
-        }
+    if (!selectedAddress?.id) {
+        toast.error("Please select a delivery address.");
+        return;
+    }
 
-        if (isInsufficientBalance) {
-            toast.error("Insufficient wallet balance.");
-            return;
-        }
+    if (isInsufficientBalance) {
+        toast.error("Insufficient wallet balance.");
+        return;
+    }
 
-        setIsPlacingOrder(true);
+    setIsPlacingOrder(true);
 
-        try {
-            const token = getAuthToken();
-            if (!token) throw new Error("No authentication token");
+    try {
+        const token = getAuthToken();
+        if (!token) throw new Error("No authentication token");
 
-            if (cartItems.length === 0) throw new Error("Cart is empty");
+        if (cartItems.length === 0) throw new Error("Cart is empty");
 
-            let calculatedSubTotal = 0;
-            const delivery = Number(deliveryFee) || 0;
+        let calculatedSubTotal = 0;
+        const delivery = Number(deliveryFee) || 0;
 
-            const formData = new FormData();
-            formData.append('address_id', String(selectedAddress.id));
-            formData.append('payment_method', paymentMethod.toLowerCase());
-            formData.append('delivery_charge', delivery.toFixed(2));
+        const formData = new FormData();
+        formData.append('address_id', String(selectedAddress.id));
+        formData.append('payment_method', paymentMethod.toLowerCase());
+        formData.append('delivery_charge', delivery.toFixed(2));
 
-            cartItems.forEach((item: any) => {
-                const offerPrice = Number(item.offer_price) || 0;
-                const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
-                const price = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
-                const qty = Number(item.quantity) || 1;
-                const itemTotal = price * qty;
+        cartItems.forEach((item: any) => {
+            const offerPrice = Number(item.offer_price) || 0;
+            const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
+            const price = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
+            const qty = Number(item.quantity) || 1;
+            const itemTotal = price * qty;
 
-                calculatedSubTotal += itemTotal;
+            calculatedSubTotal += itemTotal;
 
-                formData.append('product_id[]', String(item.id));
-                formData.append('service_type[]', "product"); 
-                formData.append('quantity[]', String(qty));
-                formData.append('item_total[]', String(itemTotal));
-            });
+            formData.append('product_id[]', String(item.id));
+            formData.append('service_type[]', "product");
+            formData.append('quantity[]', String(qty));
+            formData.append('item_total[]', String(itemTotal));
+        });
 
-            const finalTotal = calculatedSubTotal + delivery;
-            formData.append('order_total', finalTotal.toFixed(2));
+        const finalTotal = calculatedSubTotal + delivery;
+        formData.append('order_total', finalTotal.toFixed(2));
 
-            const response = await axios.post(
-                `${baseURL}/api/student/Orderstore`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        const response = await axios.post(
+            `${baseURL}/api/student/Orderstore`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
 
-            if (response.data?.status === 'success' || response.data?.success) {
-                toast.success(response.data?.message || "Order placed successfully!");
-                const orderNo = response.data?.order?.order_no; 
-                console.log(orderNo);
-                
-                
-                if (orderNo) {
-                        navigate(`/dashboard/order-details`, { state: {  orderNo: orderNo } }); ;
-                }
+        if (response.data?.status === 'success' || response.data?.success) {
+            toast.success(response.data?.message || "Order placed successfully!");
 
-                localStorage.removeItem("cart");
-                window.dispatchEvent(new Event("cartUpdated"));
+            const orderNo = response.data?.order?.order_no;
 
-                if (paymentMethod.toLowerCase() === 'wallet') {
-                    triggerWalletUpdate?.();
-                }
+            // ─── Clean up first ───────────────────────────────────────
+            localStorage.removeItem("cart");
+            window.dispatchEvent(new Event("cartUpdated"));
 
-                changeCheckoutModal();
-                onConfirm();
+            if (paymentMethod.toLowerCase() === 'wallet') {
+                triggerWalletUpdate?.();
+            }
+
+            // ─── CLOSE MODAL BEFORE NAVIGATION ────────────────────────
+            onConfirm();           // This should call changeCheckoutModal() in parent
+
+            // ─── Then navigate using query param ──────────────────────
+            if (orderNo) {
+                navigate(`/dashboard/order-details?order=${orderNo}`);
             } else {
-                throw new Error(response.data?.message || "Order failed");
+                // fallback – rare case
+                console.warn("Order placed but no order_no received");
+                navigate('/dashboard');
             }
-        } catch (err: any) {
-            console.error("Order placement failed:", err);
-
-            let msg = "Failed to place order. Please try again.";
-            if (err.response?.data?.message) {
-                msg = err.response.data.message;
-            } else if (err.response?.data?.errors) {
-                const firstKey = Object.keys(err.response.data.errors)[0];
-                msg = err.response.data.errors[firstKey][0];
-            }
-
-            toast.error(msg);
-        } finally {
-            setIsPlacingOrder(false);
+        } else {
+            throw new Error(response.data?.message || "Order placement failed");
         }
-    };
+    } catch (err: any) {
+        console.error("Order placement failed:", err);
+
+        let msg = "Failed to place order. Please try again.";
+        if (err.response?.data?.message) {
+            msg = err.response.data.message;
+        } else if (err.response?.data?.errors) {
+            const firstKey = Object.keys(err.response.data.errors)[0];
+            msg = err.response.data.errors[firstKey][0];
+        }
+
+        toast.error(msg);
+    } finally {
+        setIsPlacingOrder(false);
+    }
+};
 
     const handleBackToCart = () => {
         changeCheckoutModal();
