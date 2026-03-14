@@ -232,7 +232,7 @@ export const routes = createBrowserRouter([
     },
     {
         path: '/vendor',
-        element: <VendorProtectedRoute />,
+        // element: <VendorProtectedRoute />,
         children: [
             {
                 element: <VendorLayout />,
@@ -260,6 +260,10 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'wallet/send', // Renders at /vendor/dashboard/wallet/withdraw
                                 element: <WalletSend />
+                            },
+                            {
+                                path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletPurchase />
                             },
                             {
                                 path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
@@ -401,10 +405,7 @@ export const routes = createBrowserRouter([
         path: '/allcourses',  // Separate route for Help page
         element: <AllCourses />,
     },
-    {
-        path: '/orderdetails',  // Separate route for Help page
-        element: <OrderDetails />,
-    },
+
     {
         path: '/trending',  // Separate route for Help page
         element: <Trending />,

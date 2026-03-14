@@ -40,7 +40,6 @@ const OrderSkeleton = () => (
   <div className="bg-white/70 border border-slate-200/70 rounded-2xl sm:rounded-3xl overflow-hidden animate-pulse">
     <div className="p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-        {/* Icon skeleton */}
         <div className="h-9 w-9 sm:h-10 sm:w-10 bg-slate-200 rounded-xl sm:rounded-2xl" />
         <div className="space-y-1.5">
           <div className="h-4 w-36 bg-slate-200 rounded" />
@@ -69,9 +68,10 @@ const OrderHistory = () => {
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-  const goToDetails = (e: React.MouseEvent, orderNo: string) => {
+  // FIX: Passing both `id` and `orderNo` in state in case the Details API needs the DB id instead of the string.
+  const goToDetails = (e: React.MouseEvent, orderId: number, orderNo: string) => {
     e.stopPropagation();
-    navigate(`/dashboard/order-details`);
+    navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } }); 
   };
 
   const getAuthToken = () => {
@@ -120,7 +120,6 @@ const OrderHistory = () => {
     return (
       <div className="min-h-screen bg-slate-50/40">
         <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 sm:py-8 lg:py-10">
-          {/* Header Skeleton (smaller) */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8 lg:mb-10">
             <div className="p-3 bg-slate-200 rounded-2xl w-fit" />
             <div className="space-y-1.5">
@@ -128,8 +127,6 @@ const OrderHistory = () => {
               <div className="h-3.5 w-64 bg-slate-200 rounded" />
             </div>
           </div>
-
-          {/* Skeleton Cards */}
           <div className="space-y-4 sm:space-y-5 lg:space-y-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <OrderSkeleton key={i} />
@@ -159,7 +156,6 @@ const OrderHistory = () => {
   return (
     <div className="min-h-screen bg-slate-50/40">
       <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 sm:py-8 lg:py-10">
-        {/* Header (smaller fonts) */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-8 lg:mb-10">
           <div className="p-3.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-200/40 inline-flex">
             <ShoppingBag className="text-white w-6 h-6 sm:w-7 sm:h-7" />
@@ -184,7 +180,6 @@ const OrderHistory = () => {
                   : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
               }`}
             >
-              {/* Header Row (smaller fonts) */}
               <div
                 onClick={() => toggleOrder(order.id)}
                 className="p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-white/60 active:bg-white/70 transition-colors"
@@ -200,7 +195,7 @@ const OrderHistory = () => {
 
                   <div>
                     <div
-                      onClick={(e) => goToDetails(e, order.order_no)}
+                      onClick={(e) => goToDetails(e, order.id, order.order_no)}
                       className="group flex items-center gap-1.5 w-fit"
                     >
                       <h3 className="font-black text-slate-900 text-sm sm:text-base lg:text-lg group-hover:text-emerald-600 transition-colors">
@@ -227,6 +222,7 @@ const OrderHistory = () => {
                 <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</p>
+                    {/* Exact value, no formatting */}
                     <p className="text-base sm:text-lg lg:text-xl font-black text-slate-900">৳{order.total}</p>
                   </div>
                   <div className={`p-2 rounded-full ${expandedOrderId === order.id ? 'bg-emerald-50' : 'bg-slate-100/70'}`}>
@@ -242,9 +238,7 @@ const OrderHistory = () => {
               {/* Expanded Content */}
               {expandedOrderId === order.id && (
                 <div className="border-t border-slate-100/60 bg-gradient-to-b from-white/80 to-white/60 p-4 sm:p-5 lg:p-6">
-                  {/* Metadata Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6 lg:mb-8">
-                    {/* Payment */}
                     <div className="bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm">
                       <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                         <Wallet size={12} /> Payment
@@ -252,17 +246,16 @@ const OrderHistory = () => {
                       <p className="font-bold text-slate-800 text-sm">{order.payment?.payment_method ?? 'N/A'}</p>
                     </div>
 
-                    {/* Delivery */}
                     <div className="bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm">
                       <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                         <Truck size={12} /> Delivery
                       </p>
+                      {/* Exact value, no formatting */}
                       <p className="font-bold text-slate-800 text-sm">৳{order.delivery_charge}</p>
                     </div>
 
-                    {/* Full Details */}
                     <div
-                      onClick={(e) => goToDetails(e, order.order_no)}
+                      onClick={(e) => goToDetails(e, order.id, order.order_no)}
                       className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 shadow-sm hover:bg-emerald-50 cursor-pointer transition-colors flex flex-col justify-center"
                     >
                       <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
@@ -272,13 +265,11 @@ const OrderHistory = () => {
                     </div>
                   </div>
 
-                  {/* Order Items Section */}
                   <div>
                     <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 px-1">
                       Order Items
                     </h4>
 
-                    {/* Desktop Table Header */}
                     <div className="hidden md:grid grid-cols-12 gap-3 pb-3 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase px-2">
                       <div className="col-span-7 lg:col-span-8">Product</div>
                       <div className="col-span-2 text-center">Qty</div>
@@ -291,7 +282,6 @@ const OrderHistory = () => {
                           key={item.id}
                           className="py-4 px-2 flex flex-col md:grid md:grid-cols-12 md:items-center gap-3 group hover:bg-slate-50/50 transition-colors rounded-xl"
                         >
-                          {/* Product Info (smaller image + font) */}
                           <div className="md:col-span-7 lg:col-span-8 flex items-center gap-3">
                             <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm">
                               <img
@@ -308,7 +298,6 @@ const OrderHistory = () => {
                             </div>
                           </div>
 
-                          {/* Quantity & Subtotal (smaller font) */}
                           <div className="flex justify-between md:contents">
                             <div className="md:col-span-2 md:text-center">
                               <span className="md:hidden text-[10px] text-slate-500 block mb-0.5">Quantity</span>
@@ -316,6 +305,7 @@ const OrderHistory = () => {
                             </div>
                             <div className="md:col-span-3 lg:col-span-2 md:text-right">
                               <span className="md:hidden text-[10px] text-slate-500 block mb-0.5">Subtotal</span>
+                              {/* Exact value, no formatting */}
                               <span className="font-black text-slate-900 text-sm sm:text-base">৳{item.subtotal}</span>
                             </div>
                           </div>

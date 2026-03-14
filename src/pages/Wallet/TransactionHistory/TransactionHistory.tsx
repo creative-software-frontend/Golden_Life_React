@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, Clock, Plus, Minus, Receipt } from 'lucide-react';
+import { Loader2, Clock, Receipt, Wallet, ArrowUpRight, ArrowDownLeft, Hash } from 'lucide-react';
 
 export default function TransactionHistory() {
     const [transactions, setTransactions] = useState([]);
@@ -43,106 +43,157 @@ export default function TransactionHistory() {
     }, []);
 
     const getStatusBadge = (status) => {
-        if (!status) return <span className="px-4 py-1.5 text-[10px] md:text-xs font-black text-white bg-[#10b981] rounded-full uppercase tracking-wider">Success</span>;
+        if (!status) return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-emerald-700 bg-emerald-100/80 rounded-full border border-emerald-200/50 uppercase tracking-wider">Success</span>;
         const normalized = status.toLowerCase();
         if (normalized === 'completed' || normalized === 'success') {
-            return <span className="px-4 py-1.5 text-[10px] md:text-xs font-black text-white bg-[#10b981] rounded-full uppercase tracking-wider">Success</span>;
+            return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-emerald-700 bg-emerald-100/80 rounded-full border border-emerald-200/50 uppercase tracking-wider">Success</span>;
         }
         if (normalized === 'pending') {
-            return <span className="px-4 py-1.5 text-[10px] md:text-xs font-black text-white bg-[#fb923c] rounded-full uppercase tracking-wider">Pending</span>;
+            return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-amber-700 bg-amber-100/80 rounded-full border border-amber-200/50 uppercase tracking-wider">Pending</span>;
         }
-        return <span className="px-4 py-1.5 text-[10px] md:text-xs font-black text-white bg-[#ef4444] rounded-full uppercase tracking-wider">{status}</span>;
+        return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-rose-700 bg-rose-100/80 rounded-full border border-rose-200/50 uppercase tracking-wider">{status}</span>;
+    };
+
+    const formatMethod = (method) => {
+        if (!method) return 'N/A';
+        const lower = method.toLowerCase();
+        if (lower === 'add') return 'ADD MONEY';
+        if (lower === 'send') return 'SEND MONEY';
+        return method.toUpperCase();
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return { date: 'N/A', time: '' };
+        const date = new Date(dateString);
+        return {
+            date: date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+            time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
     };
 
     return (
-        /* UPDATED: Added max-w-4xl and mx-auto to center it */
-        <div className="animate-in fade-in duration-300 w-full max-w-4xl mx-auto px-4 py-12 md:py-8  md:px-8">
-            
+        <div className="animate-in fade-in duration-500 w-full max-w-5xl mx-auto px-4 py-8 md:py-12 md:px-8">
+
             {/* Header Area */}
-            <div className="flex flex-wrap items-center justify-start gap-4 mb-6 md:mb-8 border-b border-slate-100 pb-4">
-                <h2 className="text-base md:text-lg font-black text-slate-500 uppercase tracking-widest">
-                    Transaction History
-                </h2>
-                <span className="bg-[#eef7f2] text-[#6cb28d] px-3 py-1 rounded-full text-[10px] md:text-[11px] font-bold uppercase tracking-wider shrink-0">
-                    {transactions.length} Records Found
-                </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+                        Transaction History
+                    </h2>
+                    <p className="text-slate-500 text-sm mt-1 font-medium">Keep track of your wallet activities</p>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-indigo-50/80 border border-indigo-100 px-4 py-2.5 rounded-2xl w-fit">
+                    <Wallet className="w-4 h-4 text-indigo-500" />
+                    <span className="text-indigo-700 text-sm font-bold tracking-wide">
+                        {transactions.length} Records
+                    </span>
+                </div>
             </div>
 
             <div className="w-full">
-                {/* Desktop Headers */}
-                <div className="hidden md:grid grid-cols-4 gap-4 pb-4 text-[11px] font-black text-slate-400 uppercase tracking-widest px-6">
-                    <div>Details</div>
-                    <div>Method</div>
-                    <div>Status</div>
-                    <div className="text-right">Timestamp</div>
-                </div>
-
                 <div className="space-y-4">
                     {isLoadingHistory ? (
-                        <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-                            <Loader2 className="w-8 h-8 animate-spin mb-4 text-[#fb923c]" />
-                            <p className="text-sm font-medium">Loading history...</p>
+                        <div className="py-24 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 rounded-3xl border border-slate-100">
+                            <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
+                            <p className="text-sm font-semibold text-slate-500">Loading your transactions...</p>
                         </div>
                     ) : transactions.length === 0 ? (
-                        <div className="py-20 text-center text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                            No transactions found.
+                        <div className="py-24 flex flex-col items-center justify-center text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                                <Receipt className="w-8 h-8 text-slate-400" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-700 mb-1">No transactions yet</h3>
+                            <p className="text-slate-500 text-sm max-w-[250px] mx-auto">Your transaction history will be displayed here once you make a move.</p>
                         </div>
                     ) : (
-                        transactions.map((tx, idx) => {
-                            const isPositive = tx.type === 'add';
-                            const isPurchase = tx.type === 'purchase';
+                        <div className="grid grid-cols-1 gap-3 md:gap-4">
+                            {transactions.map((tx, idx) => {
+                                const isPositive = tx.type === 'add';
+                                const isPurchase = tx.type === 'purchase';
+                                const { date, time } = formatDate(tx.created_at);
 
-                            return (
-                                <div key={tx.id || idx} className="grid grid-cols-2 md:grid-cols-4 items-center gap-y-4 gap-x-2 md:gap-4 p-4 md:py-5 md:px-6 border border-slate-100 rounded-[20px] bg-white shadow-sm hover:shadow-md transition-shadow">
-                                    
-                                    {/* 1. Details */}
-                                    <div className="order-1 flex items-center gap-3 md:gap-4">
-                                        <div className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl shrink-0 ${isPositive ? 'bg-emerald-50 text-emerald-500' : 'bg-[#fff6ef] text-[#fb923c]'}`}>
-                                            {isPositive ? <Plus size={20} strokeWidth={3} /> : isPurchase ? <Receipt size={20} strokeWidth={2.5} /> : <Minus size={20} strokeWidth={3} />}
-                                        </div>
-                                        <div>
-                                            <p className="text-[16px] md:text-[18px] font-black text-[#0f172a] leading-none mb-1 tracking-tight">
-                                                {isPositive ? '+' : '-'}৳{Number(tx.amount || 0).toFixed(2)}
-                                            </p>
-                                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase truncate max-w-[100px] md:max-w-none">
-                                                {tx.Transaction_ID || tx.invoice_number || 'No ID'}
-                                            </p>
-                                        </div>
-                                    </div>
+                                return (
+                                    <div
+                                        key={tx.id || idx}
+                                        className="group relative bg-white flex flex-col md:flex-row md:items-center justify-between p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all duration-300"
+                                    >
+                                        <div className="flex items-start md:items-center gap-4 w-full md:w-auto">
+                                            {/* Icon */}
+                                            <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shrink-0 transition-colors duration-300 ${isPositive
+                                                    ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'
+                                                    : isPurchase
+                                                        ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
+                                                        : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100'
+                                                }`}>
+                                                {isPositive ? <ArrowDownLeft size={24} strokeWidth={2.5} /> : <ArrowUpRight size={24} strokeWidth={2.5} />}
+                                            </div>
 
-                                    {/* 3. Status (Swapped for Desktop Order) */}
-                                    <div className="order-2 md:order-3 flex items-center justify-end md:justify-start w-full">
-                                        {getStatusBadge(tx.status)}
-                                    </div>
+                                            {/* Main Details */}
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-[15px] font-bold text-slate-800">
+                                                        {formatMethod(tx.type)}
+                                                    </span>
+                                                </div>
 
-                                    {/* 2. Method & Type */}
-                                    <div className="order-3 md:order-2 flex flex-col items-start w-full">
-                                        <div className="flex flex-col items-start gap-1">
-                                            <span className="bg-[#f1f5f9] text-[#334155] px-2 py-0.5 rounded-md text-[9px] md:text-[10px] font-black uppercase tracking-widest">
-                                                {tx.payment_method || 'Wallet'}
-                                            </span>
-                                            <span className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase">
-                                                {tx.type} • {tx.number || 'N/A'}
-                                            </span>
-                                        </div>
-                                    </div>
+                                                <div className="flex items-center flex-wrap gap-1.5 md:gap-2 text-xs font-medium text-slate-500">
+                                                    <span className="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md text-slate-600 uppercase tracking-wider text-[10px]">
+                                                        {tx.payment_method || 'Wallet'}
+                                                    </span>
+                                                    {tx.number && (
+                                                        <>
+                                                            <span className="text-slate-300 hidden md:inline">•</span>
+                                                            <span className="tracking-wide break-all">{tx.number}</span>
+                                                        </>
+                                                    )}
+                                                </div>
 
-                                    {/* 4. Timestamp */}
-                                    <div className="order-4 flex flex-col items-end text-right w-full">
-                                        <p className="text-[12px] md:text-[14px] font-black text-[#0f172a] mb-0.5">
-                                            {tx.created_at ? new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : 'N/A'}
-                                        </p>
-                                        <div className="flex items-center justify-end gap-1 text-slate-400">
-                                            <Clock className="w-3 h-3" />
-                                            <span className="text-[10px] md:text-[11px] font-semibold">
-                                                {tx.created_at ? new Date(tx.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
-                                            </span>
+                                                <div className="flex items-center gap-1 mt-1.5 text-[11px] text-slate-400 font-medium">
+                                                    <Hash className="w-3 h-3 shrink-0" />
+                                                    <span className="truncate max-w-[150px] md:max-w-[250px]">
+                                                        {tx.Transaction_ID || tx.invoice_number || 'No ID'}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        {/* Mobile Divider */}
+                                        <div className="h-px w-full bg-slate-50 my-3 md:hidden"></div>
+
+                                        <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center w-full md:w-auto">
+                                            {/* Amount & Status */}
+                                            <div className="flex flex-col items-start md:items-end w-full md:w-auto">
+                                                <div className="flex items-center justify-between md:justify-end w-full md:w-auto md:mb-1">
+                                                    <p className={`text-lg md:text-xl font-black ${isPositive ? 'text-emerald-600' : 'text-slate-800'}`}>
+                                                        {isPositive ? '+' : '-'}৳{Number(tx.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </p>
+                                                    {/* Status Badge (shows inline on mobile right side) */}
+                                                    <div className="md:hidden ml-4">
+                                                        {getStatusBadge(tx.status)}
+                                                    </div>
+                                                </div>
+
+                                                {/* Status Badge Desktop */}
+                                                <div className="hidden md:block">
+                                                    {getStatusBadge(tx.status)}
+                                                </div>
+                                            </div>
+
+                                            {/* Timestamp */}
+                                            <div className="flex flex-col items-start md:flex-row md:items-center gap-0.5 md:gap-2 text-xs mt-1 md:mt-2 text-slate-400 font-medium">
+                                                <span>{date}</span>
+                                                <span className="hidden md:inline text-slate-300">•</span>
+                                                <div className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3 md:hidden" />
+                                                    <span>{time}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                    
-                                </div>
-                            );
-                        })
+                                );
+                            })}
+                        </div>
                     )}
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Corrected import
+import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package } from 'lucide-react';
 import { Address, PaymentMethod } from './CheckoutModal'; // Adjust path if needed
 import useModalStore from '@/store/Store';
 import axios from 'axios';
@@ -43,11 +44,15 @@ const CheckoutSummaryView = ({
     deliveryFee
 }: Props) => {
     const { changeCheckoutModal, toggleClicked, triggerWalletUpdate } = useModalStore();
+    const navigate = useNavigate(); // Initialized the navigate hook
 
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState(false);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     
+    // --- CART ITEMS STATE ---
+    const [cartItems, setCartItems] = useState<any[]>([]);
+
     // --- WALLET BALANCE STATE ---
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [isFetchingBalance, setIsFetchingBalance] = useState(true);
@@ -63,7 +68,6 @@ const CheckoutSummaryView = ({
     const total = safeSubTotal + safeDeliveryFee;
     const remainingBalance = walletBalance - total;
     
-    // Cleaned up unused variable by applying it here
     const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
 
     // Fetch Wallet Balance & Calculate Savings
@@ -89,13 +93,15 @@ const CheckoutSummaryView = ({
             }
         };
 
-        // Calculate discount from cart items
+        // Calculate discount from cart items and set cart state
         try {
-            const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+            const items = JSON.parse(localStorage.getItem('cart') || '[]');
+            setCartItems(items); 
+            
             let originalTotal = 0;
             let currentTotal = 0;
 
-            cartItems.forEach((item: any) => {
+            items.forEach((item: any) => {
                 const qty = Number(item.quantity) || 0;
                 const offerPrice = Number(item.offer_price) || 0;
                 const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
@@ -146,7 +152,6 @@ const CheckoutSummaryView = ({
             const token = getAuthToken();
             if (!token) throw new Error("No authentication token");
 
-            const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
             if (cartItems.length === 0) throw new Error("Cart is empty");
 
             let calculatedSubTotal = 0;
@@ -187,6 +192,13 @@ const CheckoutSummaryView = ({
 
             if (response.data?.status === 'success' || response.data?.success) {
                 toast.success(response.data?.message || "Order placed successfully!");
+                const orderNo = response.data?.order?.order_no; 
+                console.log(orderNo);
+                
+                
+                if (orderNo) {
+                        navigate(`/dashboard/order-details`, { state: {  orderNo: orderNo } }); ;
+                }
 
                 localStorage.removeItem("cart");
                 window.dispatchEvent(new Event("cartUpdated"));
@@ -270,7 +282,52 @@ const CheckoutSummaryView = ({
                     </div>
                 </div>
 
-                {/* 2. Order Summary Details */}
+                {/* 2. Product List Section */}
+                {cartItems.length > 0 && (
+                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                        <div className="flex items-center gap-2 border-b border-gray-100 pb-3 mb-1">
+                            <Package className="w-4 h-4 text-gray-400" />
+                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Items in Order</h3>
+                        </div>
+                        <div className="space-y-3">
+                            {cartItems.map((item: any, idx: number) => {
+                                const offerPrice = Number(item.offer_price) || 0;
+                                const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
+                                const activePrice = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
+                                const qty = Number(item.quantity) || 1;
+                                const itemTotal = activePrice * qty;
+                                
+                                const imageUrl = item.image || item.thumbnail || item.product_image;
+
+                                return (
+                                    <div key={item.id || idx} className="flex justify-between items-center gap-3">
+                                        <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center group">
+                                            <img 
+                                                src={imageUrl || "/placeholder.svg"} 
+                                                alt={item.product_title_english || item.name || "Product"} 
+                                                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[14px] font-bold text-gray-800 truncate">
+                                                {item.name || item.product_title_english || item.product_name || "Unknown Item"}
+                                            </p>
+                                            <p className="text-[12px] font-medium text-gray-500 mt-0.5">
+                                                Qty: {qty} × ৳{activePrice.toFixed(2)}
+                                            </p>
+                                        </div>
+                                        <span className="text-[14px] font-black text-gray-900 shrink-0">
+                                            ৳{itemTotal.toFixed(2)}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* 3. Order Summary Details */}
                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
                     <div className="flex items-center gap-2 border-b border-gray-100 pb-3 mb-1">
                         <Receipt className="w-4 h-4 text-gray-400" />
@@ -315,7 +372,7 @@ const CheckoutSummaryView = ({
             {/* --- FIXED FOOTER --- */}
             <div className="p-4 border-t border-gray-200 bg-white space-y-4 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.08)] z-20">
                 
-                {/* 3. Payment Option */}
+                {/* 4. Payment Option */}
                 <div>
                     <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5 px-1">Choose Payment Method</h4>
                     <div className="flex flex-wrap gap-2">
@@ -340,7 +397,7 @@ const CheckoutSummaryView = ({
                     </div>
                 </div>
 
-                {/* 4. INSUFFICIENT BALANCE WARNING */}
+                {/* 5. INSUFFICIENT BALANCE WARNING */}
                 {isInsufficientBalance && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -353,7 +410,7 @@ const CheckoutSummaryView = ({
                     </div>
                 )}
 
-                {/* 5. Terms */}
+                {/* 6. Terms */}
                 <div className="flex flex-col gap-1.5 px-1 py-1">
                     <div className="flex items-center gap-3">
                         <input

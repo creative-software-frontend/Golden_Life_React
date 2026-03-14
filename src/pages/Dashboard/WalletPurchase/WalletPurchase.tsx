@@ -70,7 +70,7 @@ export default function WalletPurchase() {
                     
                     {/* Header with Record Count */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 md:px-8 py-6 md:py-8">
-                        <h2 className="text-base md:text-xl font-black text-slate-700 uppercase tracking-tight">History</h2>
+                        <h2 className="text-base md:text-xl font-black text-slate-700 uppercase tracking-tight">Purchase History</h2>
                         <span className="bg-emerald-50 text-emerald-600 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider w-fit">
                             {purchases.length} Records Found
                         </span>

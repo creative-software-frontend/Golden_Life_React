@@ -8,18 +8,18 @@ type LoginMethod = 'mobile' | 'email';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-  
+
   // --- Form States ---
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('mobile');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ mobile: '', email: '', password: '' });
   const [errors, setErrors] = useState({ mobile: '', email: '', password: '' });
-  const [apiError, setApiError] = useState(''); 
+  const [apiError, setApiError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // --- OTP Modal States ---
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", ""]); 
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -58,14 +58,14 @@ const Login: React.FC = () => {
     if (loginMethod === 'mobile') {
       try {
         // REAL API CALL: SEND OTP
-        const response = await axios.post(`${baseURL}/api/login/send-otp`, { 
-          mobile: formData.mobile 
+        const response = await axios.post(`${baseURL}/api/login/send-otp`, {
+          mobile: formData.mobile
         });
 
         if (response.status === 200 || response.data.success) {
-           setShowOtpModal(true);
+          setShowOtpModal(true);
         } else {
-           throw new Error(response.data.message || "Failed to send OTP.");
+          throw new Error(response.data.message || "Failed to send OTP.");
         }
       } catch (err: any) {
         setApiError(err.response?.data?.message || "Failed to send OTP. Please try again.");
@@ -75,9 +75,9 @@ const Login: React.FC = () => {
     } else {
       // EMAIL LOGIN FLOW
       try {
-        const response = await axios.post(`${baseURL}/api/student/login`, { 
-          email: formData.email, 
-          password: formData.password 
+        const response = await axios.post(`${baseURL}/api/student/login`, {
+          email: formData.email,
+          password: formData.password
         });
         handleAuthSuccess(response.data.token || response.data.data?.token);
       } catch (error: any) {
@@ -127,11 +127,11 @@ const Login: React.FC = () => {
   const handleAuthSuccess = (token: string) => {
     const expirationDate = new Date();
     expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000));
-    
+
     document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
-    sessionStorage.setItem('student_session', JSON.stringify({ 
-      token: token, 
-      expiry: expirationDate.getTime() 
+    sessionStorage.setItem('student_session', JSON.stringify({
+      token: token,
+      expiry: expirationDate.getTime()
     }));
 
     navigate('/dashboard');
@@ -195,6 +195,26 @@ const Login: React.FC = () => {
             <p className="text-center text-gray-600 pt-2">
               Don't have an account? <Link to="/register" className="text-[#FF8A00] font-bold hover:underline">Register</Link>
             </p>
+
+            {/* --- NEW VENDOR LOGIN LINK --- */}
+            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
+              <Link
+                to="/vendor/login"
+                className="group flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow"
+              >
+                <span>Are you a vendor?</span>
+                <span className="text-[#FF8A00] font-bold">Login here</span>
+                <svg
+                  className="w-4 h-4 text-[#FF8A00] transform group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </div>
+
           </form>
         </div>
       </div>
@@ -203,7 +223,7 @@ const Login: React.FC = () => {
       {showOtpModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 relative">
-            <button onClick={() => setShowOtpModal(false)} className="absolute top-4 right-4 text-gray-400 p-2"><X size={20}/></button>
+            <button onClick={() => setShowOtpModal(false)} className="absolute top-4 right-4 text-gray-400 p-2"><X size={20} /></button>
 
             <div className="text-center mb-6">
               <h2 className="text-2xl font-black text-gray-900">Verify Your Phone</h2>
@@ -227,7 +247,7 @@ const Login: React.FC = () => {
             <button onClick={handleOtpSubmit} disabled={isOtpLoading} className="w-full bg-[#FF8A00] text-white font-bold text-lg py-4 rounded-xl shadow-lg active:scale-95 transition-all">
               {isOtpLoading ? "Verifying..." : "Verify & Continue"}
             </button>
-            
+
             <p className="text-center text-sm text-gray-500 mt-6">
               Didn't receive the code? <button type="button" onClick={() => handleSubmit()} className="text-[#FF8A00] font-bold hover:underline">Resend</button>
             </p>
@@ -238,7 +258,7 @@ const Login: React.FC = () => {
   );
 };
 
-const X = ({size}: {size: number}) => (
+const X = ({ size }: { size: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 );
 
