@@ -23,12 +23,26 @@ export default function EditProduct() {
       }
 
       try {
+        console.log('🔄 Fetching product with ID:', id);
         const data = await fetchProductById(Number(id));
+        console.log('✅ Product fetched successfully:', data);
         setProductData(data);
       } catch (err: any) {
-        console.error('Fetch product error:', err);
-        toast.error(err.response?.data?.message || 'Failed to load product');
-        navigate('/vendor/dashboard/products');
+        console.error('❌ Fetch product error:', err);
+        
+        // Show detailed error message
+        const errorMessage = err.message || 'Failed to load product';
+        toast.error(errorMessage);
+        
+        // If it's a 404 or endpoint not found, suggest backend issue
+        if (err.message?.includes('endpoint')) {
+          toast.warning('Backend API endpoint may not be implemented yet. Please check with your backend team.');
+        }
+        
+        // Wait a bit then redirect
+        setTimeout(() => {
+          navigate('/vendor/dashboard/products');
+        }, 2000);
       } finally {
         setIsLoading(false);
       }

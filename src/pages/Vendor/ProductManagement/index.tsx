@@ -61,11 +61,16 @@ const Products: React.FC = () => {
 
   // Handle individual product actions
   const handleViewProduct = useCallback((product: Product) => {
+    console.log('Viewing product:', product);
+    console.log('Product ID:', product.id);
     toast.info(`Viewing product: ${product.product_title_english}`);
-    // TODO: Navigate to product detail page or open modal
-  }, []);
+    // Navigate to product detail page
+    navigate(`/vendor/dashboard/products/${product.id}`);
+  }, [navigate]);
 
   const handleEditProduct = useCallback((product: Product) => {
+    console.log('Editing product:', product);
+    console.log('Product ID:', product.id);
     navigate(`/vendor/dashboard/products/edit/${product.id}`);
   }, [navigate]);
 

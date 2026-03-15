@@ -46,6 +46,7 @@ import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
 import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
+import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
@@ -62,6 +63,7 @@ import VendorProfile from "@/pages/Vendor/Profile/index";
 import Products from "@/pages/Vendor/ProductManagement/index";
 import AddProduct from "@/pages/Vendor/Products/AddProduct";
 import EditProduct from "@/pages/Vendor/Products/EditProduct";
+// import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; // Commented - duplicate
 
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
@@ -275,6 +277,10 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'products/edit/:id',
                                 element: <EditProduct />
+                            },
+                            {
+                                path: 'products/:id',
+                                element: <VendorProductDetails />
                             },
                             
                             // Existing wallet routes

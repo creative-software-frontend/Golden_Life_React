@@ -151,44 +151,74 @@ export function useProductMutation() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      const response = await axios.get(
-        `${baseURL}/api/vendor/product/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      // Try multiple possible endpoints (backend may use different patterns)
+      const possibleEndpoints = [
+        `/api/vendor/ecommerce/product/${id}`,  
+        `/api/vendor/product/show/${id}`,       
+        `/api/vendor/product/details/${id}`,    
+        `/api/vendor/product/${id}`            
+      ];
+
+      let lastError: any;
+
+      for (const endpoint of possibleEndpoints) {
+        try {
+          console.log(`🔄 Trying endpoint: ${endpoint}`);
+          
+          const response = await axios.get(
+            `${baseURL}${endpoint}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          console.log(`✅ Success with endpoint: ${endpoint}`);
+          console.log('Response data:', response.data);
+
+          const productData = response.data?.data || response.data;
+
+          // Transform API response to form data structure
+          const formData: ProductFormData = {
+            product_title_english: productData.product_title_english || '',
+            product_title_bangla: productData.product_title_bangla || '',
+            category_id: productData.category_id || productData.category?.id || 0,
+            subcategory_id: productData.subcategory_id || productData.subcategory?.id || 0,
+            short_description_english: productData.short_description_english || '',
+            short_description_bangla: productData.short_description_bangla || '',
+            long_description_english: productData.long_description_english || '',
+            long_description_bangla: productData.long_description_bangla || '',
+            seller_price: parseFloat(productData.seller_price) || 0,
+            regular_price: parseFloat(productData.regular_price) || 0,
+            offer_price: parseFloat(productData.offer_price) || 0,
+            sku: productData.sku || '',
+            stock: parseInt(productData.stock) || 0,
+            video_link: productData.video_link || '',
+            status: productData.status === 1 ? 1 : 0,
+            images: [], // No new images initially in edit mode
+            existing_images: [
+              productData.product_image,
+              ...(productData.gallery_images || [])
+            ].filter(Boolean),
+            removed_images: []
+          };
+
+          return formData;
+        } catch (err: any) {
+          console.warn(`❌ Failed with endpoint ${endpoint}:`, err.response?.status || err.message);
+          lastError = err;
+          // Continue to next endpoint
         }
+      }
+
+      // All endpoints failed
+      console.error('❌ All endpoints failed. Last error:', lastError.response?.data);
+      throw new Error(
+        lastError.response?.data?.message || 
+        'Failed to fetch product. Backend endpoint may not be implemented yet. Please check the console for tried endpoints.'
       );
-
-      const productData: ProductApiResponse = response.data?.data || response.data;
-
-      // Transform API response to form data structure
-      const formData: ProductFormData = {
-        product_title_english: productData.product_title_english,
-        product_title_bangla: productData.product_title_bangla,
-        category_id: productData.category_id,
-        subcategory_id: productData.subcategory_id,
-        short_description_english: productData.short_description_english || '',
-        short_description_bangla: productData.short_description_bangla || '',
-        long_description_english: productData.long_description_english || '',
-        long_description_bangla: productData.long_description_bangla || '',
-        seller_price: productData.seller_price,
-        regular_price: productData.regular_price,
-        offer_price: productData.offer_price,
-        sku: productData.sku,
-        stock: productData.stock,
-        video_link: productData.video_link || '',
-        status: productData.status,
-        images: [], // No images initially in edit mode
-        existing_images: [
-          productData.product_image,
-          ...(productData.gallery_images || [])
-        ].filter(Boolean),
-        removed_images: []
-      };
-
-      return formData;
     } catch (err: any) {
       console.error('Fetch product error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load product';
