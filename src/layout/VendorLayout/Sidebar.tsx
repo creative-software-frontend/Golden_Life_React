@@ -17,6 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
     const menuItems = [
         { name: 'Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
+        { name: 'Products', path: '/vendor/dashboard/products', icon: Package },
         { name: 'Profile', path: '/vendor/dashboard/profile', icon: User },
         { name: 'Pickup Parcel', path: '/vendor/pickup', icon: Package },
         { name: 'Delivery Parcel', path: '/vendor/delivery', icon: Truck },

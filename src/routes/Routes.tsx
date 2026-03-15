@@ -59,6 +59,7 @@ import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 
 // Vendor Profile
 import VendorProfile from "@/pages/Vendor/Profile/index";
+import Products from "@/pages/Vendor/ProductManagement/index";
 
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
@@ -256,6 +257,12 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'profile',
                                 element: <VendorProfile />
+                            },
+                            
+                            // Vendor Products Route
+                            {
+                                path: 'products',
+                                element: <Products />
                             },
                             
                             // Existing wallet routes

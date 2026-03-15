@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Search, Bell, MapPin, User, ChevronDown, ArrowLeft,
-    Wallet, PlusCircle, Send, Landmark, Camera, ShoppingBag, History
+    Wallet, PlusCircle, Send, Landmark, Camera, ShoppingBag, History,
+    Settings, LogOut
 } from 'lucide-react';
 import ImageUploadModal from '@/components/shared/ImageUploadModal';
+import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/hooks/useVendorProfile';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -29,6 +31,12 @@ const MenuFoldRightIcon = ({ size = 24, className = "" }) => (
 const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ toggleSidebar, isOpen }) => {
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isImageSearchOpen, setIsImageSearchOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+
+    // --- Fetch Vendor Profile ---
+    const { profile, isLoading: isProfileLoading } = useVendorProfile();
+    const profileRef = useRef<HTMLDivElement>(null);
 
     // --- State for Wallet ---
     const [isLoading, setIsLoading] = useState(true);
@@ -77,6 +85,11 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                 walletRefMobile.current && !walletRefMobile.current.contains(event.target as Node)
             ) {
                 setIsWalletMenuOpen(false);
+            }
+            if (
+                profileRef.current && !profileRef.current.contains(event.target as Node)
+            ) {
+                setIsProfileMenuOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -225,16 +238,100 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                         <span className="absolute top-[6px] right-[6px] sm:top-[7px] sm:right-[7px] w-2.5 h-2.5 bg-destructive rounded-full border-[2px] border-background"></span>
                     </button>
 
-                    {/* User Profile */}
-                    <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border cursor-pointer group flex-shrink-0">
-                        <div className="text-right hidden sm:block max-w-[120px] xl:max-w-none">
-                            <p className="text-sm xl:text-base font-bold text-foreground leading-none truncate">Farhana Jaman</p>
-                            <p className="text-[11px] xl:text-xs text-secondary font-bold mt-1 uppercase tracking-wider">Available</p>
+                    {/* User Profile with Dropdown */}
+                    <div className="relative" ref={profileRef}>
+                        <div 
+                            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                            className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border cursor-pointer group flex-shrink-0 hover:bg-muted/50 rounded-xl pr-3 py-2 transition-all"
+                        >
+                            {/* Avatar */}
+                            <div className="relative flex-shrink-0">
+                                {isProfileLoading ? (
+                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-muted animate-pulse" />
+                                ) : getVendorAvatarUrl(profile) ? (
+                                    <img
+                                        src={getVendorAvatarUrl(profile)}
+                                        alt={getVendorDisplayName(profile)}
+                                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-secondary/20"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                            const parent = (e.target as HTMLImageElement).parentElement;
+                                            if (parent && !parent.querySelector('.fallback-avatar')) {
+                                                const fallback = document.createElement('div');
+                                                fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E] rounded-full';
+                                                fallback.innerHTML = `<span class="text-white font-bold text-xs sm:text-sm">${getVendorDisplayName(profile).charAt(0).toUpperCase()}</span>`;
+                                                parent.appendChild(fallback);
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E]">
+                                        <span className="text-white font-bold text-xs sm:text-sm">
+                                            {getVendorDisplayName(profile).charAt(0).toUpperCase()}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* Name - Desktop Only */}
+                            <div className="text-right hidden sm:block max-w-[120px] xl:max-w-none">
+                                <p className="text-sm xl:text-base font-bold text-foreground leading-none truncate">
+                                    {getVendorDisplayName(profile)}
+                                </p>
+                                <p className="text-[11px] xl:text-xs text-secondary font-bold mt-1 uppercase tracking-wider">
+                                    Available
+                                </p>
+                            </div>
+                            
+                            <ChevronDown size={18} className="text-muted-foreground group-hover:text-foreground transition-colors hidden sm:block flex-shrink-0" />
                         </div>
-                        <div className="bg-secondary/10 p-2 rounded-full text-secondary group-hover:bg-secondary/20 transition-colors flex-shrink-0">
-                            <User className="w-[20px] h-[20px]" />
-                        </div>
-                        <ChevronDown size={18} className="text-muted-foreground group-hover:text-foreground transition-colors hidden sm:block flex-shrink-0" />
+
+                        {/* Profile Dropdown Menu */}
+                        {isProfileMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-xl shadow-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                {/* Header */}
+                                <div className="px-4 py-3 bg-muted/50 border-b border-border">
+                                    <p className="text-sm font-bold text-foreground">{getVendorDisplayName(profile)}</p>
+                                    <p className="text-xs text-muted-foreground truncate">Seller ID: {profile?.vendor?.seller_id || 'N/A'}</p>
+                                </div>
+                                
+                                {/* Menu Items */}
+                                <div className="py-2">
+                                    <Link
+                                        to="/vendor/dashboard/profile"
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                                        onClick={() => setIsProfileMenuOpen(false)}
+                                    >
+                                        <User className="h-4 w-4 text-[#E8A87C]" />
+                                        <span>My Profile</span>
+                                    </Link>
+                                    
+                                    <button
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
+                                        onClick={() => {
+                                            setIsProfileMenuOpen(false);
+                                            // Navigate to settings when available
+                                        }}
+                                    >
+                                        <Settings className="h-4 w-4 text-[#C38D9E]" />
+                                        <span>Settings</span>
+                                    </button>
+                                    
+                                    <div className="my-2 border-t border-border" />
+                                    
+                                    <button
+                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
+                                        onClick={() => {
+                                            sessionStorage.removeItem('vendor_session');
+                                            navigate('/vendor/login');
+                                        }}
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        <span>Logout</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

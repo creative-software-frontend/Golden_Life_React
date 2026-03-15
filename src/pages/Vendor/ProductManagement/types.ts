@@ -1,0 +1,112 @@
+// Product interface matching API structure
+export interface Product {
+  id: number;
+  product_title_english: string;
+  product_title_bangla: string;
+  sku: string;
+  seller_price: number;
+  regular_price: number;
+  offer_price: number;
+  category_id: number;
+  subcategory_id: number;
+  stock: number;
+  status: 0 | 1; // 0 = Inactive, 1 = Active
+  product_image: string;
+  created_at: string;
+}
+
+// API Response type
+export interface ProductsResponse {
+  products: Product[];
+  total?: number;
+  page?: number;
+  per_page?: number;
+}
+
+// Filter and sort types
+export type StatusFilter = 'all' | 'active' | 'inactive';
+export type StockFilter = 'all' | 'low_stock' | 'out_of_stock';
+export type SortOption = 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc' | 'date_asc' | 'date_desc';
+
+export interface ProductFilters {
+  search: string;
+  status: StatusFilter;
+  stock: StockFilter;
+  sort: SortOption;
+}
+
+// Pagination type
+export interface PaginationState {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+// View mode type
+export type ViewMode = 'table' | 'grid';
+
+// Component props types
+export interface ProductStatusBadgeProps {
+  status: 0 | 1;
+}
+
+export interface ProductActionsProps {
+  product: Product;
+  onView: (product: Product) => void;
+  onEdit: (product: Product) => void;
+  onToggleStatus: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}
+
+export interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  productName: string;
+  isDeleting?: boolean;
+}
+
+export interface BulkActionsBarProps {
+  selectedCount: number;
+  onActivateAll: () => void;
+  onDeactivateAll: () => void;
+  onDeleteAll: () => void;
+  onClearSelection: () => void;
+}
+
+export interface ProductFiltersProps {
+  filters: ProductFilters;
+  onFiltersChange: (filters: ProductFilters) => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
+  onAddProduct: () => void;
+}
+
+export interface ProductTableProps {
+  products: Product[];
+  isLoading: boolean;
+  selectedProducts: number[];
+  onSelectionChange: (ids: number[]) => void;
+  onView: (product: Product) => void;
+  onEdit: (product: Product) => void;
+  onToggleStatus: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}
+
+export interface ProductGridProps {
+  products: Product[];
+  isLoading: boolean;
+  selectedProducts: number[];
+  onSelectionChange: (ids: number[]) => void;
+  onView: (product: Product) => void;
+  onEdit: (product: Product) => void;
+  onToggleStatus: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}
+
+export interface PaginationProps {
+  pagination: PaginationState;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+}

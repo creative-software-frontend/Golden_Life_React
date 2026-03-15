@@ -9,7 +9,7 @@ interface ProfileInfoProps {
   };
   vendor: {
     owner_name: string;
-    business_name: string;
+    businee_name?: string;   
     mobile?: string;
     country?: string;
     district?: string;
@@ -62,7 +62,7 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
         {
           icon: Building2,
           label: 'Business Name',
-          value: safeVendor.business_name || 'Not provided',
+          value: safeVendor.businee_name || 'Not provided',
           color: '#E8A87C'
         },
         {
