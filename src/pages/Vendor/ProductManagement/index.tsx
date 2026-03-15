@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,8 @@ import { useProducts } from './hooks/useProducts';
 import { Product, ProductFilters as ProductFiltersType, ViewMode, PaginationState } from './types';
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
+  
   // State
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
@@ -63,9 +66,8 @@ const Products: React.FC = () => {
   }, []);
 
   const handleEditProduct = useCallback((product: Product) => {
-    toast.info(`Editing product: ${product.product_title_english}`);
-    // TODO: Navigate to product edit page or open modal
-  }, []);
+    navigate(`/vendor/dashboard/products/edit/${product.id}`);
+  }, [navigate]);
 
   const handleToggleProductStatus = useCallback(async (product: Product) => {
     const success = await toggleProductStatus(product.id, product.status);
@@ -143,9 +145,8 @@ const Products: React.FC = () => {
 
   // Handle add product
   const handleAddProduct = useCallback(() => {
-    toast.info('Add product feature coming soon!');
-    // TODO: Navigate to product creation page or open modal
-  }, []);
+    navigate('/vendor/dashboard/products/add');
+  }, [navigate]);
 
   // Handle retry on error
   const handleRetry = useCallback(() => {
