@@ -235,7 +235,7 @@ export const routes = createBrowserRouter([
     },
     {
         path: '/vendor',
-        // element: <VendorProtectedRoute />,
+        element: <VendorProtectedRoute />,
         children: [
             {
                 element: <VendorLayout />,
