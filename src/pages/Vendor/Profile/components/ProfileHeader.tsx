@@ -1,4 +1,6 @@
 import { Camera, MapPin, Mail, Phone, Link as LinkIcon } from 'lucide-react';
+import { getVendorImageUrl, getFallbackImage } from '@/utils/imageHelpers';
+import { useState } from 'react';
 
 interface ProfileHeaderProps {
   name: string;
@@ -15,18 +17,13 @@ export function ProfileHeader({
   imageUrl,
   coverGradient = 'from-[#E8A87C]/20 via-[#C38D9E]/20 to-[#E8A87C]/10'
 }: ProfileHeaderProps) {
-  // Handle undefined/null values
+  const [imageError, setImageError] = useState(false);
+  
+  // Use image helper to get full URL or fallback
+  const displayImageUrl = imageError ? getFallbackImage('vendor') : (imageUrl || getFallbackImage('vendor'));
   const displayName = name || 'User';
   const displayEmail = email || '';
   const displaySellerId = sellerId || '';
-  const displayImageUrl = imageUrl || '';
-  
-  // Check if we have a valid image URL (must be http or https)
-  const isValidUrl = displayImageUrl && (
-    displayImageUrl.startsWith('http://') || 
-    displayImageUrl.startsWith('https://') ||
-    displayImageUrl.startsWith('/')
-  );
   return (
     <div className="relative mb-6">
       {/* Cover Background */}
@@ -44,23 +41,12 @@ export function ProfileHeader({
           {/* Avatar */}
           <div className="relative group">
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
-              {isValidUrl ? (
-                <img
-                  src={displayImageUrl}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // If image fails to load, show initial instead
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E]">
-                  <span className="text-4xl md:text-5xl font-black text-white">
-                    {displayName.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              <img
+                src={displayImageUrl}
+                alt={displayName}
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
+              />
             </div>
             
             {/* Edit Badge */}

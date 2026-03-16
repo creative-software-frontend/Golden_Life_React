@@ -46,6 +46,7 @@ import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
 import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
+import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
@@ -59,6 +60,10 @@ import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 
 // Vendor Profile
 import VendorProfile from "@/pages/Vendor/Profile/index";
+import Products from "@/pages/Vendor/ProductManagement/index";
+import AddProduct from "@/pages/Vendor/Products/AddProduct";
+import EditProduct from "@/pages/Vendor/Products/EditProduct";
+// import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; // Commented - duplicate
 
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
@@ -248,7 +253,7 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    {
+       {
         path: '/vendor',
         element: <VendorProtectedRoute />,
         children: [
@@ -266,13 +271,33 @@ export const routes = createBrowserRouter([
                                 index: true, // Renders at /vendor/dashboard
                                 element: <VendorHome />
                             },
-
+                            
                             // Vendor Profile Route
                             {
                                 path: 'profile',
                                 element: <VendorProfile />
                             },
-
+                            
+                            // Vendor Products Route
+                            {
+                                path: 'products',
+                                element: <Products />
+                            },
+                            
+                            // NEW: Product Add/Edit Routes
+                            {
+                                path: 'products/add',
+                                element: <AddProduct />
+                            },
+                            {
+                                path: 'products/edit/:id',
+                                element: <EditProduct />
+                            },
+                            {
+                                path: 'products/:id',
+                                element: <VendorProductDetails />
+                            },
+                            
                             // Existing wallet routes
                             {
                                 path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add

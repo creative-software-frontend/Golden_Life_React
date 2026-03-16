@@ -100,7 +100,8 @@ export default function VendorProfile() {
     }
     
     // Otherwise, assume it's just a filename and construct full URL
-    return `${baseURL}/uploads/profiles/${imagePath}`;
+    // Pattern: https://api.goldenlife.my/uploads/vendor/image/{filename}
+    return `${baseURL}/uploads/vendor/image/${imagePath}`;
   };
 
   const handleSubmit = async (formData: any) => {
