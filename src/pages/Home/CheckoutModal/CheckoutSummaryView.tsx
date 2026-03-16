@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Corrected import
-import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package } from 'lucide-react';
-import { Address, PaymentMethod } from './CheckoutModal'; // Adjust path if needed
+import { useNavigate } from 'react-router-dom';
+import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package, Trash2 } from 'lucide-react'; // Added Trash2
+import { Address, PaymentMethod } from './CheckoutModal'; 
 import useModalStore from '@/store/Store';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -34,7 +34,7 @@ const getAuthToken = () => {
 };
 
 const CheckoutSummaryView = ({
-    data,
+    data, // We will override subTotal/totalItems dynamically to handle deletions
     selectedAddress,
     paymentMethod,
     setPaymentMethod,
@@ -44,7 +44,7 @@ const CheckoutSummaryView = ({
     deliveryFee
 }: Props) => {
     const { changeCheckoutModal, toggleClicked, triggerWalletUpdate } = useModalStore();
-    const navigate = useNavigate(); // Initialized the navigate hook
+    const navigate = useNavigate(); 
 
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState(false);
@@ -56,21 +56,10 @@ const CheckoutSummaryView = ({
     // --- WALLET BALANCE STATE ---
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [isFetchingBalance, setIsFetchingBalance] = useState(true);
-    
-    // --- DISCOUNT CALCULATION STATE ---
-    const [totalSavings, setTotalSavings] = useState<number>(0);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
     
-    // --- SAFE MATH ---
-    const safeSubTotal = Number(data.subTotal) || 0;
-    const safeDeliveryFee = Number(deliveryFee) || 0;
-    const total = safeSubTotal + safeDeliveryFee;
-    const remainingBalance = walletBalance - total;
-    
-    const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
-
-    // Fetch Wallet Balance & Calculate Savings
+    // Fetch Initial Cart & Wallet Balance
     useEffect(() => {
         const fetchWalletBalance = async () => {
             setIsFetchingBalance(true);
@@ -93,29 +82,11 @@ const CheckoutSummaryView = ({
             }
         };
 
-        // Calculate discount from cart items and set cart state
         try {
             const items = JSON.parse(localStorage.getItem('cart') || '[]');
             setCartItems(items); 
-            
-            let originalTotal = 0;
-            let currentTotal = 0;
-
-            items.forEach((item: any) => {
-                const qty = Number(item.quantity) || 0;
-                const offerPrice = Number(item.offer_price) || 0;
-                const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
-                
-                const activePrice = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
-                const originalPrice = regularPrice > 0 ? regularPrice : activePrice;
-
-                originalTotal += originalPrice * qty;
-                currentTotal += activePrice * qty;
-            });
-
-            setTotalSavings(originalTotal - currentTotal);
         } catch (err) {
-            console.error("Error calculating discount", err);
+            console.error("Error loading cart", err);
         }
 
         fetchWalletBalance();
@@ -128,111 +99,145 @@ const CheckoutSummaryView = ({
         };
     }, []);
 
-    // --- INTEGRATED ORDER PLACEMENT API ---
-const handleConfirm = async () => {
-    if (!termsAccepted) {
-        setError(true);
-        toast.error("Please accept the terms and conditions.");
-        return;
-    }
-
-    if (!selectedAddress?.id) {
-        toast.error("Please select a delivery address.");
-        return;
-    }
-
-    if (isInsufficientBalance) {
-        toast.error("Insufficient wallet balance.");
-        return;
-    }
-
-    setIsPlacingOrder(true);
-
-    try {
-        const token = getAuthToken();
-        if (!token) throw new Error("No authentication token");
-
-        if (cartItems.length === 0) throw new Error("Cart is empty");
-
-        let calculatedSubTotal = 0;
-        const delivery = Number(deliveryFee) || 0;
-
-        const formData = new FormData();
-        formData.append('address_id', String(selectedAddress.id));
-        formData.append('payment_method', paymentMethod.toLowerCase());
-        formData.append('delivery_charge', delivery.toFixed(2));
-
-        cartItems.forEach((item: any) => {
+    // --- DYNAMIC CALCULATIONS ---
+    // We calculate these dynamically so they instantly update when an item is deleted
+    const { currentSubTotal, originalTotal, currentTotalItems } = cartItems.reduce(
+        (acc, item) => {
+            const qty = Number(item.quantity) || 1;
             const offerPrice = Number(item.offer_price) || 0;
             const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
-            const price = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
-            const qty = Number(item.quantity) || 1;
-            const itemTotal = price * qty;
+            const activePrice = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
+            const origPrice = regularPrice > 0 ? regularPrice : activePrice;
 
-            calculatedSubTotal += itemTotal;
+            acc.currentSubTotal += activePrice * qty;
+            acc.originalTotal += origPrice * qty;
+            acc.currentTotalItems += qty;
+            return acc;
+        },
+        { currentSubTotal: 0, originalTotal: 0, currentTotalItems: 0 }
+    );
 
-            formData.append('product_id[]', String(item.id));
-            formData.append('service_type[]', "product");
-            formData.append('quantity[]', String(qty));
-            formData.append('item_total[]', String(itemTotal));
-        });
+    const totalSavings = originalTotal - currentSubTotal;
+    const safeDeliveryFee = Number(deliveryFee) || 0;
+    const total = currentSubTotal + safeDeliveryFee;
+    const remainingBalance = walletBalance - total;
+    
+    const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
 
-        const finalTotal = calculatedSubTotal + delivery;
-        formData.append('order_total', finalTotal.toFixed(2));
+    // --- HANDLERS ---
+    const handleRemoveItem = (idToRemove: string | number) => {
+        const updatedCart = cartItems.filter(item => item.id !== idToRemove);
+        setCartItems(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        window.dispatchEvent(new Event("cartUpdated")); // Notify other components (like navbar cart count)
 
-        const response = await axios.post(
-            `${baseURL}/api/student/Orderstore`,
-            formData,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-
-        if (response.data?.status === 'success' || response.data?.success) {
-            toast.success(response.data?.message || "Order placed successfully!");
-
-            const orderNo = response.data?.order?.order_no;
-
-            // ─── Clean up first ───────────────────────────────────────
-            localStorage.removeItem("cart");
-            window.dispatchEvent(new Event("cartUpdated"));
-
-            if (paymentMethod.toLowerCase() === 'wallet') {
-                triggerWalletUpdate?.();
-            }
-
-            // ─── CLOSE MODAL BEFORE NAVIGATION ────────────────────────
-            onConfirm();           // This should call changeCheckoutModal() in parent
-
-            // ─── Then navigate using query param ──────────────────────
-            if (orderNo) {
-                navigate(`/dashboard/order-details?order=${orderNo}`);
-            } else {
-                // fallback – rare case
-                console.warn("Order placed but no order_no received");
-                navigate('/dashboard');
-            }
+        if (updatedCart.length === 0) {
+            toast.error("Cart is empty.");
+            onClose(); // Automatically close if they delete the last item
         } else {
-            throw new Error(response.data?.message || "Order placement failed");
+            toast.success("Item removed");
         }
-    } catch (err: any) {
-        console.error("Order placement failed:", err);
+    };
 
-        let msg = "Failed to place order. Please try again.";
-        if (err.response?.data?.message) {
-            msg = err.response.data.message;
-        } else if (err.response?.data?.errors) {
-            const firstKey = Object.keys(err.response.data.errors)[0];
-            msg = err.response.data.errors[firstKey][0];
+    const handleConfirm = async () => {
+        if (!termsAccepted) {
+            setError(true);
+            toast.error("Please accept the terms and conditions.");
+            return;
         }
 
-        toast.error(msg);
-    } finally {
-        setIsPlacingOrder(false);
-    }
-};
+        if (!selectedAddress?.id) {
+            toast.error("Please select a delivery address.");
+            return;
+        }
+
+        if (isInsufficientBalance) {
+            toast.error("Insufficient wallet balance.");
+            return;
+        }
+
+        setIsPlacingOrder(true);
+
+        try {
+            const token = getAuthToken();
+            if (!token) throw new Error("No authentication token");
+
+            if (cartItems.length === 0) throw new Error("Cart is empty");
+
+            let calculatedSubTotal = 0;
+            const delivery = Number(deliveryFee) || 0;
+
+            const formData = new FormData();
+            formData.append('address_id', String(selectedAddress.id));
+            formData.append('payment_method', paymentMethod.toLowerCase());
+            formData.append('delivery_charge', delivery.toFixed(2));
+
+            cartItems.forEach((item: any) => {
+                const offerPrice = Number(item.offer_price) || 0;
+                const regularPrice = Number(item.regular_price) || Number(item.price) || 0;
+                const price = (offerPrice > 0 && offerPrice < regularPrice) ? offerPrice : regularPrice;
+                const qty = Number(item.quantity) || 1;
+                const itemTotal = price * qty;
+
+                calculatedSubTotal += itemTotal;
+
+                formData.append('product_id[]', String(item.id));
+                formData.append('service_type[]', "product");
+                formData.append('quantity[]', String(qty));
+                formData.append('item_total[]', String(itemTotal));
+            });
+
+            const finalTotal = calculatedSubTotal + delivery;
+            formData.append('order_total', finalTotal.toFixed(2));
+
+            const response = await axios.post(
+                `${baseURL}/api/student/Orderstore`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.data?.status === 'success' || response.data?.success) {
+                toast.success(response.data?.message || "Order placed successfully!");
+
+                const orderNo = response.data?.order?.order_no;
+
+                localStorage.removeItem("cart");
+                window.dispatchEvent(new Event("cartUpdated"));
+
+                if (paymentMethod.toLowerCase() === 'wallet') {
+                    triggerWalletUpdate?.();
+                }
+
+                onConfirm(); 
+
+                if (orderNo) {
+                    navigate(`/dashboard/order-details?order=${orderNo}`);
+                } else {
+                    navigate('/dashboard');
+                }
+            } else {
+                throw new Error(response.data?.message || "Order placement failed");
+            }
+        } catch (err: any) {
+            console.error("Order placement failed:", err);
+
+            let msg = "Failed to place order. Please try again.";
+            if (err.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err.response?.data?.errors) {
+                const firstKey = Object.keys(err.response.data.errors)[0];
+                msg = err.response.data.errors[firstKey][0];
+            }
+
+            toast.error(msg);
+        } finally {
+            setIsPlacingOrder(false);
+        }
+    };
 
     const handleBackToCart = () => {
         changeCheckoutModal();
@@ -322,9 +327,20 @@ const handleConfirm = async () => {
                                                 Qty: {qty} × ৳{activePrice.toFixed(2)}
                                             </p>
                                         </div>
-                                        <span className="text-[14px] font-black text-gray-900 shrink-0">
-                                            ৳{itemTotal.toFixed(2)}
-                                        </span>
+                                        
+                                        {/* NEW: Updated Price Column with Delete Button */}
+                                        <div className="flex flex-col items-end shrink-0">
+                                            <span className="text-[14px] font-black text-gray-900">
+                                                ৳{itemTotal.toFixed(2)}
+                                            </span>
+                                            <button 
+                                                onClick={() => handleRemoveItem(item.id)}
+                                                className="mt-1 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                                                title="Remove item"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -340,8 +356,8 @@ const handleConfirm = async () => {
                     </div>
 
                     <div className="flex justify-between text-[13px] font-bold text-gray-500">
-                        <span>Items ({data.totalItems}):</span>
-                        <span className="text-gray-900">৳{safeSubTotal.toFixed(2)}</span>
+                        <span>Items ({currentTotalItems}):</span>
+                        <span className="text-gray-900">৳{currentSubTotal.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between text-[13px] font-bold text-gray-500">
@@ -438,9 +454,9 @@ const handleConfirm = async () => {
                 <div className="flex flex-col gap-3">
                     <button
                         onClick={handleConfirm}
-                        disabled={isPlacingOrder || isInsufficientBalance}
+                        disabled={isPlacingOrder || isInsufficientBalance || cartItems.length === 0}
                         className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                            (isPlacingOrder || isInsufficientBalance)
+                            (isPlacingOrder || isInsufficientBalance || cartItems.length === 0)
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
                                 : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
                         }`}
