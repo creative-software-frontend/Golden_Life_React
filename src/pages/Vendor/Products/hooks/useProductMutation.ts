@@ -139,7 +139,7 @@ export function useProductMutation() {
     }
   };
 
-  // Fetch single product by ID
+  // Fetch single product by ID using query parameter
   const fetchProductById = async (id: number): Promise<ProductFormData> => {
     try {
       setIsLoading(true);
@@ -151,77 +151,80 @@ export function useProductMutation() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      // Try multiple possible endpoints (backend may use different patterns)
-      const possibleEndpoints = [
-        `/api/vendor/ecommerce/product/${id}`,  
-        `/api/vendor/product/show/${id}`,       
-        `/api/vendor/product/details/${id}`,    
-        `/api/vendor/product/${id}`            
-      ];
+      // Correct endpoint with query parameter as per backend specification
+      const endpoint = `/api/vendor/product/details`;
+      
+      console.log(`🔄 Fetching product from: ${endpoint}?product_id=${id}`);
 
-      let lastError: any;
-
-      for (const endpoint of possibleEndpoints) {
-        try {
-          console.log(`🔄 Trying endpoint: ${endpoint}`);
-          
-          const response = await axios.get(
-            `${baseURL}${endpoint}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          console.log(`✅ Success with endpoint: ${endpoint}`);
-          console.log('Response data:', response.data);
-
-          const productData = response.data?.data || response.data;
-
-          // Transform API response to form data structure
-          const formData: ProductFormData = {
-            product_title_english: productData.product_title_english || '',
-            product_title_bangla: productData.product_title_bangla || '',
-            category_id: productData.category_id || productData.category?.id || 0,
-            subcategory_id: productData.subcategory_id || productData.subcategory?.id || 0,
-            short_description_english: productData.short_description_english || '',
-            short_description_bangla: productData.short_description_bangla || '',
-            long_description_english: productData.long_description_english || '',
-            long_description_bangla: productData.long_description_bangla || '',
-            seller_price: parseFloat(productData.seller_price) || 0,
-            regular_price: parseFloat(productData.regular_price) || 0,
-            offer_price: parseFloat(productData.offer_price) || 0,
-            sku: productData.sku || '',
-            stock: parseInt(productData.stock) || 0,
-            video_link: productData.video_link || '',
-            status: productData.status === 1 ? 1 : 0,
-            images: [], // No new images initially in edit mode
-            existing_images: [
-              productData.product_image,
-              ...(productData.gallery_images || [])
-            ].filter(Boolean),
-            removed_images: []
-          };
-
-          return formData;
-        } catch (err: any) {
-          console.warn(`❌ Failed with endpoint ${endpoint}:`, err.response?.status || err.message);
-          lastError = err;
-          // Continue to next endpoint
+      const response = await axios.get(
+        `${baseURL}${endpoint}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            product_id: id  // Query parameter format
+          }
         }
+      );
+
+      console.log(`✅ Product fetched successfully`);
+      console.log('Response data:', response.data);
+      console.log('Product ID from URL:', id);
+
+      // Handle different response structures
+      let productData = response.data?.data || response.data?.product || response.data;
+      
+      // Check if status field exists in response
+      if (response.data?.status === true || response.data?.success === true) {
+        productData = response.data?.data || response.data?.product || productData;
       }
 
-      // All endpoints failed
-      console.error('❌ All endpoints failed. Last error:', lastError.response?.data);
-      throw new Error(
-        lastError.response?.data?.message || 
-        'Failed to fetch product. Backend endpoint may not be implemented yet. Please check the console for tried endpoints.'
-      );
+      // Transform API response to form data structure
+      const formData: ProductFormData = {
+        product_title_english: productData.product_title_english || '',
+        product_title_bangla: productData.product_title_bangla || '',
+        category_id: productData.category_id || productData.category?.id || 0,
+        subcategory_id: productData.subcategory_id || productData.subcategory?.id || 0,
+        short_description_english: productData.short_description_english || '',
+        short_description_bangla: productData.short_description_bangla || '',
+        long_description_english: productData.long_description_english || '',
+        long_description_bangla: productData.long_description_bangla || '',
+        seller_price: parseFloat(productData.seller_price) || 0,
+        regular_price: parseFloat(productData.regular_price) || 0,
+        offer_price: parseFloat(productData.offer_price) || 0,
+        sku: productData.sku || '',
+        stock: parseInt(productData.stock) || 0,
+        video_link: productData.video_link || '',
+        status: productData.status === 1 ? 1 : 0,
+        images: [], // No new images initially in edit mode
+        existing_images: [
+          productData.product_image,
+          ...(productData.gallery_images || [])
+        ].filter(Boolean),
+        removed_images: []
+      };
+
+      return formData;
     } catch (err: any) {
-      console.error('Fetch product error:', err);
+      console.error('❌ Fetch product error:', err);
+      console.error('Error details:', err.response?.data);
+      
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load product';
+      
+      // Provide helpful error messages based on status code
+      if (err.response?.status === 404) {
+        console.error('⚠️ Product not found. This could mean:');
+        console.error('  - The product ID does not exist');
+        console.error('  - The backend endpoint is not implemented yet');
+        console.error('  - The endpoint format is incorrect');
+      } else if (err.response?.status === 401) {
+        console.error('⚠️ Authentication failed. Please login again.');
+      } else if (err.response?.status === 500) {
+        console.error('⚠️ Server error. Backend may have an issue.');
+      }
+      
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
