@@ -63,7 +63,7 @@ import VendorProfile from "@/pages/Vendor/Profile/index";
 import Products from "@/pages/Vendor/ProductManagement/index";
 import AddProduct from "@/pages/Vendor/Products/AddProduct";
 import EditProduct from "@/pages/Vendor/Products/EditProduct";
-// import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; // Commented - duplicate
+// import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; 
 
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";

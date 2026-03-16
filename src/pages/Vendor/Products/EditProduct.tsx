@@ -24,18 +24,20 @@ export default function EditProduct() {
 
       try {
         console.log('🔄 Fetching product with ID:', id);
+        console.log('Product ID from URL:', id);
         const data = await fetchProductById(Number(id));
         console.log('✅ Product fetched successfully:', data);
         setProductData(data);
       } catch (err: any) {
         console.error('❌ Fetch product error:', err);
+        console.error('Error response:', err.response?.data);
         
         // Show detailed error message
         const errorMessage = err.message || 'Failed to load product';
         toast.error(errorMessage);
         
         // If it's a 404 or endpoint not found, suggest backend issue
-        if (err.message?.includes('endpoint')) {
+        if (err.message?.includes('endpoint') || err.response?.status === 404) {
           toast.warning('Backend API endpoint may not be implemented yet. Please check with your backend team.');
         }
         
