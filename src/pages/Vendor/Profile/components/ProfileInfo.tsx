@@ -27,6 +27,16 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
   const safeUser = user || {};
   const safeVendor = vendor || {};
   
+  // Debug logging
+  console.log('📋 [ProfileInfo] Received data:', {
+    hasUser: !!user,
+    hasVendor: !!vendor,
+    userKeys: user ? Object.keys(user) : 'N/A',
+    vendorKeys: vendor ? Object.keys(vendor) : 'N/A',
+    userName: user?.name,
+    businessName: vendor?.business_name || vendor?.businee_name
+  });
+  
   const infoSections = [
     {
       title: 'Personal Information',

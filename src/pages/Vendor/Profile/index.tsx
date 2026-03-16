@@ -15,6 +15,15 @@ export default function VendorProfile() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
+  // Debug logging for data changes
+  console.log('📄 [VendorProfile] Component render:', {
+    isLoading,
+    hasError: !!error,
+    hasData: !!data,
+    isEdit: isEditMode,
+    dataKeys: data ? Object.keys(data) : 'N/A'
+  });
+
   // Loading state
   if (isLoading) {
     return (
@@ -48,10 +57,11 @@ export default function VendorProfile() {
     );
   }
 
-  const { user, vendor, districts, countries } = data;
+  const { user, vendor, districts, countries } = data || {};
 
   // Safety check for required data
   if (!user || !vendor) {
+    console.error('❌ [VendorProfile] Missing required data:', { user, vendor });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E8A87C]/10 via-[#C38D9E]/10 to-white">
         <div className="text-center max-w-md px-6">
@@ -70,6 +80,13 @@ export default function VendorProfile() {
       </div>
     );
   }
+  
+  console.log('✅ [VendorProfile] Data validated:', {
+    userName: user.name,
+    businessName: vendor.business_name || (vendor as any).businee_name,
+    districtsCount: districts?.length || 0,
+    countriesCount: countries?.length || 0
+  });
 
   const handleImageChange = (file: File) => {
     setProfileImage(file);
@@ -85,23 +102,33 @@ export default function VendorProfile() {
     setImagePreview(null);
   };
 
-  // Helper function to get full image URL
+  // Helper function to get full image URL with better debugging
   const getImageUrl = (imagePath: string | undefined): string => {
-    if (!imagePath) return '';
+    console.log('🖼️ [getImageUrl] Called with:', imagePath);
+    
+    if (!imagePath) {
+      console.log('[getImageUrl] No image path provided, returning empty');
+      return '';
+    }
     
     // If already a full URL, return as-is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('[getImageUrl] Already full URL:', imagePath);
       return imagePath;
     }
     
     // If it's a relative path starting with /, prepend API base URL
     if (imagePath.startsWith('/')) {
-      return `${baseURL}${imagePath}`;
+      const fullUrl = `${baseURL}${imagePath}`;
+      console.log('[getImageUrl] Relative path constructed:', fullUrl);
+      return fullUrl;
     }
     
     // Otherwise, assume it's just a filename and construct full URL
     // Pattern: https://api.goldenlife.my/uploads/vendor/image/{filename}
-    return `${baseURL}/uploads/vendor/image/${imagePath}`;
+    const fullUrl = `${baseURL}/uploads/vendor/image/${imagePath}`;
+    console.log('[getImageUrl] Filename path constructed:', fullUrl);
+    return fullUrl;
   };
 
   const handleSubmit = async (formData: any) => {

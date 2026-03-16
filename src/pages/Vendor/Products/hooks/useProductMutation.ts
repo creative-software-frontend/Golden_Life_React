@@ -232,10 +232,99 @@ export function useProductMutation() {
     }
   };
 
+  // Toggle product status
+  const toggleProductStatus = async (id: number, currentStatus: 0 | 1): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const token = getAuthToken();
+      
+      if (!token) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+
+      const newStatus = currentStatus === 0 ? 1 : 0;
+      
+      console.log(`🔄 Toggling product ${id} status from ${currentStatus} to ${newStatus}`);
+
+      // Try multiple possible endpoints for status toggle
+      const possibleEndpoints = [
+        `/api/vendor/product/toggle-status`,
+        `/api/vendor/product/status`,
+        `/api/vendor/product/${id}/status`,
+        `/api/vendor/ecommerce/product/${id}/status`
+      ];
+
+      let lastError: any;
+      let successData: any = null;
+
+      for (const endpoint of possibleEndpoints) {
+        try {
+          console.log(`🔄 Trying endpoint: ${endpoint}`);
+          
+          const response = await axios.put(
+            `${baseURL}${endpoint}`,
+            { 
+              product_id: id,
+              status: newStatus 
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+
+          console.log(`✅ Success with endpoint: ${endpoint}`);
+          console.log('Response data:', response.data);
+          successData = response.data;
+          break; // Exit loop on success
+        } catch (err: any) {
+          console.warn(`❌ Failed with endpoint ${endpoint}:`, err.response?.status || err.message);
+          lastError = err;
+          // Continue to next endpoint
+        }
+      }
+
+      if (!successData) {
+        // All endpoints failed
+        console.error('❌ All status toggle endpoints failed. Last error:', lastError.response?.data);
+        throw new Error(
+          lastError.response?.data?.message || 
+          'Failed to toggle product status. Backend endpoint may not be implemented yet.'
+        );
+      }
+
+      toast.success(`Product ${newStatus === 1 ? 'activated' : 'deactivated'} successfully`);
+      return true;
+    } catch (err: any) {
+      console.error('❌ Toggle status error:', err);
+      console.error('Error details:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to update product status';
+      
+      // Provide helpful error messages
+      if (err.response?.status === 404) {
+        console.error('⚠️ Endpoint not found. Backend team needs to implement this.');
+      } else if (err.response?.status === 401) {
+        console.error('⚠️ Authentication failed. Please login again.');
+      }
+      
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     createProduct,
     updateProduct,
     fetchProductById,
+    toggleProductStatus,
     isLoading,
     error,
   };

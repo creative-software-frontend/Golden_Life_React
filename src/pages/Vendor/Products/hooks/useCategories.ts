@@ -25,15 +25,28 @@ export function useCategories() {
   // Fetch all categories
   const fetchCategories = useCallback(async () => {
     try {
+      console.log('🔄 [useCategories] Fetching categories...');
       setIsLoading(true);
       setError(null);
 
       const token = getAuthToken();
-      const response = await axios.get(`${baseURL}/api/vendor/ecommerce/categories`, {
+      console.log('[useCategories] Auth token:', token ? 'Present' : 'Missing');
+      
+      const url = `${baseURL}/api/vendor/ecommerce/categories`;
+      console.log('[useCategories] API URL:', url);
+      
+      const response = await axios.get(url, {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` })
         }
+      });
+
+      console.log('📥 [useCategories] Raw API Response:', {
+        status: response.data?.status,
+        hasData: !!response.data?.data,
+        dataLength: Array.isArray(response.data?.data) ? response.data.data.length : 'N/A',
+        firstItem: Array.isArray(response.data?.data) ? response.data.data[0] : 'N/A'
       });
 
       const rawData = response.data?.data || [];
@@ -45,15 +58,26 @@ export function useCategories() {
         category_image: item.category_image
       }));
 
+      console.log('✅ [useCategories] Mapped Categories:', {
+        count: mappedCategories.length,
+        categories: mappedCategories.map(c => ({ id: c.id, name: c.category_name }))
+      });
+
       setCategories(mappedCategories);
       return mappedCategories;
     } catch (err: any) {
-      console.error('Failed to fetch categories:', err);
+      console.error('❌ [useCategories] Failed to fetch categories:', err);
+      console.error('[useCategories] Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load categories';
       setError(errorMessage);
       return [];
     } finally {
       setIsLoading(false);
+      console.log('[useCategories] Loading complete');
     }
   }, [baseURL]);
 
@@ -100,6 +124,15 @@ export function useCategories() {
     setSubcategories([]);
   }, []);
 
+  // Helper function to get category name by ID
+  const getCategoryNameById = (categoryId: number, categories: Category[]): string => {
+    console.log('[useCategories.getCategoryNameById] Called with:', { categoryId, categoriesCount: categories.length });
+    const category = categories.find(cat => cat.id === categoryId);
+    const result = category ? category.category_name : `ID: ${categoryId}`;
+    console.log('[useCategories.getCategoryNameById] Result:', result);
+    return result;
+  };
+
   return {
     categories,
     subcategories,
@@ -108,5 +141,6 @@ export function useCategories() {
     fetchCategories,
     fetchSubcategories,
     clearSubcategories,
+    getCategoryNameById,
   };
 }
