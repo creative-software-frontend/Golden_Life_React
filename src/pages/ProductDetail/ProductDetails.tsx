@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom"; // <-- Added useNavigate
 import {
     ShoppingCart, Heart, Minus, Plus, Star,
-    CheckCircle, ChevronLeft, ChevronRight
+    CheckCircle, ChevronLeft, ChevronRight, Zap // <-- Added Zap
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import useModalStore from '@/store/Store';
 
 // --- INTERFACES ---
 interface GalleryItem {
@@ -43,7 +44,9 @@ const TABS = [
 
 export default function ProductDetails() {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate(); // <-- Initialize navigate
     const { t, i18n } = useTranslation("global");
+        const { toggleClicked, changeCheckoutModal } = useModalStore();
 
     // --- STATE ---
     const [product, setProduct] = useState<Product | null>(null);
@@ -54,7 +57,7 @@ export default function ProductDetails() {
 
     // Slider State
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-    const [isHovered, setIsHovered] = useState(false); // Used to pause auto-play on hover
+    const [isHovered, setIsHovered] = useState(false);
 
     // --- API & IMAGE PATHS ---
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -96,7 +99,8 @@ export default function ProductDetails() {
         window.scrollTo(0, 0);
     }, [id]);
 
-    // --- HANDLER ---
+    // --- HANDLERS ---
+// --- HANDLERS ---
     const addToCart = () => {
         if (!product) return;
 
@@ -104,13 +108,19 @@ export default function ProductDetails() {
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
 
         const displayName = i18n.language === 'bn' ? product.product_title_bangla : product.product_title_english;
-        const price = parseFloat(product.offer_price || product.regular_price || product.seller_price);
+        
+        // Calculate the fallback price
+        const fallbackPrice = parseFloat(product.offer_price || product.regular_price || product.seller_price) || 0;
 
+        // --- NEW: Pass offer_price and regular_price so the Cart can show discounts ---
         const cartItem = {
             id: product.id,
             name: displayName,
+            product_title_english: product.product_title_english, // Added to match cart logic
             image: `${mainImgBase}${product.product_image}`,
-            price: price,
+            price: fallbackPrice, 
+            offer_price: parseFloat(product.offer_price) || 0,     // ADDED
+            regular_price: parseFloat(product.regular_price) || 0, // ADDED
             quantity: quantity
         };
 
@@ -123,6 +133,15 @@ export default function ProductDetails() {
         localStorage.setItem("cart", JSON.stringify(existingCart));
         window.dispatchEvent(new Event("cartUpdated"));
     };
+    // <-- NEW: Handle Buy Now -->
+     const handleBuyNow = (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation(); 
+          addToCart();
+          changeCheckoutModal(); 
+          toggleClicked(); 
+      };
+  
 
     // --- DERIVED DATA ---
     const isBangla = i18n.language === 'bn';
@@ -136,7 +155,6 @@ export default function ProductDetails() {
     const discountPercent = hasDiscount ? Math.round(((regularPrice - currentPrice) / regularPrice) * 100) : 0;
     const currentStock = product ? parseInt(product.stock) : 0;
 
-    // Prepare Slider Images Array
     const allImages = product ? [
         `${mainImgBase}${product.product_image}`,
         ...gallery.map(img => `${galleryImgBase}${img.gal_img}`)
@@ -145,13 +163,12 @@ export default function ProductDetails() {
     const nextSlide = () => setActiveSlideIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
     const prevSlide = () => setActiveSlideIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
 
-    // --- AUTO PLAY SLIDER LOGIC ---
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (!isHovered && allImages.length > 1) {
             interval = setInterval(() => {
                 nextSlide();
-            }, 3000); // Changes image every 3 seconds
+            }, 3000); 
         }
         return () => clearInterval(interval);
     }, [isHovered, allImages.length, activeSlideIndex]);
@@ -177,7 +194,6 @@ export default function ProductDetails() {
         >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
-                {/* --- BREADCRUMBS --- */}
                 <nav className="flex mb-6 text-xs sm:text-sm text-gray-500 font-medium overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
                     <Link to="/dashboard" className="hover:text-orange-600 transition-colors">Home</Link>
                     <span className="mx-2 text-gray-300">/</span>
@@ -189,11 +205,8 @@ export default function ProductDetails() {
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
 
-                        {/* --- LEFT: IMAGE SLIDER --- */}
-                        {/* --- LEFT: IMAGE SLIDER --- */}
                         <div className="lg:col-span-5 p-4 sm:p-6 lg:p-8 bg-white flex flex-col items-center lg:border-r border-gray-100">
 
-                            {/* Main Active Image Box - Removed shadow-inner and changed bg to solid white for clarity */}
                             <div
                                 className="relative w-full aspect-square flex items-center justify-center mb-4 bg-white rounded-2xl border border-gray-100 group overflow-hidden"
                                 onMouseEnter={() => setIsHovered(true)}
@@ -202,7 +215,7 @@ export default function ProductDetails() {
                                 <AnimatePresence mode="wait">
                                     <motion.img
                                         key={activeSlideIndex}
-                                        initial={{ opacity: 0 }} // Removed scale animation to prevent "interpolation blur"
+                                        initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.2 }}
@@ -212,7 +225,6 @@ export default function ProductDetails() {
                                     />
                                 </AnimatePresence>
 
-                                {/* Slider Arrows */}
                                 {allImages.length > 1 && (
                                     <>
                                         <button onClick={prevSlide} className="absolute left-2 sm:left-4 p-2 bg-white hover:bg-gray-50 rounded-full text-gray-700 shadow-md transition-all active:scale-95 z-10">
@@ -224,17 +236,14 @@ export default function ProductDetails() {
                                     </>
                                 )}
 
-                                {/* Discount Badge */}
                                 {hasDiscount && (
                                     <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm z-10">
                                         -{discountPercent}% OFF
                                     </span>
                                 )}
 
-                                {/* Heart Icon Button has been removed from here */}
                             </div>
 
-                            {/* Thumbnail Row */}
                             {allImages.length > 1 && (
                                 <div className="w-full flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                                     {allImages.map((img, idx) => (
@@ -250,7 +259,6 @@ export default function ProductDetails() {
                             )}
                         </div>
 
-                        {/* --- RIGHT: PRODUCT DETAILS --- */}
                         <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 flex flex-col justify-center">
                             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 leading-tight">{title}</h1>
 
@@ -276,7 +284,6 @@ export default function ProductDetails() {
                                 />
                             </div>
 
-                            {/* Updated Price Section with background removed */}
                             <div className="flex flex-wrap items-end gap-3 sm:gap-4 mb-8 w-fit">
                                 <div className="flex flex-col">
                                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Price</span>
@@ -292,9 +299,8 @@ export default function ProductDetails() {
                                 )}
                             </div>
 
-                            {/* Add to Cart Actions */}
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-auto">
-                                <div className="flex items-center justify-between border-2 border-gray-200 rounded-xl overflow-hidden h-14 w-full sm:w-36 bg-white">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-auto w-full">
+                                <div className="flex items-center justify-between border-2 border-gray-200 rounded-xl overflow-hidden h-14 w-full sm:w-36 bg-white shrink-0">
                                     <button
                                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
                                         className="h-full px-4 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
@@ -310,17 +316,30 @@ export default function ProductDetails() {
                                     </button>
                                 </div>
 
-                                <Button
-                                    onClick={addToCart}
-                                    disabled={currentStock === 0}
-                                    className="flex-1 h-14 bg-orange-600 hover:bg-orange-700 text-white font-bold text-base rounded-xl shadow-lg shadow-orange-600/20 transition-all active:scale-[0.98]"
-                                >
-                                    <ShoppingCart className="mr-2 w-5 h-5 sm:w-6 sm:h-6" />
-                                    {currentStock > 0 ? t('buttons.addToCart') : "Out of Stock"}
-                                </Button>
+                                <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                                    <Button
+                                        onClick={addToCart}
+                                        disabled={currentStock === 0}
+                                        className="flex-1 h-14 bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200 font-bold text-base rounded-xl transition-all active:scale-[0.98]"
+                                    >
+                                        <ShoppingCart className="mr-2 w-5 h-5 sm:w-6 sm:h-6" />
+                                        {currentStock > 0 ? t('buttons.addToCart') : "Out of Stock"}
+                                    </Button>
+
+                                    {/* <-- UPDATED BUTTON --> */}
+                                    <Button
+                                        onClick={handleBuyNow} 
+                                        disabled={currentStock === 0}
+                                        className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98] relative overflow-hidden group/buy"
+                                    >
+                                        <Zap className="mr-2 w-5 h-5 sm:w-6 sm:h-6 fill-current" />
+                                        {currentStock > 0 ? "Buy Now" : "Out of Stock"}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/buy:animate-[shimmer_1.5s_infinite]" />
+                                    </Button>
+
+                                </div>
                             </div>
 
-                            {/* Stock Indicator */}
                             <div className="mt-4 flex items-center justify-center sm:justify-start gap-2 text-sm">
                                 {currentStock > 0 ? (
                                     <>
@@ -338,7 +357,6 @@ export default function ProductDetails() {
                 {/* --- TABS SECTION --- */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="px-4 sm:px-8 pt-6">
-                        {/* Scrollable Tabs on Mobile */}
                         <div className="flex gap-6 sm:gap-8 border-b border-gray-200 overflow-x-auto scrollbar-hide whitespace-nowrap">
                             {TABS.map((tab) => (
                                 <button
@@ -360,7 +378,6 @@ export default function ProductDetails() {
                         </div>
                     </div>
 
-                    {/* Tab Content */}
                     <div className="p-4 sm:p-8 min-h-[300px]">
                         <AnimatePresence mode="wait">
                             <motion.div
