@@ -70,6 +70,7 @@ import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
 import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
 import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
 import OrderHistory from "@/pages/common/Orders/OrderHistory";
+import BasicInfoTab from "@/components/profile/BasicInfoTab/BasicInfoTab";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -207,7 +208,21 @@ export const routes = createBrowserRouter([
                         path: 'order-details',  // Separate route for Help page
                         element: <OrderDetails />,
                     },
-                    { path: "profile/settings", element: <ProfileSettings /> },
+                    // Inside your routes array, replacing the old profile/settings line:
+                    {
+                        path: "profile/settings",
+                        element: <ProfileSettings />,
+                        children: [
+                            // Redirect the base URL to basic-info by default
+                            { index: true, element: <Navigate to="basic-info" replace /> },
+
+                            // These will render inside the <Outlet /> in ProfileSettings.tsx
+                            { path: "basic-info", element: <BasicInfoTab /> },
+                            // { path: "personal-info", element: <PersonalInfoTab /> },
+                            // { path: "document-info", element: <DocumentInfoTab /> },
+                            // { path: "nominee-info", element: <NomineeInfoTab /> },
+                        ]
+                    },
                     {
                         path: 'help', // This creates /dashboard/help
                         element: <HelpLayout />, // Ensure this layout has an <Outlet />
@@ -238,7 +253,7 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-    {
+       {
         path: '/vendor',
         element: <VendorProtectedRoute />,
         children: [
