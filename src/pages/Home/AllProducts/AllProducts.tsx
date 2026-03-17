@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { 
-    ChevronLeft, ChevronRight, SearchX, 
-    Tag, ArrowUpDown, SlidersHorizontal 
+import {
+    ChevronLeft, ChevronRight, SearchX,
+    SlidersHorizontal, Search, Plus, Grid3X3, Table as TableIcon,
+    Trash2, CheckCircle, XCircle
 } from 'lucide-react';
-import useModalStore from "@/store/Store";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { ProductCard } from "@/pages/common/ProductCard/ProductCard";
@@ -16,13 +16,17 @@ export default function AllProduct() {
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // --- FILTER & SORT STATE ---
-    const [maxPrice, setMaxPrice] = useState<number>(5000); 
-    const [sortBy, setSortBy] = useState("newest"); 
+    // --- FILTER & VIEW STATES ---
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("all");
+    const [stock, setStock] = useState("all");
+    const [sortBy, setSortBy] = useState("newest");
+    const [viewMode, setViewMode] = useState("grid");
 
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 12;
+    const [itemsPerPage, setItemsPerPage] = useState<number | string>(12);
+
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     const getAuthToken = () => {
@@ -34,61 +38,107 @@ export default function AllProduct() {
         } catch (e) { return null; }
     };
 
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const token = getAuthToken();
+            const config = {
+                headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) }
+            };
+
+            const response = await axios.get(`${baseURL}/api/products`, config);
+            let rawData = response.data?.data?.products || response.data?.data || [];
+
+            const mappedProducts = rawData.map((item: any) => ({
+                ...item,
+                id: item.id,
+                date: item.created_at ? new Date(item.created_at).getTime() : item.id,
+                titleEn: item.product_title_english || item.name_en || "Product",
+                titleBn: item.product_title_bangla || item.name_bn || "",
+                offer_price: parseFloat(item.offer_price) || parseFloat(item.price) || 0,
+                regular_price: parseFloat(item.regular_price) || parseFloat(item.mrp) || 0,
+                stock_qty: item.stock || item.quantity || 0,
+                status: item.status || 'active',
+                product_image: item.product_image?.startsWith("http")
+                    ? item.product_image
+                    : `${baseURL}/uploads/ecommarce/product_image/${item.product_image}`
+            }));
+
+            setProducts(mappedProducts);
+        } catch (error) {
+            console.error("Failed to fetch products:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const token = getAuthToken();
-                const config = {
-                    headers: { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) }
-                };
-
-                const response = await axios.get(`${baseURL}/api/products`, config);
-                let rawData = response.data?.data?.products || response.data?.data || [];
-
-                const mappedProducts = rawData.map((item: any) => ({
-                    ...item,
-                    id: item.id,
-                    date: item.created_at ? new Date(item.created_at).getTime() : item.id,
-                    titleEn: item.product_title_english || item.name_en || "Product",
-                    titleBn: item.product_title_bangla || item.name_bn || "",
-                    offer_price: parseFloat(item.offer_price) || parseFloat(item.price) || 0,
-                    regular_price: parseFloat(item.regular_price) || parseFloat(item.mrp) || 0,
-                    product_image: item.product_image?.startsWith("http") 
-                        ? item.product_image 
-                        : `${baseURL}/uploads/ecommarce/product_image/${item.product_image}`
-                }));
-
-                setProducts(mappedProducts);
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchProducts();
     }, [baseURL]);
 
+    // --- PRODUCT ACTIONS (ACTIVE, INACTIVE, REMOVE) ---
+    const handleToggleStatus = async (id: string | number, currentStatus: string) => {
+        // Toggle handles both numeric string status ("1"/"0") and words ("active"/"inactive")
+        const newStatus = (currentStatus === 'active' || currentStatus === '1') ? 'inactive' : 'active';
+        setProducts(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
+        try {
+            // API call logic
+        } catch (error) {
+            console.error("Failed to update status:", error);
+            setProducts(prev => prev.map(p => p.id === id ? { ...p, status: currentStatus } : p));
+            alert("Failed to update product status.");
+        }
+    };
+
+    const handleRemoveProduct = async (id: string | number) => {
+        if (!window.confirm("Are you sure you want to completely remove this product?")) return;
+        setProducts(prev => prev.filter(p => p.id !== id));
+        try {
+            // API call logic
+        } catch (error) {
+            console.error("Failed to delete product:", error);
+            fetchProducts();
+            alert("Failed to delete the product.");
+        }
+    };
+
     // --- FILTERING & SORTING ENGINE ---
-    const filteredProducts = useMemo(() => {
-        return products
-            .filter(product => product.offer_price <= maxPrice)
-            .sort((a, b) => {
-                if (sortBy === "newest") return b.date - a.date;
-                if (sortBy === "oldest") return a.date - b.date;
-                if (sortBy === "lowToHigh") return a.offer_price - b.offer_price;
-                if (sortBy === "highToLow") return b.offer_price - a.offer_price;
-                return 0;
-            });
-    }, [products, maxPrice, sortBy]);
+    const filteredAndSortedProducts = useMemo(() => {
+        let result = [...products];
 
-    // Reset pagination on filter change
-    useEffect(() => setCurrentPage(1), [maxPrice, sortBy]);
+        // 1. Search Filter
+        if (search) {
+            const lowerSearch = search.toLowerCase();
+            result = result.filter((p) =>
+                p.titleEn.toLowerCase().includes(lowerSearch) ||
+                p.titleBn.toLowerCase().includes(lowerSearch) ||
+                (p.sku && p.sku.toLowerCase().includes(lowerSearch))
+            );
+        }
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+        // 3. Stock Filter
+        if (stock !== "all") {
+            if (stock === "in_stock") result = result.filter((p) => p.stock_qty > 0);
+            if (stock === "out_of_stock") result = result.filter((p) => p.stock_qty <= 0);
+        }
+
+        // 4. Sorting
+        return result.sort((a, b) => {
+            if (sortBy === "newest") return b.date - a.date;
+            if (sortBy === "oldest") return a.date - b.date;
+            if (sortBy === "lowToHigh") return a.offer_price - b.offer_price;
+            if (sortBy === "highToLow") return b.offer_price - a.offer_price;
+            return 0;
+        });
+    }, [products, search, status, stock, sortBy]);
+
+    useEffect(() => setCurrentPage(1), [search, status, stock, sortBy]);
+
+    const currentLimit = itemsPerPage === "all" ? filteredAndSortedProducts.length : (itemsPerPage as number);
+    const totalPages = currentLimit > 0 ? Math.ceil(filteredAndSortedProducts.length / currentLimit) : 1;
+    const indexOfLastItem = currentPage * currentLimit;
+    const indexOfFirstItem = indexOfLastItem - currentLimit;
+    const currentProducts = filteredAndSortedProducts.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -122,96 +172,157 @@ export default function AllProduct() {
     return (
         <section className="py-8 w-full container mx-auto px-4 sm:px-6">
             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-                
-                {/* 1. Simplified Header */}
+
+                {/* 1. Header */}
                 <div className="bg-gradient-to-br from-[#2d5a35] via-[#4d8b59] to-[#5ca367] p-8 text-white">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-3xl font-black tracking-tight mb-1">{t("header.allProducts", "Premium Collection")}</h1>
-                            <p className="text-white/70 text-sm font-medium">Browsing {filteredProducts.length} items within your budget</p>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-2">
-                            <SlidersHorizontal className="w-4 h-4 text-white/80" />
-                            <span className="text-xs font-bold uppercase tracking-wider">Active Filters</span>
+                            <p className="text-white/70 text-sm font-medium">Displaying {filteredAndSortedProducts.length} items</p>
                         </div>
                     </div>
                 </div>
 
                 {/* 2. Control Panel */}
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex flex-wrap gap-6 items-center justify-between">
-                    <div className="flex flex-wrap gap-4 items-center">
-                        {/* Sort Dropdown */}
-                        <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-2xl border border-slate-200 shadow-sm">
-                            <ArrowUpDown className="w-4 h-4 text-[#4d8b59]" />
-                            <select 
-                                className="text-xs font-bold text-slate-600 bg-transparent outline-none cursor-pointer"
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                            >
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="lowToHigh">Price: Low to High</option>
-                                <option value="highToLow">Price: High to Low</option>
-                            </select>
+                <div className="p-6 border-b border-slate-100 bg-slate-50/30">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                            <div className="relative flex-1 w-full">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by product name or SKU..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A87C]/40 focus:border-[#E8A87C] text-sm transition-all"
+                                />
+                            </div>
                         </div>
 
-                        {/* Price Badge */}
-                        <div className="flex items-center gap-2 bg-green-50 px-4 py-2.5 rounded-2xl border border-green-100">
-                            <Tag className="w-3.5 h-3.5 text-green-600" />
-                            <span className="text-[11px] font-black text-green-700 uppercase tracking-wider">Under ৳{maxPrice}</span>
-                        </div>
-                    </div>
+                        <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
+                            <div className="flex flex-wrap gap-3 w-full lg:w-auto">
 
-                    {/* Price Slider */}
-                    <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-2xl border border-slate-200 shadow-sm min-w-[280px]">
-                        <span className="text-[10px] font-black text-slate-400 uppercase">Max Price</span>
-                        <input 
-                            type="range" min="100" max="10000" step="100"
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(Number(e.target.value))}
-                            className="accent-[#4d8b59] h-1.5 flex-1 cursor-pointer"
-                        />
-                        <span className="text-sm font-bold text-slate-700 min-w-[60px] text-right">৳{maxPrice}</span>
+                                <select value={stock} onChange={(e) => setStock(e.target.value)} className="h-10 w-full sm:w-[150px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
+                                    <option value="all">All Stock</option>
+                                    <option value="in_stock">In Stock</option>
+                                    <option value="out_of_stock">Out of Stock</option>
+                                </select>
+
+                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="h-10 w-full sm:w-[170px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
+                                    <option value="all">Show All</option>
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="lowToHigh">Price: Low to High</option>
+                                    <option value="highToLow">Price: High to Low</option>
+                                </select>
+
+                            </div>
+
+                            <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-slate-200">
+                                <button
+                                    onClick={() => setViewMode('table')}
+                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'table' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
+                                        }`}
+                                >
+                                    <TableIcon className="w-4 h-4 mr-1.5" /> Table
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
+                                        }`}
+                                >
+                                    <Grid3X3 className="w-4 h-4 mr-1.5" /> Grid
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* 3. Product Grid */}
-                <div className="p-8">
+                {/* 3. Product Display */}
+                <div className="p-8 bg-slate-50/30">
                     {currentProducts.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-10">
-                                {currentProducts.map((product) => (
-                                    <div key={product.id} className="transition-transform duration-300 hover:-translate-y-2">
-                                        <ProductCard
-                                            product={product} 
-                                            baseURL={baseURL} 
-                                            onAddToCart={() => handleAddToCart(product)} 
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                            {viewMode === 'grid' ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-10">
+                                    {currentProducts.map((product) => (
+                                        <div key={product.id} className="transition-transform duration-300 hover:-translate-y-2">
+                                            <ProductCard
+                                                product={product}
+                                                baseURL={baseURL}
+                                                onAddToCart={() => handleAddToCart(product)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="mb-10 w-full overflow-x-auto bg-white rounded-xl border border-slate-200">
+                                    <table className="w-full text-left text-sm text-slate-600 whitespace-nowrap">
+                                        <thead className="bg-slate-50 text-slate-800 font-semibold border-b border-slate-200">
+                                            <tr>
+                                                <th className="px-4 py-3">Image</th>
+                                                <th className="px-4 py-3">Product Name & SKU</th>
+                                                <th className="px-4 py-3">Regular Price</th>
+                                                <th className="px-4 py-3">Offer Price</th>
+                                                <th className="px-4 py-3">Discount</th>
+                                                <th className="px-4 py-3">Stock</th>
+                                            
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {currentProducts.map((product) => {
+                                                // Calculate dynamic discount percentage
+                                                let discountText = "-";
+                                                if (product.regular_price > 0 && product.offer_price < product.regular_price) {
+                                                    const discount = Math.round(((product.regular_price - product.offer_price) / product.regular_price) * 100);
+                                                    discountText = `${discount}% OFF`;
+                                                }
+
+                                                // Determine active/inactive properly based on "1"/"0" or strings
+                                                const isActive = product.status === '1' || product.status === 'active';
+
+                                                return (
+                                                    <tr key={product.id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                                                        <td className="px-4 py-3">
+                                                            <img src={product.product_image} alt="product" className="w-12 h-12 rounded object-cover border" />
+                                                        </td>
+                                                        <td className="px-4 py-3">
+                                                            <div className="font-medium text-slate-800">{product.titleEn}</div>
+                                                            {product.sku && <div className="text-xs text-slate-500">SKU: {product.sku}</div>}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-slate-400 line-through">৳{product.regular_price}</td>
+                                                        <td className="px-4 py-3 font-semibold text-slate-800">৳{product.offer_price}</td>
+                                                        <td className="px-4 py-3 font-medium text-amber-600">{discountText}</td>
+                                                        <td className="px-4 py-3">{product.stock_qty}</td>
+                                                     
+                                                      
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
 
                             {/* Pagination */}
                             {totalPages > 1 && (
-                                <div className="flex justify-center items-center gap-3 pt-10 border-t border-slate-50">
+                                <div className="flex justify-center items-center gap-3 pt-10 border-t border-slate-200/60">
                                     <button
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
-                                        className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-20 transition-all shadow-sm"
+                                        className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
                                     >
                                         <ChevronLeft className="w-5 h-5 text-slate-600" />
                                     </button>
-                                    
-                                    <div className="flex items-center gap-2 bg-slate-100/50 p-1.5 rounded-2xl">
+
+                                    <div className="flex items-center gap-2 bg-slate-100/70 p-1.5 rounded-2xl border border-slate-200/50">
                                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                                             <button
                                                 key={page}
                                                 onClick={() => handlePageChange(page)}
-                                                className={`w-9 h-9 rounded-xl font-bold text-xs transition-all ${
-                                                    currentPage === page 
-                                                    ? "bg-[#4d8b59] text-white shadow-md shadow-green-200" 
+                                                className={`w-9 h-9 rounded-xl font-bold text-xs transition-all ${currentPage === page
+                                                    ? "bg-[#4d8b59] text-white shadow-md shadow-green-200"
                                                     : "hover:bg-white text-slate-500"
-                                                }`}
+                                                    }`}
                                             >
                                                 {page}
                                             </button>
@@ -221,7 +332,7 @@ export default function AllProduct() {
                                     <button
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}
-                                        className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-20 transition-all shadow-sm"
+                                        className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
                                     >
                                         <ChevronRight className="w-5 h-5 text-slate-600" />
                                     </button>
@@ -229,17 +340,19 @@ export default function AllProduct() {
                             )}
                         </>
                     ) : (
-                        <div className="py-40 flex flex-col items-center justify-center text-center">
-                            <div className="bg-slate-50 p-8 rounded-[3rem] mb-6">
-                                <SearchX className="h-20 w-20 text-slate-200" />
+                        <div className="py-32 flex flex-col items-center justify-center text-center">
+                            <div className="bg-slate-100 p-8 rounded-[3rem] mb-6 shadow-sm">
+                                <SearchX className="h-16 w-16 text-slate-400" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-800 mb-2">No items in this range</h3>
-                            <p className="text-slate-500 text-sm max-w-xs mx-auto mb-6">Try increasing your budget filter to see more products.</p>
-                            <button 
-                                onClick={() => {setMaxPrice(10000); setSortBy("newest");}}
-                                className="px-8 py-3 bg-[#4d8b59] text-white rounded-2xl font-bold text-sm hover:bg-[#3d7044] transition-all shadow-lg shadow-green-100"
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">No products found</h3>
+                            <p className="text-slate-500 text-sm max-w-sm mx-auto">
+                                We couldn't find any products matching your current filters. Try adjusting your search or clearing the filters.
+                            </p>
+                            <button
+                                onClick={() => { setSearch(''); setStatus('all'); setStock('all'); }}
+                                className="mt-6 px-6 py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
                             >
-                                Reset Price Filter
+                                Clear All Filters
                             </button>
                         </div>
                     )}
