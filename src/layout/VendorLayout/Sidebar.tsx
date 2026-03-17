@@ -1,9 +1,8 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard, Package, Truck,
-    ArrowRightLeft, Undo2, CalendarClock,
-    BarChart3, LogOut, Store, X, User
+    LayoutDashboard, Package, 
+    BarChart3, LogOut, Store, X, 
 } from 'lucide-react';
 
 interface SidebarProps { 
@@ -18,12 +17,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     const menuItems = [
         { name: 'Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
         { name: 'Products', path: '/vendor/dashboard/products', icon: Package },
-        { name: 'Profile', path: '/vendor/dashboard/profile', icon: User },
-        { name: 'Pickup Parcel', path: '/vendor/pickup', icon: Package },
-        { name: 'Delivery Parcel', path: '/vendor/delivery', icon: Truck },
-        { name: 'Transfer Order', path: '/vendor/transfer', icon: ArrowRightLeft },
-        { name: 'Return Parcel', path: '/vendor/return', icon: Undo2 },
-        { name: 'Reschedule Order', path: '/vendor/reschedule', icon: CalendarClock },
+        // { name: 'Pickup Parcel', path: '/vendor/pickup', icon: Package },
+        // { name: 'Delivery Parcel', path: '/vendor/delivery', icon: Truck },
+        // { name: 'Transfer Order', path: '/vendor/transfer', icon: ArrowRightLeft },
+        // { name: 'Return Parcel', path: '/vendor/return', icon: Undo2 },
+        // { name: 'Reschedule Order', path: '/vendor/reschedule', icon: CalendarClock },
         { name: 'Report', path: '/vendor/report', icon: BarChart3 },
     ];
 
