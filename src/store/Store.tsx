@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 
+// Shared student profile shape used by ProfileSidebar and BasicInfoTab
+export interface StudentProfileData {
+    id?: number;
+    name: string;
+    email?: string;
+    image: string | null;
+    status?: string;
+    mobile?: string;
+    affiliate_id?: string;
+    refer_code?: string | null;
+}
+
 interface ModalStore {
     isCheckoutModalOpen: boolean;
     isLoginModalOpen: boolean;
@@ -7,13 +19,26 @@ interface ModalStore {
     isCourseModalOpen: boolean;
     isBuyNowClicked: boolean;
     clicked: boolean;
-    
+
     // --- ADDED: Wallet trigger states ---
     walletUpdateTrigger: number;
 
+    // --- ADDED: Profile image update trigger ---
+    profileUpdateTrigger: number;
+
+    // --- ADDED: Shared student profile data ---
+    studentProfile: StudentProfileData | null;
+    setStudentProfile: (data: StudentProfileData) => void;
+
+    // --- ADDED: Blob preview URL from FileReader after a successful image upload ---
+    profileBlobPreview: string | null;
+    setProfileBlobPreview: (url: string | null) => void;
+
     // Toggle state methods
     toggleClicked: () => void;
-    
+    setCartOpen: (isOpen: boolean) => void;
+    setCheckoutModalOpen: (isOpen: boolean) => void;
+
     //methods for buy now
     openBuyNow: () => void;
     closeBuyNow: () => void;
@@ -41,9 +66,12 @@ interface ModalStore {
 
     // Alternative change method for Checkout Modal
     changeCheckoutModal: () => void;
-    
+
     // --- ADDED: Wallet trigger method ---
     triggerWalletUpdate: () => void;
+
+    // --- ADDED: Profile update trigger method ---
+    triggerProfileUpdate: () => void;
 }
 
 const useModalStore = create<ModalStore>((set) => ({
@@ -54,12 +82,25 @@ const useModalStore = create<ModalStore>((set) => ({
     isCourseModalOpen: false,
     isBuyNowClicked: false,
     clicked: false,
-    
+
     // --- ADDED: Initial state for wallet trigger ---
     walletUpdateTrigger: 0,
 
+    // --- ADDED: Initial state for profile update trigger ---
+    profileUpdateTrigger: 0,
+
+    // --- ADDED: Initial student profile state ---
+    studentProfile: null,
+    setStudentProfile: (data) => set({ studentProfile: data }),
+
+    // --- ADDED: Initial blob preview state ---
+    profileBlobPreview: null,
+    setProfileBlobPreview: (url) => set({ profileBlobPreview: url }),
+
     // Toggle clicked state
     toggleClicked: () => set((state) => ({ clicked: !state.clicked })),
+    setCartOpen: (isOpen: boolean) => set({ clicked: isOpen }),
+    setCheckoutModalOpen: (isOpen: boolean) => set({ isCheckoutModalOpen: isOpen }),
 
     // Buy Now Controls
     openBuyNow: () => set({ isBuyNowClicked: true }),
@@ -88,8 +129,13 @@ const useModalStore = create<ModalStore>((set) => ({
     toggleCourseModal: () => set((state) => ({ isCourseModalOpen: !state.isCourseModalOpen })),
 
     // --- ADDED: Method to trigger wallet update ---
-    triggerWalletUpdate: () => set((state) => ({ 
-        walletUpdateTrigger: state.walletUpdateTrigger + 1 
+    triggerWalletUpdate: () => set((state) => ({
+        walletUpdateTrigger: state.walletUpdateTrigger + 1
+    })),
+
+    // --- ADDED: Method to trigger profile image refresh across the app ---
+    triggerProfileUpdate: () => set((state) => ({
+        profileUpdateTrigger: state.profileUpdateTrigger + 1
     })),
 }));
 

@@ -71,6 +71,7 @@ import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHis
 import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
 import OrderHistory from "@/pages/common/Orders/OrderHistory";
 import BasicInfoTab from "@/components/profile/BasicInfoTab/BasicInfoTab";
+import PersonalInfoTab from "@/components/profile/PersonalInfoTab/PersonalInfoTab";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -218,7 +219,7 @@ export const routes = createBrowserRouter([
 
                             // These will render inside the <Outlet /> in ProfileSettings.tsx
                             { path: "basic-info", element: <BasicInfoTab /> },
-                            // { path: "personal-info", element: <PersonalInfoTab /> },
+                            { path: "personal-info", element: <PersonalInfoTab /> },
                             // { path: "document-info", element: <DocumentInfoTab /> },
                             // { path: "nominee-info", element: <NomineeInfoTab /> },
                         ]

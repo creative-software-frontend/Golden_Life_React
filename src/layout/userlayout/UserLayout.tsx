@@ -26,6 +26,7 @@ import {
     SidebarProvider,
     SidebarRail,
 } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton"
 import Footer from "@/pages/common/Footer/Footer"
 import Header from "@/pages/common/Header/Header"
 import useModalStore from "@/store/Store"
@@ -385,8 +386,13 @@ export default function UserLayout() {
                     <SidebarGroup>
                         <SidebarMenu>
                             {isLoadingCategories ? (
-                                <div className="flex justify-center py-10">
-                                    <Loader2 className="h-6 w-6 animate-spin text-[#5ca367]" />
+                                <div className="flex flex-col gap-2 px-1 md:px-3 py-4">
+                                    {Array.from({ length: 8 }).map((_, i) => (
+                                        <div key={i} className="flex items-center gap-3 w-full h-[48px] px-2 rounded-lg">
+                                            <Skeleton className="h-[22px] w-[22px] rounded-md bg-[#5ca367]/10" />
+                                            <Skeleton className="h-4 w-2/3 rounded-md bg-slate-200" />
+                                        </div>
+                                    ))}
                                 </div>
                             ) : categories.length > 0 ? (
                                 /* 1. WRAPPER SPACING: 

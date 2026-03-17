@@ -8,6 +8,7 @@ import {
     HelpCircle, X,CheckCircle2
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // --- Configuration ---
 const BANK_DETAILS = {
@@ -511,9 +512,29 @@ export default function WalletAdd() {
                     </div>
 
                     {isLoadingHistory ? (
-                        <div className="flex flex-col items-center justify-center py-32 gap-4">
-                            <Loader2 className="w-12 h-12 animate-spin text-secondary/40" />
-                            <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">{t('loading_records', 'Processing Records...')}</p>
+                        <div className="p-4 md:p-8 space-y-3">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="group p-5 md:px-10 md:py-6 border border-slate-100 rounded-[2rem] grid grid-cols-1 md:grid-cols-4 items-center gap-4 bg-white shadow-sm">
+                                    <div className="flex items-center gap-5">
+                                        <Skeleton className="h-14 w-14 rounded-2xl shrink-0" />
+                                        <div className="flex flex-col gap-2">
+                                            <Skeleton className="h-6 w-24" />
+                                            <Skeleton className="h-3 w-32" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col md:items-center gap-2">
+                                        <Skeleton className="h-5 w-16 rounded-lg" />
+                                        <Skeleton className="h-3 w-28" />
+                                    </div>
+                                    <div className="flex md:justify-center">
+                                        <Skeleton className="h-6 w-20 rounded-full" />
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-3 w-16" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : transactions.length === 0 ? (
                         <div className="text-center py-32">
