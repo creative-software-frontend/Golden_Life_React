@@ -10,15 +10,20 @@ import {
   Truck,
   ShoppingBag,
   ExternalLink,
+  FileText,
+  ArrowRight,
 } from 'lucide-react';
 
 // --- Types ---
 interface Product {
   id: number;
+  product_id?: string | number; // Added to match OrderDetails logic
   product_name: string;
   product_image: string;
   quantity: string;
   subtotal: string;
+  ebook?: string;
+  video_link?: string;
 }
 
 interface Order {
@@ -97,10 +102,30 @@ const OrderHistory = () => {
         return;
       }
       try {
-        const response = await axios.get(`${baseURL}/api/student/orders`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setOrders(Array.isArray(response.data.orders) ? response.data.orders : []);
+        const headers = { Authorization: `Bearer ${token}` };
+        const [ordersRes, productsRes] = await Promise.all([
+          axios.get(`${baseURL}/api/student/orders`, { headers }),
+          axios.get(`${baseURL}/api/products`, { headers }).catch(() => null)
+        ]);
+
+        const rawOrders = Array.isArray(ordersRes.data.orders) ? ordersRes.data.orders : [];
+        const allProductsList = productsRes?.data?.data?.products || productsRes?.data?.products || [];
+
+        // Enrich orders with product ebook/video info
+        const enrichedOrders = rawOrders.map((order: Order) => ({
+          ...order,
+          products: order.products?.map((orderP: Product) => {
+            const pId = String(orderP.product_id ?? orderP.id);
+            const details = allProductsList.find((p: any) => String(p.id) === pId);
+            return {
+              ...orderP,
+              ebook: details?.ebook ? String(details.ebook).trim() : "0",
+              video_link: details?.video_link?.trim() || ""
+            };
+          })
+        }));
+
+        setOrders(enrichedOrders);
       } catch (error) {
         console.error("Error fetching orders:", error);
         setOrders([]);
@@ -204,17 +229,27 @@ const OrderHistory = () => {
                       <ExternalLink size={12} className="text-slate-400 group-hover:text-emerald-500 transition-colors" />
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs">
-                      <span className="flex items-center gap-1 text-slate-500">
-                        <Calendar size={12} /> {new Date(order.created_at).toLocaleDateString()}
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5 text-xs text-slate-500">
+                      <span className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 rounded-md border border-slate-100">
+                        <Calendar size={12} className="text-slate-400" /> 
+                        {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                          order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                        }`}
-                      >
-                        {order.status}
-                      </span>
+                      {(() => {
+                        const s = order.status.toLowerCase();
+                        let colorClass = "bg-slate-100 text-slate-700 border-slate-200"; // default
+                        
+                        if (s.includes('delivered')) colorClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
+                        else if (s.includes('pending') || s.includes('placed')) colorClass = "bg-amber-50 text-amber-700 border-amber-100";
+                        else if (s.includes('process') || s.includes('packag')) colorClass = "bg-indigo-50 text-indigo-700 border-indigo-100";
+                        else if (s.includes('way') || s.includes('courier')) colorClass = "bg-sky-50 text-sky-700 border-sky-100";
+                        else if (s.includes('returned') || s.includes('cancel')) colorClass = "bg-rose-50 text-rose-700 border-rose-100";
+
+                        return (
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm ${colorClass}`}>
+                            {order.status}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -239,29 +274,31 @@ const OrderHistory = () => {
               {expandedOrderId === order.id && (
                 <div className="border-t border-slate-100/60 bg-gradient-to-b from-white/80 to-white/60 p-4 sm:p-5 lg:p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 mb-6 lg:mb-8">
-                    <div className="bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <Wallet size={12} /> Payment
+                    <div className="bg-white/90 p-4 rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-slate-200">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                        <Wallet size={12} className="text-slate-300" /> Payment
                       </p>
                       <p className="font-bold text-slate-800 text-sm">{order.payment?.payment_method ?? 'N/A'}</p>
+                      {order.payment?.transaction_number && (
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-medium italic">TXN: {order.payment.transaction_number}</p>
+                      )}
                     </div>
 
-                    <div className="bg-white/80 p-4 rounded-2xl border border-slate-100 shadow-sm">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <Truck size={12} /> Delivery
+                    <div className="bg-white/90 p-4 rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-slate-200">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                        <Truck size={12} className="text-slate-300" /> Delivery
                       </p>
-                      {/* Exact value, no formatting */}
-                      <p className="font-bold text-slate-800 text-sm">৳{order.delivery_charge}</p>
+                      <p className="font-bold text-slate-800 text-sm">৳{Number(order.delivery_charge).toFixed(2)}</p>
                     </div>
 
                     <div
                       onClick={(e) => goToDetails(e, order.id, order.order_no)}
-                      className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 shadow-sm hover:bg-emerald-50 cursor-pointer transition-colors flex flex-col justify-center"
+                      className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 shadow-sm hover:bg-indigo-50 cursor-pointer transition-all flex flex-col justify-center group/btn"
                     >
-                      <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        Full Details <ExternalLink size={11} />
+                      <p className="text-[10px] font-bold text-indigo-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                        Deep Insights <ArrowRight size={11} className="transition-transform group-hover/btn:translate-x-0.5" />
                       </p>
-                      <p className="text-xs font-semibold text-emerald-800">View Invoice & Tracking</p>
+                      <p className="text-xs font-semibold text-indigo-900/80">View Full Invoice & Tracker</p>
                     </div>
                   </div>
 
@@ -298,15 +335,30 @@ const OrderHistory = () => {
                             </div>
                           </div>
 
-                          <div className="flex justify-between md:contents">
+                          <div className="flex flex-col sm:flex-row items-end sm:items-center justify-between md:contents gap-3">
                             <div className="md:col-span-2 md:text-center">
-                              <span className="md:hidden text-[10px] text-slate-500 block mb-0.5">Quantity</span>
-                              <span className="font-bold text-slate-700 text-sm">×{item.quantity}</span>
+                              <span className="md:hidden text-[10px] text-slate-500 block mb-0.5 font-bold uppercase">Qty</span>
+                              <span className="font-bold text-slate-700 text-sm bg-slate-100/50 px-2 py-0.5 rounded">×{item.quantity}</span>
                             </div>
-                            <div className="md:col-span-3 lg:col-span-2 md:text-right">
-                              <span className="md:hidden text-[10px] text-slate-500 block mb-0.5">Subtotal</span>
-                              {/* Exact value, no formatting */}
-                              <span className="font-black text-slate-900 text-sm sm:text-base">৳{item.subtotal}</span>
+                            <div className="md:col-span-3 lg:col-span-2 md:text-right flex flex-col items-end">
+                              <span className="md:hidden text-[10px] text-slate-500 block mb-0.5 font-bold uppercase">Subtotal</span>
+                              <span className="font-black text-slate-900 text-sm sm:text-base">৳{Number(item.subtotal).toFixed(2)}</span>
+                              
+                              {/* New Access Button for E-books */}
+                              {item.ebook === "1" && item.video_link ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(item.video_link, '_blank', 'noopener,noreferrer');
+                                  }}
+                                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm shadow-indigo-100 no-print"
+                                >
+                                  <FileText size={12} />
+                                  ACCESS CONTENT
+                                </button>
+                              ) : item.ebook === "1" ? (
+                                <span className="text-[10px] text-amber-600 font-bold mt-1 uppercase tracking-tighter italic">Digitizing...</span>
+                              ) : null}
                             </div>
                           </div>
                         </div>
