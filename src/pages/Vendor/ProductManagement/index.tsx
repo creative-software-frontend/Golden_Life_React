@@ -35,7 +35,26 @@ const Products: React.FC = () => {
     applyFilters,
     updatePageSize,
     setPagination,
+    updateEbookStatus,
+    updateVideoLink,
   } = useProducts();
+
+  // Debug logging - log products count when it changes
+  React.useEffect(() => {
+    console.log('📊 [ProductManagement] Products updated:', {
+      totalProducts: products.length,
+      currentPage: pagination.currentPage,
+      pageSize: pagination.pageSize,
+      totalItems: pagination.totalItems,
+      totalPages: pagination.totalPages,
+      showing: `${products.length} of ${pagination.totalItems} products`
+    });
+  }, [products, pagination]);
+
+  // Additional debug: Log filter state
+  React.useEffect(() => {
+    console.log('🔍 [ProductManagement] Current filters:', filters);
+  }, [filters]);
 
   // Load categories for category name lookup
   const {
@@ -143,6 +162,7 @@ const Products: React.FC = () => {
         onViewModeChange={handleViewModeChange}
         onAddProduct={handleAddProduct}
       />
+
 
       {/* Products Content */}
       {!error && (

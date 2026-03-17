@@ -12,9 +12,11 @@ export interface Product {
   category_id: number;
   subcategory_id: number;
   stock: number;
-  status: 0 | 1; // 0 = Inactive, 1 = Active
+  status: 0 | 1 | string; // 0 = Inactive, 1 = Active (can be string from API)
   product_image: string;
   created_at: string;
+  video_link?: string | null;
+  ebook?: string | '0' | '1'; // '0' = regular product, '1' = ebook
 }
 
 // API Response type
@@ -50,7 +52,7 @@ export type ViewMode = 'table' | 'grid';
 
 // Component props types
 export interface ProductStatusBadgeProps {
-  status: 0 | 1;
+  status: 0 | 1 | string;
 }
 
 export interface ProductActionsProps {

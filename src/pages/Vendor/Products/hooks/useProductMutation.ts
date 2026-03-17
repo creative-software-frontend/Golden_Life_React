@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { ProductFormData, ProductApiResponse } from '../types/product.types';
+import { ProductFormData } from '../types/product.types';
 
 export function useProductMutation() {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,15 +34,22 @@ export function useProductMutation() {
       }
 
       // Debug: Log form data
-      console.log('=== Creating Product ===');
+      console.log('📦 === CREATING PRODUCT - FormData Details ===');
       console.log('FormData entries:');
+      const formDataEntries = [];
       for (const [key, value] of formData.entries()) {
         if (value instanceof File) {
-          console.log(`${key}: ${value.name} (${value.size} bytes)`);
+          console.log(`  📁 ${key}: ${value.name} (${value.size} bytes)`);
+          formDataEntries.push({ key, value: `File: ${value.name}` });
+        } else if (Array.isArray(value)) {
+          console.log(`  📋 ${key}: [${value.join(', ')}]`);
+          formDataEntries.push({ key, value: `[Array: ${value.length} items]` });
         } else {
-          console.log(`${key}: ${value}`);
+          console.log(`  📝 ${key}: ${value}`);
+          formDataEntries.push({ key, value });
         }
       }
+      console.log('==========================================\n');
 
       const response = await axios.post(
         `${baseURL}/api/vendor/product/store`,
@@ -197,7 +204,6 @@ export function useProductMutation() {
         sku: productData.sku || '',
         stock: parseInt(productData.stock) || 0,
         video_link: productData.video_link || '',
-        status: productData.status === 1 ? 1 : 0,
         images: [], // No new images initially in edit mode
         existing_images: [
           productData.product_image,

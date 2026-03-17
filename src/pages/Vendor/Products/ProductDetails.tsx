@@ -1,32 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, Image, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import axios from 'axios';
-import { getMockProduct } from './utils/mockData';
 
 interface ProductDetailsData {
   id: number;
+  vendor_id: string;
   product_title_english: string;
   product_title_bangla: string;
+  category_id: string;
+  subcategory_id: string;
+  ebook: string;
+  short_description_english: string;
+  short_description_bangla: string;
+  long_description_english: string;
+  long_description_bangla: string;
+  seller_price: string;
+  regular_price: string;
+  offer_price: string;
   sku: string;
-  seller_price: number;
-  regular_price: number;
-  offer_price: number;
-  stock: number;
-  status: 0 | 1;
   product_image: string;
-  gallery_images?: string[];
-  category_name?: string;
-  subcategory_name?: string;
-  short_description_english?: string;
-  short_description_bangla?: string;
-  long_description_english?: string;
-  long_description_bangla?: string;
-  video_link?: string;
+  status: string;
+  stock: string;
+  video_link: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface GalleryImage {
+  id: number;
+  product_id: string;
+  gal_img: string;
   created_at: string;
 }
 
@@ -34,19 +43,24 @@ export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetailsData | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  
+  // Lightbox modal state
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_BASE_URL || 'https://api.goldenlife.my';
 
   // Helper functions for safe formatting
-  const formatPrice = (price: number | undefined | null): string => {
-    if (price === undefined || price === null) return '0.00';
-    return `৳ ${price.toFixed(2)}`;
+  const formatPrice = (price: string | number | undefined | null): string => {
+    if (price === undefined || price === null || price === '') return '0.00';
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return `৳ ${numPrice.toFixed(2)}`;
   };
 
-  const formatNumber = (num: number | undefined | null): string => {
-    if (num === undefined || num === null) return '0';
+  const formatNumber = (num: string | number | undefined | null): string => {
+    if (num === undefined || num === null || num === '') return '0';
     return num.toString();
   };
 
@@ -64,6 +78,53 @@ export default function ProductDetails() {
       return 'Invalid Date';
     }
   };
+
+  // Get image URLs
+  const getProductImageUrl = (filename: string | null | undefined): string => {
+    if (!filename) return '/assets/default-vendor.png';
+    return filename.startsWith('http') ? filename : `${baseURL}/uploads/ecommarce/product_image/${filename}`;
+  };
+
+  const getGalleryImageUrl = (filename: string | null | undefined): string => {
+    if (!filename) return '/assets/default-vendor.png';
+    return filename.startsWith('http') ? filename : `${baseURL}/uploads/ecommarce/gal_img/${filename}`;
+  };
+
+  // Lightbox handlers
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      
+      if (e.key === 'ArrowLeft') {
+        goToPreviousImage();
+      } else if (e.key === 'ArrowRight') {
+        goToNextImage();
+      } else if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, galleryImages.length]);
 
   // Get auth token
   const getAuthToken = () => {
@@ -87,11 +148,9 @@ export default function ProductDetails() {
 
       try {
         console.log('🔄 Fetching product details for ID:', id);
-        console.log('Product ID from URL:', id);
         
         const token = getAuthToken();
         
-        // Use query parameter format instead of URL segment
         const response = await axios.get(
           `${baseURL}/api/vendor/product/details`,
           {
@@ -108,32 +167,35 @@ export default function ProductDetails() {
         console.log('✅ Product details fetched successfully');
         console.log('Response data:', response.data);
         
-        // Handle different response structures
-        let productData = response.data?.data || response.data?.product || response.data;
-        
-        // Check if status field exists in response
-        if (response.data?.status === true || response.data?.success === true) {
-          productData = response.data?.data || response.data?.product || productData;
+        // Extract product and gallery from response
+        // Expected structure: { status: true, data: { product: {...}, gallery: [...] } }
+        if (response.data?.data?.product) {
+          setProduct(response.data.data.product);
+          setGalleryImages(response.data.data.gallery || []);
+          console.log('Product loaded:', response.data.data.product.id);
+          console.log('Gallery images:', response.data.data.gallery?.length || 0);
+        } else {
+          throw new Error('Invalid response structure - product data not found');
         }
         
-        setProduct(productData);
-        setIsDemoMode(false); // Real data loaded
-        console.log('ℹ️ Using real API data');
       } catch (err: any) {
         console.error('❌ Fetch product details error:', err);
         console.error('Error response:', err.response?.data);
         
-        // Instead of showing error and redirecting, use mock data
-        console.warn('⚠️ API failed - switching to demo mode with mock data');
+        let errorMessage = 'Failed to load product details';
         
-        const mockProduct = getMockProduct(Number(id));
-        setProduct(mockProduct);
-        setIsDemoMode(true);
+        if (err.response?.status === 404) {
+          errorMessage = 'Product not found.';
+        } else if (err.response?.status === 401) {
+          errorMessage = 'Authentication failed. Please login again.';
+        } else if (err.response?.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
         
-        toast.warning('API unavailable - showing demo data', {
-          autoClose: 5000,
-          position: 'top-right'
-        });
+        toast.error(errorMessage);
+        setTimeout(() => {
+          navigate('/vendor/dashboard/products');
+        }, 2000);
       } finally {
         setIsLoading(false);
       }
@@ -155,7 +217,6 @@ export default function ProductDetails() {
 
   // Always show product (real or mock)
   if (!product) {
-    // This should never happen now due to mock fallback
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -170,24 +231,6 @@ export default function ProductDetails() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
-      {/* Demo Mode Banner */}
-      {isDemoMode && (
-        <Card className="border-amber-300 bg-amber-50 dark:bg-amber-950/20">
-          <CardContent className="py-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 space-y-1">
-                <p className="font-bold text-amber-800 dark:text-amber-400">
-                  🎭 Demo Mode Active
-                </p>
-                <p className="text-sm text-amber-700 dark:text-amber-500">
-                  API is unavailable. Showing <strong>mock product data</strong> for demonstration purposes. All information displayed is sample data.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
       
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -219,41 +262,54 @@ export default function ProductDetails() {
               <CardTitle className="text-lg font-bold">Product Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200">
+              <div 
+                className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 cursor-pointer group relative"
+                onClick={() => openLightbox(0)}
+              >
                 <img
-                  src={product.product_image && (product.product_image.startsWith('http') 
-                    ? product.product_image 
-                    : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`)
-                  }
+                  src={getProductImageUrl(product.product_image)}
                   alt={product.product_title_english}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     console.error('Failed to load product image');
-                    e.currentTarget.src = '/assets/default-vendor.png'; // Fallback image
+                    e.currentTarget.src = '/assets/default-vendor.png';
                   }}
                 />
+                
+                {/* Gallery count badge */}
+                {galleryImages.length > 0 && (
+                  <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2">
+                    <Image size={16} />
+                    <span>{galleryImages.length + 1} Photos</span>
+                  </div>
+                )}
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm">
+                    Click to view gallery
+                  </div>
+                </div>
               </div>
               
-              {/* Gallery Images */}
-              {product.gallery_images && product.gallery_images.length > 0 && (
+              {/* Gallery Thumbnails Grid */}
+              {galleryImages.length > 0 && (
                 <div className="mt-4">
-                  <h4 className="text-sm font-semibold mb-2">Gallery Images</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {product.gallery_images.filter(Boolean).map((image, index) => (
+                  <h4 className="text-sm font-semibold mb-2 text-gray-700">Gallery Images ({galleryImages.length})</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {galleryImages.map((galImg, index) => (
                       <div
-                        key={index}
-                        className="aspect-square rounded-lg overflow-hidden border border-gray-200"
+                        key={galImg.id || index}
+                        className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#E8A87C] hover:shadow-md transition-all duration-200"
+                        onClick={() => openLightbox(index)}
                       >
                         <img
-                          src={image && (image.startsWith('http')
-                            ? image
-                            : `${baseURL}/uploads/ecommarce/product_image/${image}`)
-                          }
+                          src={getGalleryImageUrl(galImg.gal_img)}
                           alt={`${product.product_title_english} ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             console.error('Failed to load gallery image');
-                            e.currentTarget.src = '/assets/default-vendor.png'; // Fallback image
+                            e.currentTarget.src = '/assets/default-vendor.png';
                           }}
                         />
                       </div>
@@ -272,8 +328,8 @@ export default function ProductDetails() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600">Status</span>
-                <Badge variant={product.status === 1 ? 'default' : 'secondary'}>
-                  {product.status === 1 ? 'Active' : 'Inactive'}
+                <Badge variant={product.status === '1' ? 'default' : 'secondary'}>
+                  {product.status === '1' ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
               
@@ -355,16 +411,14 @@ export default function ProductDetails() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-gray-500" />
-                  <label className="text-xs text-gray-500">Category</label>
+                  <label className="text-xs text-gray-500">Category ID</label>
                 </div>
                 <p className="text-sm font-semibold">
-                  {product.category_name || 'N/A'}
+                  {product.category_id || 'N/A'}
                 </p>
-                {product.subcategory_name && (
-                  <p className="text-xs text-gray-500">
-                    → {product.subcategory_name}
-                  </p>
-                )}
+                <p className="text-xs text-gray-500">
+                  → Subcategory ID: {product.subcategory_id || 'N/A'}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -380,25 +434,29 @@ export default function ProductDetails() {
                 {product.short_description_english && (
                   <div>
                     <label className="text-xs text-gray-500">Short Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1">{product.short_description_english}</p>
+                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
                   </div>
                 )}
                 {product.short_description_bangla && (
                   <div>
                     <label className="text-xs text-gray-500">Short Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1">{product.short_description_bangla}</p>
+                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
                   </div>
                 )}
                 {product.long_description_english && (
                   <div>
                     <label className="text-xs text-gray-500">Long Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{product.long_description_english}</p>
+                    <div className="prose prose-sm max-w-none mt-1">
+                      <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+                    </div>
                   </div>
                 )}
                 {product.long_description_bangla && (
                   <div>
                     <label className="text-xs text-gray-500">Long Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{product.long_description_bangla}</p>
+                    <div className="prose prose-sm max-w-none mt-1">
+                      <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -464,6 +522,96 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+        <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-0">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close button */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Image counter */}
+            <div className="absolute top-4 left-4 z-50 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold">
+              {currentImageIndex + 1} / {galleryImages.length + 1}
+            </div>
+
+            {/* Previous button */}
+            <button
+              onClick={goToPreviousImage}
+              className="absolute left-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+            >
+              <ChevronLeft size={32} />
+            </button>
+
+            {/* Next button */}
+            <button
+              onClick={goToNextImage}
+              className="absolute right-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Main image */}
+            <div className="w-full h-full flex items-center justify-center p-16">
+              <img
+                key={currentImageIndex}
+                src={
+                  currentImageIndex === 0
+                    ? getProductImageUrl(product.product_image)
+                    : getGalleryImageUrl(galleryImages[currentImageIndex - 1]?.gal_img)
+                }
+                alt={product.product_title_english}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  console.error('Failed to load image');
+                  e.currentTarget.src = '/assets/default-vendor.png';
+                }}
+              />
+            </div>
+
+            {/* Thumbnail strip at bottom */}
+            {galleryImages.length > 0 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-black/50 backdrop-blur-sm p-2 rounded-lg overflow-x-auto max-w-[80%]">
+                {/* Main image thumbnail */}
+                <button
+                  onClick={() => setCurrentImageIndex(0)}
+                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                    currentImageIndex === 0 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={getProductImageUrl(product.product_image)}
+                    alt="Main"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+                
+                {/* Gallery thumbnails */}
+                {galleryImages.map((galImg, index) => (
+                  <button
+                    key={galImg.id || index}
+                    onClick={() => setCurrentImageIndex(index + 1)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                      currentImageIndex === index + 1 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={getGalleryImageUrl(galImg.gal_img)}
+                      alt={`Gallery ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

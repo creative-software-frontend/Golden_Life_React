@@ -36,8 +36,8 @@ export const productSchema = z.object({
     .url('Invalid URL format')
     .optional()
     .or(z.literal('')),
-  status: z.union([z.literal(0), z.literal(1)]),
-  images: z.array(z.instanceof(File)).min(1, 'At least one product image is required'),
+  ebook: z.string().default('0'), // Default value '0' for regular products
+  images: z.array(z.instanceof(File)).min(1, 'At least one product image is required').optional(),
   existing_images: z.array(z.string()).optional(),
   removed_images: z.array(z.string()).optional(),
 });
