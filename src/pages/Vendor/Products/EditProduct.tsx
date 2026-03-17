@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProductForm } from './components/ProductForm';
 import { useProductMutation } from './hooks/useProductMutation';
 import { ProductFormData } from './types/product.types';
-import { getMockProduct, getMockProductFormData } from './utils/mockData';
+import axios from 'axios';
 
 export default function EditProduct() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +15,13 @@ export default function EditProduct() {
   const { fetchProductById, updateProduct, isLoading: mutationLoading } = useProductMutation();
   const [productData, setProductData] = useState<ProductFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  // Helper functions
+  const getAuthToken = () => {
+    return localStorage.getItem('authToken');
+  };
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -27,27 +33,78 @@ export default function EditProduct() {
 
       try {
         console.log('🔄 Fetching product with ID:', id);
-        console.log('Product ID from URL:', id);
-        const data = await fetchProductById(Number(id));
-        console.log('✅ Product fetched successfully:', data);
-        setProductData(data);
-        setIsDemoMode(false); // Real data loaded
-        console.log('ℹ️ Using real API data');
+        
+        const token = getAuthToken();
+        
+        const response = await axios.get(
+          `${baseURL}/api/vendor/product/details`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              product_id: Number(id)
+            }
+          }
+        );
+
+        console.log('✅ Product fetched successfully');
+        
+        // Extract product from response
+        if (response.data?.data?.product) {
+          const product = response.data.data.product;
+          const gallery = response.data.data.gallery || [];
+          
+          // Convert API response to form data
+          const formData: ProductFormData = {
+            product_title_english: product.product_title_english,
+            product_title_bangla: product.product_title_bangla,
+            category_id: product.category_id,
+            subcategory_id: product.subcategory_id,
+            short_description_english: product.short_description_english,
+            short_description_bangla: product.short_description_bangla,
+            long_description_english: product.long_description_english,
+            long_description_bangla: product.long_description_bangla,
+            seller_price: parseFloat(product.seller_price) || 0,
+            regular_price: parseFloat(product.regular_price) || 0,
+            offer_price: parseFloat(product.offer_price) || 0,
+            sku: product.sku,
+            stock: parseInt(product.stock) || 0,
+            video_link: product.video_link || undefined,
+            ebook: product.ebook || '0', // Include ebook field
+            images: [],
+            existing_images: [
+              product.product_image,
+              ...gallery.map((g: any) => g.gal_img)
+            ].filter(Boolean),
+            removed_images: []
+          };
+          
+          setProductData(formData);
+          console.log('Form data loaded successfully');
+        } else {
+          throw new Error('Product data not found in response');
+        }
+        
       } catch (err: any) {
         console.error('❌ Fetch product error:', err);
         console.error('Error response:', err.response?.data);
         
-        // Use mock data instead of failing
-        console.warn('⚠️ API failed - switching to demo mode with mock data');
+        let errorMessage = 'Failed to load product for editing';
         
-        const mockProduct = getMockProductFormData(Number(id));
-        setProductData(mockProduct);
-        setIsDemoMode(true);
+        if (err.response?.status === 404) {
+          errorMessage = 'Product not found.';
+        } else if (err.response?.status === 401) {
+          errorMessage = 'Authentication failed. Please login again.';
+        } else if (err.response?.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
         
-        toast.warning('API unavailable - showing demo data. Form is in read-only demo mode.', {
-          autoClose: 5000,
-          position: 'top-right'
-        });
+        toast.error(errorMessage);
+        setTimeout(() => {
+          navigate('/vendor/dashboard/products');
+        }, 2000);
       } finally {
         setIsLoading(false);
       }
@@ -57,11 +114,6 @@ export default function EditProduct() {
   }, [id, fetchProductById, navigate]);
 
   const handleSubmit = async (data: ProductFormData) => {
-    if (isDemoMode) {
-      toast.info('Demo Mode: Cannot save changes. This is mock data for demonstration only.');
-      return;
-    }
-    
     try {
       if (!id) {
         throw new Error('Product ID is missing');
@@ -152,24 +204,6 @@ export default function EditProduct() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
-      {/* Demo Mode Banner */}
-      {isDemoMode && (
-        <Card className="border-amber-300 bg-amber-50 dark:bg-amber-950/20">
-          <CardContent className="py-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 space-y-1">
-                <p className="font-bold text-amber-800 dark:text-amber-400">
-                  🎭 Demo Mode Active - Read Only
-                </p>
-                <p className="text-sm text-amber-700 dark:text-amber-500">
-                  API is unavailable. Form is pre-filled with <strong>mock data</strong> for demonstration. Changes cannot be saved in demo mode.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
       
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -195,7 +229,6 @@ export default function EditProduct() {
       <ProductForm
         initialData={productData}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         isLoading={mutationLoading}
         mode="edit"
       />

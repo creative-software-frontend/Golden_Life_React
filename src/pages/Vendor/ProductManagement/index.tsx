@@ -35,7 +35,20 @@ const Products: React.FC = () => {
     applyFilters,
     updatePageSize,
     setPagination,
+    updateEbookStatus,
+    updateVideoLink,
   } = useProducts();
+
+  // Debug logging - log products count when it changes
+  React.useEffect(() => {
+    console.log('📊 [ProductManagement] Products updated:', {
+      totalProducts: products.length,
+      currentPage: pagination.currentPage,
+      pageSize: pagination.pageSize,
+      totalItems: pagination.totalItems,
+      totalPages: pagination.totalPages
+    });
+  }, [products, pagination]);
 
   // Load categories for category name lookup
   const {

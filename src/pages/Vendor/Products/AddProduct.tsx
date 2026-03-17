@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft } from 'lucide-react';
@@ -86,7 +85,6 @@ export default function AddProduct() {
       {/* Product Form */}
       <ProductForm
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
         isLoading={isLoading}
         mode="add"
       />

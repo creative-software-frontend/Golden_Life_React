@@ -2,22 +2,20 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { productSchemaWithValidation, ProductFormData } from '../validation/product.validation';
-import { ImageUpload } from './ImageUpload';
 import { CategorySelect } from './CategorySelect';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, TrendingUp, Percent, Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Sparkles, TrendingUp, Percent, Loader2, Upload, X } from 'lucide-react';
 import { generateSKU, calculateProfitMargin, calculateDiscount } from '../utils/helpers';
 import { FormMode } from '../types/product.types';
 
 interface ProductFormProps {
   initialData?: Partial<ProductFormData>;
   onSubmit: (data: any) => Promise<void>;
-  onCancel: () => void;
   isLoading: boolean;
   mode: FormMode;
 }
@@ -25,15 +23,16 @@ interface ProductFormProps {
 export function ProductForm({
   initialData,
   onSubmit,
-  onCancel,
   isLoading,
   mode
 }: ProductFormProps) {
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<string[]>(
-    initialData?.existing_images || []
+  const [mainImage, setMainImage] = useState<File | null>(null);
+  const [galleryImages, setGalleryImages] = useState<File[]>([]);
+  const [existingGalleryImages, setExistingGalleryImages] = useState<string[]>(
+    initialData?.existing_images?.slice(1) || [] // Skip first image (main image)
   );
-  const [removedImages, setRemovedImages] = useState<string[]>([]);
+  const [removedGalleryImages, setRemovedGalleryImages] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'short-en' | 'short-bn' | 'long-en' | 'long-bn'>('short-en');
 
   const {
     register,
@@ -43,7 +42,7 @@ export function ProductForm({
     setValue,
     watch,
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchemaWithValidation),
+    resolver: zodResolver(productSchemaWithValidation) as any, // Type assertion to resolve resolver compatibility
     defaultValues: {
       product_title_english: initialData?.product_title_english || '',
       product_title_bangla: initialData?.product_title_bangla || '',
@@ -59,7 +58,7 @@ export function ProductForm({
       sku: initialData?.sku || '',
       stock: initialData?.stock || 0,
       video_link: initialData?.video_link || '',
-      status: initialData?.status !== undefined ? initialData.status : 1,
+      ebook: initialData?.ebook ?? '0', // Use nullish coalescing for undefined
       images: [],
       existing_images: initialData?.existing_images || [],
       removed_images: [],
@@ -84,33 +83,71 @@ export function ProductForm({
     }
   };
 
-  // Handle image changes
-  const handleImagesChange = (files: File[]) => {
-    setNewImages(files);
-    setValue('images', files);
+  // Handle main image change
+  const handleMainImageChange = (file: File | null) => {
+    setMainImage(file);
+    if (file) {
+      setValue('images', [file]);
+    } else {
+      setValue('images', []);
+    }
   };
 
-  // Handle existing image removal
-  const handleExistingImageRemove = (index: number) => {
-    const imageUrl = existingImages[index];
-    const newExistingImages = existingImages.filter((_: any, i: number) => i !== index);
-    setExistingImages(newExistingImages);
-    setRemovedImages([...removedImages, imageUrl]);
-    setValue('existing_images', newExistingImages);
-    setValue('removed_images', [...removedImages, imageUrl]);
+  // Handle gallery images change
+  const handleGalleryImagesChange = (files: File[]) => {
+    setGalleryImages(files);
+  };
+
+  // Handle existing gallery image removal
+  const handleExistingGalleryImageRemove = (index: number) => {
+    const imageUrl = existingGalleryImages[index];
+    const newExistingImages = existingGalleryImages.filter((_: any, i: number) => i !== index);
+    setExistingGalleryImages(newExistingImages);
+    setRemovedGalleryImages([...removedGalleryImages, imageUrl]);
+    setValue('removed_images', [...removedGalleryImages, imageUrl]);
   };
 
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
-    // Combine new and existing images
+    // Combine main image and gallery images
     const submitData = {
       ...data,
-      images: newImages,
-      existing_images: mode === 'edit' ? existingImages : undefined,
-      removed_images: mode === 'edit' ? removedImages : undefined,
+      images: mainImage ? [mainImage] : [],
+      gallery_images: galleryImages,
+      existing_gallery_images: mode === 'edit' ? existingGalleryImages : undefined,
+      removed_gallery_images: mode === 'edit' ? removedGalleryImages : undefined,
     };
     
     await onSubmit(submitData);
+  };
+
+  // Clear form handler
+  const handleClear = () => {
+    setMainImage(null);
+    setGalleryImages([]);
+    setExistingGalleryImages([]);
+    setRemovedGalleryImages([]);
+    setActiveTab('short-en');
+    
+    // Reset form values
+    setValue('product_title_english', '');
+    setValue('product_title_bangla', '');
+    setValue('category_id', 0);
+    setValue('subcategory_id', 0);
+    setValue('short_description_english', '');
+    setValue('short_description_bangla', '');
+    setValue('long_description_english', '');
+    setValue('long_description_bangla', '');
+    setValue('seller_price', 0);
+    setValue('regular_price', 0);
+    setValue('offer_price', 0);
+    setValue('sku', '');
+    setValue('stock', 0);
+    setValue('video_link', '');
+    setValue('ebook', '0'); // Reset to default
+    setValue('images', []);
+    setValue('existing_images', []);
+    setValue('removed_images', []);
   };
 
   return (
@@ -140,7 +177,7 @@ export function ProductForm({
                 </p>
               )}
             </div>
-
+            
             {/* Product Title Bangla */}
             <div>
               <Label htmlFor="product_title_bangla" className="font-semibold">
@@ -220,9 +257,15 @@ export function ProductForm({
           <CardTitle className="text-lg font-bold">Descriptions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Short Description English */}
-            <div>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="short-en">Short EN</TabsTrigger>
+              <TabsTrigger value="short-bn">Short BN</TabsTrigger>
+              <TabsTrigger value="long-en">Long EN</TabsTrigger>
+              <TabsTrigger value="long-bn">Long BN</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="short-en" className="space-y-2">
               <Label htmlFor="short_description_english" className="font-semibold">
                 Short Description (English)
               </Label>
@@ -230,10 +273,10 @@ export function ProductForm({
                 id="short_description_english"
                 {...register('short_description_english')}
                 placeholder="Brief product description in English"
-                rows={3}
+                rows={4}
                 className={errors.short_description_english ? 'border-red-500' : ''}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500">
                 {watch('short_description_english')?.length || 0}/200 characters
               </p>
               {errors.short_description_english && (
@@ -241,10 +284,9 @@ export function ProductForm({
                   {errors.short_description_english.message}
                 </p>
               )}
-            </div>
+            </TabsContent>
 
-            {/* Short Description Bangla */}
-            <div>
+            <TabsContent value="short-bn" className="space-y-2">
               <Label htmlFor="short_description_bangla" className="font-semibold">
                 Short Description (Bangla)
               </Label>
@@ -252,10 +294,10 @@ export function ProductForm({
                 id="short_description_bangla"
                 {...register('short_description_bangla')}
                 placeholder="সংক্ষিপ্ত পণ্য বিবরণ বাংলায়"
-                rows={3}
+                rows={4}
                 className={errors.short_description_bangla ? 'border-red-500' : ''}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500">
                 {watch('short_description_bangla')?.length || 0}/200 characters
               </p>
               {errors.short_description_bangla && (
@@ -263,12 +305,9 @@ export function ProductForm({
                   {errors.short_description_bangla.message}
                 </p>
               )}
-            </div>
-          </div>
+            </TabsContent>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Long Description English */}
-            <div>
+            <TabsContent value="long-en" className="space-y-2">
               <Label htmlFor="long_description_english" className="font-semibold">
                 Long Description (English)
               </Label>
@@ -276,10 +315,10 @@ export function ProductForm({
                 id="long_description_english"
                 {...register('long_description_english')}
                 placeholder="Detailed product description in English"
-                rows={5}
+                rows={6}
                 className={errors.long_description_english ? 'border-red-500' : ''}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500">
                 {watch('long_description_english')?.length || 0}/1000 characters
               </p>
               {errors.long_description_english && (
@@ -287,10 +326,9 @@ export function ProductForm({
                   {errors.long_description_english.message}
                 </p>
               )}
-            </div>
+            </TabsContent>
 
-            {/* Long Description Bangla */}
-            <div>
+            <TabsContent value="long-bn" className="space-y-2">
               <Label htmlFor="long_description_bangla" className="font-semibold">
                 Long Description (Bangla)
               </Label>
@@ -298,10 +336,10 @@ export function ProductForm({
                 id="long_description_bangla"
                 {...register('long_description_bangla')}
                 placeholder="বিস্তারিত পণ্য বিবরণ বাংলায়"
-                rows={5}
+                rows={6}
                 className={errors.long_description_bangla ? 'border-red-500' : ''}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500">
                 {watch('long_description_bangla')?.length || 0}/1000 characters
               </p>
               {errors.long_description_bangla && (
@@ -309,8 +347,8 @@ export function ProductForm({
                   {errors.long_description_bangla.message}
                 </p>
               )}
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
@@ -441,56 +479,173 @@ export function ProductForm({
               )}
             </div>
           </div>
-
-          {/* Status Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <Label htmlFor="status" className="font-semibold">
-                Product Status
-              </Label>
-              <p className="text-xs text-gray-500">
-                {watch('status') === 1 ? 'Active - Visible to customers' : 'Inactive - Hidden from customers'}
-              </p>
-            </div>
-            <Controller
-              name="status"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  checked={field.value === 1}
-                  onCheckedChange={(checked: boolean) => field.onChange(checked ? 1 : 0)}
-                />
-              )}
-            />
-          </div>
         </CardContent>
       </Card>
 
+      {/* Hidden ebook field */}
+      <input type="hidden" {...register('ebook')} value="0" />
+      
       {/* Media Upload */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-bold">Product Images</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ImageUpload
-            images={newImages}
-            existingImages={existingImages}
-            onImagesChange={handleImagesChange}
-            onExistingImagesRemove={mode === 'edit' ? handleExistingImageRemove : undefined}
-            maxImages={5}
-          />
-          {errors.images && (
-            <p className="mt-2 text-sm text-red-500">{errors.images.message}</p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Main Image Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Upload size={20} />
+              Main Product Image
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4">
+              {/* Main Image Preview */}
+              <div className="w-32 h-32 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-50 flex-shrink-0">
+                {mainImage ? (
+                  <img
+                    src={URL.createObjectURL(mainImage)}
+                    alt="Main product"
+                    className="w-full h-full object-cover"
+                  />
+                ) : initialData?.existing_images?.[0] ? (
+                  <img
+                    src={`${initialData.existing_images[0].startsWith('http') ? initialData.existing_images[0] : `https://api.goldenlife.my/uploads/ecommarce/product_image/${initialData.existing_images[0]}`}`}
+                    alt="Current main image"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <Upload size={32} />
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Section */}
+              <div className="flex-1">
+                <Label className="font-semibold mb-2 block">Upload New Image</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleMainImageChange(file);
+                    }
+                  }}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Recommended: 800x800px minimum. Square format preferred.
+                </p>
+                {mainImage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleMainImageChange(null)}
+                    className="mt-2"
+                  >
+                    <X size={14} className="mr-1" />
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Gallery Images Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Upload size={20} />
+              Gallery Images
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Upload Input */}
+              <div>
+                <Label className="font-semibold mb-2 block">Add Gallery Images</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 0) {
+                      handleGalleryImagesChange([...galleryImages, ...files]);
+                    }
+                  }}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Add up to 5 additional images for product gallery
+                </p>
+              </div>
+
+              {/* Gallery Grid */}
+              {(galleryImages.length > 0 || existingGalleryImages.length > 0) && (
+                <div className="grid grid-cols-4 gap-2">
+                  {/* Existing Gallery Images */}
+                  {existingGalleryImages.map((imgUrl, index) => (
+                    <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                      <img
+                        src={imgUrl.startsWith('http') ? imgUrl : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgUrl}`}
+                        alt={`Gallery ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleExistingGalleryImageRemove(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* New Gallery Images */}
+                  {galleryImages.map((file, index) => (
+                    <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`New gallery ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newGallery = galleryImages.filter((_, i) => i !== index);
+                          setGalleryImages(newGallery);
+                        }}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-4 pt-4">
+      <div className="flex items-center justify-between gap-4 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleClear}
+          disabled={isLoading}
+          className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-bold rounded-xl transition-all duration-300 disabled:opacity-50"
+        >
+          Clear Form
+        </Button>
+
         <Button
           type="submit"
           disabled={isLoading}
-          className="flex-1 sm:flex-none px-8 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -502,16 +657,6 @@ export function ProductForm({
           ) : (
             'Update Product'
           )}
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-          className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-bold rounded-xl transition-all duration-300 disabled:opacity-50"
-        >
-          Cancel
         </Button>
       </div>
     </form>

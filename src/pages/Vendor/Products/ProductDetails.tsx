@@ -1,32 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
-import { getMockProduct } from './utils/mockData';
 
 interface ProductDetailsData {
   id: number;
+  vendor_id: string;
   product_title_english: string;
   product_title_bangla: string;
+  category_id: string;
+  subcategory_id: string;
+  ebook: string;
+  short_description_english: string;
+  short_description_bangla: string;
+  long_description_english: string;
+  long_description_bangla: string;
+  seller_price: string;
+  regular_price: string;
+  offer_price: string;
   sku: string;
-  seller_price: number;
-  regular_price: number;
-  offer_price: number;
-  stock: number;
-  status: 0 | 1;
   product_image: string;
-  gallery_images?: string[];
-  category_name?: string;
-  subcategory_name?: string;
-  short_description_english?: string;
-  short_description_bangla?: string;
-  long_description_english?: string;
-  long_description_bangla?: string;
-  video_link?: string;
+  status: string;
+  stock: string;
+  video_link: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface GalleryImage {
+  id: number;
+  product_id: string;
+  gal_img: string;
   created_at: string;
 }
 
@@ -34,19 +42,20 @@ export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetailsData | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   // Helper functions for safe formatting
-  const formatPrice = (price: number | undefined | null): string => {
-    if (price === undefined || price === null) return '0.00';
-    return `৳ ${price.toFixed(2)}`;
+  const formatPrice = (price: string | number | undefined | null): string => {
+    if (price === undefined || price === null || price === '') return '0.00';
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return `৳ ${numPrice.toFixed(2)}`;
   };
 
-  const formatNumber = (num: number | undefined | null): string => {
-    if (num === undefined || num === null) return '0';
+  const formatNumber = (num: string | number | undefined | null): string => {
+    if (num === undefined || num === null || num === '') return '0';
     return num.toString();
   };
 
@@ -87,11 +96,9 @@ export default function ProductDetails() {
 
       try {
         console.log('🔄 Fetching product details for ID:', id);
-        console.log('Product ID from URL:', id);
         
         const token = getAuthToken();
         
-        // Use query parameter format instead of URL segment
         const response = await axios.get(
           `${baseURL}/api/vendor/product/details`,
           {
@@ -108,32 +115,35 @@ export default function ProductDetails() {
         console.log('✅ Product details fetched successfully');
         console.log('Response data:', response.data);
         
-        // Handle different response structures
-        let productData = response.data?.data || response.data?.product || response.data;
-        
-        // Check if status field exists in response
-        if (response.data?.status === true || response.data?.success === true) {
-          productData = response.data?.data || response.data?.product || productData;
+        // Extract product and gallery from response
+        // Expected structure: { status: true, data: { product: {...}, gallery: [...] } }
+        if (response.data?.data?.product) {
+          setProduct(response.data.data.product);
+          setGalleryImages(response.data.data.gallery || []);
+          console.log('Product loaded:', response.data.data.product.id);
+          console.log('Gallery images:', response.data.data.gallery?.length || 0);
+        } else {
+          throw new Error('Invalid response structure - product data not found');
         }
         
-        setProduct(productData);
-        setIsDemoMode(false); // Real data loaded
-        console.log('ℹ️ Using real API data');
       } catch (err: any) {
         console.error('❌ Fetch product details error:', err);
         console.error('Error response:', err.response?.data);
         
-        // Instead of showing error and redirecting, use mock data
-        console.warn('⚠️ API failed - switching to demo mode with mock data');
+        let errorMessage = 'Failed to load product details';
         
-        const mockProduct = getMockProduct(Number(id));
-        setProduct(mockProduct);
-        setIsDemoMode(true);
+        if (err.response?.status === 404) {
+          errorMessage = 'Product not found.';
+        } else if (err.response?.status === 401) {
+          errorMessage = 'Authentication failed. Please login again.';
+        } else if (err.response?.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
         
-        toast.warning('API unavailable - showing demo data', {
-          autoClose: 5000,
-          position: 'top-right'
-        });
+        toast.error(errorMessage);
+        setTimeout(() => {
+          navigate('/vendor/dashboard/products');
+        }, 2000);
       } finally {
         setIsLoading(false);
       }
@@ -155,7 +165,6 @@ export default function ProductDetails() {
 
   // Always show product (real or mock)
   if (!product) {
-    // This should never happen now due to mock fallback
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -170,24 +179,6 @@ export default function ProductDetails() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
-      {/* Demo Mode Banner */}
-      {isDemoMode && (
-        <Card className="border-amber-300 bg-amber-50 dark:bg-amber-950/20">
-          <CardContent className="py-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 space-y-1">
-                <p className="font-bold text-amber-800 dark:text-amber-400">
-                  🎭 Demo Mode Active
-                </p>
-                <p className="text-sm text-amber-700 dark:text-amber-500">
-                  API is unavailable. Showing <strong>mock product data</strong> for demonstration purposes. All information displayed is sample data.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
       
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -235,19 +226,19 @@ export default function ProductDetails() {
               </div>
               
               {/* Gallery Images */}
-              {product.gallery_images && product.gallery_images.length > 0 && (
+              {galleryImages && galleryImages.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-sm font-semibold mb-2">Gallery Images</h4>
                   <div className="grid grid-cols-3 gap-2">
-                    {product.gallery_images.filter(Boolean).map((image, index) => (
+                    {galleryImages.map((galImg, index) => (
                       <div
-                        key={index}
+                        key={galImg.id || index}
                         className="aspect-square rounded-lg overflow-hidden border border-gray-200"
                       >
                         <img
-                          src={image && (image.startsWith('http')
-                            ? image
-                            : `${baseURL}/uploads/ecommarce/product_image/${image}`)
+                          src={galImg.gal_img && (galImg.gal_img.startsWith('http')
+                            ? galImg.gal_img
+                            : `${baseURL}/uploads/ecommarce/gal_img/${galImg.gal_img}`)
                           }
                           alt={`${product.product_title_english} ${index + 1}`}
                           className="w-full h-full object-cover"
@@ -272,8 +263,8 @@ export default function ProductDetails() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600">Status</span>
-                <Badge variant={product.status === 1 ? 'default' : 'secondary'}>
-                  {product.status === 1 ? 'Active' : 'Inactive'}
+                <Badge variant={product.status === '1' ? 'default' : 'secondary'}>
+                  {product.status === '1' ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
               
@@ -355,16 +346,14 @@ export default function ProductDetails() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-gray-500" />
-                  <label className="text-xs text-gray-500">Category</label>
+                  <label className="text-xs text-gray-500">Category ID</label>
                 </div>
                 <p className="text-sm font-semibold">
-                  {product.category_name || 'N/A'}
+                  {product.category_id || 'N/A'}
                 </p>
-                {product.subcategory_name && (
-                  <p className="text-xs text-gray-500">
-                    → {product.subcategory_name}
-                  </p>
-                )}
+                <p className="text-xs text-gray-500">
+                  → Subcategory ID: {product.subcategory_id || 'N/A'}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -380,25 +369,29 @@ export default function ProductDetails() {
                 {product.short_description_english && (
                   <div>
                     <label className="text-xs text-gray-500">Short Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1">{product.short_description_english}</p>
+                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
                   </div>
                 )}
                 {product.short_description_bangla && (
                   <div>
                     <label className="text-xs text-gray-500">Short Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1">{product.short_description_bangla}</p>
+                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
                   </div>
                 )}
                 {product.long_description_english && (
                   <div>
                     <label className="text-xs text-gray-500">Long Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{product.long_description_english}</p>
+                    <div className="prose prose-sm max-w-none mt-1">
+                      <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+                    </div>
                   </div>
                 )}
                 {product.long_description_bangla && (
                   <div>
                     <label className="text-xs text-gray-500">Long Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{product.long_description_bangla}</p>
+                    <div className="prose prose-sm max-w-none mt-1">
+                      <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                    </div>
                   </div>
                 )}
               </CardContent>

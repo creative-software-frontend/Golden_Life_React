@@ -24,8 +24,8 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'stock_desc', label: 'Stock: High to Low' },
 ];
 
-// Page size options
-export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+// Page size options (added "All" as 9999)
+export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 9999];
 
 // Low stock threshold
 export const LOW_STOCK_THRESHOLD = 10;

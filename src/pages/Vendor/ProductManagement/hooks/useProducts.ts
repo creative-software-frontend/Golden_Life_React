@@ -11,7 +11,7 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 25, // Increased default from 10 to 25
     totalItems: 0,
     totalPages: 0,
   });
@@ -45,11 +45,26 @@ export function useProducts() {
       setIsLoading(true);
       setError(null);
 
+      console.log('🔄 [useProducts] Fetching products from API...');
       const response = await axios.get(`${baseURL}/api/vendor/product/list`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        params: {
+          // No limit parameter - fetch all products
+        },
+      });
+
+      console.log('📦 [useProducts] API Response:', {
+        status: response.status,
+        data: response.data,
+        hasProducts: !!response.data.products,
+        hasData: !!response.data.data,
+        isArray: Array.isArray(response.data),
+        productsLength: response.data.products?.length || 0,
+        dataLength: response.data.data?.length || 0,
+        total: response.data.total || 0
       });
 
       // Handle different response structures
@@ -58,15 +73,28 @@ export function useProducts() {
       let total = 0;
 
       if (responseData.products) {
+        console.log('✅ [useProducts] Found products array in response.products');
         productList = responseData.products;
         total = responseData.total || responseData.products.length;
       } else if (Array.isArray(responseData)) {
+        console.log('✅ [useProducts] Response is direct array');
         productList = responseData;
         total = responseData.length;
       } else if (responseData.data) {
+        console.log('✅ [useProducts] Found data object in response.data');
         productList = responseData.data.products || responseData.data;
         total = responseData.data.total || responseData.data.length;
       }
+
+      console.log('📊 [useProducts] Processed data:', {
+        productCount: productList.length,
+        total,
+        firstProduct: productList[0] ? {
+          id: productList[0].id,
+          title: productList[0].product_title_english,
+          sku: productList[0].sku
+        } : null
+      });
 
       setProducts(productList);
       setFilteredProducts(productList);
@@ -78,7 +106,12 @@ export function useProducts() {
       
       toast.success(`Loaded ${productList.length} products`);
     } catch (err: any) {
-      console.error('Failed to fetch products:', err);
+      console.error('❌ [useProducts] Failed to fetch products:', err);
+      console.error('[useProducts] Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        code: err.code
+      });
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load products';
       setError(errorMessage);
       toast.error(errorMessage);
@@ -220,6 +253,74 @@ export function useProducts() {
     }));
   }, [filteredProducts.length]);
 
+  // Update ebook status
+  const updateEbookStatus = async (productId: number, isEbook: boolean): Promise<void> => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      await axios.post(
+        `${baseURL}/api/vendor/product/${productId}/ebook`,
+        { ebook: isEbook ? '1' : '0' },
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+
+      // Update local state
+      setProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, ebook: isEbook ? '1' : '0' } : p
+      ));
+      setFilteredProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, ebook: isEbook ? '1' : '0' } : p
+      ));
+    } catch (err: any) {
+      console.error('Failed to update ebook status:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to update ebook status';
+      toast.error(errorMessage);
+      throw err;
+    }
+  };
+
+  // Update video link
+  const updateVideoLink = async (productId: number, videoLink: string): Promise<void> => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      await axios.post(
+        `${baseURL}/api/vendor/product/${productId}/video-link`,
+        { video_link: videoLink },
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+
+      // Update local state
+      setProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, video_link: videoLink } : p
+      ));
+      setFilteredProducts(prev => prev.map(p => 
+        p.id === productId ? { ...p, video_link: videoLink } : p
+      ));
+    } catch (err: any) {
+      console.error('Failed to update video link:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to update video link';
+      toast.error(errorMessage);
+      throw err;
+    }
+  };
+
   // Get paginated products
   const getPaginatedProducts = useCallback(() => {
     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
@@ -240,5 +341,7 @@ export function useProducts() {
     applyFilters,
     updatePageSize,
     setPagination,
+    updateEbookStatus,
+    updateVideoLink,
   };
 }

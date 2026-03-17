@@ -83,7 +83,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 </TableCell>
                 <TableCell className="py-4"><Skeleton className="h-4 w-24" /></TableCell>
                 <TableCell className="py-4 text-right"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
-                <TableCell className="py-4 text-center"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
+                <TableCell className="py-4"><Skeleton className="h-4 w-12 mx-auto" /></TableCell>
                 <TableCell className="py-4 text-center"><Skeleton className="h-6 w-20 mx-auto rounded-full" /></TableCell>
                 <TableCell className="py-4 text-right"><Skeleton className="h-8 w-8 ml-auto rounded-lg" /></TableCell>
               </TableRow>
@@ -141,7 +141,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             <TableHead className="w-[120px] h-14 font-bold text-foreground">Image</TableHead>
             <TableHead className="h-14 min-w-[280px] font-bold text-foreground">Product Details</TableHead>
             <TableHead className="h-14 min-w-[180px] font-bold text-foreground">Category</TableHead>
-            <TableHead className="h-14 w-[140px] text-right font-bold text-foreground">Price</TableHead>
+            <TableHead className="h-14 w-[140px] text-left font-bold text-foreground">Price</TableHead>
             <TableHead className="h-14 w-[120px] text-center font-bold text-foreground">Stock</TableHead>
             <TableHead className="h-14 w-[120px] text-center font-bold text-foreground">Status</TableHead>
             <TableHead className="h-14 w-[100px] text-right font-bold text-foreground">Actions</TableHead>
@@ -218,13 +218,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               </TableCell>
 
               {/* Price */}
-              <TableCell className="py-4 px-4 text-right">
-                <div className="flex flex-col items-end gap-0.5">
-                  <span className="font-bold text-primary text-base">
+              <TableCell className="py-4 px-4">
+                <div className="flex flex-row items-center gap-2 text-left">
+                  <span className="font-bold text-primary text-sm whitespace-nowrap">
                     {formatPrice(product.offer_price)}
                   </span>
                   {product.regular_price > product.offer_price && (
-                    <span className="text-xs text-muted-foreground line-through font-medium">
+                    <span className="text-xs text-muted-foreground line-through font-medium whitespace-nowrap">
                       {formatPrice(product.regular_price)}
                     </span>
                   )}

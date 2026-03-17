@@ -73,7 +73,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <SelectContent>
             {PAGE_SIZE_OPTIONS.map((size) => (
               <SelectItem key={size} value={size.toString()}>
-                {size}
+                {size === 9999 ? 'All' : size}
               </SelectItem>
             ))}
           </SelectContent>

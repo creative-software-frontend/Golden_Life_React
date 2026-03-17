@@ -4,7 +4,9 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { ProductStatusBadgeProps } from '../types';
 
 export const ProductStatusBadge: React.FC<ProductStatusBadgeProps> = ({ status }) => {
-  const isActive = status === 1;
+  // Convert status to number for comparison (handles both string and number types)
+  const statusNum = typeof status === 'string' ? parseInt(status, 10) : status;
+  const isActive = statusNum === 1;
   
   return (
     <Badge
