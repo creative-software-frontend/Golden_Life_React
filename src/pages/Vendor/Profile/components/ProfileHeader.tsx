@@ -19,11 +19,23 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   const [imageError, setImageError] = useState(false);
   
+  // Debug logging
+  console.log('🖼️ [ProfileHeader] Props:', {
+    name,
+    email,
+    sellerId,
+    imageUrl,
+    hasImage: !!imageUrl
+  });
+  
   // Use image helper to get full URL or fallback
   const displayImageUrl = imageError ? getFallbackImage('vendor') : (imageUrl || getFallbackImage('vendor'));
   const displayName = name || 'User';
   const displayEmail = email || '';
   const displaySellerId = sellerId || '';
+  
+  console.log('[ProfileHeader] Display image URL:', displayImageUrl);
+  console.log('[ProfileHeader] Using fallback:', !imageUrl || imageError);
   return (
     <div className="relative mb-6">
       {/* Cover Background */}

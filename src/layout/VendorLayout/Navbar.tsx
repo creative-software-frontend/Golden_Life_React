@@ -218,7 +218,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                 </div>
 
                 {/* RIGHT SIDE ICONS */}
-                <div className="flex items-center gap-1 sm:gap-3 xl:gap-5 ml-auto flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-4 xl:gap-6 ml-auto flex-shrink-0">
                     
                     {/* Search Trigger for Mobile/Tablet */}
                     <button
@@ -228,12 +228,14 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                         <Search size={20} className="sm:w-[22px] sm:h-[22px]" />
                     </button>
 
-                    <div className="hidden lg:flex items-center gap-1.5 text-muted-foreground text-sm xl:text-base cursor-pointer hover:text-foreground transition-colors">
-                        <MapPin size={20} />
-                        <span>Dhaka</span>
+                    {/* Location Icon - Desktop Only */}
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group">
+                        <MapPin size={20} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                        <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground">Dhaka</span>
                     </div>
 
-                    <button className="relative p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex-shrink-0">
+                    {/* Notification Bell */}
+                    <button className="relative p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex-shrink-0 group">
                         <Bell className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" />
                         <span className="absolute top-[6px] right-[6px] sm:top-[7px] sm:right-[7px] w-2.5 h-2.5 bg-destructive rounded-full border-[2px] border-background"></span>
                     </button>

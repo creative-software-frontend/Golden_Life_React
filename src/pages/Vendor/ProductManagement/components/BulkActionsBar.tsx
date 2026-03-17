@@ -1,13 +1,10 @@
 import React from 'react';
-import { X, CheckCircle2, Trash2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BulkActionsBarProps } from '../types';
 
 export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
   selectedCount,
-  onActivateAll,
-  onDeactivateAll,
-  onDeleteAll,
   onClearSelection,
 }) => {
   if (selectedCount === 0) return null;
@@ -23,43 +20,12 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
         
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
-            size="sm"
-            onClick={onActivateAll}
-            className="h-8 text-xs"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-            Activate
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onDeactivateAll}
-            className="h-8 text-xs"
-          >
-            <X className="w-3.5 h-3.5 mr-1 text-red-600" />
-            Deactivate
-          </Button>
-          
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={onDeleteAll}
-            className="h-8 text-xs"
-          >
-            <Trash2 className="w-3.5 h-3.5 mr-1" />
-            Delete
-          </Button>
-          
-          <div className="h-4 w-px bg-border mx-1" />
-          
-          <Button
             variant="ghost"
             size="sm"
             onClick={onClearSelection}
             className="h-8 text-xs"
           >
+            <X className="w-3.5 h-3.5 mr-1" />
             Clear
           </Button>
         </div>

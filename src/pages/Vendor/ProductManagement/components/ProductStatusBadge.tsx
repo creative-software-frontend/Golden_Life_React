@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { ProductStatusBadgeProps } from '../types';
 
 export const ProductStatusBadge: React.FC<ProductStatusBadgeProps> = ({ status }) => {
@@ -9,19 +10,19 @@ export const ProductStatusBadge: React.FC<ProductStatusBadgeProps> = ({ status }
     <Badge
       variant={isActive ? 'default' : 'secondary'}
       className={`
-        inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold
+        inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full transition-all
         ${isActive 
-          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400' 
-          : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400'
+          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
+          : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800'
         }
       `}
     >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          isActive ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-red-600 dark:bg-red-400'
-        }`}
-      />
-      {isActive ? 'Active' : 'Inactive'}
+      {isActive ? (
+        <CheckCircle2 className="w-3.5 h-3.5" />
+      ) : (
+        <XCircle className="w-3.5 h-3.5" />
+      )}
+      <span>{isActive ? 'Active' : 'Inactive'}</span>
     </Badge>
   );
 };

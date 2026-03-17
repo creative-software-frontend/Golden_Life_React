@@ -1,4 +1,6 @@
 // Product interface matching API structure
+import { Category } from '../Products/types/product.types';
+
 export interface Product {
   id: number;
   product_title_english: string;
@@ -55,8 +57,8 @@ export interface ProductActionsProps {
   product: Product;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
-  onToggleStatus: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onToggleStatus?: (product: Product) => void; // Optional - toggle functionality removed
+  onDelete?: (product: Product) => void; // Optional - delete functionality removed
 }
 
 export interface DeleteConfirmationModalProps {
@@ -69,9 +71,6 @@ export interface DeleteConfirmationModalProps {
 
 export interface BulkActionsBarProps {
   selectedCount: number;
-  onActivateAll: () => void;
-  onDeactivateAll: () => void;
-  onDeleteAll: () => void;
   onClearSelection: () => void;
 }
 
@@ -90,8 +89,9 @@ export interface ProductTableProps {
   onSelectionChange: (ids: number[]) => void;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
-  onToggleStatus: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onToggleStatus?: (product: Product) => void; // Optional - toggle functionality removed
+  onDelete?: (product: Product) => void; // Optional - delete functionality removed
+  categories?: Category[]; // For category name lookup
 }
 
 export interface ProductGridProps {
@@ -101,8 +101,8 @@ export interface ProductGridProps {
   onSelectionChange: (ids: number[]) => void;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
-  onToggleStatus: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onToggleStatus?: (product: Product) => void; // Optional - toggle functionality removed
+  onDelete?: (product: Product) => void; // Optional - delete functionality removed
 }
 
 export interface PaginationProps {

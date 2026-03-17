@@ -26,6 +26,13 @@ export function ProfileForm({
   onImageChange,
   onImageRemove
 }: ProfileFormProps) {
+  // Debug logging for form data
+  console.log('📝 [ProfileForm] Initializing with:', {
+    userName: user?.name,
+    businessName: vendor?.business_name || vendor?.businee_name,
+    districtsCount: districts?.length || 0,
+    countriesCount: countries?.length || 0
+  });
   const {
     register,
     handleSubmit,
@@ -47,6 +54,11 @@ export function ProfileForm({
       telegram: vendor?.telegram || '',
       whatsapp: vendor?.whatsapp || '',
     }
+  });
+  
+  console.log('[ProfileForm] Form default values set:', {
+    name: user?.name,
+    business_name: vendor?.businee_name || vendor?.business_name
   });
 
   // Debug: Log available countries and districts

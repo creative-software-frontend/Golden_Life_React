@@ -122,45 +122,6 @@ export function useProducts() {
     }
   };
 
-  // Toggle product status
-  const toggleProductStatus = async (productId: number, currentStatus: 0 | 1): Promise<boolean> => {
-    try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
-      const newStatus = currentStatus === 0 ? 1 : 0;
-      
-      await axios.put(
-        `${baseURL}/api/vendor/product/${productId}/status`,
-        { status: newStatus },
-        {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        }
-      );
-
-      // Update in local state
-      const updateProduct = (p: Product) => 
-        p.id === productId ? { ...p, status: newStatus as 0 | 1 } : p;
-      
-      setProducts(prev => prev.map(updateProduct));
-      setFilteredProducts(prev => prev.map(updateProduct));
-      
-      const action = newStatus === 1 ? 'activated' : 'deactivated';
-      toast.success(`Product ${action} successfully`);
-      return true;
-    } catch (err: any) {
-      console.error('Failed to toggle product status:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to update product status';
-      toast.error(errorMessage);
-      return false;
-    }
-  };
-
   // Bulk actions
   const bulkDeleteProducts = async (productIds: number[]): Promise<boolean> => {
     try {
@@ -192,52 +153,9 @@ export function useProducts() {
     }
   };
 
-  const bulkToggleStatus = async (productIds: number[], newStatus: 0 | 1): Promise<boolean> => {
-    try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
-      // Update all selected products
-      const updatePromises = productIds.map(id =>
-        axios.put(
-          `${baseURL}/api/vendor/product/${id}/status`,
-          { status: newStatus },
-          {
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-          }
-        )
-      );
-
-      await Promise.all(updatePromises);
-
-      // Update in local state
-      const updateProduct = (p: Product) =>
-        productIds.includes(p.id) ? { ...p, status: newStatus } : p;
-      
-      setProducts(prev => prev.map(updateProduct));
-      setFilteredProducts(prev => prev.map(updateProduct));
-      
-      const action = newStatus === 1 ? 'activated' : 'deactivated';
-      toast.success(`Successfully ${action} ${productIds.length} products`);
-      return true;
-    } catch (err: any) {
-      console.error('Failed to bulk update status:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to update products';
-      toast.error(errorMessage);
-      return false;
-    }
-  };
-
   // Apply filters and sorting
   const applyFilters = useCallback((filters: ProductFilters) => {
     let result = [...products];
-
-    // Search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       result = result.filter(product =>
@@ -318,9 +236,7 @@ export function useProducts() {
     pagination,
     fetchProducts,
     deleteProduct,
-    toggleProductStatus,
     bulkDeleteProducts,
-    bulkToggleStatus,
     applyFilters,
     updatePageSize,
     setPagination,

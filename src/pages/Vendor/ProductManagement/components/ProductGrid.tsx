@@ -2,7 +2,7 @@ import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye, Pencil, ToggleLeft, Trash2, MoreVertical } from 'lucide-react';
+import { Eye, Pencil, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +23,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onSelectionChange,
   onView,
   onEdit,
-  onToggleStatus,
-  onDelete,
 }) => {
   // Handle individual product selection
   const handleSelectProduct = (productId: number, checked: boolean) => {
@@ -189,21 +187,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
                 <DropdownMenuItem onClick={() => onEdit(product)} className="cursor-pointer">
                   <Pencil className="mr-2 h-4 w-4" />
                   <span>Edit</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => onToggleStatus(product)} 
-                  className="cursor-pointer"
-                >
-                  <ToggleLeft className="mr-2 h-4 w-4" />
-                  <span>{product.status === 1 ? 'Deactivate' : 'Activate'}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  onClick={() => onDelete(product)} 
-                  className="cursor-pointer text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Delete</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -8,8 +8,8 @@ import { ProductTable } from './components/ProductTable';
 import { ProductGrid } from './components/ProductGrid';
 import { BulkActionsBar } from './components/BulkActionsBar';
 import { Pagination } from './components/Pagination';
-import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import { useProducts } from './hooks/useProducts';
+import { useCategories } from '../Products/hooks/useCategories';
 import { Product, ProductFilters as ProductFiltersType, ViewMode, PaginationState } from './types';
 
 const Products: React.FC = () => {
@@ -18,8 +18,6 @@ const Products: React.FC = () => {
   // State
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [filters, setFilters] = useState<ProductFiltersType>({
     search: '',
     status: 'all',
@@ -34,14 +32,22 @@ const Products: React.FC = () => {
     error,
     pagination,
     fetchProducts,
-    deleteProduct,
-    toggleProductStatus,
-    bulkDeleteProducts,
-    bulkToggleStatus,
     applyFilters,
     updatePageSize,
     setPagination,
   } = useProducts();
+
+  // Load categories for category name lookup
+  const {
+    categories,
+    fetchCategories,
+  } = useCategories();
+
+  // Fetch categories on mount
+  React.useEffect(() => {
+    console.log('🚀 [ProductManagement] Component mounted, fetching categories...');
+    fetchCategories();
+  }, [fetchCategories]);
 
   // Handle filters change
   const handleFiltersChange = useCallback((newFilters: ProductFiltersType) => {
@@ -73,67 +79,6 @@ const Products: React.FC = () => {
     console.log('Product ID:', product.id);
     navigate(`/vendor/dashboard/products/edit/${product.id}`);
   }, [navigate]);
-
-  const handleToggleProductStatus = useCallback(async (product: Product) => {
-    const success = await toggleProductStatus(product.id, product.status);
-    if (!success) {
-      toast.error('Failed to update product status');
-    }
-  }, [toggleProductStatus]);
-
-  const handleDeleteProduct = useCallback((product: Product) => {
-    setProductToDelete(product);
-  }, []);
-
-  const confirmDeleteProduct = useCallback(async () => {
-    if (!productToDelete) return;
-    
-    setIsDeleting(true);
-    const success = await deleteProduct(productToDelete.id);
-    setIsDeleting(false);
-    
-    if (success) {
-      setProductToDelete(null);
-      setSelectedProducts([]); // Clear selection
-    }
-  }, [productToDelete, deleteProduct]);
-
-  // Handle bulk actions
-  const handleBulkActivate = useCallback(async () => {
-    if (selectedProducts.length === 0) return;
-    
-    const success = await bulkToggleStatus(selectedProducts, 1);
-    if (success) {
-      setSelectedProducts([]);
-    }
-  }, [selectedProducts, bulkToggleStatus]);
-
-  const handleBulkDeactivate = useCallback(async () => {
-    if (selectedProducts.length === 0) return;
-    
-    const success = await bulkToggleStatus(selectedProducts, 0);
-    if (success) {
-      setSelectedProducts([]);
-    }
-  }, [selectedProducts, bulkToggleStatus]);
-
-  const handleBulkDelete = useCallback(async () => {
-    if (selectedProducts.length === 0) return;
-    
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${selectedProducts.length} products? This action cannot be undone.`
-    );
-    
-    if (confirmed) {
-      setIsDeleting(true);
-      const success = await bulkDeleteProducts(selectedProducts);
-      setIsDeleting(false);
-      
-      if (success) {
-        setSelectedProducts([]);
-      }
-    }
-  }, [selectedProducts, bulkDeleteProducts]);
 
   const handleClearSelection = useCallback(() => {
     setSelectedProducts([]);
@@ -211,8 +156,7 @@ const Products: React.FC = () => {
               onSelectionChange={handleSelectionChange}
               onView={handleViewProduct}
               onEdit={handleEditProduct}
-              onToggleStatus={handleToggleProductStatus}
-              onDelete={handleDeleteProduct}
+              categories={categories}
             />
           ) : (
             <ProductGrid
@@ -222,8 +166,6 @@ const Products: React.FC = () => {
               onSelectionChange={handleSelectionChange}
               onView={handleViewProduct}
               onEdit={handleEditProduct}
-              onToggleStatus={handleToggleProductStatus}
-              onDelete={handleDeleteProduct}
             />
           )}
 
@@ -238,25 +180,13 @@ const Products: React.FC = () => {
         </>
       )}
 
-      {/* Bulk Actions Bar */}
+          {/* Bulk Actions Bar */}
       {selectedProducts.length > 0 && (
         <BulkActionsBar
           selectedCount={selectedProducts.length}
-          onActivateAll={handleBulkActivate}
-          onDeactivateAll={handleBulkDeactivate}
-          onDeleteAll={handleBulkDelete}
           onClearSelection={handleClearSelection}
         />
       )}
-
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={!!productToDelete}
-        onClose={() => setProductToDelete(null)}
-        onConfirm={confirmDeleteProduct}
-        productName={productToDelete?.product_title_english || ''}
-        isDeleting={isDeleting}
-      />
     </div>
   );
 };
