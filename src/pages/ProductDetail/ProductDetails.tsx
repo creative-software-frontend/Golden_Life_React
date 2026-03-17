@@ -46,7 +46,7 @@ export default function ProductDetails() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate(); // <-- Initialize navigate
     const { t, i18n } = useTranslation("global");
-        const { toggleClicked, changeCheckoutModal } = useModalStore();
+    const { setCartOpen, setCheckoutModalOpen } = useModalStore();
 
     // --- STATE ---
     const [product, setProduct] = useState<Product | null>(null);
@@ -100,7 +100,7 @@ export default function ProductDetails() {
     }, [id]);
 
     // --- HANDLERS ---
-// --- HANDLERS ---
+    // --- HANDLERS ---
     const addToCart = () => {
         if (!product) return;
 
@@ -108,7 +108,7 @@ export default function ProductDetails() {
         const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
 
         const displayName = i18n.language === 'bn' ? product.product_title_bangla : product.product_title_english;
-        
+
         // Calculate the fallback price
         const fallbackPrice = parseFloat(product.offer_price || product.regular_price || product.seller_price) || 0;
 
@@ -118,7 +118,7 @@ export default function ProductDetails() {
             name: displayName,
             product_title_english: product.product_title_english, // Added to match cart logic
             image: `${mainImgBase}${product.product_image}`,
-            price: fallbackPrice, 
+            price: fallbackPrice,
             offer_price: parseFloat(product.offer_price) || 0,     // ADDED
             regular_price: parseFloat(product.regular_price) || 0, // ADDED
             quantity: quantity
@@ -134,14 +134,14 @@ export default function ProductDetails() {
         window.dispatchEvent(new Event("cartUpdated"));
     };
     // <-- NEW: Handle Buy Now -->
-     const handleBuyNow = (e: React.MouseEvent) => {
-          e.preventDefault();
-          e.stopPropagation(); 
-          addToCart();
-          changeCheckoutModal(); 
-          toggleClicked(); 
-      };
-  
+    const handleBuyNow = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart();
+        setCartOpen(false);          // Close the cart sidebar
+        setCheckoutModalOpen(true); // Open the checkout modal
+    };
+
 
     // --- DERIVED DATA ---
     const isBangla = i18n.language === 'bn';
@@ -168,7 +168,7 @@ export default function ProductDetails() {
         if (!isHovered && allImages.length > 1) {
             interval = setInterval(() => {
                 nextSlide();
-            }, 3000); 
+            }, 3000);
         }
         return () => clearInterval(interval);
     }, [isHovered, allImages.length, activeSlideIndex]);
@@ -328,7 +328,7 @@ export default function ProductDetails() {
 
                                     {/* <-- UPDATED BUTTON --> */}
                                     <Button
-                                        onClick={handleBuyNow} 
+                                        onClick={handleBuyNow}
                                         disabled={currentStock === 0}
                                         className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98] relative overflow-hidden group/buy"
                                     >

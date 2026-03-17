@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios'; // Ensure axios is installed
+import axios from 'axios';
 import { User, FileText, FileBadge, Users, Settings, ShieldCheck } from 'lucide-react';
+import useModalStore from '@/store/Store';
 
 interface StudentProfile {
     id?: number;
@@ -14,7 +15,11 @@ interface StudentProfile {
 export default function ProfileSidebar() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const profileUpdateTrigger = useModalStore((s) => s.profileUpdateTrigger);
+    // Instantly reflect data pushed by BasicInfoTab after a successful save
+    const storedProfile = useModalStore((s) => s.studentProfile);
+    // Blob URL from FileReader — guaranteed to be the exact image the user just uploaded
+    const profileBlobPreview = useModalStore((s) => s.profileBlobPreview);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -49,33 +54,34 @@ export default function ProfileSidebar() {
             const token = getAuthToken();
 
             if (!token) {
-                setProfile({
-                    name: "Guest",
-                    image: null,
-                    status: 'guest'
-                });
+                setProfile({ name: "Guest", image: null, status: 'guest' });
                 setLoading(false);
                 return;
             }
 
             try {
-                const response = await axios.get(`${baseURL}/api/student/profile`, {
+                // Use the same /dashboard endpoint as BasicInfoTab — known-good response shape
+                const response = await axios.get(`${baseURL}/api/student/dashboard`, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     }
                 });
 
-                // Matches the logic that worked in your previous snippet
-                if (response.data?.status === "success" || response.data?.status === true) {
-                    setProfile(response.data.student);
+                if (response.data?.success) {
+                    const s = response.data.data.student;
+                    setProfile({
+                        id: s.id,
+                        name: s.name,
+                        email: s.email,
+                        image: s.image || null,
+                        status: s.status,
+                    });
                 } else {
-                    throw new Error('Invalid response');
+                    throw new Error('Dashboard fetch: non-success response');
                 }
             } catch (err) {
-                console.error('Error fetching profile:', err);
-                setError(true);
-                // Fallback to Guest on error so the UI doesn't break
+                console.error('ProfileSidebar: fetch failed:', err);
                 setProfile({ name: "Guest", image: null });
             } finally {
                 setLoading(false);
@@ -83,12 +89,18 @@ export default function ProfileSidebar() {
         };
 
         fetchProfile();
-    }, [baseURL]);
+    }, [baseURL, profileUpdateTrigger]); // Re-fetches after every successful upload
 
-    // Construct Avatar URL with dynamic fallback
-    const avatarUrl = profile?.image
-        ? `${baseURL}/uploads/profiles/${profile.image}`.replace(/([^:]\/)\/+/g, "$1")
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+    // storedProfile takes priority (instant, from Zustand); falls back to fetched profile
+    const displayProfile = storedProfile ?? profile;
+
+    // Priority 1: blob preview from FileReader (100% correct — it's the actual file selected)
+    // Priority 2: server URL from /storage/ path
+    // Priority 3: initials avatar fallback
+    const serverImageUrl = displayProfile?.image
+        ? `${baseURL}/storage/${displayProfile.image}?t=${profileUpdateTrigger}`
+        : null;
+    const avatarUrl = profileBlobPreview ?? serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(displayProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
 
     return (
         <div className="w-full md:w-80 bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 shrink-0">
@@ -105,21 +117,27 @@ export default function ProfileSidebar() {
                         <div className="relative mb-4 group cursor-pointer">
                             <div className="absolute inset-0 bg-primary/20 rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                             <img
+                                key={avatarUrl}
                                 src={avatarUrl}
-                                alt={profile?.name}
+                                alt={displayProfile?.name}
                                 className="relative w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-md z-10 bg-slate-50"
+                                onError={(e) => {
+                                    // Graceful fallback if the image URL 404s
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+                                }}
                             />
-                            <div className={`absolute bottom-1 right-2 w-4 h-4 ${profile?.status === 'active' ? 'bg-green-500' : 'bg-slate-300'} border-2 border-white rounded-full z-20`} />
+                            <div className={`absolute bottom-1 right-2 w-4 h-4 ${displayProfile?.status === 'active' ? 'bg-green-500' : 'bg-slate-300'} border-2 border-white rounded-full z-20`} />
                         </div>
 
                         <h3 className="font-bold text-xl text-slate-800 tracking-tight capitalize">
-                            {profile?.name || 'Student User'}
+                            {displayProfile?.name || 'Student User'}
                         </h3>
                         <p className="text-sm font-medium text-slate-500 mt-0.5">
-                            {profile?.email || 'Guest Session'}
+                            {displayProfile?.email || 'Guest Session'}
                         </p>
 
-                        {profile?.status === 'active' && (
+                        {displayProfile?.status === 'active' && (
                             <div className="mt-3 px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 text-xs font-semibold rounded-full">
                                 Active Student
                             </div>

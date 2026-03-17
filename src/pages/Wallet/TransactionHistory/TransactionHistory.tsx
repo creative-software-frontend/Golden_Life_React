@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, Clock, Receipt, Wallet, ArrowUpRight, ArrowDownLeft, Hash } from 'lucide-react';
+import { Clock, Receipt, Wallet, ArrowUpRight, ArrowDownLeft, Hash } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface Transaction {
+    id: number;
+    type: string;
+    amount: string;
+    payment_method: string;
+    number: string;
+    Transaction_ID: string | null;
+    invoice_number?: string | null;
+    status: string;
+    created_at: string;
+}
 
 export default function TransactionHistory() {
-    const [transactions, setTransactions] = useState([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -42,7 +55,7 @@ export default function TransactionHistory() {
         fetchHistory();
     }, []);
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (status: string) => {
         if (!status) return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-emerald-700 bg-emerald-100/80 rounded-full border border-emerald-200/50 uppercase tracking-wider">Success</span>;
         const normalized = status.toLowerCase();
         if (normalized === 'completed' || normalized === 'success') {
@@ -54,7 +67,7 @@ export default function TransactionHistory() {
         return <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold text-rose-700 bg-rose-100/80 rounded-full border border-rose-200/50 uppercase tracking-wider">{status}</span>;
     };
 
-    const formatMethod = (method) => {
+    const formatMethod = (method: string) => {
         if (!method) return 'N/A';
         const lower = method.toLowerCase();
         if (lower === 'add') return 'ADD MONEY';
@@ -62,7 +75,7 @@ export default function TransactionHistory() {
         return method.toUpperCase();
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string) => {
         if (!dateString) return { date: 'N/A', time: '' };
         const date = new Date(dateString);
         return {
@@ -93,9 +106,23 @@ export default function TransactionHistory() {
             <div className="w-full">
                 <div className="space-y-4">
                     {isLoadingHistory ? (
-                        <div className="py-24 flex flex-col items-center justify-center text-slate-400 bg-slate-50/50 rounded-3xl border border-slate-100">
-                            <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
-                            <p className="text-sm font-semibold text-slate-500">Loading your transactions...</p>
+                        <div className="grid grid-cols-1 gap-3 md:gap-4 mt-4">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm bg-white gap-4">
+                                    <div className="flex items-center gap-4 w-full md:w-auto">
+                                        <Skeleton className="w-12 h-12 rounded-2xl" />
+                                        <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                                            <Skeleton className="h-5 w-3/4" />
+                                            <Skeleton className="h-4 w-1/2" />
+                                            <Skeleton className="h-4 w-2/3" />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto mt-2 md:mt-0">
+                                        <Skeleton className="h-6 w-24" />
+                                        <Skeleton className="h-4 w-20" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : transactions.length === 0 ? (
                         <div className="py-24 flex flex-col items-center justify-center text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">

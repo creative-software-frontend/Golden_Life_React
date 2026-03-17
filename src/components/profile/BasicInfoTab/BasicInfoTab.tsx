@@ -3,7 +3,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
-import EditProfileModal from '../EditProfileModal/EditProfileModal';
+import EditPersonalInfoModal from '../EditPersonalInfoModal.tsx/EditPersonalInfoModal';
+import useModalStore from '@/store/Store';
 
 // Exporting the interface so the modal can use it
 export interface StudentData {
@@ -14,7 +15,7 @@ export interface StudentData {
     affiliate_id: string;
     mobile: string;
     image: string;
-    refer_code: string | null;   // ← Changed to allow null (backend sometimes returns null)
+    refer_code: string | null;
     status: string;
     created_at: string;
     updated_at: string;
@@ -25,6 +26,8 @@ export default function BasicInfoTab() {
     const [student, setStudent] = useState<StudentData | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const triggerProfileUpdate = useModalStore((s) => s.triggerProfileUpdate);
+    const setStudentProfile = useModalStore((s) => s.setStudentProfile);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -53,22 +56,13 @@ export default function BasicInfoTab() {
 
             if (response.data?.success) {
                 const fetchedStudent = response.data.data.student;
-                console.log(fetchedStudent.refer_code );
                 
-                // Force refer_code fallback in case backend returns null/undefined
                 const safeStudent: StudentData = {
                     ...fetchedStudent,
                     refer_code: fetchedStudent.refer_code ?? null
                 };
 
                 setStudent(safeStudent);
-
-                // Debug log (you can remove this later)
-                console.log("✅ Fetched Student Data:", {
-                    name: fetchedStudent.name,
-                    refer_code: fetchedStudent.refer_code,
-                    affiliate_id: fetchedStudent.affiliate_id
-                });
             }
         } catch (error) {
             console.error('❌ Dashboard fetch failed:', error);
@@ -83,7 +77,6 @@ export default function BasicInfoTab() {
 
     if (loading) return <LoadingSkeleton />;
 
-    // Safe display values
     const displayReferCode = student?.refer_code
         ? student.refer_code
         : 'Not generated yet';
@@ -122,7 +115,6 @@ export default function BasicInfoTab() {
                             label="Referral Code"
                             value={displayReferCode}
                             icon={<Hash size={14} />}
-                            // Optional: different style when not generated
                             className={student?.refer_code ? '' : 'text-amber-600 font-medium'}
                         />
                         <DataRow label="Affiliate ID" value={student?.affiliate_id || '—'} icon={<Fingerprint size={14} />} />
@@ -131,20 +123,26 @@ export default function BasicInfoTab() {
                 </div>
             </motion.div>
 
-            {/* IMPORTED EDIT MODAL */}
-            <EditProfileModal
+            {/* EDIT MODAL – Now with image refresh key */}
+            <EditPersonalInfoModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 student={student}
                 baseURL={baseURL}
                 token={getAuthToken()}
-                onSuccess={(updatedData) => setStudent(updatedData)}
+                onSuccess={(updatedData) => {
+                    setStudent(updatedData);
+                    setStudentProfile(updatedData);  // ← Push to global store → sidebar updates instantly
+                    triggerProfileUpdate();           // ← Still triggers sidebar re-fetch as backup
+                }}
             />
         </div>
     );
 }
 
-// --- UI SUB-COMPONENTS (unchanged except small improvement) ---
+// ──────────────────────────────────────────────────────────────
+// UI SUB-COMPONENTS (unchanged)
+// ──────────────────────────────────────────────────────────────
 
 const Card = ({ title, icon, children, color }: any) => (
     <motion.div

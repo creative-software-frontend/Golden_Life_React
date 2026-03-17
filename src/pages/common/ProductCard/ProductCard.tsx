@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { ShoppingCart, Zap, Info,Eye } from 'lucide-react'; // Added Info for details
-import { Link } from 'react-router-dom'; 
+import { ShoppingCart, Zap, Info, Eye } from 'lucide-react'; // Added Info for details
+import { Link } from 'react-router-dom';
 import useModalStore from '@/store/Store';
 
 interface ProductCardProps {
@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false }: ProductCardProps) => {
-    const { toggleClicked, changeCheckoutModal } = useModalStore();
+    const { setCartOpen, setCheckoutModalOpen } = useModalStore();
 
     if (isSkeleton) {
         return (
@@ -30,12 +30,12 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
 
     const handleBuyNow = (e: React.MouseEvent) => {
         e.preventDefault();
-        e.stopPropagation(); 
+        e.stopPropagation();
         if (onAddToCart) {
             onAddToCart(product);
         }
-        changeCheckoutModal(); 
-        toggleClicked(); 
+        setCartOpen(false);          // Close the cart sidebar
+        setCheckoutModalOpen(true); // Open the checkout modal
     };
 
     const discount = product.regular_price > product.offer_price
@@ -44,7 +44,7 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
 
     return (
         <div className="group relative flex flex-col bg-white rounded-[20px] p-3 border border-slate-100 h-full overflow-hidden transition-all duration-500 ease-out hover:bg-emerald-50/30 hover:border-emerald-200 hover:shadow-[0_20px_40px_-15px_rgba(16,185,129,0.15)]">
-            
+
             {/* IMAGE SECTION */}
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[14px] bg-slate-50">
                 <img
@@ -55,8 +55,8 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
                 />
 
                 {/* --- DETAIL PAGE ICON (Appears on Hover) --- */}
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                    <Link 
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                    <Link
                         to={`/dashboard/product/${product.id}`}
                         className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-white text-slate-700 w-12 h-12 rounded-full shadow-xl flex items-center justify-center hover:bg-emerald-600 hover:text-white hover:scale-110"
                         title="View Details"
