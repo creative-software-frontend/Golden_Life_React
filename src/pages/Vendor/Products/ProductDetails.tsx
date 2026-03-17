@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, Image, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import axios from 'axios';
 
 interface ProductDetailsData {
@@ -44,8 +45,12 @@ export default function ProductDetails() {
   const [product, setProduct] = useState<ProductDetailsData | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Lightbox modal state
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_BASE_URL || 'https://api.goldenlife.my';
 
   // Helper functions for safe formatting
   const formatPrice = (price: string | number | undefined | null): string => {
@@ -73,6 +78,53 @@ export default function ProductDetails() {
       return 'Invalid Date';
     }
   };
+
+  // Get image URLs
+  const getProductImageUrl = (filename: string | null | undefined): string => {
+    if (!filename) return '/assets/default-vendor.png';
+    return filename.startsWith('http') ? filename : `${baseURL}/uploads/ecommarce/product_image/${filename}`;
+  };
+
+  const getGalleryImageUrl = (filename: string | null | undefined): string => {
+    if (!filename) return '/assets/default-vendor.png';
+    return filename.startsWith('http') ? filename : `${baseURL}/uploads/ecommarce/gal_img/${filename}`;
+  };
+
+  // Lightbox handlers
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      
+      if (e.key === 'ArrowLeft') {
+        goToPreviousImage();
+      } else if (e.key === 'ArrowRight') {
+        goToNextImage();
+      } else if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, galleryImages.length]);
 
   // Get auth token
   const getAuthToken = () => {
@@ -210,41 +262,54 @@ export default function ProductDetails() {
               <CardTitle className="text-lg font-bold">Product Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200">
+              <div 
+                className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 cursor-pointer group relative"
+                onClick={() => openLightbox(0)}
+              >
                 <img
-                  src={product.product_image && (product.product_image.startsWith('http') 
-                    ? product.product_image 
-                    : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`)
-                  }
+                  src={getProductImageUrl(product.product_image)}
                   alt={product.product_title_english}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     console.error('Failed to load product image');
-                    e.currentTarget.src = '/assets/default-vendor.png'; // Fallback image
+                    e.currentTarget.src = '/assets/default-vendor.png';
                   }}
                 />
+                
+                {/* Gallery count badge */}
+                {galleryImages.length > 0 && (
+                  <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2">
+                    <Image size={16} />
+                    <span>{galleryImages.length + 1} Photos</span>
+                  </div>
+                )}
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm">
+                    Click to view gallery
+                  </div>
+                </div>
               </div>
               
-              {/* Gallery Images */}
-              {galleryImages && galleryImages.length > 0 && (
+              {/* Gallery Thumbnails Grid */}
+              {galleryImages.length > 0 && (
                 <div className="mt-4">
-                  <h4 className="text-sm font-semibold mb-2">Gallery Images</h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <h4 className="text-sm font-semibold mb-2 text-gray-700">Gallery Images ({galleryImages.length})</h4>
+                  <div className="grid grid-cols-4 gap-2">
                     {galleryImages.map((galImg, index) => (
                       <div
                         key={galImg.id || index}
-                        className="aspect-square rounded-lg overflow-hidden border border-gray-200"
+                        className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#E8A87C] hover:shadow-md transition-all duration-200"
+                        onClick={() => openLightbox(index)}
                       >
                         <img
-                          src={galImg.gal_img && (galImg.gal_img.startsWith('http')
-                            ? galImg.gal_img
-                            : `${baseURL}/uploads/ecommarce/gal_img/${galImg.gal_img}`)
-                          }
+                          src={getGalleryImageUrl(galImg.gal_img)}
                           alt={`${product.product_title_english} ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             console.error('Failed to load gallery image');
-                            e.currentTarget.src = '/assets/default-vendor.png'; // Fallback image
+                            e.currentTarget.src = '/assets/default-vendor.png';
                           }}
                         />
                       </div>
@@ -457,6 +522,96 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+        <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-0">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close button */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Image counter */}
+            <div className="absolute top-4 left-4 z-50 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold">
+              {currentImageIndex + 1} / {galleryImages.length + 1}
+            </div>
+
+            {/* Previous button */}
+            <button
+              onClick={goToPreviousImage}
+              className="absolute left-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+            >
+              <ChevronLeft size={32} />
+            </button>
+
+            {/* Next button */}
+            <button
+              onClick={goToNextImage}
+              className="absolute right-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+            >
+              <ChevronRight size={32} />
+            </button>
+
+            {/* Main image */}
+            <div className="w-full h-full flex items-center justify-center p-16">
+              <img
+                key={currentImageIndex}
+                src={
+                  currentImageIndex === 0
+                    ? getProductImageUrl(product.product_image)
+                    : getGalleryImageUrl(galleryImages[currentImageIndex - 1]?.gal_img)
+                }
+                alt={product.product_title_english}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  console.error('Failed to load image');
+                  e.currentTarget.src = '/assets/default-vendor.png';
+                }}
+              />
+            </div>
+
+            {/* Thumbnail strip at bottom */}
+            {galleryImages.length > 0 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-black/50 backdrop-blur-sm p-2 rounded-lg overflow-x-auto max-w-[80%]">
+                {/* Main image thumbnail */}
+                <button
+                  onClick={() => setCurrentImageIndex(0)}
+                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                    currentImageIndex === 0 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={getProductImageUrl(product.product_image)}
+                    alt="Main"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+                
+                {/* Gallery thumbnails */}
+                {galleryImages.map((galImg, index) => (
+                  <button
+                    key={galImg.id || index}
+                    onClick={() => setCurrentImageIndex(index + 1)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                      currentImageIndex === index + 1 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={getGalleryImageUrl(galImg.gal_img)}
+                      alt={`Gallery ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -52,7 +52,9 @@ export function useProducts() {
           'Content-Type': 'application/json'
         },
         params: {
-          // No limit parameter - fetch all products
+          page: 1,
+          limit: 100,  // Request up to 100 products
+          all: true    // Try to get all products
         },
       });
 
@@ -97,12 +99,21 @@ export function useProducts() {
       });
 
       setProducts(productList);
-      setFilteredProducts(productList);
+      setFilteredProducts(productList); 
+      const newPageSize = 25; 
       setPagination((prev: PaginationState) => ({
         ...prev,
-        totalItems: total,
-        totalPages: Math.ceil(total / prev.pageSize),
+        totalItems: productList.length, 
+        totalPages: Math.ceil(productList.length / prev.pageSize),
       }));
+      
+      console.log('✅ [useProducts] Initial state updated - ALL products shown:', {
+        productsSet: productList.length,
+        filteredProductsSet: productList.length,
+        totalItems: productList.length,
+        pageSize: newPageSize,
+        currentPage: 1
+      });
       
       toast.success(`Loaded ${productList.length} products`);
     } catch (err: any) {
@@ -188,7 +199,11 @@ export function useProducts() {
 
   // Apply filters and sorting
   const applyFilters = useCallback((filters: ProductFilters) => {
+    console.log('🔍 [useProducts.applyFilters] Applying filters:', filters);
+    console.log('📦 [useProducts.applyFilters] Total products in state:', products.length);
+    
     let result = [...products];
+    
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       result = result.filter(product =>
@@ -196,43 +211,64 @@ export function useProducts() {
         product.product_title_bangla.toLowerCase().includes(searchTerm) ||
         product.sku.toLowerCase().includes(searchTerm)
       );
+      console.log('🔎 [applyFilters] After search filter:', result.length, 'products');
     }
 
-    // Status filter
+    // Status filter - IMPORTANT: Only filter if NOT 'all'
     if (filters.status === 'active') {
+      const beforeCount = result.length;
       result = result.filter(product => product.status === 1);
+      console.log('🔎 [applyFilters] After ACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else if (filters.status === 'inactive') {
+      const beforeCount = result.length;
       result = result.filter(product => product.status === 0);
+      console.log('🔎 [applyFilters] After INACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
+    } else {
+      console.log('✅ [applyFilters] Status filter is "all" - showing all statuses');
     }
 
-    // Stock filter
+    // Stock filter - IMPORTANT: Only filter if NOT 'all'
     if (filters.stock === 'low_stock') {
+      const beforeCount = result.length;
       result = result.filter(product => product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD);
+      console.log('🔎 [applyFilters] After LOW_STOCK filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else if (filters.stock === 'out_of_stock') {
+      const beforeCount = result.length;
       result = result.filter(product => product.stock === 0);
+      console.log('🔎 [applyFilters] After OUT_OF_STOCK filter:', result.length, 'products (removed', beforeCount - result.length, ')');
+    } else {
+      console.log('✅ [applyFilters] Stock filter is "all" - showing all stock levels');
     }
 
     // Sorting
     switch (filters.sort) {
       case 'price_asc':
         result.sort((a, b) => a.offer_price - b.offer_price);
+        console.log('📊 [applyFilters] Sorted by price ascending');
         break;
       case 'price_desc':
         result.sort((a, b) => b.offer_price - a.offer_price);
+        console.log('📊 [applyFilters] Sorted by price descending');
         break;
       case 'stock_asc':
         result.sort((a, b) => a.stock - b.stock);
+        console.log('📊 [applyFilters] Sorted by stock ascending');
         break;
       case 'stock_desc':
-        result.sort((a, b) => b.stock - a.stock);
+        result.sort((a, b) => b.stock - b.stock);
+        console.log('📊 [applyFilters] Sorted by stock descending');
         break;
       case 'date_asc':
         result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        console.log('📊 [applyFilters] Sorted by date ascending');
         break;
       case 'date_desc':
         result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        console.log('📊 [applyFilters] Sorted by date descending (default)');
         break;
     }
+
+    console.log('🎯 [applyFilters] Final filtered count:', result.length, 'out of', products.length);
 
     setFilteredProducts(result);
     setPagination((prev: PaginationState) => ({
@@ -325,7 +361,19 @@ export function useProducts() {
   const getPaginatedProducts = useCallback(() => {
     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
     const endIndex = startIndex + pagination.pageSize;
-    return filteredProducts.slice(startIndex, endIndex);
+    const paginatedResult = filteredProducts.slice(startIndex, endIndex);
+    
+    console.log('📄 [useProducts.getPaginatedProducts] Pagination info:', {
+      currentPage: pagination.currentPage,
+      pageSize: pagination.pageSize,
+      totalFiltered: filteredProducts.length,
+      startIndex,
+      endIndex,
+      showingCount: paginatedResult.length,
+      productIds: paginatedResult.map(p => p.id)
+    });
+    
+    return paginatedResult;
   }, [filteredProducts, pagination.currentPage, pagination.pageSize]);
 
   return {

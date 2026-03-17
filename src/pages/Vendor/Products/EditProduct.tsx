@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { ProductForm } from './components/ProductForm';
 import { useProductMutation } from './hooks/useProductMutation';
 import { ProductFormData } from './types/product.types';
