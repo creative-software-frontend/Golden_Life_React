@@ -163,36 +163,6 @@ const Products: React.FC = () => {
         onAddProduct={handleAddProduct}
       />
 
-      {/* Debug Info Panel - Temporary */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
-        <div className="flex items-center gap-2 mb-2">
-          <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="font-semibold text-yellow-800">Debug Information</span>
-        </div>
-        <div className="grid md:grid-cols-4 gap-4 text-xs">
-          <div>
-            <span className="text-gray-600">Total from API:</span>
-            <span className="ml-2 font-mono">{pagination.totalItems}</span>
-          </div>
-          <div>
-            <span className="text-gray-600">Showing in table:</span>
-            <span className="ml-2 font-mono">{products.length}</span>
-          </div>
-          <div>
-            <span className="text-gray-600">Current page:</span>
-            <span className="ml-2 font-mono">{pagination.currentPage}</span>
-          </div>
-          <div>
-            <span className="text-gray-600">Items per page:</span>
-            <span className="ml-2 font-mono">{pagination.pageSize}</span>
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-gray-600">
-          <span className="font-semibold">Filters:</span> Search="{filters.search}", Status="{filters.status}", Stock="{filters.stock}"
-        </div>
-      </div>
 
       {/* Products Content */}
       {!error && (
