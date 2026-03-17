@@ -734,7 +734,7 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
       if (!result.status) throw new Error('Backend failed');
 
       // Immediate sync after marking read
-      setTimeout(() => fetchNotifications(true), 200);
+      setTimeout(() => fetchNotifications(true), 100);
     } catch (error) {
       console.error('Mark as read failed:', error);
       fetchNotifications(true);
