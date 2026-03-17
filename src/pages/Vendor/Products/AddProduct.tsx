@@ -14,9 +14,14 @@ export default function AddProduct() {
     try {
       const formData = new FormData();
 
+      console.log('📊 === SUBMITTING PRODUCT ===');
+      console.log('📋 Full form data received:', data);
+      console.log('🖼️ Main images array:', data.images);
+      console.log('📸 Gallery images array:', (data as any).gallery_images);
+
       // Append all text fields
       Object.keys(data).forEach((key) => {
-        if (key !== 'images' && key !== 'existing_images' && key !== 'removed_images') {
+        if (key !== 'images' && key !== 'existing_images' && key !== 'removed_images' && key !== 'gallery_images') {
           const value = data[key as keyof ProductFormData];
           if (value !== undefined && value !== null) {
             formData.append(key, value.toString());
@@ -24,23 +29,32 @@ export default function AddProduct() {
         }
       });
 
-      // Handle images - API expects 'product_image' for main image
+      // Handle main image - API expects 'product_image' for main image
       if (data.images && data.images.length > 0) {
-        // Send first image as 'product_image' (required field)
         formData.append('product_image', data.images[0]);
-        
-        // Send remaining images as gallery
-        if (data.images.length > 1) {
-          for (let i = 1; i < data.images.length; i++) {
-            formData.append('gallery_images[]', data.images[i]);
-          }
-        }
+        console.log('✅ Added main product_image:', data.images[0].name);
       }
 
-      console.log('Submitting product data...');
-      console.log('Form data keys:', Array.from(formData.keys()));
-      console.log('Number of images:', data.images.length);
-      console.log('Has product_image:', formData.has('product_image'));
+      // Handle gallery images from ProductForm
+      const galleryImages = (data as any).gallery_images || [];
+      console.log('📸 Processing gallery images:', galleryImages.length, 'files');
+      
+      if (galleryImages && galleryImages.length > 0) {
+        console.log('📸 Gallery images to send:', galleryImages.map((g: File) => g.name));
+        for (let i = 0; i < galleryImages.length; i++) {
+          formData.append('gallery_images[]', galleryImages[i]);
+          console.log(`  ➕ Added gallery image ${i + 1}:`, galleryImages[i].name);
+        }
+      } else {
+        console.warn('⚠️ No gallery images found in form data!');
+      }
+
+      console.log('\n📦 === FORMDATA CONTENTS ===');
+      console.log('Total keys:', Array.from(formData.keys()).length);
+      for (let pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1] instanceof File ? `📁 File: ${pair[1].name}` : pair[1]);
+      }
+      console.log('=========================\n');
 
       const success = await createProduct(formData);
 
@@ -51,7 +65,8 @@ export default function AddProduct() {
         toast.error('Failed to create product');
       }
     } catch (err: any) {
-      console.error('Create product error:', err);
+      console.error('❌ Create product error:', err);
+      console.error('Error response:', err.response?.data);
       // Error is already shown by useProductMutation
     }
   };

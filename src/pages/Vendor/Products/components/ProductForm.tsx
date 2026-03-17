@@ -44,7 +44,7 @@ export function ProductForm({
     setValue,
     watch,
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchemaWithValidation) as any, // Type assertion to resolve resolver compatibility
+    resolver: zodResolver(productSchemaWithValidation) as any, 
     defaultValues: {
       product_title_english: initialData?.product_title_english || '',
       product_title_bangla: initialData?.product_title_bangla || '',
@@ -60,7 +60,7 @@ export function ProductForm({
       sku: initialData?.sku || '',
       stock: initialData?.stock || 0,
       video_link: initialData?.video_link || '',
-      ebook: isEbook ? '1' : '0', // Use state value
+      ebook: isEbook ? '1' : '0', 
       images: [],
       existing_images: initialData?.existing_images || [],
       removed_images: [],
@@ -111,6 +111,9 @@ export function ProductForm({
 
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
+    console.log('🚀 === PRODUCT FORM SUBMIT ===');
+    console.log('📋 Form data from react-hook-form:', data);
+    
     // Combine main image and gallery images
     const submitData = {
       ...data,
@@ -119,6 +122,11 @@ export function ProductForm({
       existing_gallery_images: mode === 'edit' ? existingGalleryImages : undefined,
       removed_gallery_images: mode === 'edit' ? removedGalleryImages : undefined,
     };
+    
+    console.log('🖼️ Main image state:', mainImage ? mainImage.name : 'None');
+    console.log('📸 Gallery images state:', galleryImages.map(g => g.name));
+    console.log('📦 Combined submit data:', submitData);
+    console.log('=====================================\n');
     
     await onSubmit(submitData);
   };
@@ -147,7 +155,7 @@ export function ProductForm({
     setValue('sku', '');
     setValue('stock', 0);
     setValue('video_link', '');
-    setValue('ebook', '0'); // Reset to default
+    setValue('ebook', '0'); 
     setValue('images', []);
     setValue('existing_images', []);
     setValue('removed_images', []);
