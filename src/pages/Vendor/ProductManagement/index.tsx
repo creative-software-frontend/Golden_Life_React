@@ -35,8 +35,6 @@ const Products: React.FC = () => {
     applyFilters,
     updatePageSize,
     setPagination,
-    updateEbookStatus,
-    updateVideoLink,
   } = useProducts();
 
   // Debug logging - log products count when it changes

@@ -1,5 +1,5 @@
 // Product interfaces matching API structure
-
+// product.types.ts
 // Category interface
 export interface Category {
   id: number;

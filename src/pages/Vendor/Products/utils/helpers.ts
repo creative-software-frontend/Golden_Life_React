@@ -1,4 +1,4 @@
-import { ImageFile } from '../types/product.types';
+// helpers.ts
 
 /**
  * Auto-generate SKU from product name
