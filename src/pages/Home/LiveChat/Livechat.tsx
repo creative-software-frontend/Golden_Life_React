@@ -55,7 +55,7 @@ export default function LiveChat() {
     return (
         <>
             <div
-                className={`fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-lg transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+                className={`fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-lg transition-transform duration-300 ease-in-out no-print ${isOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
             >
                 <div className="flex flex-col h-full">
@@ -103,7 +103,7 @@ export default function LiveChat() {
                     </form>
                 </div>
             </div>
-            <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light">
+            <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light no-print">
                 <button
                     onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
                     className="px-4  text-black-500"

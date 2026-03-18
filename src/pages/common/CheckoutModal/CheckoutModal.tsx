@@ -28,7 +28,7 @@ export default function CheckoutModal() {
   }, [isCheckoutModalOpen]);
 
   const subTotal = cartItems.reduce((acc, item) => acc + (Number(item.price) * Number(item.quantity)), 0);
-  const deliveryFee = 150.00; 
+  const deliveryFee = 150.00;
   const total = subTotal + deliveryFee;
 
   if (!isCheckoutModalOpen) return null;
@@ -36,18 +36,18 @@ export default function CheckoutModal() {
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
-        onClick={changeCheckoutModal} 
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        onClick={changeCheckoutModal}
       />
 
       {/* Modal Content */}
       <div className="relative bg-gray-50 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300">
-        
+
         {/* Header */}
         <div className="sticky top-0 bg-white p-5 border-b flex items-center justify-between z-10">
           <h2 className="text-xl font-black uppercase tracking-tight text-gray-900">Checkout</h2>
-          <button 
+          <button
             onClick={changeCheckoutModal}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >

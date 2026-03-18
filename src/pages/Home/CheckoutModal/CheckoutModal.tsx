@@ -137,7 +137,7 @@ const CheckoutModal = () => {
     const handleSaveNewAddress = async (newAddr: Address) => {
         // Automatically select the new address and refresh the address list
         await handleSelectAddress(newAddr, true);
-        fetchAddresses(); 
+        fetchAddresses();
     };
 
     if (!isCheckoutModalOpen) return null;
@@ -149,11 +149,11 @@ const CheckoutModal = () => {
 
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[2000] p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-            
+
             <div className="bg-white w-full max-w-[420px] rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-auto max-h-[90vh]">
-                
+
                 {view === 'CHECKOUT' && (
-                    <CheckoutSummaryView 
+                    <CheckoutSummaryView
                         data={cartData}
                         selectedAddress={selectedAddress}
                         paymentMethod={paymentMethod}
@@ -166,8 +166,8 @@ const CheckoutModal = () => {
                 )}
 
                 {view === 'ADDRESS_LIST' && (
-                    <AddressListView 
-                        addresses={addresses} 
+                    <AddressListView
+                        addresses={addresses}
                         selectedId={selectedAddress?.id}
                         onBack={() => setView('CHECKOUT')}
                         onClose={handleClose}
@@ -178,10 +178,10 @@ const CheckoutModal = () => {
                 )}
 
                 {view === 'ADD_ADDRESS' && (
-                    <AddAddressForm 
-                        onClose={() => setView('ADDRESS_LIST')} 
-                        onBack={() => setView('ADDRESS_LIST')} 
-                        onSave={handleSaveNewAddress} 
+                    <AddAddressForm
+                        onClose={() => setView('ADDRESS_LIST')}
+                        onBack={() => setView('ADDRESS_LIST')}
+                        onSave={handleSaveNewAddress}
                     />
                 )}
             </div>
