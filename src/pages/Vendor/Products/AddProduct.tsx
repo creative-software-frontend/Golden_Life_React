@@ -35,15 +35,15 @@ export default function AddProduct() {
         console.log('✅ Added main product_image:', data.images[0].name);
       }
 
-      // Handle gallery images from ProductForm
+      // Handle gallery images from ProductForm - API expects 'gal_img[]'
       const galleryImages = (data as any).gallery_images || [];
       console.log('📸 Processing gallery images:', galleryImages.length, 'files');
       
       if (galleryImages && galleryImages.length > 0) {
         console.log('📸 Gallery images to send:', galleryImages.map((g: File) => g.name));
         for (let i = 0; i < galleryImages.length; i++) {
-          formData.append('gallery_images[]', galleryImages[i]);
-          console.log(`  ➕ Added gallery image ${i + 1}:`, galleryImages[i].name);
+          formData.append('gal_img[]', galleryImages[i]);
+          console.log(`  ➕ Added gallery image ${i + 1} with field name 'gal_img[]':`, galleryImages[i].name);
         }
       } else {
         console.warn('⚠️ No gallery images found in form data!');

@@ -99,22 +99,31 @@ export function ProductForm({
 
   // Handle gallery images change
   const handleGalleryImagesChange = (files: File[]) => {
+    console.log('📸 [ProductForm] Gallery images changed:', files.length, 'files');
+    console.log('📸 [ProductForm] Gallery file names:', files.map(f => f.name));
     setGalleryImages(files);
   };
 
   // Handle existing gallery image removal
   const handleExistingGalleryImageRemove = (index: number) => {
     const imageUrl = existingGalleryImages[index];
+    console.log('🗑️ [ProductForm] Removing existing gallery image at index', index, ':', imageUrl);
     const newExistingImages = existingGalleryImages.filter((_: any, i: number) => i !== index);
     setExistingGalleryImages(newExistingImages);
-    setRemovedGalleryImages([...removedGalleryImages, imageUrl]);
-    setValue('removed_images', [...removedGalleryImages, imageUrl]);
+    const newRemovedImages = [...removedGalleryImages, imageUrl];
+    setRemovedGalleryImages(newRemovedImages);
+    setValue('removed_images', newRemovedImages);
+    console.log('✅ Remaining existing images:', newExistingImages.length);
+    console.log('📝 Marked for removal:', newRemovedImages.length);
   };
 
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
     console.log('🚀 === PRODUCT FORM SUBMIT ===');
     console.log('📋 Form data from react-hook-form:', data);
+    console.log('🖼️ Main image state:', mainImage ? mainImage.name : 'None');
+    console.log('📸 Gallery images state (before combine):', galleryImages.map(g => g.name));
+    console.log('📊 Gallery images count:', galleryImages.length);
     
     // Combine main image and gallery images
     const submitData = {
@@ -125,9 +134,11 @@ export function ProductForm({
       removed_gallery_images: mode === 'edit' ? removedGalleryImages : undefined,
     };
     
-    console.log('🖼️ Main image state:', mainImage ? mainImage.name : 'None');
-    console.log('📸 Gallery images state:', galleryImages.map(g => g.name));
-    console.log('📦 Combined submit data:', submitData);
+    console.log('🖼️ Main image to send:', submitData.images?.length || 0, 'files');
+    console.log('📸 Gallery images to send:', submitData.gallery_images?.length || 0, 'files');
+    console.log('📸 Gallery image names:', submitData.gallery_images?.map((g: File) => g.name));
+    console.log('🏷️ Existing gallery images:', submitData.existing_gallery_images?.length || 0);
+    console.log('🗑️ Removed gallery images:', submitData.removed_gallery_images?.length || 0);
     console.log('=====================================\n');
     
     await onSubmit(submitData);
