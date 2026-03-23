@@ -110,7 +110,7 @@ src/
 │   ├── PercelLayout/
 │   │   └── PercelLayout.tsx
 │   ├── ProfileSidebar/
-│   │   └── ProfileSidebar.tsx
+│   │   └── Sidebar.tsx
 │   ├── ShoppingLayout/
 │   │   └── ShoppingLayout.tsx
 │   ├── TopUplayout/
