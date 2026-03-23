@@ -21,15 +21,15 @@ export function StatsCard({
       icon: Wallet,
       label: 'Current Balance',
       value: `৳${numericBalance.toFixed(2)}`,
-      color: '#E8A87C',
-      bgColor: 'bg-[#E8A87C]/10'
+      color: 'primary-light',
+      bgColor: 'bg-primary-light/10'
     },
     {
       icon: Package,
       label: 'Total Products',
       value: totalProducts.toString(),
-      color: '#C38D9E',
-      bgColor: 'bg-[#C38D9E]/10'
+      color: 'primary-dark',
+      bgColor: 'bg-primary-dark/10'
     },
     {
       icon: TrendingUp,

@@ -124,15 +124,10 @@ export const Pagination: React.FC<PaginationProps> = ({
                 size="sm"
                 className={`h-9 w-9 rounded-lg ${
                   page === currentPage 
-                    ? 'font-semibold shadow-md' 
+                    ? 'bg-primary-light font-semibold shadow-md' 
                     : 'hover:bg-accent'
                 }`}
                 onClick={() => onPageChange(page as number)}
-                style={
-                  page === currentPage 
-                    ? { backgroundColor: '#E8A87C', borderColor: '#E8A87C' }
-                    : {}
-                }
               >
                 {page}
               </Button>

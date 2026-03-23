@@ -81,7 +81,7 @@ export function CategorySelect({
           <SelectContent>
             {isLoading && categories.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 size={24} className="animate-spin text-[#E8A87C]" />
+                <Loader2 size={24} className="animate-spin text-primary-light" />
               </div>
             ) : categories.length > 0 ? (
               categories.map((category) => (
@@ -111,7 +111,7 @@ export function CategorySelect({
             </p>
             <button
               onClick={fetchCategories}
-              className="text-xs text-[#E8A87C] hover:text-[#C38D9E] font-medium flex items-center gap-1"
+              className="text-xs text-primary-light hover:text-primary-dark font-medium flex items-center gap-1"
             >
               <RefreshCcw size={12} />
               Retry
@@ -139,7 +139,7 @@ export function CategorySelect({
           <SelectContent>
             {isLoading && subcategories.length === 0 && categoryId ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 size={24} className="animate-spin text-[#E8A87C]" />
+                <Loader2 size={24} className="animate-spin text-primary-light" />
               </div>
             ) : subcategories.length > 0 ? (
               subcategories.map((subcategory) => (

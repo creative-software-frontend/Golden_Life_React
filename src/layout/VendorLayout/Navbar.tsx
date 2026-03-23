@@ -267,14 +267,14 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                             const parent = (e.target as HTMLImageElement).parentElement;
                                             if (parent && !parent.querySelector('.fallback-avatar')) {
                                                 const fallback = document.createElement('div');
-                                                fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E] rounded-full';
+                                                fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary-dark rounded-full';
                                                 fallback.innerHTML = `<span class="text-white font-bold text-xs sm:text-sm">${getVendorDisplayName(profile).charAt(0).toUpperCase()}</span>`;
                                                 parent.appendChild(fallback);
                                             }
                                         }}
                                     />
                                 ) : (
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E]">
+                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary-dark">
                                         <span className="text-white font-bold text-xs sm:text-sm">
                                             {getVendorDisplayName(profile).charAt(0).toUpperCase()}
                                         </span>
@@ -311,7 +311,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                                         onClick={() => setIsProfileMenuOpen(false)}
                                     >
-                                        <User className="h-4 w-4 text-[#E8A87C]" />
+                                        <User className="h-4 w-4 text-primary-light" />
                                         <span>My Profile</span>
                                     </Link>
                                     
@@ -322,7 +322,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                             // Navigate to settings when available
                                         }}
                                     >
-                                        <Settings className="h-4 w-4 text-[#C38D9E]" />
+                                        <Settings className="h-4 w-4 text-primary-dark" />
                                         <span>Settings</span>
                                     </button>
                                     

@@ -41,13 +41,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           
           <Button 
             onClick={onAddProduct}
-            className="h-10 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-            style={{ 
-              backgroundColor: '#E8A87C',
-              borderColor: '#E8A87C'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#D49A6C'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E8A87C'}
+            className="h-10 px-6 rounded-xl font-semibold shadow-md bg-primary-light hover:bg-primary-default transition-all duration-200"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Product
@@ -117,14 +111,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               onClick={() => onViewModeChange('table')}
               className={`h-9 px-3 rounded-lg ${
                 viewMode === 'table' 
-                  ? 'shadow-sm' 
+                  ? 'bg-primary-light shadow-sm' 
                   : 'hover:bg-background'
               }`}
-              style={
-                viewMode === 'table' 
-                  ? { backgroundColor: '#E8A87C', borderColor: '#E8A87C' }
-                  : {}
-              }
             >
               <Table className="w-4 h-4 mr-2" />
               Table
@@ -135,14 +124,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               onClick={() => onViewModeChange('grid')}
               className={`h-9 px-3 rounded-lg ${
                 viewMode === 'grid' 
-                  ? 'shadow-sm' 
+                  ? 'bg-primary-light shadow-sm' 
                   : 'hover:bg-background'
               }`}
-              style={
-                viewMode === 'grid' 
-                  ? { backgroundColor: '#E8A87C', borderColor: '#E8A87C' }
-                  : {}
-              }
             >
               <Grid3X3 className="w-4 h-4 mr-2" />
               Grid

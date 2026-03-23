@@ -200,7 +200,7 @@ export default function EditProduct() {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 size={48} className="animate-spin text-[#E8A87C] mx-auto" />
+          <Loader2 size={48} className="animate-spin text-primary-light mx-auto" />
           <p className="text-gray-600">Loading product...</p>
         </div>
       </div>

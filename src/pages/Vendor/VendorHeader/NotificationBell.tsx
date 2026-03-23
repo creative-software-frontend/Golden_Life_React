@@ -39,8 +39,8 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${
           isOpen
-            ? 'bg-[#E8A87C]/10 text-[#E8A87C] shadow-inner'
-            : 'bg-white text-slate-500 hover:text-[#E8A87C] hover:bg-slate-50 shadow-sm border border-slate-200'
+            ? 'bg-primary-light/10 text-primary-light shadow-inner'
+            : 'bg-white text-slate-500 hover:text-primary-light hover:bg-slate-50 shadow-sm border border-slate-200'
         }`}
         disabled={syncing}
       >
@@ -57,7 +57,7 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
 
         {syncing && (
           <span className="absolute inset-0 flex items-center justify-center bg-white/30 rounded-full">
-            <div className="w-4 h-4 border-2 border-[#E8A87C] border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-primary-light border-t-transparent rounded-full animate-spin" />
           </span>
         )}
       </button>
@@ -69,7 +69,7 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
             <div className="flex items-center gap-3">
               <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Notifications</h3>
               {unreadCount > 0 && (
-                <span className="px-2.5 py-0.5 rounded-full bg-[#E8A87C]/10 text-[#E8A87C] text-xs font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-primary-light/10 text-primary-light text-xs font-bold">
                   {unreadCount} new
                 </span>
               )}
@@ -107,7 +107,7 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
                       onClick={() => unread && !syncing && markAsRead(notif.id)}
                       className={`group relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                         unread
-                          ? 'bg-[#E8A87C]/5 hover:bg-[#E8A87C]/10 border-l-4 border-[#E8A87C]'
+                          ? 'bg-primary-light/5 hover:bg-primary-light/10 border-l-4 border-primary-light'
                           : 'bg-white hover:bg-slate-50 border-l-4 border-transparent opacity-80'
                       } ${syncing ? 'opacity-60 pointer-events-none' : ''}`}
                     >

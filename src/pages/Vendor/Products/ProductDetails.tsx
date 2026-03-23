@@ -208,7 +208,7 @@ export default function ProductDetails() {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 size={48} className="animate-spin text-[#E8A87C] mx-auto" />
+          <Loader2 size={48} className="animate-spin text-primary-light mx-auto" />
           <p className="text-gray-600 font-semibold">Loading product details...</p>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default function ProductDetails() {
                     {galleryImages.map((galImg, index) => (
                       <div
                         key={galImg.id || index}
-                        className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-[#E8A87C] hover:shadow-md transition-all duration-200"
+                        className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-primary-light hover:shadow-md transition-all duration-200"
                         onClick={() => openLightbox(index)}
                       >
                         <img
@@ -374,7 +374,7 @@ export default function ProductDetails() {
             <CardContent className="grid md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-xs text-gray-500">Seller Price (Cost)</label>
-                <p className="text-lg font-bold text-[#E8A87C]">
+                <p className="text-lg font-bold text-primary-light">
                   {formatPrice(product.seller_price)}
                 </p>
               </div>
@@ -508,7 +508,7 @@ export default function ProductDetails() {
           <div className="flex gap-4 pt-4">
             <Button
               onClick={() => navigate(`/vendor/dashboard/products/edit/${id}`)}
-              className="flex-1 sm:flex-none px-6 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300"
+              className="flex-1 sm:flex-none px-6 py-3 bg-primary-light text-white font-bold rounded-xl transition-all duration-300"
             >
               Edit This Product
             </Button>

@@ -45,19 +45,19 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
           icon: User,
           label: 'Full Name',
           value: safeUser.name || 'Not provided',
-          color: '#E8A87C'
+          color: 'primary-light'
         },
         {
           icon: Mail,
           label: 'Email Address',
           value: safeUser.email || 'Not provided',
-          color: '#C38D9E'
+          color: 'primary-dark'
         },
         {
           icon: Phone,
           label: 'Mobile Number',
           value: `${safeUser.mobile || 'Not provided'} ${safeUser.mobile_verify ? '✓' : ''}`,
-          color: '#E8A87C'
+          color: 'primary-light'
         }
       ]
     },
@@ -68,19 +68,19 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
           icon: User,
           label: 'Owner Name',
           value: safeVendor.owner_name || 'Not provided',
-          color: '#C38D9E'
+          color: 'primary-dark'
         },
         {
           icon: Building2,
           label: 'Business Name',
           value: safeVendor.businee_name || safeVendor.business_name || 'Not provided',
-          color: '#E8A87C'
+          color: 'primary-light'
         },
         {
           icon: Phone,
           label: 'Business Mobile',
           value: safeVendor.mobile || 'Not provided',
-          color: '#C38D9E'
+          color: 'primary-dark'
         }
       ]
     },
@@ -91,19 +91,19 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
           icon: MapPin,
           label: 'Country',
           value: safeVendor.country || 'Not provided',
-          color: '#E8A87C'
+          color: 'primary-light'
         },
         {
           icon: MapPin,
           label: 'District',
           value: safeVendor.district || 'Not provided',
-          color: '#C38D9E'
+          color: 'primary-dark'
         },
         {
           icon: MapPin,
           label: 'Address',
           value: safeVendor.address || 'Not provided',
-          color: '#E8A87C'
+          color: 'primary-light'
         }
       ]
     },
@@ -118,12 +118,12 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
               href={safeVendor.website} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[#C38D9E] hover:underline"
+              className="text-primary-dark hover:underline"
             >
               Visit Website
             </a>
           ) : 'Not provided',
-          color: '#C38D9E'
+          color: 'primary-dark'
         },
         {
           icon: Facebook,
@@ -163,7 +163,7 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
           key={sectionIdx}
           className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#E8A87C]/20">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary-light/20">
             {section.title}
           </h3>
           

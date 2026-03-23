@@ -15,7 +15,7 @@ export function ProfileHeader({
   email, 
   sellerId, 
   imageUrl,
-  coverGradient = 'from-[#E8A87C]/20 via-[#C38D9E]/20 to-[#E8A87C]/10'
+  coverGradient = 'from-primary-light/20 via-primary-dark/20 to-primary-light/10'
 }: ProfileHeaderProps) {
   const [imageError, setImageError] = useState(false);
   
@@ -62,7 +62,7 @@ export function ProfileHeader({
             </div>
             
             {/* Edit Badge */}
-            <div className="absolute -bottom-2 -right-2 bg-[#E8A87C] text-white p-2.5 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-[#C38D9E]">
+            <div className="absolute -bottom-2 -right-2 bg-primary-light text-white p-2.5 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-primary-dark">
               <Camera size={18} />
             </div>
           </div>
@@ -74,21 +74,21 @@ export function ProfileHeader({
             </h1>
             
             {displaySellerId && (
-              <p className="text-sm font-semibold text-[#C38D9E] mb-2">
+              <p className="text-sm font-semibold text-primary-dark mb-2">
                 Seller ID: {displaySellerId}
               </p>
             )}
 
             <div className="flex flex-wrap gap-3 text-sm text-gray-600">
               <div className="flex items-center gap-1.5">
-                <Mail size={16} className="text-[#E8A87C]" />
+                <Mail size={16} className="text-primary-light" />
                 <span>{displayEmail}</span>
               </div>
               
               <div className="hidden md:block w-px h-4 bg-gray-300" />
               
               <div className="flex items-center gap-1.5">
-                <MapPin size={16} className="text-[#E8A87C]" />
+                <MapPin size={16} className="text-primary-light" />
                 <span>Dhaka, Bangladesh</span>
               </div>
             </div>
@@ -96,10 +96,10 @@ export function ProfileHeader({
 
           {/* Action Buttons */}
           <div className="flex gap-2 md:pb-4">
-            <button className="px-4 py-2 bg-white border-2 border-[#E8A87C] text-[#E8A87C] font-bold rounded-xl hover:bg-[#E8A87C] hover:text-white transition-all duration-300 shadow-md hover:shadow-lg">
+            <button className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 shadow-md hover:shadow-lg">
               Share Profile
             </button>
-            <button className="px-4 py-2 bg-[#E8A87C] text-white font-bold rounded-xl hover:bg-[#C38D9E] transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30">
+            <button className="px-4 py-2 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary-light/30 hover:shadow-primary-dark/30">
               View Shop
             </button>
           </div>

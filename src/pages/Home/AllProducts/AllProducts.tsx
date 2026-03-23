@@ -194,7 +194,7 @@ export default function AllProduct() {
                                     placeholder="Search by product name or SKU..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A87C]/40 focus:border-[#E8A87C] text-sm transition-all"
+                                    className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary-light/40 focus:border-primary-light text-sm transition-all"
                                 />
                             </div>
                         </div>
@@ -202,13 +202,13 @@ export default function AllProduct() {
                         <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
                             <div className="flex flex-wrap gap-3 w-full lg:w-auto">
 
-                                <select value={stock} onChange={(e) => setStock(e.target.value)} className="h-10 w-full sm:w-[150px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
+                                <select value={stock} onChange={(e) => setStock(e.target.value)} className="h-10 w-full sm:w-[150px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-primary-light/40">
                                     <option value="all">All Stock</option>
                                     <option value="in_stock">In Stock</option>
                                     <option value="out_of_stock">Out of Stock</option>
                                 </select>
 
-                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="h-10 w-full sm:w-[170px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
+                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="h-10 w-full sm:w-[170px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-primary-light/40">
                                     <option value="all">Show All</option>
                                     <option value="newest">Newest First</option>
                                     <option value="oldest">Oldest First</option>
@@ -221,14 +221,14 @@ export default function AllProduct() {
                             <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-slate-200">
                                 <button
                                     onClick={() => setViewMode('table')}
-                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'table' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
+                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'table' ? 'bg-primary-light text-white shadow-sm' : 'text-slate-500 hover:bg-white'
                                         }`}
                                 >
                                     <TableIcon className="w-4 h-4 mr-1.5" /> Table
                                 </button>
                                 <button
                                     onClick={() => setViewMode('grid')}
-                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
+                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-primary-light text-white shadow-sm' : 'text-slate-500 hover:bg-white'
                                         }`}
                                 >
                                     <Grid3X3 className="w-4 h-4 mr-1.5" /> Grid
