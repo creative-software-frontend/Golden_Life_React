@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 `}
             >
                 {/* Header Section */}
-                <div className="px-6 py-4 flex items-center justify-between border-b border-secondary-foreground/20 whitespace-nowrap overflow-hidden">
+                <div className="px-6 py-5 flex items-center justify-between border-b border-secondary-foreground/20 whitespace-nowrap overflow-hidden">
                     <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center bg-background text-secondary shadow-lg">
                             <Store size={22} strokeWidth={2.5} />

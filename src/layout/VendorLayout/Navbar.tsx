@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import ImageUploadModal from '@/components/shared/ImageUploadModal';
 import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/hooks/useVendorProfile';
+import VendorNotificationBell from '@/pages/Vendor/VendorHeader/NotificationBell';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -47,6 +48,12 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     const walletRefMobile = useRef<HTMLDivElement>(null);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+    // --- Get Vendor Token ---
+    const getVendorToken = () => {
+        const session = sessionStorage.getItem('vendor_session');
+        return session ? JSON.parse(session).token : null;
+    };
 
     // --- Fetch Wallet Balance ---
     useEffect(() => {
@@ -235,10 +242,10 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                     </div>
 
                     {/* Notification Bell */}
-                    <button className="relative p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex-shrink-0 group">
-                        <Bell className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" />
-                        <span className="absolute top-[6px] right-[6px] sm:top-[7px] sm:right-[7px] w-2.5 h-2.5 bg-destructive rounded-full border-[2px] border-background"></span>
-                    </button>
+                    <VendorNotificationBell 
+                        baseURL={baseURL}
+                        token={getVendorToken()}
+                    />
 
                     {/* User Profile with Dropdown */}
                     <div className="relative" ref={profileRef}>

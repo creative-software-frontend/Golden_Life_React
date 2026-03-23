@@ -161,7 +161,7 @@ export default function EditProduct() {
         if (data.images.length > 1) {
           for (let i = 1; i < data.images.length; i++) {
             console.log(`  Added gallery image ${i}: ${data.images[i].name}`);
-            formData.append('gallery_images[]', data.images[i]);
+            formData.append('gal_img[]', data.images[i]);
           }
         }
       }
