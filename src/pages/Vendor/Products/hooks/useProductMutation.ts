@@ -9,7 +9,6 @@ export function useProductMutation() {
   
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-  // Get auth token from session storage
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
     if (!session) return null;
@@ -21,7 +20,6 @@ export function useProductMutation() {
     }
   };
 
-  // Create new product
   const createProduct = async (formData: FormData): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -32,24 +30,6 @@ export function useProductMutation() {
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
-
-      // Debug: Log form data
-      console.log('📦 === CREATING PRODUCT - FormData Details ===');
-      console.log('FormData entries:');
-      const formDataEntries = [];
-      for (const [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(`  📁 ${key}: ${value.name} (${value.size} bytes)`);
-          formDataEntries.push({ key, value: `File: ${value.name}` });
-        } else if (Array.isArray(value)) {
-          console.log(`  📋 ${key}: [${value.join(', ')}]`);
-          formDataEntries.push({ key, value: `[Array: ${value.length} items]` });
-        } else {
-          console.log(`  📝 ${key}: ${value}`);
-          formDataEntries.push({ key, value });
-        }
-      }
-      console.log('==========================================\n');
 
       const response = await axios.post(
         `${baseURL}/api/vendor/product/store`,
@@ -62,8 +42,6 @@ export function useProductMutation() {
         }
       );
 
-      console.log('API Response:', response.data);
-
       const isSuccess = response.data?.success === true || 
                        response.data?.status === 'success' ||
                        response.data?.message?.toLowerCase().includes('success');
@@ -71,29 +49,11 @@ export function useProductMutation() {
       if (isSuccess) {
         return true;
       } else {
-        // Extract validation errors from API response
-        const validationErrors = response.data?.errors || {};
-        if (Object.keys(validationErrors).length > 0) {
-          console.error('Validation errors:', validationErrors);
-          Object.values(validationErrors).forEach((messages: any) => {
-            if (Array.isArray(messages)) {
-              messages.forEach((msg: string) => {
-                toast.error(msg);
-              });
-            }
-          });
-        }
         throw new Error(response.data?.message || 'Failed to create product');
       }
     } catch (err: any) {
       console.error('Create product error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create product';
-      
-      // Show specific validation error if available
-      if (err.response?.data?.errors) {
-        console.error('Validation errors:', err.response.data.errors);
-      }
-      
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -101,7 +61,6 @@ export function useProductMutation() {
     }
   };
 
-  // Update existing product
   const updateProduct = async (id: number, formData: FormData): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -113,11 +72,20 @@ export function useProductMutation() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      // Append _method for Laravel/PHP backends to handle PUT requests
       formData.append('_method', 'PUT');
 
+      console.log('Sending update request for product ID:', id);
+      console.log('FormData entries:');
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: File - ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+
       const response = await axios.post(
-        `${baseURL}/api/vendor/product/update/${id}`,
+        `${baseURL}/api/vendor/product/${id}`,
         formData,
         {
           headers: {
@@ -126,6 +94,8 @@ export function useProductMutation() {
           }
         }
       );
+
+      console.log('Update response:', response.data);
 
       const isSuccess = response.data?.success === true || 
                        response.data?.status === 'success' ||
@@ -138,15 +108,30 @@ export function useProductMutation() {
       }
     } catch (err: any) {
       console.error('Update product error:', err);
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to update product';
+      if (err.response) {
+        console.error('Error status:', err.response.status);
+        console.error('Error data:', err.response.data);
+      }
+      
+      let errorMessage = 'Failed to update product';
+      if (err.response?.status === 404) {
+        errorMessage = 'Update endpoint not found.';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Authentication failed. Please login again.';
+      } else if (err.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+      
       setError(errorMessage);
-      throw new Error(errorMessage);
+      toast.error(errorMessage);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Fetch single product by ID using query parameter
   const fetchProductById = async (id: number): Promise<ProductFormData> => {
     try {
       setIsLoading(true);
@@ -158,42 +143,25 @@ export function useProductMutation() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      // Correct endpoint with query parameter as per backend specification
-      const endpoint = `/api/vendor/product/details`;
-      
-      console.log(`🔄 Fetching product from: ${endpoint}?product_id=${id}`);
-
       const response = await axios.get(
-        `${baseURL}${endpoint}`,
+        `${baseURL}/api/vendor/product/details`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          params: {
-            product_id: id  // Query parameter format
-          }
+          headers: { Authorization: `Bearer ${token}` },
+          params: { product_id: id }
         }
       );
 
-      console.log(`✅ Product fetched successfully`);
-      console.log('Response data:', response.data);
-      console.log('Product ID from URL:', id);
-
-      // Handle different response structures
       let productData = response.data?.data || response.data?.product || response.data;
       
-      // Check if status field exists in response
       if (response.data?.status === true || response.data?.success === true) {
         productData = response.data?.data || response.data?.product || productData;
       }
 
-      // Transform API response to form data structure
       const formData: ProductFormData = {
         product_title_english: productData.product_title_english || '',
         product_title_bangla: productData.product_title_bangla || '',
-        category_id: productData.category_id || productData.category?.id || 0,
-        subcategory_id: productData.subcategory_id || productData.subcategory?.id || 0,
+        category_id: productData.category_id || 0,
+        subcategory_id: productData.subcategory_id || 0,
         short_description_english: productData.short_description_english || '',
         short_description_bangla: productData.short_description_bangla || '',
         long_description_english: productData.long_description_english || '',
@@ -204,7 +172,7 @@ export function useProductMutation() {
         sku: productData.sku || '',
         stock: parseInt(productData.stock) || 0,
         video_link: productData.video_link || '',
-        images: [], // No new images initially in edit mode
+        images: [],
         existing_images: [
           productData.product_image,
           ...(productData.gallery_images || [])
@@ -214,113 +182,10 @@ export function useProductMutation() {
 
       return formData;
     } catch (err: any) {
-      console.error('❌ Fetch product error:', err);
-      console.error('Error details:', err.response?.data);
-      
+      console.error('Fetch product error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load product';
-      
-      // Provide helpful error messages based on status code
-      if (err.response?.status === 404) {
-        console.error('⚠️ Product not found. This could mean:');
-        console.error('  - The product ID does not exist');
-        console.error('  - The backend endpoint is not implemented yet');
-        console.error('  - The endpoint format is incorrect');
-      } else if (err.response?.status === 401) {
-        console.error('⚠️ Authentication failed. Please login again.');
-      } else if (err.response?.status === 500) {
-        console.error('⚠️ Server error. Backend may have an issue.');
-      }
-      
       setError(errorMessage);
       throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Toggle product status
-  const toggleProductStatus = async (id: number, currentStatus: 0 | 1): Promise<boolean> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const token = getAuthToken();
-      
-      if (!token) {
-        throw new Error('Authentication required. Please log in again.');
-      }
-
-      const newStatus = currentStatus === 0 ? 1 : 0;
-      
-      console.log(`🔄 Toggling product ${id} status from ${currentStatus} to ${newStatus}`);
-
-      // Try multiple possible endpoints for status toggle
-      const possibleEndpoints = [
-        `/api/vendor/product/toggle-status`,
-        `/api/vendor/product/status`,
-        `/api/vendor/product/${id}/status`,
-        `/api/vendor/ecommerce/product/${id}/status`
-      ];
-
-      let lastError: any;
-      let successData: any = null;
-
-      for (const endpoint of possibleEndpoints) {
-        try {
-          console.log(`🔄 Trying endpoint: ${endpoint}`);
-          
-          const response = await axios.put(
-            `${baseURL}${endpoint}`,
-            { 
-              product_id: id,
-              status: newStatus 
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          console.log(`✅ Success with endpoint: ${endpoint}`);
-          console.log('Response data:', response.data);
-          successData = response.data;
-          break; // Exit loop on success
-        } catch (err: any) {
-          console.warn(`❌ Failed with endpoint ${endpoint}:`, err.response?.status || err.message);
-          lastError = err;
-          // Continue to next endpoint
-        }
-      }
-
-      if (!successData) {
-        // All endpoints failed
-        console.error('❌ All status toggle endpoints failed. Last error:', lastError.response?.data);
-        throw new Error(
-          lastError.response?.data?.message || 
-          'Failed to toggle product status. Backend endpoint may not be implemented yet.'
-        );
-      }
-
-      toast.success(`Product ${newStatus === 1 ? 'activated' : 'deactivated'} successfully`);
-      return true;
-    } catch (err: any) {
-      console.error('❌ Toggle status error:', err);
-      console.error('Error details:', err.response?.data);
-      
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to update product status';
-      
-      // Provide helpful error messages
-      if (err.response?.status === 404) {
-        console.error('⚠️ Endpoint not found. Backend team needs to implement this.');
-      } else if (err.response?.status === 401) {
-        console.error('⚠️ Authentication failed. Please login again.');
-      }
-      
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
     } finally {
       setIsLoading(false);
     }
@@ -330,7 +195,6 @@ export function useProductMutation() {
     createProduct,
     updateProduct,
     fetchProductById,
-    toggleProductStatus,
     isLoading,
     error,
   };

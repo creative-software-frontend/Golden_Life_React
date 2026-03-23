@@ -105,28 +105,35 @@ export function ProductForm({
     const imageUrl = existingGalleryImages[index];
     const newExistingImages = existingGalleryImages.filter((_: any, i: number) => i !== index);
     setExistingGalleryImages(newExistingImages);
-    setRemovedGalleryImages([...removedGalleryImages, imageUrl]);
-    setValue('removed_images', [...removedGalleryImages, imageUrl]);
+    const newRemovedImages = [...removedGalleryImages, imageUrl];
+    setRemovedGalleryImages(newRemovedImages);
+    setValue('removed_images', newRemovedImages);
   };
 
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
-    console.log('🚀 === PRODUCT FORM SUBMIT ===');
-    console.log('📋 Form data from react-hook-form:', data);
+    console.log('🚀 PRODUCT FORM SUBMIT - Mode:', mode);
     
-    // Combine main image and gallery images
-    const submitData = {
+    // Prepare submit data based on mode
+    const submitData: any = {
       ...data,
       images: mainImage ? [mainImage] : [],
       gallery_images: galleryImages,
-      existing_gallery_images: mode === 'edit' ? existingGalleryImages : undefined,
-      removed_gallery_images: mode === 'edit' ? removedGalleryImages : undefined,
     };
+
+    // Add edit-specific fields only in edit mode
+    if (mode === 'edit') {
+      submitData.existing_gallery_images = existingGalleryImages;
+      submitData.removed_gallery_images = removedGalleryImages;
+    }
     
-    console.log('🖼️ Main image state:', mainImage ? mainImage.name : 'None');
-    console.log('📸 Gallery images state:', galleryImages.map(g => g.name));
-    console.log('📦 Combined submit data:', submitData);
-    console.log('=====================================\n');
+    console.log('Submit data prepared for', mode, 'mode');
+    console.log('Images:', submitData.images?.length || 0);
+    console.log('Gallery:', submitData.gallery_images?.length || 0);
+    if (mode === 'edit') {
+      console.log('Existing gallery:', submitData.existing_gallery_images?.length || 0);
+      console.log('Removed gallery:', submitData.removed_gallery_images?.length || 0);
+    }
     
     await onSubmit(submitData);
   };
@@ -138,9 +145,8 @@ export function ProductForm({
     setExistingGalleryImages([]);
     setRemovedGalleryImages([]);
     setActiveTab('short-en');
-    setIsEbook(false); // Reset ebook toggle
+    setIsEbook(false);
     
-    // Reset form values
     setValue('product_title_english', '');
     setValue('product_title_bangla', '');
     setValue('category_id', 0);
@@ -506,7 +512,6 @@ export function ProductForm({
               onCheckedChange={(checked) => {
                 setIsEbook(checked);
                 setValue('ebook', checked ? '1' : '0');
-                // Clear video link when turning off
                 if (!checked) {
                   setValue('video_link', '');
                 }
@@ -515,9 +520,9 @@ export function ProductForm({
             />
           </div>
 
-          {/* Conditional Video Link Field - Only shown when E-book is ON */}
+          {/* Conditional Video Link Field */}
           {isEbook && (
-            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50/50 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50/50 space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <Youtube className="w-4 h-4 text-blue-600" />
                 <Link2 className="w-4 h-4 text-blue-600" />
@@ -701,6 +706,12 @@ export function ProductForm({
 
         <Button
           type="submit"
+
+
+
+
+
+          
           disabled={isLoading}
           className="px-8 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -714,8 +725,13 @@ export function ProductForm({
           ) : (
             'Update Product'
           )}
+
+
+
+
         </Button>
       </div>
     </form>
   );
 }
+

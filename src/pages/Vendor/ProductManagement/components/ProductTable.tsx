@@ -1,3 +1,5 @@
+// ProductTable.tsx
+
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import {

@@ -1,4 +1,7 @@
-import React, { useEffect } from 'react';
+// CategorySelector.tsx
+
+
+import { useEffect } from 'react';
 import { Loader2, RefreshCcw } from 'lucide-react';
 import { useCategories } from '../hooks/useCategories';
 import { Label } from '@/components/ui/label';

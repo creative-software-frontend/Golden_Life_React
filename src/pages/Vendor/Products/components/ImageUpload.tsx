@@ -1,7 +1,8 @@
+// ImageUpload.tsx
+
 import React, { useRef, useState, useCallback } from 'react';
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import { validateImageFile, createImagePreview } from '../utils/helpers';
-import { ImageFile } from '../types/product.types';
 
 interface ImageUploadProps {
   images: File[];
