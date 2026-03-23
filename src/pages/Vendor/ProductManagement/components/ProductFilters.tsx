@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ProductFiltersProps, ViewMode } from '../types';
+import { ProductFiltersProps } from '../types';
 import { STATUS_OPTIONS, STOCK_OPTIONS, SORT_OPTIONS } from '../constants';
 
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
