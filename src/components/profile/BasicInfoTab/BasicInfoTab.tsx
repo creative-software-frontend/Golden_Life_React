@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity } from 'lucide-react';
+import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
-import EditPersonalInfoModal from '../EditPersonalInfoModal.tsx/EditPersonalInfoModal';
+import EditProfileModal from '../EditProfileModal/EditProfileModal';
 import useModalStore from '@/store/Store';
 
 // Exporting the interface so the modal can use it
@@ -20,6 +20,7 @@ export interface StudentData {
     created_at: string;
     updated_at: string;
     user_id: string;
+    student_id: string;
 }
 
 export default function BasicInfoTab() {
@@ -56,7 +57,7 @@ export default function BasicInfoTab() {
 
             if (response.data?.success) {
                 const fetchedStudent = response.data.data.student;
-                
+
                 const safeStudent: StudentData = {
                     ...fetchedStudent,
                     refer_code: fetchedStudent.refer_code ?? null
@@ -85,20 +86,49 @@ export default function BasicInfoTab() {
         <div className="w-full max-w-5xl mx-auto">
             <motion.div initial="hidden" animate="visible" variants={containerVariants}>
                 {/* Header Section */}
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Basic Information</h2>
-                        <p className="text-slate-500 text-sm mt-1">Manage your account identity and contact details.</p>
+                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse" />
+
+                    <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-white shadow-xl relative bg-slate-50">
+                                {student?.image ? (
+                                    <img
+                                        src={`${baseURL}/uploads/student/image/${student.image}`}
+                                        alt={student.name}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                        <UserIcon size={40} />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
+                                <Check size={14} />
+                            </div>
+                        </div>
+
+                        <div className="text-center sm:text-left space-y-1">
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">{student?.name || 'Loading...'}</h2>
+                            <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-2">
+                                <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg border border-primary/10">
+                                    Verified Student
+                                </span>
+
+                            </div>
+                        </div>
                     </div>
 
                     <motion.button
                         onClick={() => setIsEditModalOpen(true)}
-                        whileHover={{ scale: 1.02 }}
+                        whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                        className="relative flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl text-sm font-black shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all group/btn"
                     >
-                        <Edit2 size={16} />
-                        Edit Profile
+                        <Edit2 size={18} className="transition-transform group-hover/btn:rotate-12" />
+                        <span>Update Identity</span>
                     </motion.button>
                 </motion.div>
 
@@ -124,16 +154,17 @@ export default function BasicInfoTab() {
             </motion.div>
 
             {/* EDIT MODAL – Now with image refresh key */}
-            <EditPersonalInfoModal
+            <EditProfileModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 student={student}
                 baseURL={baseURL}
                 token={getAuthToken()}
-                onSuccess={(updatedData) => {
+                onSuccess={(updatedData: any) => {
                     setStudent(updatedData);
-                    setStudentProfile(updatedData);  // ← Push to global store → sidebar updates instantly
-                    triggerProfileUpdate();           // ← Still triggers sidebar re-fetch as backup
+                    setStudentProfile(updatedData);
+                    triggerProfileUpdate();
+                    fetchDashboardData(); // Re-fetch all dashboard/student info          
                 }}
             />
         </div>

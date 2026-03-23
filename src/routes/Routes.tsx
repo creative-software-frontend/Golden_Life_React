@@ -72,6 +72,10 @@ import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
 import OrderHistory from "@/pages/common/Orders/OrderHistory";
 import BasicInfoTab from "@/components/profile/BasicInfoTab/BasicInfoTab";
 import PersonalInfoTab from "@/components/profile/PersonalInfoTab/PersonalInfoTab";
+import DocumentInfoTab from "@/components/profile/DocumentInfoTab/DocumentInfoTab";
+import NomineeInfoTab from "@/components/profile/NomineeInfoTab/NomineeInfoTab";
+import AdditionalInfoTab from "@/components/profile/AdditionalInfoTab/AdditionalInfoTab";
+import ProjectOverviewTab from "@/components/profile/ProjectOverviewTab/ProjectOverviewTab";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -216,12 +220,13 @@ export const routes = createBrowserRouter([
                         children: [
                             // Redirect the base URL to basic-info by default
                             { index: true, element: <Navigate to="basic-info" replace /> },
-
+                            { path: "project-overview-info", element: <ProjectOverviewTab /> },
                             // These will render inside the <Outlet /> in ProfileSettings.tsx
                             { path: "basic-info", element: <BasicInfoTab /> },
                             { path: "personal-info", element: <PersonalInfoTab /> },
-                            // { path: "document-info", element: <DocumentInfoTab /> },
-                            // { path: "nominee-info", element: <NomineeInfoTab /> },
+                            { path: "document-info", element: <DocumentInfoTab /> },
+                            { path: "nominee-info", element: <NomineeInfoTab /> },
+                            { path: "Additional-info", element: <AdditionalInfoTab /> },
                         ]
                     },
                     {
@@ -254,7 +259,7 @@ export const routes = createBrowserRouter([
             }
         ]
     },
-       {
+    {
         path: '/vendor',
         element: <VendorProtectedRoute />,
         children: [
@@ -272,19 +277,19 @@ export const routes = createBrowserRouter([
                                 index: true, // Renders at /vendor/dashboard
                                 element: <VendorHome />
                             },
-                            
+
                             // Vendor Profile Route
                             {
                                 path: 'profile',
                                 element: <VendorProfile />
                             },
-                            
+
                             // Vendor Products Route
                             {
                                 path: 'products',
                                 element: <Products />
                             },
-                            
+
                             // NEW: Product Add/Edit Routes
                             {
                                 path: 'products/add',
@@ -298,7 +303,7 @@ export const routes = createBrowserRouter([
                                 path: 'products/:id',
                                 element: <VendorProductDetails />
                             },
-                            
+
                             // Existing wallet routes
                             {
                                 path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add

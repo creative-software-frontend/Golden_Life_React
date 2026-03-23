@@ -1,0 +1,310 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  X,
+  Loader2,
+  User,
+  Phone,
+  Heart,
+  FileText,
+  Upload,
+  ChevronRight,
+  Camera
+} from 'lucide-react';
+import { toast } from 'react-toastify';
+import { NomineeData } from '../types/types';
+
+interface EditNomineeInfoTabModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  data: NomineeData | null;
+  baseURL: string;
+  token: string | null;
+  onSuccess: (updatedData: NomineeData) => void;
+}
+
+const InputField = ({ icon: Icon, label, value, onChange, placeholder, type = "text", options = [] }: any) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">{label}</label>
+    <div className="relative group">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-primary/10 group-focus-within:text-primary transition-all">
+        <Icon size={16} />
+      </div>
+      {options.length > 0 ? (
+        <select
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none text-slate-700 font-bold"
+        >
+          <option value="" disabled>{placeholder}</option>
+          {options.map((opt: any) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-slate-700 font-bold placeholder:text-slate-300"
+        />
+      )}
+    </div>
+  </div>
+);
+
+export default function EditNomineeInfoTabModal({
+  isOpen,
+  onClose,
+  data,
+  baseURL,
+  token,
+  onSuccess
+}: EditNomineeInfoTabModalProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    nominee_name: '',
+    nominee_mobile: '',
+    nominee_nid_number: '',
+    relation_with: ''
+  });
+
+  const [nomineeImage, setNomineeImage] = useState<File | null>(null);
+  const [nidFront, setNidFront] = useState<File | null>(null);
+  const [nidBack, setNidBack] = useState<File | null>(null);
+
+  const [previews, setPreviews] = useState({
+    nominee_image: null as string | null,
+    nid_front: null as string | null,
+    nid_back: null as string | null
+  });
+
+  const imageBaseUrl = `${baseURL}/uploads/student/image/`;
+
+  useEffect(() => {
+    if (data && isOpen) {
+      setFormData({
+        nominee_name: data.nominee_name || '',
+        nominee_mobile: data.nominee_mobile || '',
+        nominee_nid_number: data.nominee_nid_number || '',
+        relation_with: data.relation_with || ''
+      });
+      setPreviews({
+        nominee_image: data.nominee_image ? `${imageBaseUrl}${data.nominee_image}` : null,
+        nid_front: data.nominee_nid_front_page ? `${imageBaseUrl}${data.nominee_nid_front_page}` : null,
+        nid_back: data.nominee_nid_back_page ? `${imageBaseUrl}${data.nominee_nid_back_page}` : null
+      });
+      setNomineeImage(null);
+      setNidFront(null);
+      setNidBack(null);
+    }
+  }, [data, isOpen]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'front' | 'back') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      if (type === 'image') {
+        setNomineeImage(file);
+        setPreviews(p => ({ ...p, nominee_image: url }));
+      } else if (type === 'front') {
+        setNidFront(file);
+        setPreviews(p => ({ ...p, nid_front: url }));
+      } else {
+        setNidBack(file);
+        setPreviews(p => ({ ...p, nid_back: url }));
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!data?.student_id) {
+      toast.error("Student ID missing.");
+      return;
+    }
+    setIsSubmitting(true);
+
+    const submitData = new FormData();
+    submitData.append('student_id', data.student_id);
+    submitData.append('nominee_name', formData.nominee_name);
+    submitData.append('nominee_mobile', formData.nominee_mobile);
+    submitData.append('nominee_nid_number', formData.nominee_nid_number);
+    submitData.append('relation_with', formData.relation_with);
+
+    if (nomineeImage) submitData.append('nominee_image', nomineeImage);
+    if (nidFront) submitData.append('nominee_nid_front_page', nidFront);
+    if (nidBack) submitData.append('nominee_nid_back_page', nidBack);
+
+    try {
+      const response = await axios.post(
+        `${baseURL}/api/student/nominee-info?id=${data.student_id}`,
+        submitData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      if (response.data?.status === "success" || response.data?.success) {
+        toast.success(response.data.message || "Nominee updated successfully!");
+        onSuccess(response.data.data);
+        onClose();
+      } else {
+        toast.error(response.data?.message || "Failed to update nominee.");
+      }
+    } catch (error: any) {
+      console.error("Update Error:", error.response?.data);
+      toast.error(error.response?.data?.message || "An error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => !isSubmitting && onClose()}
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+          />
+
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[90vh] flex flex-col"
+          >
+            {/* Header */}
+            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-rose-50 rounded-2xl text-rose-500">
+                  <Heart size={24} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tight">Nominee Registry</h3>
+                  <p className="text-xs text-slate-400 font-medium tracking-wide">Update your legal nominee & identity info</p>
+                </div>
+              </div>
+              <button onClick={onClose} disabled={isSubmitting} className="p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-2xl transition-all">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto">
+              {/* Photo & Basic Info */}
+              <div className="grid grid-cols-1 md:grid-cols-[140px_1fr] gap-8">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative group/avatar">
+                    <div className="w-32 h-32 rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 shadow-lg relative group-hover/avatar:scale-[1.02] transition-transform duration-500">
+                      {previews.nominee_image ? (
+                        <img src={previews.nominee_image} className="w-full h-full object-cover" alt="Nominee" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                          <User size={40} />
+                        </div>
+                      )}
+                      <label className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                        <Camera size={24} className="text-white" />
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
+                      </label>
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
+                      <Camera size={14} />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] text-center">Nominee Photo</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <InputField icon={User} label="Nominee Name" value={formData.nominee_name} onChange={(v: any) => setFormData(p => ({ ...p, nominee_name: v }))} placeholder="Full Legal Name" />
+                  <InputField icon={Phone} label="Mobile Number" value={formData.nominee_mobile} onChange={(v: any) => setFormData(p => ({ ...p, nominee_mobile: v }))} placeholder="Contact Number" />
+                  <InputField icon={Heart} label="Relation" value={formData.relation_with} onChange={(v: any) => setFormData(p => ({ ...p, relation_with: v }))} placeholder="Select Relation" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
+                  <InputField icon={FileText} label="Nominee NID" value={formData.nominee_nid_number} onChange={(v: any) => setFormData(p => ({ ...p, nominee_nid_number: v }))} placeholder="National ID Number" />
+                </div>
+              </div>
+
+              {/* NID Documents */}
+              <div className="space-y-4 pt-4 border-t border-slate-50">
+                <div className="flex items-center gap-2 px-1">
+                  <FileText size={16} className="text-primary" />
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identification Background</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Front Page</p>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_front_input')?.click()}>
+                      {previews.nid_front ? (
+                        <>
+                          <img src={previews.nid_front} className="w-full h-full object-cover" alt="Front Preview" />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera size={20} className="text-white" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Upload size={24} />
+                          <p className="text-[10px] font-bold uppercase tracking-widest">Upload Front</p>
+                        </div>
+                      )}
+                      <input id="nid_front_input" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'front')} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Back Page</p>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_back_input')?.click()}>
+                      {previews.nid_back ? (
+                        <>
+                          <img src={previews.nid_back} className="w-full h-full object-cover" alt="Back Preview" />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera size={20} className="text-white" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Upload size={24} />
+                          <p className="text-[10px] font-bold uppercase tracking-widest">Upload Back</p>
+                        </div>
+                      )}
+                      <input id="nid_back_input" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'back')} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <div className="p-8 border-t border-slate-50 bg-slate-50/30">
+              <button
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e as any)}
+                className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    <span className="uppercase tracking-widest text-xs">Securing Registry...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="uppercase tracking-widest text-xs">Save Nominee Profile</span>
+                    <div className="p-1 px-2 bg-white/20 rounded-lg group-hover/btn:bg-white/30 transition-colors">
+                      <ChevronRight size={18} />
+                    </div>
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}

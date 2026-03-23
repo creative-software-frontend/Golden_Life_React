@@ -14,8 +14,8 @@ const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
             <Icon size={18} />
         </div>
         <div className="overflow-hidden">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight truncate">{label}</p>
-            <p className="text-sm font-semibold text-slate-700 mt-0.5 truncate">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
+            <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">
                 {value || '—'} 
             </p>
         </div>

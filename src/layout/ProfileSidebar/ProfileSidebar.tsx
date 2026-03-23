@@ -1,8 +1,24 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
-import { User, FileText, FileBadge, Users, Settings, ShieldCheck } from 'lucide-react';
+import {
+    LayoutDashboard,
+    User,
+    FileText,
+    FileBadge,
+    Users,
+    Info,
+    Settings,
+    ShieldCheck,
+    UserCircle2,
+    Facebook,
+    Send,
+    Twitter,
+    Youtube,
+    Linkedin
+} from 'lucide-react';
 import useModalStore from '@/store/Store';
+import { AdditionalInfoData } from '@/components/profile/types/types';
 
 interface StudentProfile {
     id?: number;
@@ -12,64 +28,61 @@ interface StudentProfile {
     status?: string;
 }
 
+interface DashboardStats {
+    boucher: string | number;
+    earning: string | number;
+    recharge: string | number;
+}
+
+const SocialIcon = ({ icon: Icon, url, color }: { icon: any, url: string | null, color: string }) => {
+    if (!url) return null;
+    return (
+        <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 flex items-center justify-center rounded-xl shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+            style={{ backgroundColor: color, color: 'white' }}
+        >
+            <Icon size={16} strokeWidth={2.5} />
+        </a>
+    );
+};
+
 export default function ProfileSidebar() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfoData | null>(null);
+    const [stats, setStats] = useState<DashboardStats>({ boucher: 0, earning: 0, recharge: 0 });
+
     const profileUpdateTrigger = useModalStore((s) => s.profileUpdateTrigger);
-    // Instantly reflect data pushed by BasicInfoTab after a successful save
     const storedProfile = useModalStore((s) => s.studentProfile);
-    // Blob URL from FileReader — guaranteed to be the exact image the user just uploaded
     const profileBlobPreview = useModalStore((s) => s.profileBlobPreview);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-    const links = [
-        { path: 'basic-info', label: 'Basic Information', icon: User },
-        { path: 'personal-info', label: 'Personal Information', icon: FileText },
-        { path: 'document-info', label: 'Document Information', icon: FileBadge },
-        { path: 'nominee-info', label: 'Nominee Information', icon: Users },
-        { path: 'security', label: 'Password & Security', icon: ShieldCheck },
-        { path: 'settings', label: 'Account Settings', icon: Settings },
-    ];
-
-    // Helper to safely get and parse the token
     const getAuthToken = () => {
         const session = sessionStorage.getItem("student_session");
         if (!session) return null;
         try {
             const parsedSession = JSON.parse(session);
-            // Check expiry if your session object includes it
-            if (parsedSession.expiry && new Date().getTime() > parsedSession.expiry) {
-                sessionStorage.removeItem("student_session");
-                return null;
-            }
             return parsedSession.token;
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     };
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             const token = getAuthToken();
-
-            if (!token) {
-                setProfile({ name: "Guest", image: null, status: 'guest' });
-                setLoading(false);
-                return;
-            }
+            if (!token) return;
 
             try {
-                // Use the same /dashboard endpoint as BasicInfoTab — known-good response shape
-                const response = await axios.get(`${baseURL}/api/student/dashboard`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    }
+                // Fetch Dashboard for basic profile and stats
+                const dashboardRes = await axios.get(`${baseURL}/api/student/dashboard`, {
+                    headers: { Authorization: `Bearer ${token}` }
                 });
 
-                if (response.data?.success) {
-                    const s = response.data.data.student;
+                if (dashboardRes.data?.success) {
+                    const data = dashboardRes.data.data;
+                    const s = data.student;
                     setProfile({
                         id: s.id,
                         name: s.name,
@@ -77,113 +90,139 @@ export default function ProfileSidebar() {
                         image: s.image || null,
                         status: s.status,
                     });
-                } else {
-                    throw new Error('Dashboard fetch: non-success response');
+
+                    // Attempt to extract stats from dashboard
+                    setStats({
+                        boucher: data.boucher_balance || 0,
+                        earning: data.earning_balance || 0,
+                        recharge: data.recharge_balance || 0
+                    });
                 }
+
+                // Fetch Additional Info for social links
+                const additionalRes = await axios.get(`${baseURL}/api/student/additional-info`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (additionalRes.data?.success) {
+                    setAdditionalInfo(additionalRes.data.data);
+                }
+
             } catch (err) {
-                console.error('ProfileSidebar: fetch failed:', err);
-                setProfile({ name: "Guest", image: null });
+                console.error('ProfileSidebar: Data fetch failed:', err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProfile();
-    }, [baseURL, profileUpdateTrigger]); // Re-fetches after every successful upload
+        fetchData();
+    }, [baseURL, profileUpdateTrigger]);
 
-    // storedProfile takes priority (instant, from Zustand); falls back to fetched profile
     const displayProfile = storedProfile ?? profile;
-
-    // Priority 1: blob preview from FileReader (100% correct — it's the actual file selected)
-    // Priority 2: server URL from /storage/ path
-    // Priority 3: initials avatar fallback
     const serverImageUrl = displayProfile?.image
-        ? `${baseURL}/storage/${displayProfile.image}?t=${profileUpdateTrigger}`
+        ? `${baseURL}/uploads/student/image/${displayProfile.image}?t=${profileUpdateTrigger}`
         : null;
     const avatarUrl = profileBlobPreview ?? serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(displayProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
 
+    const links = [
+        { path: 'project-overview-info', label: 'Project Overview', icon: LayoutDashboard },
+        { path: 'basic-info', label: 'Basic Information', icon: User },
+        { path: 'personal-info', label: 'Personal Information', icon: FileText },
+        { path: 'document-info', label: 'Document Information', icon: FileBadge },
+        { path: 'nominee-info', label: 'Nominee Information', icon: UserCircle2 },
+        { path: 'Additional-info', label: 'Additional Information', icon: Info },
+        { path: 'settings', label: 'Account Settings', icon: Settings },
+    ];
+
     return (
-        <div className="w-full md:w-80 bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 shrink-0">
-            {/* User Profile Header */}
-            <div className="flex flex-col items-center pb-6 mb-5 border-b border-slate-100">
-                {loading ? (
-                    <div className="animate-pulse flex flex-col items-center w-full">
-                        <div className="w-24 h-24 bg-slate-200 rounded-full mb-4" />
-                        <div className="h-6 bg-slate-200 rounded w-3/4 mb-2" />
-                        <div className="h-4 bg-slate-200 rounded w-1/2" />
+        <div className="w-full md:w-80 bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 shrink-0 h-fit sticky top-24">
+            {/* Header section with photo and name */}
+            <div className="flex flex-col items-center pb-6 border-b border-slate-50">
+                <div className="relative mb-4 group">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full scale-110 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="relative w-28 h-28 rounded-full p-1.5 bg-white shadow-xl ring-1 ring-slate-100 overflow-hidden">
+                        <img
+                            src={avatarUrl}
+                            alt="Profile"
+                            className="w-full h-full rounded-full object-cover z-10"
+                        />
+                        <div className="absolute bottom-2 right-4 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full shadow-sm z-20" />
                     </div>
-                ) : (
-                    <>
-                        <div className="relative mb-4 group cursor-pointer">
-                            <div className="absolute inset-0 bg-primary/20 rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                            <img
-                                key={avatarUrl}
-                                src={avatarUrl}
-                                alt={displayProfile?.name}
-                                className="relative w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-md z-10 bg-slate-50"
-                                onError={(e) => {
-                                    // Graceful fallback if the image URL 404s
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
-                                }}
-                            />
-                            <div className={`absolute bottom-1 right-2 w-4 h-4 ${displayProfile?.status === 'active' ? 'bg-green-500' : 'bg-slate-300'} border-2 border-white rounded-full z-20`} />
-                        </div>
+                </div>
 
-                        <h3 className="font-bold text-xl text-slate-800 tracking-tight capitalize">
-                            {displayProfile?.name || 'Student User'}
-                        </h3>
-                        <p className="text-sm font-medium text-slate-500 mt-0.5">
-                            {displayProfile?.email || 'Guest Session'}
-                        </p>
+                <div className="text-center space-y-1">
+                    <h3 className="font-black text-xl text-slate-800 tracking-tight capitalize">
+                        {displayProfile?.name || 'Student User'}
+                    </h3>
+                </div>
 
-                        {displayProfile?.status === 'active' && (
-                            <div className="mt-3 px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 text-xs font-semibold rounded-full">
-                                Active Student
-                            </div>
-                        )}
-                    </>
-                )}
+                {/* Social Icons - UI like requested */}
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
+                    <SocialIcon icon={Facebook} url={additionalInfo?.facebook_url || null} color="#1877F2" />
+                    <SocialIcon icon={Send} url={additionalInfo?.telegram || null} color="#26A5E4" />
+                    <SocialIcon icon={Twitter} url={additionalInfo?.x_url || null} color="#1DA1F2" />
+                    <SocialIcon icon={Youtube} url={additionalInfo?.youtube_url || null} color="#FF0000" />
+                    <SocialIcon icon={Linkedin} url={additionalInfo?.linkedin_url || null} color="#0A66C2" />
+                    {additionalInfo?.tiktok_url && (
+                        <a
+                            href={additionalInfo.tiktok_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl shadow-sm bg-slate-900 text-white transition-all hover:-translate-y-1 hover:shadow-md"
+                        >
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z" /></svg>
+                        </a>
+                    )}
+                </div>
+
+                {/* Stats row - UI like requested */}
+                <div className="grid grid-cols-3 gap-0 w-full mt-8 pt-6 border-t border-slate-50 text-center">
+                    <div className="space-y-1.5 border-r border-slate-100">
+                        <p className="text-sm font-black text-slate-800">${stats.boucher}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Boucher</p>
+                    </div>
+                    <div className="space-y-1.5 border-r border-slate-100">
+                        <p className="text-sm font-black text-slate-800">${stats.earning}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Earning</p>
+                    </div>
+                    <div className="space-y-1.5">
+                        <p className="text-sm font-black text-slate-800">${stats.recharge}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Recharge</p>
+                    </div>
+                </div>
             </div>
 
             {/* Navigation Links */}
-            <div className="px-1">
-                <h4 className="text-[11px] font-bold text-slate-400 tracking-wider mb-3 px-3 uppercase">
-                    PROFILE MANAGEMENT
-                </h4>
-
-                <nav className="flex flex-col gap-1.5">
-                    {links.map((link) => {
-                        const Icon = link.icon;
-                        return (
-                            <NavLink
-                                key={link.path}
-                                to={link.path}
-                                className={({ isActive }) =>
-                                    `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium relative overflow-hidden ${isActive
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                                    }`
-                                }
-                            >
-                                {({ isActive }) => (
-                                    <>
-                                        {isActive && (
-                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
-                                        )}
-                                        <Icon
-                                            size={18}
-                                            className={`transition-colors duration-200 ${isActive ? 'text-primary' : 'text-slate-400 group-hover:text-primary/80'
-                                                }`}
-                                        />
-                                        {link.label}
-                                    </>
-                                )}
-                            </NavLink>
-                        );
-                    })}
-                </nav>
-            </div>
+            <nav className="flex flex-col gap-1.5 mt-6 px-1">
+                {links.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                        <NavLink
+                            key={link.path}
+                            to={link.path}
+                            className={({ isActive }) =>
+                                `group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-bold relative overflow-hidden ${isActive
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                                }`
+                            }
+                        >
+                            {({ isActive }) => (
+                                <>
+                                    {isActive && (
+                                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary rounded-r-full" />
+                                    )}
+                                    <Icon
+                                        size={20}
+                                        className={`transition-all duration-300 ${isActive ? 'text-primary scale-110' : 'text-slate-300 group-hover:text-primary group-hover:scale-110'
+                                            }`}
+                                    />
+                                    {link.label}
+                                </>
+                            )}
+                        </NavLink>
+                    );
+                })}
+            </nav>
         </div>
     );
 }

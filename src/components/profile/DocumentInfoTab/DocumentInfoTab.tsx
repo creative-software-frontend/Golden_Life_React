@@ -1,0 +1,195 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+    FileText,
+    ShieldCheck,
+    Loader2,
+    LucideIcon,
+    Edit2,
+    CheckCircle2,
+    Image as ImageIcon,
+    Eye
+} from 'lucide-react';
+import EditDocumentInfoTabModal from '../EditDocumentInfoTabModal/EditDocumentInfoTabModal';
+import { DocumentData } from '../types/types';
+
+interface InfoCardProps {
+    icon: LucideIcon;
+    label: string;
+    value: string | null | undefined;
+}
+
+const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
+    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
+        <div className="p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+            <Icon size={18} />
+        </div>
+        <div className="overflow-hidden">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
+            <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">{value || 'Not Provided'}</p>
+        </div>
+    </div>
+);
+
+export default function DocumentInfoTab() {
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [documentData, setDocumentData] = useState<DocumentData | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const imageBaseUrl = `${baseURL}/uploads/student/image/`;
+
+    const getActiveToken = () => {
+        const session = sessionStorage.getItem("student_session");
+        if (!session) return null;
+        try {
+            return JSON.parse(session).token;
+        } catch (e) { return null; }
+    };
+
+    const token = getActiveToken();
+
+    const fetchDocumentInfo = async (signal?: AbortSignal) => {
+        if (!token || !baseURL) return;
+
+        setLoading(true);
+        try {
+            const response = await axios.get(`${baseURL}/api/student/document-info`, {
+                signal,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.data?.success) {
+                setDocumentData(response.data.data);
+            }
+        } catch (error: any) {
+            if (error.name !== 'CanceledError') {
+                console.error('❌ Document info fetch failed:', error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const controller = new AbortController();
+        fetchDocumentInfo(controller.signal);
+        return () => controller.abort();
+    }, [token, baseURL]);
+
+    const handleLocalUpdate = (updatedData: DocumentData) => {
+        setDocumentData(updatedData);
+        // Optional: Re-fetch to be 100% sure
+        fetchDocumentInfo();
+    };
+
+    // Better empty/loading check
+    const isDataEmpty = !documentData || Object.keys(documentData).length <= 2;
+
+    if (loading || isDataEmpty) {
+        return (
+            <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full" />
+                    <Loader2 className="animate-spin text-primary relative" size={40} />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-base font-bold text-slate-700">Loading document details...</p>
+                    <p className="text-xs text-slate-400">Verifying your identification records</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+                <div className="relative">
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Identity Documents</h2>
+                    <p className="text-xs text-slate-400 font-medium mt-1 uppercase tracking-widest">Verification & Compliance Status</p>
+                </div>
+                <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="relative flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn"
+                >
+                    <Edit2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
+                    <span>Manage Documents</span>
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 ml-1">
+                        <ShieldCheck size={16} className="text-primary" />
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Primary Verification</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <InfoCard icon={FileText} label="National ID (NID) Number" value={documentData.nid_number} />
+                        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center gap-4">
+                            <div className="p-2 bg-white rounded-lg text-emerald-500 shadow-sm">
+                                <CheckCircle2 size={16} />
+                            </div>
+                            <p className="text-[11px] font-bold text-emerald-800 tracking-tight">System holds active verification records for this student.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 ml-1">
+                        <ImageIcon size={16} className="text-primary" />
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Document Previews</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
+                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img">
+                            {documentData.nid_front_page ? (
+                                <>
+                                    <img src={`${imageBaseUrl}${documentData.nid_front_page}`} className="w-full h-full object-cover" alt="NID Front" />
+                                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Eye className="text-white" size={20} />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                                    <ImageIcon size={24} />
+                                </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Back</p>
+                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img">
+                            {documentData.nid_back_page ? (
+                                <>
+                                    <img src={`${imageBaseUrl}${documentData.nid_back_page}`} className="w-full h-full object-cover" alt="NID Back" />
+                                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Eye className="text-white" size={20} />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                                    <ImageIcon size={24} />
+                                </div>
+                            )}
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <EditDocumentInfoTabModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                data={documentData}
+                baseURL={baseURL}
+                token={token}
+                onSuccess={handleLocalUpdate}
+            />
+        </div>
+    );
+}
