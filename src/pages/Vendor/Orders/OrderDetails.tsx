@@ -25,17 +25,21 @@ export default function OrderDetails() {
 
   const loadOrderDetails = async (no: string) => {
     try {
+      console.log('🔵 [OrderDetails] Loading order:', no);
       const data = await fetchOrderDetails(no);
+      console.log('🟢 [OrderDetails] Order loaded:', data);
       setOrder(data);
     } catch (error) {
-      console.error('Failed to load order details:', error);
+      console.error('❌ [OrderDetails] Failed to load order details:', error);
     }
   };
 
   const handleUpdateStatus = async (newStatus: OrderStatus) => {
     if (!order) return;
     
+    console.log('🔵 [OrderDetails] Updating status:', { orderNo: order.order_no, newStatus });
     const success = await updateOrderStatus(order.order_no, newStatus);
+    console.log('🟢 [OrderDetails] Update result:', success);
     if (success) {
       await loadOrderDetails(order.order_no);
     }
@@ -234,14 +238,14 @@ export default function OrderDetails() {
       </Card>
 
       {/* Status History (if available) */}
-      {order.status_history && order.status_history.length > 0 && (
+      {order.status_history && order.status_history.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-bold">Status History</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {order.status_history?.map((history: any) => (
+              {order.status_history.map((history: any) => (
                 <div key={history.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                   <OrderStatusBadge status={history.status as OrderStatus} />
                   <span className="text-sm text-gray-600">
@@ -250,6 +254,12 @@ export default function OrderDetails() {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="py-6">
+            <p className="text-center text-gray-500 text-sm">No status history available</p>
           </CardContent>
         </Card>
       )}

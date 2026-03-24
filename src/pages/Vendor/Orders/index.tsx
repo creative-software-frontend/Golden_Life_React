@@ -35,10 +35,12 @@ export default function Orders() {
   const loadOrders = async () => {
     setIsRefreshing(true);
     try {
+      console.log('🔵 [Orders] Loading orders with filters:', filters);
       const data = await fetchOrders(filters);
+      console.log('🟢 [Orders] Orders loaded:', data.length, 'orders');
       setOrders(data);
     } catch (error) {
-      console.error('Failed to load orders:', error);
+      console.error('❌ [Orders] Failed to load orders:', error);
     } finally {
       setIsRefreshing(false);
     }
@@ -73,7 +75,9 @@ export default function Orders() {
   const handleStatusUpdate = async (newStatus: OrderStatus) => {
     if (!selectedOrder) return;
     
+    console.log('🔵 [Orders] Updating status:', { orderNo: selectedOrder.orderNo, newStatus });
     const success = await updateOrderStatus(selectedOrder.orderNo, newStatus);
+    console.log('🟢 [Orders] Update result:', success);
     if (success) {
       await loadOrders();
     }

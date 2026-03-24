@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Package, 
     BarChart3, LogOut, Store, X, 
+    ClipboardList,
 } from 'lucide-react';
 
 interface SidebarProps { 
@@ -17,6 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     const menuItems = [
         { name: 'Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
         { name: 'Products', path: '/vendor/dashboard/products', icon: Package },
+        { name: 'Orders', path: '/vendor/dashboard/orders', icon: ClipboardList },
         // { name: 'Pickup Parcel', path: '/vendor/pickup', icon: Package },
         // { name: 'Delivery Parcel', path: '/vendor/delivery', icon: Truck },
         // { name: 'Transfer Order', path: '/vendor/transfer', icon: ArrowRightLeft },

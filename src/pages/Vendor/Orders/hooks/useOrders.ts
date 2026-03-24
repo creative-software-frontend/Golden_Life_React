@@ -28,6 +28,8 @@ export function useOrders() {
       setIsLoading(true);
       setError(null);
 
+      console.log('🔵 [API] Fetching orders with filters:', filters);
+
       const token = getAuthToken();
       
       if (!token) {
@@ -40,6 +42,8 @@ export function useOrders() {
       if (filters?.page) params.append('page', filters.page.toString());
       if (filters?.limit) params.append('limit', filters.limit.toString());
 
+      console.log('🔵 [API] Request params:', params.toString());
+
       const response = await axios.get<OrdersApiResponse>(
         `${baseURL}/api/vendor/orders/history`,
         {
@@ -48,16 +52,29 @@ export function useOrders() {
         }
       );
 
+      console.log('🟢 [API] Orders response received:', response.data);
+
       if (response.data.success) {
-        return response.data.orders || [];
+        const orders = response.data.orders || [];
+        console.log('✅ [API] Orders loaded successfully:', orders.length, 'orders');
+        return orders;
       } else {
         throw new Error(response.data.message || 'Failed to fetch orders');
       }
     } catch (err: any) {
-      console.error('Fetch orders error:', err);
+      console.error('❌ [API] Fetch orders error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch orders';
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Handle 404 specifically
+      if (err.response?.status === 404) {
+        toast.error('Orders endpoint not found. Please check API configuration.');
+      } else if (err.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       return [];
     } finally {
       setIsLoading(false);
@@ -71,6 +88,8 @@ export function useOrders() {
     try {
       setIsLoading(true);
       setError(null);
+
+      console.log('🔵 [API] Fetching order details for:', orderNo);
 
       const token = getAuthToken();
       
@@ -86,16 +105,27 @@ export function useOrders() {
         }
       );
 
+      console.log('🟢 [API] Order details response:', response.data);
+
       if (response.data.status) {
-        return response.data.order || null;
+        const order = response.data.order || null;
+        console.log('✅ [API] Order loaded successfully:', order?.order_no);
+        return order;
       } else {
         throw new Error(response.data.message || 'Failed to fetch order details');
       }
     } catch (err: any) {
-      console.error('Fetch order details error:', err);
+      console.error('❌ [API] Fetch order details error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch order details';
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Handle 404 specifically
+      if (err.response?.status === 404) {
+        toast.error('Order not found. The order number may be invalid.');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       return null;
     } finally {
       setIsLoading(false);
@@ -110,12 +140,15 @@ export function useOrders() {
       setIsLoading(true);
       setError(null);
 
+      console.log('🔵 [API] Updating order status:', { orderNo, status });
+
       const token = getAuthToken();
       
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
 
+      // Correct endpoint: POST /api/updatetStatus/order?id={order_no}
       const response = await axios.post<UpdateStatusApiResponse>(
         `${baseURL}/api/updatetStatus/order`,
         { status },
@@ -128,6 +161,8 @@ export function useOrders() {
         }
       );
 
+      console.log('🟢 [API] Status update response:', response.data);
+
       if (response.data.success) {
         toast.success('Order status updated successfully!');
         return true;
@@ -135,10 +170,19 @@ export function useOrders() {
         throw new Error(response.data.message || 'Failed to update order status');
       }
     } catch (err: any) {
-      console.error('Update order status error:', err);
+      console.error('❌ [API] Update order status error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update order status';
       setError(errorMessage);
-      toast.error(errorMessage);
+      
+      // Handle 404 specifically
+      if (err.response?.status === 404) {
+        toast.error('Update endpoint not found. Please check API configuration.');
+      } else if (err.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       return false;
     } finally {
       setIsLoading(false);
