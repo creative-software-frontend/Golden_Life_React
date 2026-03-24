@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Phone, User as UserIcon, X, Hash, Image as ImageIcon, ChevronRight, Check } from 'lucide-react';
+import { Mail, Phone, User as UserIcon, X, Hash, Image as ImageIcon, ChevronRight, Check, Camera, Loader2 } from 'lucide-react';
 import { StudentData } from '../BasicInfoTab/BasicInfoTab';
+import useModalStore from '@/store/Store';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -21,6 +24,10 @@ interface FormDataState {
 
 export default function EditProfileModal({ isOpen, onClose, student, baseURL }: EditProfileModalProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const triggerProfileUpdate = useModalStore(s => s.triggerProfileUpdate);
+    const setProfileBlobPreview = useModalStore(s => s.setProfileBlobPreview);
+
     const [formData, setFormData] = useState<FormDataState>({
         name: '',
         email: '',
@@ -44,6 +51,69 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
             setPreviewUrl(student.image ? `${baseURL}/uploads/student/image/${student.image}` : null);
         }
     }, [student, isOpen, baseURL]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFormData(prev => ({ ...prev, image: file }));
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!student?.student_id) {
+            toast.error("Student ID is missing. Cannot update.");
+            return;
+        }
+
+        const session = sessionStorage.getItem("student_session");
+        const token = session ? JSON.parse(session).token : null;
+        if (!token) {
+            toast.error("Session expired. Please login again.");
+            return;
+        }
+
+        setIsSubmitting(true);
+        const dataToSend = new FormData();
+        dataToSend.append('student_id', student.student_id);
+        if (formData.image) {
+            dataToSend.append('image', formData.image);
+        }
+
+        try {
+            const response = await axios.post(
+                `${baseURL}/api/student/profile?id=${student.student_id}`,
+                dataToSend,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                    }
+                }
+            );
+
+            if (response.data?.status === "success" || response.data?.success) {
+                toast.success(response.data.message || "Profile photo updated successfully!");
+                
+                // Set global blob preview for instant refresh in other components
+                if (previewUrl) {
+                    setProfileBlobPreview(previewUrl);
+                }
+                
+                // Trigger global refresh
+                triggerProfileUpdate();
+                onClose();
+            } else {
+                toast.error(response.data?.message || "Failed to update profile photo.");
+            }
+        } catch (error: any) {
+            console.error("Profile Photo Update Error:", error.response?.data);
+            toast.error(error.response?.data?.message || "An error occurred while saving.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -73,10 +143,9 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
                         </div>
 
                         <div className="p-8 space-y-8 overflow-y-auto">
-                            {/* Image Preview & Upload */}
                             <div className="flex flex-col items-center pb-6 border-b border-slate-50 relative">
-                                <div className="relative group">
-                                    <div className="w-28 h-28 rounded-[2rem] overflow-hidden border-4 border-white bg-slate-100 shadow-xl relative transition-transform">
+                                <div className="relative group/avatar">
+                                    <div className="w-28 h-28 rounded-[2rem] overflow-hidden border-4 border-white bg-slate-100 shadow-xl relative transition-transform group-hover/avatar:scale-[1.02]">
                                         {previewUrl ? (
                                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                                         ) : (
@@ -84,6 +153,13 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
                                                 <ImageIcon size={36} />
                                             </div>
                                         )}
+                                        <label className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                            <Camera size={24} className="text-white" />
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                        </label>
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
+                                        <Camera size={14} />
                                     </div>
                                 </div>
                                 <div className="mt-4 text-center">
@@ -156,11 +232,32 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
                             </div>
 
                             <div className="pt-6 flex gap-4 sticky bottom-0 bg-white">
-                                <button type="button" onClick={onClose} className="w-full py-4 px-6 bg-primary text-white font-bold rounded-full shadow-[0_10px_30px_-10px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_15px_40px_-10px_rgba(var(--primary-rgb),0.6)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
-                                    <span>Close Window</span>
-                                    <div className="p-1 bg-white/20 rounded-lg">
-                                        <ChevronRight size={16} />
-                                    </div>
+                                <button 
+                                    type="button" 
+                                    onClick={onClose} 
+                                    className="flex-1 py-4 px-6 border-2 border-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 hover:border-slate-200 transition-all flex items-center justify-center gap-2"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting}
+                                    type="button" 
+                                    className="flex-[2] py-4 px-6 bg-primary text-white font-bold rounded-2xl shadow-[0_10px_30px_-10px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_15px_40px_-10px_rgba(var(--primary-rgb),0.6)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:translate-y-0"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={20} />
+                                            <span className="animate-pulse">Updating...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Update Photo</span>
+                                            <div className="p-1 bg-white/20 rounded-lg">
+                                                <ChevronRight size={16} />
+                                            </div>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>

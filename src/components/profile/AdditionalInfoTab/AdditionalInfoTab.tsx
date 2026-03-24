@@ -33,7 +33,7 @@ const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
         <div className="p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors text-emerald-600">
             <Icon size={20} />
         </div>
-        <div className="overflow-hidden">
+        <div className="break-words">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
             <p className="text-sm font-bold text-slate-700 mt-1">{value || 'Not Disclosed'}</p>
         </div>

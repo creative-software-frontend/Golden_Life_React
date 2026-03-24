@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Smartphone, Mail, User, Lock, TicketCheck, ShieldCheck, Loader2, AlertCircle, RefreshCcw, X } from 'lucide-react';
 import Logo from '../Logo';
 import { cn } from "@/lib/utils";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref') || '';
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +31,7 @@ const Register: React.FC = () => {
     lastName: '',
     email: '',
     phone: '', 
-    referCode: '', 
+    referCode: refCode, 
     password: '',
     confirmPassword: '',
     acceptTerms: false
@@ -194,26 +196,26 @@ const Register: React.FC = () => {
             )}
 
             <div className="grid grid-cols-2 gap-4">
-                <InputGroup label="First Name" name="firstName" value={formData.firstName} error={errors.firstName} icon={<User size={18}/>} onChange={handleChange} placeholder="John" disabled={isLoading} />
-                <InputGroup label="Last Name" name="lastName" value={formData.lastName} error={errors.lastName} icon={<User size={18}/>} onChange={handleChange} placeholder="Doe" disabled={isLoading} />
+                <InputGroup label="First Name" name="firstName" value={formData.firstName} error={errors.firstName} icon={<User size={18}/>} onChange={handleChange} placeholder="John" disabled={isLoading} required />
+                <InputGroup label="Last Name" name="lastName" value={formData.lastName} error={errors.lastName} icon={<User size={18}/>} onChange={handleChange} placeholder="Doe" disabled={isLoading} required />
             </div>
 
-            <InputGroup label="Email Address" name="email" type="email" value={formData.email} error={errors.email} icon={<Mail size={18}/>} onChange={handleChange} placeholder="john@example.com" disabled={isLoading} />
+            <InputGroup label="Email Address" name="email" type="email" value={formData.email} error={errors.email} icon={<Mail size={18}/>} onChange={handleChange} placeholder="john@example.com" disabled={isLoading} required />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputGroup label="Mobile Number" name="phone" type="tel" value={formData.phone} error={errors.phone} icon={<Smartphone size={18}/>} onChange={handleChange} placeholder="017XXXXXXXX" disabled={isLoading} />
-                <InputGroup label="Referral Code" name="referCode" value={formData.referCode} error={errors.referCode} icon={<TicketCheck size={18}/>} onChange={handleChange} placeholder="REQUIRED" disabled={isLoading} />
+                <InputGroup label="Mobile Number" name="phone" type="tel" value={formData.phone} error={errors.phone} icon={<Smartphone size={18}/>} onChange={handleChange} placeholder="017XXXXXXXX" disabled={isLoading} required />
+                <InputGroup label="Referral Code" name="referCode" value={formData.referCode} error={errors.referCode} icon={<TicketCheck size={18}/>} onChange={handleChange} placeholder="REQUIRED" disabled={isLoading} required />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
-                    <InputGroup label="Password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} error={errors.password} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} />
+                    <InputGroup label="Password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} error={errors.password} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                 </div>
                 <div className="relative">
-                    <InputGroup label="Confirm" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} error={errors.confirmPassword} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} />
+                    <InputGroup label="Confirm" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} error={errors.confirmPassword} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
                     <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
                         {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -290,12 +292,14 @@ const Register: React.FC = () => {
   );
 };
 
-const InputGroup = ({ label, icon, error, ...props }: any) => (
+const InputGroup = ({ label, icon, error, required, ...props }: any) => (
     <div className="space-y-1.5 flex-1">
-        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
+        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
         <div className="relative group">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors">{icon}</span>
-            <input {...props} className={cn("w-full pl-11 pr-4 py-3.5 bg-slate-50 border-2 rounded-2xl outline-none transition-all font-semibold text-slate-700", error ? "border-red-200 bg-red-50 focus:border-red-500" : "border-transparent focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5")} />
+            <input {...props} required={required} className={cn("w-full pl-11 pr-4 py-3.5 bg-slate-50 border-2 rounded-2xl outline-none transition-all font-semibold text-slate-700", error ? "border-red-200 bg-red-50 focus:border-red-500" : "border-transparent focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5")} />
         </div>
         {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
     </div>

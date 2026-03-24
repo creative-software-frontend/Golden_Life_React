@@ -238,6 +238,9 @@ export default function DriveLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
+                    <Header />
+                </div>
                 <main className="pt-6 ">
                     <button
                         onClick={changeCheckoutModal}
@@ -252,7 +255,6 @@ export default function DriveLayout() {
                         </div>
                     </button>
 
-                    <Header />
                     <Cart />
                     <LiveChat />
 

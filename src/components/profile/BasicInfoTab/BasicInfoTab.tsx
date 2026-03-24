@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
 import EditProfileModal from '../EditProfileModal/EditProfileModal';
+import useModalStore from '@/store/Store';
 
 // Exporting the interface so the modal can use it
 export interface StudentData {
@@ -26,6 +27,7 @@ export default function BasicInfoTab() {
     const [student, setStudent] = useState<StudentData | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const profileUpdateTrigger = useModalStore(s => s.profileUpdateTrigger);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -71,7 +73,7 @@ export default function BasicInfoTab() {
 
     useEffect(() => {
         fetchDashboardData();
-    }, []);
+    }, [profileUpdateTrigger]);
 
     if (loading) return <LoadingSkeleton />;
 
