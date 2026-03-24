@@ -73,7 +73,7 @@ export default function FreshSell() {
                 }));
 
                 // For Fresh Sell, we might only want a slice if not searching
-                setProducts(keyword ? mappedData : mappedData.slice(0, 20));
+                setProducts(keyword ? mappedData : mappedData.slice(0, 10));
             } catch (error) {
                 console.error("Fetch error:", error);
             } finally {

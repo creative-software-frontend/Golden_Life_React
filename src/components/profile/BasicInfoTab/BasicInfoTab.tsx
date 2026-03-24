@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
 import EditProfileModal from '../EditProfileModal/EditProfileModal';
-import useModalStore from '@/store/Store';
 
 // Exporting the interface so the modal can use it
 export interface StudentData {
