@@ -286,7 +286,7 @@ const Header: React.FC = () => {
             {/* =========================================
     1. DESKTOP HEADER (Large Screens)
    ========================================= */}
-            <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-20 gap-5">
+            <header className="hidden lg:flex items-center justify-between px-6 py-4 w-full max-w-[1350px] mx-auto h-24 gap-5">
                 {/* --- LEFT: USER & WALLET --- */}
                 <div className="flex items-center gap-4 shrink-0">
 

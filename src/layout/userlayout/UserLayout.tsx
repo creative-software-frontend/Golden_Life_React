@@ -349,7 +349,7 @@ export default function UserLayout() {
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                    <div className="flex items-center justify-center py-6 border-b h-24">
+                    <div className="flex items-center justify-center py-6 border-b h-[82px]">
                         {/* Increased h-17 to h-24 to provide more room for a bigger logo */}
                         <Link to="/dashboard">
                             <img
