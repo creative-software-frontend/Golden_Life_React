@@ -23,12 +23,12 @@ interface InfoCardProps {
 
 const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
     <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+        <div className="flex-shrink-0 p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
             <Icon size={20} />
         </div>
-        <div className="overflow-hidden">
+        <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{label}</p>
-            <p className="text-sm font-bold text-slate-700 mt-1">{value || 'Not Provided'}</p>
+            <p className="text-sm font-bold text-slate-700 mt-1 break-words">{value || 'Not Provided'}</p>
         </div>
     </div>
 );

@@ -178,15 +178,15 @@ export default function ProfileSidebar() {
                 {/* Stats row - UI like requested */}
                 <div className="grid grid-cols-3 gap-0 w-full mt-8 pt-6 border-t border-slate-50 text-center">
                     <div className="space-y-1.5 border-r border-slate-100">
-                        <p className="text-sm font-black text-slate-800">${stats.boucher}</p>
+                        <p className="text-sm font-black text-slate-800">{stats.boucher}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Boucher</p>
                     </div>
                     <div className="space-y-1.5 border-r border-slate-100">
-                        <p className="text-sm font-black text-slate-800">${stats.earning}</p>
+                        <p className="text-sm font-black text-slate-800">{stats.earning}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Earning</p>
                     </div>
                     <div className="space-y-1.5">
-                        <p className="text-sm font-black text-slate-800">${stats.recharge}</p>
+                        <p className="text-sm font-black text-slate-800">{stats.recharge}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Recharge</p>
                     </div>
                 </div>

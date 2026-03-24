@@ -27,8 +27,6 @@ export default function BasicInfoTab() {
     const [student, setStudent] = useState<StudentData | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const triggerProfileUpdate = useModalStore((s) => s.triggerProfileUpdate);
-    const setStudentProfile = useModalStore((s) => s.setStudentProfile);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -159,13 +157,6 @@ export default function BasicInfoTab() {
                 onClose={() => setIsEditModalOpen(false)}
                 student={student}
                 baseURL={baseURL}
-                token={getAuthToken()}
-                onSuccess={(updatedData: any) => {
-                    setStudent(updatedData);
-                    setStudentProfile(updatedData);
-                    triggerProfileUpdate();
-                    fetchDashboardData(); // Re-fetch all dashboard/student info          
-                }}
             />
         </div>
     );

@@ -104,6 +104,7 @@ const InfoGridItem = ({ label, value }: any) => (
 export default function ProjectOverviewTab() {
     const [profile, setProfile] = useState<FullProfileData | null>(null);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [walletBalance, setWalletBalance] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -119,9 +120,10 @@ export default function ProjectOverviewTab() {
             const headers = { Authorization: `Bearer ${token}` };
 
             try {
-                const [profileRes, dashRes] = await Promise.all([
+                const [profileRes, dashRes, walletRes] = await Promise.all([
                     axios.get(`${baseURL}/api/student/profile`, { headers }).catch(() => null),
-                    axios.get(`${baseURL}/api/student/dashboard`, { headers }).catch(() => null)
+                    axios.get(`${baseURL}/api/student/dashboard`, { headers }).catch(() => null),
+                    axios.get(`${baseURL}/api/wallet-balance`, { headers }).catch(() => null)
                 ]);
 
                 if (profileRes?.data?.status === "success") {
@@ -133,6 +135,9 @@ export default function ProjectOverviewTab() {
                         earning_balance: dashRes.data.data.earning_balance || 0,
                         recharge_balance: dashRes.data.data.recharge_balance || 0
                     });
+                }
+                if (walletRes?.data?.success) {
+                    setWalletBalance(walletRes.data.data.balance);
                 }
             } catch (err) {
                 console.error("ProjectOverview: Fetch failed", err);
@@ -153,7 +158,7 @@ export default function ProjectOverviewTab() {
         );
     }
 
-    const { student, personal_info, document_info, nominee_info, additional_info } = profile;
+    const { student, personal_info, nominee_info, additional_info } = profile;
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-10">
@@ -184,8 +189,8 @@ export default function ProjectOverviewTab() {
                     </div>
                     <div className="flex gap-4">
                         <div className="text-right border-r border-white/10 pr-6 hidden lg:block">
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Referral Code</p>
-                            <p className="text-lg font-black text-primary">{student.refer_code}</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Wallet Balance</p>
+                            <p className="text-lg font-black text-primary">${walletBalance || '0.00'}</p>
                         </div>
                         <div className="text-right hidden lg:block">
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
