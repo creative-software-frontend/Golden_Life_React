@@ -191,49 +191,53 @@ export default function OrderDetails() {
         <CardHeader>
           <CardTitle className="text-lg font-bold flex items-center gap-2">
             <Package className="w-5 h-5" />
-            Order Items ({order.products.length})
+            Order Items ({order.products?.length || 0})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {order.products.map((product: any) => (
-              <div
-                key={product.id}
-                className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {/* Product Image */}
-                <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                  <img
-                    src={product.product_image.startsWith('http') 
-                      ? product.product_image 
-                      : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`
-                    }
-                    alt={product.product_name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+          {order.products && order.products.length > 0 ? (
+            <div className="space-y-4">
+              {order.products.map((product: any) => (
+                <div
+                  key={product.id}
+                  className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  {/* Product Image */}
+                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img
+                      src={product.product_image.startsWith('http') 
+                        ? product.product_image 
+                        : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`
+                      }
+                      alt={product.product_name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                {/* Product Info */}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{product.product_name}</h3>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                    <span>Price: ৳{parseFloat(product.price).toFixed(2)}</span>
-                    <span className="flex items-center gap-1">
-                      Quantity: <Badge variant="secondary" className="font-semibold">{product.quantity}</Badge>
-                    </span>
+                  {/* Product Info */}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{product.product_name}</h3>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                      <span>Price: ৳{parseFloat(product.price).toFixed(2)}</span>
+                      <span className="flex items-center gap-1">
+                        Quantity: <Badge variant="secondary" className="font-semibold">{product.quantity}</Badge>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Subtotal */}
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Subtotal</p>
+                    <p className="text-xl font-bold text-primary-light">
+                      ৳{parseFloat(product.subtotal).toFixed(2)}
+                    </p>
                   </div>
                 </div>
-
-                {/* Subtotal */}
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Subtotal</p>
-                  <p className="text-xl font-bold text-primary-light">
-                    ৳{parseFloat(product.subtotal).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-8">No products in this order</p>
+          )}
         </CardContent>
       </Card>
 
