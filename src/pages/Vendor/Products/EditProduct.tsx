@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ProductForm } from './components/ProductForm';
+import { EditProductForm } from './components/EditProductForm';
 import { useProductMutation } from './hooks/useProductMutation';
 import { ProductFormData } from './types/product.types';
 import axios from 'axios';
@@ -15,6 +15,8 @@ export default function EditProduct() {
   const [productData, setProductData] = useState<ProductFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  console.log('🔵 [EDIT PAGE] EditProduct component rendered, ID:', id);
 
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
@@ -95,7 +97,7 @@ export default function EditProduct() {
           sku: product.sku || '',
           stock: parseInt(product.stock) || 0,
           video_link: product.video_link || '',
-          ebook: product.ebook || '0',
+          ebook: product.ebook ?? '0',
           images: [],
           existing_images: [
             product.product_image,
@@ -129,56 +131,75 @@ export default function EditProduct() {
     fetchProduct();
   }, [id, navigate]);
 
-  const handleSubmit = async (data: ProductFormData) => {
+  const handleSubmit = async (data: any) => {
     console.log('===================');
-    console.log('SUBMIT BUTTON CLICKED');
+    console.log('[EDIT PAGE] UPDATE BUTTON CLICKED');
     console.log('===================');
-    console.log('Data received from form:', data);
+    console.log('📊 Data received from form:', data);
     
     try {
       if (!id) {
-        console.error('No product ID found');
+        console.error('❌ No product ID found');
         throw new Error('Product ID is missing');
       }
-      console.log('Product ID:', id);
+      console.log('✅ Product ID:', id);
 
       const formData = new FormData();
 
-      console.log('Building FormData:');
+      console.log('🔧 Building FormData:');
+      
+      // Exclude all image-related keys
+      const excludedKeys = ['images', 'gallery_images', 'existing_gallery_images', 'removed_gallery_images'];
+      
       Object.keys(data).forEach((key) => {
-        if (key !== 'images' && key !== 'existing_images' && key !== 'removed_images') {
-          const value = data[key as keyof ProductFormData];
-          if (value !== undefined && value !== null) {
+        if (!excludedKeys.includes(key)) {
+          const value = data[key];
+          if (value !== undefined && value !== null && value !== '') {
             formData.append(key, value.toString());
-            console.log(`  Added ${key}: ${value}`);
+            console.log(`  ➕ Added ${key}: ${value}`);
           }
         }
       });
 
+      // Handle main image
       if (data.images && data.images.length > 0) {
-        console.log(`  Added product_image: ${data.images[0].name}`);
+        console.log(`  🖼️ Added product_image: ${data.images[0].name}`);
         formData.append('product_image', data.images[0]);
-        if (data.images.length > 1) {
-          for (let i = 1; i < data.images.length; i++) {
-            console.log(`  Added gallery image ${i}: ${data.images[i].name}`);
-            formData.append('gal_img[]', data.images[i]);
-          }
+      }
+
+      // Handle new gallery images - using 'gal_img[]' as per API spec
+      if (data.gallery_images && data.gallery_images.length > 0) {
+        console.log(`  📸 Added ${data.gallery_images.length} new gallery images`);
+        for (let i = 0; i < data.gallery_images.length; i++) {
+          formData.append('gal_img[]', data.gallery_images[i]);
         }
       }
 
-      if (data.existing_images && data.existing_images.length > 0) {
-        console.log(`  Added existing_images:`, data.existing_images);
-        formData.append('existing_images', JSON.stringify(data.existing_images));
+      // Handle existing gallery images (keeping)
+      if (data.existing_gallery_images && data.existing_gallery_images.length > 0) {
+        console.log(`  📷 Keeping ${data.existing_gallery_images.length} existing gallery images`);
+        formData.append('existing_gallery_images', JSON.stringify(data.existing_gallery_images));
       }
 
-      if (data.removed_images && data.removed_images.length > 0) {
-        console.log(`  Added removed_images:`, data.removed_images);
-        formData.append('removed_images', JSON.stringify(data.removed_images));
+      // Handle removed gallery images
+      if (data.removed_gallery_images && data.removed_gallery_images.length > 0) {
+        console.log(`  🗑️ Removing ${data.removed_gallery_images.length} gallery images`);
+        formData.append('removed_gallery_images', JSON.stringify(data.removed_gallery_images));
       }
 
-      console.log('Calling updateProduct function...');
+      console.log('\n📦 Final FormData entries:');
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: 📁 File - ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+      console.log('=========================\n');
+
+      console.log('🚀 Calling updateProduct function...');
       const success = await updateProduct(Number(id), formData);
-      console.log('Update result:', success);
+      console.log('✅ Update result:', success);
 
       if (success) {
         toast.success('Product updated successfully!');
@@ -187,7 +208,7 @@ export default function EditProduct() {
         toast.error('Failed to update product');
       }
     } catch (err: any) {
-      console.error('Error in handleSubmit:', err);
+      console.error('❌ Error in handleSubmit:', err);
       toast.error(err.message || 'Failed to update product');
     }
   };
@@ -249,11 +270,10 @@ export default function EditProduct() {
         </Button>
       </div>
 
-      <ProductForm
+      <EditProductForm
         initialData={productData}
         onSubmit={handleSubmit}
         isLoading={mutationLoading}
-        mode="edit"
       />
     </div>
   );

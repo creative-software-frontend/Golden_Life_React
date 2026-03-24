@@ -34,7 +34,7 @@ export interface ProductFormData {
   sku: string;
   stock: number;
   video_link?: string;
-  ebook?: string; // Add ebook field (default '0')
+  ebook: string; // Required field with default '0'
   images: File[];
   existing_images?: string[]; // For edit mode - URLs of existing images
   removed_images?: string[]; // Track deleted images in edit mode
