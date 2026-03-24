@@ -155,9 +155,10 @@ export function ProfileForm({
             <input
               type="email"
               {...register('email')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
+              disabled
+              className={`w-full px-4 py-2.5 bg-gray-100 border ${
                 errors.email ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all cursor-not-allowed`}
               placeholder="your@email.com"
             />
             {errors.email && (
@@ -172,9 +173,10 @@ export function ProfileForm({
             <input
               type="tel"
               {...register('mobile')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
+              disabled
+              className={`w-full px-4 py-2.5 bg-gray-100 border ${
                 errors.mobile ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all cursor-not-allowed`}
               placeholder="+8801XXXXXXXXX"
             />
             {errors.mobile && (
