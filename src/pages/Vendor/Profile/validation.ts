@@ -5,7 +5,7 @@ export const profileSchema = z.object({
   email: z.string().email('Invalid email address'),
   mobile: z.string().min(10, 'Mobile number must be at least 10 digits'),
   owner_name: z.string().min(2, 'Owner name must be at least 2 characters'),
-  business_name: z.string().min(2, 'Business name must be at least 2 characters'),
+  businee_name: z.string().min(2, 'Business name must be at least 2 characters'),
   mobile_business: z.string().optional(),
   country: z.string().min(1, 'Country is required'),
   district: z.string().min(1, 'District is required'),
