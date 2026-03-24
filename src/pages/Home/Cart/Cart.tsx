@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { X, Plus, Minus, Trash2, ShoppingBag, AlertCircle } from "lucide-react";
+import { X, Plus, Minus, Trash2, ShoppingBag, AlertCircle, Pencil, Check } from "lucide-react";
 import useModalStore from "@/store/Store";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import CheckoutModal from "../CheckoutModal/CheckoutModal";
 
 export default function Cart() {
@@ -25,7 +26,11 @@ export default function Cart() {
     if (storedItems) {
       try {
         const parsedItems = JSON.parse(storedItems);
-        setCartItems(Array.isArray(parsedItems) ? parsedItems : []);
+        const validatedItems = (Array.isArray(parsedItems) ? parsedItems : []).map(item => ({
+          ...item,
+          original_regular_price: item.original_regular_price || item.regular_price
+        }));
+        setCartItems(validatedItems);
       } catch (e) {
         setCartItems([]);
       }
@@ -43,6 +48,12 @@ export default function Cart() {
       window.removeEventListener("storage", loadCartData);
     };
   }, [loadCartData]);
+
+  const saveAndSync = (newList: any[]) => {
+    localStorage.setItem("cart", JSON.stringify(newList));
+    setCartItems(newList);
+    window.dispatchEvent(new Event("cartUpdated"));
+  };
 
   const updateQuantity = (id: number, delta: number) => {
     const updated = cartItems.map(item =>
@@ -65,42 +76,55 @@ export default function Cart() {
     setShowClearConfirm(false);
   };
 
-  const saveAndSync = (newList: any[]) => {
-    localStorage.setItem("cart", JSON.stringify(newList));
-    setCartItems(newList);
-    window.dispatchEvent(new Event("cartUpdated"));
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [tempPrice, setTempPrice] = useState<string>("");
+
+  const startEditing = (id: number, price: number) => {
+    setEditingId(id);
+    setTempPrice(price.toString());
   };
 
-  // --- PRICING LOGIC MATCHING API RESPONSE ---
-  
-  // Get the actual price to charge the user
-  const getActivePrice = (item: any) => {
-    const offerPrice = Number(item.offer_price) || 0;
-    const regularPrice = Number(item.regular_price) || 0;
-    
-    // If offer price exists, is valid, and is less than regular price, use it
-    if (offerPrice > 0 && offerPrice < regularPrice) {
-      return offerPrice;
+  const savePrice = (id: number, merchantPrice: number, maxPrice: number) => {
+    const newPrice = parseFloat(tempPrice);
+    if (isNaN(newPrice)) {
+      setEditingId(null);
+      return;
     }
-    // Fallback to regular price
-    return regularPrice > 0 ? regularPrice : (Number(item.price) || 0);
+
+    if (newPrice < merchantPrice) {
+      toast.error(`Price cannot be less than Merchant Price (৳${formatBDT(merchantPrice)})`);
+      return;
+    }
+
+    if (newPrice > maxPrice) {
+      toast.error(`Price cannot exceed the original Customer Price (৳${formatBDT(maxPrice)})`);
+      return;
+    }
+
+    const updated = cartItems.map(item =>
+      item.id === id ? { ...item, regular_price: newPrice } : item
+    );
+    saveAndSync(updated);
+    setEditingId(null);
+    toast.success("Price updated successfully");
   };
 
-  // Get the original price (for crossing out)
-  const getOriginalPrice = (item: any) => {
-    const regularPrice = Number(item.regular_price) || 0;
-    return regularPrice > 0 ? regularPrice : (Number(item.price) || 0);
-  };
+  // Determine prices for this specific item
+  const getMerchantPrice = (item: any) => Number(item.offer_price) || 0;
+  const getCustomerPrice = (item: any) => Number(item.regular_price) || 0;
+  // We'll use the price passed from the database as the Max Price if we had it, 
+  // but for simplicity in this cart, we'll assume the regular_price fetched from API is the cap.
+  // Ideally, we'd store an 'mrp' in the cart item.
 
   // Total Quantity
   const totalItems = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
   
-  // Calculate Subtotal using the Active Price
-  const subtotal = cartItems.reduce((acc, item) => acc + (getActivePrice(item) * (Number(item.quantity) || 0)), 0);
+  // Subtotal = sum of Merchant Prices (what the reseller pays)
+  const subtotal = cartItems.reduce((acc, item) => acc + (getMerchantPrice(item) * (Number(item.quantity) || 0)), 0);
 
-  // Calculate Total Savings
-  const originalTotal = cartItems.reduce((acc, item) => acc + (getOriginalPrice(item) * (Number(item.quantity) || 0)), 0);
-  const totalSavings = originalTotal - subtotal;
+  // Original Total (using Customer Price)
+  const customerTotal = cartItems.reduce((acc, item) => acc + (getCustomerPrice(item) * (Number(item.quantity) || 0)), 0);
+  const totalSavings = customerTotal - subtotal; // This reflects the total profit/adjustment
 
   return (
     <>
@@ -164,64 +188,92 @@ export default function Cart() {
           <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50">
             {cartItems.length > 0 ? (
               cartItems.map((item) => {
-                
-                // Determine prices for this specific item
-                const activePrice = getActivePrice(item);
-                const originalPrice = getOriginalPrice(item);
-                const hasDiscount = activePrice < originalPrice;
+                const merchantPrice = getMerchantPrice(item);
+                const customerPrice = getCustomerPrice(item);
+                const adjustmentValue = (customerPrice - merchantPrice) * (Number(item.quantity) || 1);
 
                 return (
-                  <div key={item.id} className="flex gap-4 p-3 border border-gray-100 rounded-2xl bg-white shadow-sm hover:border-[#5C9C72]/30 transition-all group">
-                    <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
-                      <img
-                        src={item.image || "/placeholder.svg"}
-                        alt={item.product_title_english || item.name}
-                        className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    <div className="flex-1 flex flex-col justify-between py-0.5">
-                      <div className="flex justify-between items-start gap-2">
-                        <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
-                          {item.product_title_english || item.name}
-                        </h4>
-                        <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 transition-colors shrink-0 p-1 rounded-md hover:bg-red-50">
-                          <Trash2 size={16} />
-                        </button>
+                  <div key={item.id} className="flex flex-col gap-3 p-4 border border-gray-100 rounded-2xl bg-white shadow-sm hover:border-[#5C9C72]/30 transition-all group">
+                    <div className="flex gap-4">
+                      <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
+                        <img
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.product_title_english || item.name}
+                          className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                        />
                       </div>
 
-                      <div className="flex items-end justify-between mt-2">
-                        <div className="flex flex-col">
-                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wide mb-0.5">Price</p>
-                          <div className="flex items-center gap-1.5">
-                            {/* ACTIVE PRICE */}
-                            <p className="text-[#5C9C72] font-black text-base leading-none">
-                              ৳{formatBDT(activePrice)}
-                            </p>
-                            
-                            {/* ORIGINAL PRICE (If Discounted) */}
-                            {hasDiscount && (
-                              <p className="text-gray-400 font-bold text-xs line-through leading-none">
-                                ৳{formatBDT(originalPrice)}
-                              </p>
+                      <div className="flex-1 flex flex-col justify-between py-0.5">
+                        <div className="flex justify-between items-start gap-2">
+                          <h4 className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight">
+                            {item.product_title_english || item.name}
+                          </h4>
+                          <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 transition-colors shrink-0 p-1 rounded-md hover:bg-red-50">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+
+                        <div className="mt-2 space-y-2">
+                          {/* MERCHANT PRICE */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Merchant Price:</span>
+                            <span className="text-xs font-black text-slate-500">৳{formatBDT(merchantPrice)}</span>
+                          </div>
+
+                          {/* CUSTOMER PRICE (EDITABLE) */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Price:</span>
+                            {editingId === item.id ? (
+                              <div className="flex items-center gap-1.5 animate-in slide-in-from-right-2 duration-200">
+                                <input
+                                  type="number"
+                                  value={tempPrice}
+                                  onChange={(e) => setTempPrice(e.target.value)}
+                                  className="w-20 h-8 text-xs font-black text-emerald-600 border border-emerald-100 rounded-lg px-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-emerald-50/10"
+                                  autoFocus
+                                />
+                                <button 
+                                  onClick={() => savePrice(item.id, merchantPrice, item.original_regular_price || customerPrice)} 
+                                  className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm shadow-emerald-200 active:scale-95 flex items-center justify-center"
+                                  title="Save Price"
+                                >
+                                  <Check size={14} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 group/price cursor-pointer" onClick={() => startEditing(item.id, customerPrice)}>
+                                <span className="text-sm font-black text-emerald-600 group-hover/price:text-emerald-700 transition-colors">৳{formatBDT(customerPrice)}</span>
+                                <div className="p-1.5 text-slate-300 group-hover/price:text-emerald-600 group-hover/price:bg-emerald-50 rounded-lg transition-all border border-transparent group-hover/price:border-emerald-100 shadow-none group-hover/price:shadow-sm">
+                                  <Pencil size={12} />
+                                </div>
+                              </div>
                             )}
                           </div>
                         </div>
 
-                        <div className="flex items-center border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm h-8">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="w-8 h-full flex items-center justify-center hover:bg-[#F0FDF4] hover:text-[#5C9C72] transition-colors border-r border-gray-100"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="w-8 text-center text-xs font-bold text-gray-700">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="w-8 h-full flex items-center justify-center hover:bg-[#F0FDF4] hover:text-[#5C9C72] transition-colors border-l border-gray-100"
-                          >
-                            <Plus size={14} />
-                          </button>
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Adjustment:</p>
+                            <span className={`text-[11px] font-black ${adjustmentValue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                              {adjustmentValue >= 0 ? '+' : ''}৳{formatBDT(adjustmentValue)}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm h-8">
+                            <button
+                              onClick={() => updateQuantity(item.id, -1)}
+                              className="w-8 h-full flex items-center justify-center hover:bg-[#F0FDF4] hover:text-[#5C9C72] transition-colors border-r border-gray-100"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="w-8 text-center text-xs font-bold text-gray-700">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, 1)}
+                              className="w-8 h-full flex items-center justify-center hover:bg-[#F0FDF4] hover:text-[#5C9C72] transition-colors border-l border-gray-100"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -240,15 +292,13 @@ export default function Cart() {
 
           {cartItems.length > 0 && (
             <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.03)] space-y-5 z-20">
-              
-              {/* REMOVED COUPON SECTION FROM HERE */}
-
               <div className="flex flex-col gap-1.5">
-                {/* SHOW TOTAL SAVINGS */}
-                {totalSavings > 0 && (
+                {totalSavings !== 0 && (
                   <div className="flex justify-between items-center text-xs font-bold text-gray-400">
-                    <span className="uppercase tracking-widest">Total Savings</span>
-                    <span className="text-green-600">-৳{formatBDT(totalSavings)}</span>
+                    <span className="uppercase tracking-widest">Adjustment Total</span>
+                    <span className={totalSavings >= 0 ? "text-emerald-600" : "text-rose-500"}>
+                      {totalSavings >= 0 ? "+" : ""}৳{formatBDT(totalSavings)}
+                    </span>
                   </div>
                 )}
                 

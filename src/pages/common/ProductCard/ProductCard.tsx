@@ -91,14 +91,20 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
                     </h3>
                 </Link>
 
-                <div className="flex items-baseline gap-2 mt-2 mb-4">
-                    <span className="text-[16px] sm:text-[18px] font-black text-emerald-600">
-                        ৳{product.offer_price}
-                    </span>
-                    {product.regular_price && parseFloat(product.regular_price) > parseFloat(product.offer_price) && (
-                        <span className="text-[11px] sm:text-[12px] font-bold text-slate-500 line-through tracking-tight">
-                            ৳{product.regular_price}
+                <div className="flex flex-col gap-1 mt-2 mb-4">
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Merchant Price:</span>
+                        <span className="text-[16px] sm:text-[18px] font-black text-emerald-600">
+                            ৳{product.offer_price}
                         </span>
+                    </div>
+                    {product.regular_price && parseFloat(product.regular_price) > parseFloat(product.offer_price) && (
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Customer Price:</span>
+                            <span className="text-[11px] sm:text-[12px] font-bold text-slate-500 line-through tracking-tight">
+                                ৳{product.regular_price}
+                            </span>
+                        </div>
                     )}
                 </div>
 

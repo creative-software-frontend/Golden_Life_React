@@ -3,8 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
     ChevronLeft, ChevronRight, SearchX,
-    SlidersHorizontal, Search, Plus, Grid3X3, Table as TableIcon,
-    Trash2, CheckCircle, XCircle
+    Search, Grid3X3, Table as TableIcon
 } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -18,7 +17,6 @@ export default function AllProduct() {
 
     // --- FILTER & VIEW STATES ---
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("all");
     const [stock, setStock] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
     const [viewMode, setViewMode] = useState("grid");
@@ -65,6 +63,7 @@ export default function AllProduct() {
             }));
 
             setProducts(mappedProducts);
+
         } catch (error) {
             console.error("Failed to fetch products:", error);
         } finally {
@@ -75,32 +74,6 @@ export default function AllProduct() {
     useEffect(() => {
         fetchProducts();
     }, [baseURL]);
-
-    // --- PRODUCT ACTIONS (ACTIVE, INACTIVE, REMOVE) ---
-    const handleToggleStatus = async (id: string | number, currentStatus: string) => {
-        // Toggle handles both numeric string status ("1"/"0") and words ("active"/"inactive")
-        const newStatus = (currentStatus === 'active' || currentStatus === '1') ? 'inactive' : 'active';
-        setProducts(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
-        try {
-            // API call logic
-        } catch (error) {
-            console.error("Failed to update status:", error);
-            setProducts(prev => prev.map(p => p.id === id ? { ...p, status: currentStatus } : p));
-            alert("Failed to update product status.");
-        }
-    };
-
-    const handleRemoveProduct = async (id: string | number) => {
-        if (!window.confirm("Are you sure you want to completely remove this product?")) return;
-        setProducts(prev => prev.filter(p => p.id !== id));
-        try {
-            // API call logic
-        } catch (error) {
-            console.error("Failed to delete product:", error);
-            fetchProducts();
-            alert("Failed to delete the product.");
-        }
-    };
 
     // --- FILTERING & SORTING ENGINE ---
     const filteredAndSortedProducts = useMemo(() => {
@@ -116,13 +89,13 @@ export default function AllProduct() {
             );
         }
 
-        // 3. Stock Filter
+        // 2. Stock Filter
         if (stock !== "all") {
             if (stock === "in_stock") result = result.filter((p) => p.stock_qty > 0);
             if (stock === "out_of_stock") result = result.filter((p) => p.stock_qty <= 0);
         }
 
-        // 4. Sorting
+        // 3. Sorting
         return result.sort((a, b) => {
             if (sortBy === "newest") return b.date - a.date;
             if (sortBy === "oldest") return a.date - b.date;
@@ -130,9 +103,9 @@ export default function AllProduct() {
             if (sortBy === "highToLow") return b.offer_price - a.offer_price;
             return 0;
         });
-    }, [products, search, status, stock, sortBy]);
+    }, [products, search, stock, sortBy]);
 
-    useEffect(() => setCurrentPage(1), [search, status, stock, sortBy]);
+    useEffect(() => setCurrentPage(1), [search, stock, sortBy]);
 
     const currentLimit = itemsPerPage === "all" ? filteredAndSortedProducts.length : (itemsPerPage as number);
     const totalPages = currentLimit > 0 ? Math.ceil(filteredAndSortedProducts.length / currentLimit) : 1;
@@ -183,57 +156,92 @@ export default function AllProduct() {
                     </div>
                 </div>
 
-                {/* 2. Control Panel */}
-                <div className="p-6 border-b border-slate-100 bg-slate-50/30">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                            <div className="relative flex-1 w-full">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search by product name or SKU..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full pl-10 pr-4 h-10 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#E8A87C]/40 focus:border-[#E8A87C] text-sm transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
-                            <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-
-                                <select value={stock} onChange={(e) => setStock(e.target.value)} className="h-10 w-full sm:w-[150px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
-                                    <option value="all">All Stock</option>
-                                    <option value="in_stock">In Stock</option>
+                {/* 2. Control Panel (Perfect Design Match: Integrated Middle Search) */}
+                <div className="p-4 sm:p-8 border-b border-slate-100 bg-slate-50/40 backdrop-blur-sm relative overflow-hidden group/panel">
+                    {/* Decorative element */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                    
+                    <div className="max-w-7xl mx-auto relative z-10">
+                        <div className="flex flex-col xl:flex-row items-center gap-6">
+                            
+                            {/* Left Filters - Availability */}
+                            <div className="flex items-center gap-4 w-full xl:w-auto">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Filter By</span>
+                                <select 
+                                    value={stock} 
+                                    onChange={(e) => setStock(e.target.value)} 
+                                    className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
+                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+                                >
+                                    <option value="all">All Availability</option>
+                                    <option value="in_stock">In Stock Only</option>
                                     <option value="out_of_stock">Out of Stock</option>
                                 </select>
-
-                                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="h-10 w-full sm:w-[170px] px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 outline-none focus:ring-2 focus:ring-[#E8A87C]/40">
-                                    <option value="all">Show All</option>
-                                    <option value="newest">Newest First</option>
-                                    <option value="oldest">Oldest First</option>
-                                    <option value="lowToHigh">Price: Low to High</option>
-                                    <option value="highToLow">Price: High to Low</option>
-                                </select>
-
                             </div>
 
-                            <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 border border-slate-200">
-                                <button
-                                    onClick={() => setViewMode('table')}
-                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'table' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
-                                        }`}
-                                >
-                                    <TableIcon className="w-4 h-4 mr-1.5" /> Table
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`flex items-center h-8 px-3 rounded-lg text-sm font-medium transition-all ${viewMode === 'grid' ? 'bg-[#E8A87C] text-white shadow-sm' : 'text-slate-500 hover:bg-white'
-                                        }`}
-                                >
-                                    <Grid3X3 className="w-4 h-4 mr-1.5" /> Grid
-                                </button>
+                            {/* CENTER SEARCH - The Focal Point */}
+                            <div className="flex-1 w-full max-w-2xl group mx-auto order-first xl:order-none">
+                                <div className="relative flex items-center">
+                                    <div className="absolute left-3 p-2.5 bg-emerald-50 text-emerald-600 rounded-full group-focus-within:bg-emerald-600 group-focus-within:text-white transition-all duration-300">
+                                        <Search size={18} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Search across our premium collection..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="w-full pl-16 pr-12 h-14 rounded-full border border-slate-200 bg-white focus:outline-none focus:ring-8 focus:ring-emerald-500/5 focus:border-emerald-500 text-sm font-medium transition-all shadow-sm placeholder:text-slate-300"
+                                    />
+                                    {search && (
+                                        <button 
+                                            onClick={() => setSearch('')}
+                                            className="absolute right-4 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-rose-500 transition-all"
+                                        >
+                                            <SearchX size={18} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Right Filters & View Toggles */}
+                            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-center">
+                                <div className="flex items-center gap-4 w-full sm:w-auto">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Sort By</span>
+                                    <select 
+                                        value={sortBy} 
+                                        onChange={(e) => setSortBy(e.target.value)} 
+                                        className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
+                                    >
+                                        <option value="newest">Latest Arrivals</option>
+                                        <option value="oldest">Classic First</option>
+                                        <option value="lowToHigh">Price: Low to High</option>
+                                        <option value="highToLow">Price: High to Low</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200 shadow-sm ml-auto sm:ml-0 overflow-hidden">
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'grid' 
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        <Grid3X3 size={16} /> GRID
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('table')}
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'table' 
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                                        }`}
+                                    >
+                                        <TableIcon size={16} /> TABLE
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -259,45 +267,32 @@ export default function AllProduct() {
                                     <table className="w-full text-left text-sm text-slate-600 whitespace-nowrap">
                                         <thead className="bg-slate-50 text-slate-800 font-semibold border-b border-slate-200">
                                             <tr>
-                                                <th className="px-4 py-3">Image</th>
-                                                <th className="px-4 py-3">Product Name & SKU</th>
-                                                <th className="px-4 py-3">Regular Price</th>
-                                                <th className="px-4 py-3">Offer Price</th>
-                                                <th className="px-4 py-3">Discount</th>
-                                                <th className="px-4 py-3">Stock</th>
-                                            
+                                                <th className="px-6 py-4">Image</th>
+                                                <th className="px-6 py-4">Product Details</th>
+                                                <th className="px-6 py-4">RP</th>
+                                                <th className="px-6 py-4">OP</th>
+                                                <th className="px-6 py-4">Stock</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {currentProducts.map((product) => {
-                                                // Calculate dynamic discount percentage
-                                                let discountText = "-";
-                                                if (product.regular_price > 0 && product.offer_price < product.regular_price) {
-                                                    const discount = Math.round(((product.regular_price - product.offer_price) / product.regular_price) * 100);
-                                                    discountText = `${discount}% OFF`;
-                                                }
-
-                                                // Determine active/inactive properly based on "1"/"0" or strings
-                                                const isActive = product.status === '1' || product.status === 'active';
-
-                                                return (
-                                                    <tr key={product.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                                                        <td className="px-4 py-3">
-                                                            <img src={product.product_image} alt="product" className="w-12 h-12 rounded object-cover border" />
-                                                        </td>
-                                                        <td className="px-4 py-3">
-                                                            <div className="font-medium text-slate-800">{product.titleEn}</div>
-                                                            {product.sku && <div className="text-xs text-slate-500">SKU: {product.sku}</div>}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-slate-400 line-through">৳{product.regular_price}</td>
-                                                        <td className="px-4 py-3 font-semibold text-slate-800">৳{product.offer_price}</td>
-                                                        <td className="px-4 py-3 font-medium text-amber-600">{discountText}</td>
-                                                        <td className="px-4 py-3">{product.stock_qty}</td>
-                                                     
-                                                      
-                                                    </tr>
-                                                );
-                                            })}
+                                            {currentProducts.map((product) => (
+                                                <tr key={product.id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                                                    <td className="px-6 py-4">
+                                                        <img src={product.product_image} alt="product" className="w-12 h-12 rounded-lg object-cover border" />
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="font-bold text-slate-800">{product.titleEn}</div>
+                                                        {product.sku && <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">SKU: {product.sku}</div>}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-slate-400 line-through">৳{product.regular_price}</td>
+                                                    <td className="px-6 py-4 font-black text-emerald-600 text-base">৳{product.offer_price}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${product.stock_qty > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
+                                                            {product.stock_qty > 0 ? `${product.stock_qty} In Stock` : 'Out of Stock'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -314,14 +309,14 @@ export default function AllProduct() {
                                         <ChevronLeft className="w-5 h-5 text-slate-600" />
                                     </button>
 
-                                    <div className="flex items-center gap-2 bg-slate-100/70 p-1.5 rounded-2xl border border-slate-200/50">
+                                    <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-2xl border border-slate-200">
                                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                                             <button
                                                 key={page}
                                                 onClick={() => handlePageChange(page)}
-                                                className={`w-9 h-9 rounded-xl font-bold text-xs transition-all ${currentPage === page
-                                                    ? "bg-[#4d8b59] text-white shadow-md shadow-green-200"
-                                                    : "hover:bg-white text-slate-500"
+                                                className={`w-9 h-9 rounded-xl font-black text-xs transition-all ${currentPage === page
+                                                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-200"
+                                                    : "hover:bg-slate-100 text-slate-500"
                                                     }`}
                                             >
                                                 {page}
@@ -349,8 +344,8 @@ export default function AllProduct() {
                                 We couldn't find any products matching your current filters. Try adjusting your search or clearing the filters.
                             </p>
                             <button
-                                onClick={() => { setSearch(''); setStatus('all'); setStock('all'); }}
-                                className="mt-6 px-6 py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+                                onClick={() => { setSearch(''); setStock('all'); }}
+                                className="mt-6 px-6 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors"
                             >
                                 Clear All Filters
                             </button>

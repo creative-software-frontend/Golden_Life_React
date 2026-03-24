@@ -130,7 +130,8 @@ export default function ProfileSidebar() {
         { path: 'document-info', label: 'Document Information', icon: FileBadge },
         { path: 'nominee-info', label: 'Nominee Information', icon: UserCircle2 },
         { path: 'Additional-info', label: 'Additional Information', icon: Info },
-        { path: 'settings', label: 'Account Settings', icon: Settings },
+        { path: 'Change-passward', label: 'Change Password', icon: ShieldCheck },
+
     ];
 
     return (

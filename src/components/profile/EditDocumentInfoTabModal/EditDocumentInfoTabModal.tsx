@@ -42,17 +42,22 @@ export default function EditDocumentInfoTabModal({
   const frontInputRef = useRef<HTMLInputElement>(null);
   const backInputRef = useRef<HTMLInputElement>(null);
 
-  const imageBaseUrl = `${baseURL}/uploads/student/image/`;
+  const effectiveBaseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   useEffect(() => {
     if (data && isOpen) {
       setNidNumber(data.nid_number || '');
-      setFrontPreview(data.nid_front_page ? `${imageBaseUrl}${data.nid_front_page}` : null);
-      setBackPreview(data.nid_back_page ? `${imageBaseUrl}${data.nid_back_page}` : null);
+      
+      // Correct preview paths for NID documents
+      const frontUrl = data.nid_front_page ? `${effectiveBaseURL}/uploads/student/nid_front_page/${data.nid_front_page}` : null;
+      const backUrl = data.nid_back_page ? `${effectiveBaseURL}/uploads/student/nid_back_page/${data.nid_back_page}` : null;
+      
+      setFrontPreview(frontUrl);
+      setBackPreview(backUrl);
       setFrontPage(null);
       setBackPage(null);
     }
-  }, [data, isOpen]);
+  }, [data, isOpen, baseURL]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back') => {
     const file = e.target.files?.[0];
@@ -127,7 +132,7 @@ export default function EditDocumentInfoTabModal({
             {/* Header */}
             <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-2xl text-primary">
+                <div className="p-3 bg-emerald-600/10 rounded-2xl text-emerald-600">
                   <FileText size={24} />
                 </div>
                 <div>
@@ -161,14 +166,14 @@ export default function EditDocumentInfoTabModal({
               <div className="space-y-1.5 px-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Number</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-primary/10 group-focus-within:text-primary transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-emerald-600/10 group-focus-within:text-emerald-600 transition-all">
                     <FileText size={16} />
                   </div>
                   <input
                     type="text"
                     value={nidNumber}
                     onChange={(e) => setNidNumber(e.target.value)}
-                    className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-semibold text-slate-700 placeholder:text-slate-300"
+                    className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-600/10 focus:border-emerald-600 outline-none transition-all font-semibold text-slate-700 placeholder:text-slate-300"
                     placeholder="Enter your National ID Number"
                     required
                   />
@@ -182,13 +187,13 @@ export default function EditDocumentInfoTabModal({
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Front Page</label>
                   <div 
                     onClick={() => !isSubmitting && frontInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload"
+                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
                   >
                     {frontPreview ? (
                       <>
                         <img src={frontPreview} className="w-full h-full object-cover" alt="Front Preview" />
                         <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-primary font-bold text-xs shadow-lg">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-emerald-600 font-bold text-xs shadow-lg">
                             <Camera size={14} />
                             Change Photo
                           </div>
@@ -196,7 +201,7 @@ export default function EditDocumentInfoTabModal({
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-primary transition-all duration-300">
+                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-emerald-600 transition-all duration-300">
                           <Upload size={24} />
                         </div>
                         <div className="text-center">
@@ -214,13 +219,13 @@ export default function EditDocumentInfoTabModal({
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Back Page</label>
                   <div 
                     onClick={() => !isSubmitting && backInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload"
+                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
                   >
                     {backPreview ? (
                       <>
                         <img src={backPreview} className="w-full h-full object-cover" alt="Back Preview" />
                         <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-primary font-bold text-xs shadow-lg">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-emerald-600 font-bold text-xs shadow-lg">
                             <Camera size={14} />
                             Change Photo
                           </div>
@@ -228,7 +233,7 @@ export default function EditDocumentInfoTabModal({
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-primary transition-all duration-300">
+                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-emerald-600 transition-all duration-300">
                           <Upload size={24} />
                         </div>
                         <div className="text-center">
@@ -247,7 +252,7 @@ export default function EditDocumentInfoTabModal({
               <button
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e as any)}
-                className="w-full h-14 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
+                className="w-full h-14 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
               >
                 {isSubmitting ? (
                   <>
