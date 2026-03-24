@@ -65,6 +65,10 @@ import AddProduct from "@/pages/Vendor/Products/AddProduct";
 import EditProduct from "@/pages/Vendor/Products/EditProduct";
 // import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; 
 
+// Vendor Orders
+import Orders from "@/pages/Vendor/Orders/index";
+import VendorOrderDetails from "@/pages/Vendor/Orders/OrderDetails"; 
+
 import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
 import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
 import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
@@ -302,6 +306,16 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'products/:id',
                                 element: <VendorProductDetails />
+                            },
+
+                            // NEW: Vendor Order Management Routes
+                            {
+                                path: 'orders',
+                                element: <Orders />
+                            },
+                            {
+                                path: 'orders/:order_no',
+                                element: <VendorOrderDetails />
                             },
 
                             // Existing wallet routes
