@@ -160,16 +160,16 @@ export default function AllProduct() {
                 <div className="p-4 sm:p-8 border-b border-slate-100 bg-slate-50/40 backdrop-blur-sm relative overflow-hidden group/panel">
                     {/* Decorative element */}
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
-                    
+
                     <div className="max-w-7xl mx-auto relative z-10">
                         <div className="flex flex-col xl:flex-row items-center gap-6">
-                            
+
                             {/* Left Filters - Availability */}
                             <div className="flex items-center gap-4 w-full xl:w-auto">
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Filter By</span>
-                                <select 
-                                    value={stock} 
-                                    onChange={(e) => setStock(e.target.value)} 
+                                <select
+                                    value={stock}
+                                    onChange={(e) => setStock(e.target.value)}
                                     className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
                                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
                                 >
@@ -193,7 +193,7 @@ export default function AllProduct() {
                                         className="w-full pl-16 pr-12 h-14 rounded-full border border-slate-200 bg-white focus:outline-none focus:ring-8 focus:ring-emerald-500/5 focus:border-emerald-500 text-sm font-medium transition-all shadow-sm placeholder:text-slate-300"
                                     />
                                     {search && (
-                                        <button 
+                                        <button
                                             onClick={() => setSearch('')}
                                             className="absolute right-4 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-rose-500 transition-all"
                                         >
@@ -207,9 +207,9 @@ export default function AllProduct() {
                             <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-center">
                                 <div className="flex items-center gap-4 w-full sm:w-auto">
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Sort By</span>
-                                    <select 
-                                        value={sortBy} 
-                                        onChange={(e) => setSortBy(e.target.value)} 
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
                                         className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
                                     >
@@ -223,19 +223,19 @@ export default function AllProduct() {
                                 <div className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200 shadow-sm ml-auto sm:ml-0 overflow-hidden">
                                     <button
                                         onClick={() => setViewMode('grid')}
-                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'grid' 
-                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'grid'
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20'
                                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <Grid3X3 size={16} /> GRID
                                     </button>
                                     <button
                                         onClick={() => setViewMode('table')}
-                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'table' 
-                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'table'
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20'
                                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <TableIcon size={16} /> TABLE
                                     </button>

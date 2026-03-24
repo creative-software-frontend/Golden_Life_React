@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import ImageUploadModal from '@/components/shared/ImageUploadModal';
 import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/hooks/useVendorProfile';
+import VendorNotificationBell from '@/pages/Vendor/VendorHeader/NotificationBell';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -47,6 +48,12 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     const walletRefMobile = useRef<HTMLDivElement>(null);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+    // --- Get Vendor Token ---
+    const getVendorToken = () => {
+        const session = sessionStorage.getItem('vendor_session');
+        return session ? JSON.parse(session).token : null;
+    };
 
     // --- Fetch Wallet Balance ---
     useEffect(() => {
@@ -235,10 +242,10 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                     </div>
 
                     {/* Notification Bell */}
-                    <button className="relative p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors flex-shrink-0 group">
-                        <Bell className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" />
-                        <span className="absolute top-[6px] right-[6px] sm:top-[7px] sm:right-[7px] w-2.5 h-2.5 bg-destructive rounded-full border-[2px] border-background"></span>
-                    </button>
+                    <VendorNotificationBell 
+                        baseURL={baseURL}
+                        token={getVendorToken()}
+                    />
 
                     {/* User Profile with Dropdown */}
                     <div className="relative" ref={profileRef}>
@@ -260,14 +267,14 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                             const parent = (e.target as HTMLImageElement).parentElement;
                                             if (parent && !parent.querySelector('.fallback-avatar')) {
                                                 const fallback = document.createElement('div');
-                                                fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E] rounded-full';
+                                                fallback.className = 'fallback-avatar w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary-dark rounded-full';
                                                 fallback.innerHTML = `<span class="text-white font-bold text-xs sm:text-sm">${getVendorDisplayName(profile).charAt(0).toUpperCase()}</span>`;
                                                 parent.appendChild(fallback);
                                             }
                                         }}
                                     />
                                 ) : (
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-[#E8A87C] to-[#C38D9E]">
+                                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-gradient-to-br from-primary-light to-primary-dark">
                                         <span className="text-white font-bold text-xs sm:text-sm">
                                             {getVendorDisplayName(profile).charAt(0).toUpperCase()}
                                         </span>
@@ -304,7 +311,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
                                         onClick={() => setIsProfileMenuOpen(false)}
                                     >
-                                        <User className="h-4 w-4 text-[#E8A87C]" />
+                                        <User className="h-4 w-4 text-primary-light" />
                                         <span>My Profile</span>
                                     </Link>
                                     
@@ -315,7 +322,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                             // Navigate to settings when available
                                         }}
                                     >
-                                        <Settings className="h-4 w-4 text-[#C38D9E]" />
+                                        <Settings className="h-4 w-4 text-primary-dark" />
                                         <span>Settings</span>
                                     </button>
                                     

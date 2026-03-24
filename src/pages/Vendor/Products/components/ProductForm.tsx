@@ -437,14 +437,14 @@ export function ProductForm({
           {/* Price Calculations Display */}
           <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-2">
-              <Percent size={18} className="text-[#E8A87C]" />
+              <Percent size={18} className="text-primary-light" />
               <div>
                 <p className="text-xs text-gray-600">Discount</p>
                 <p className="text-sm font-bold text-gray-900">{discount}% OFF</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <TrendingUp size={18} className="text-[#C38D9E]" />
+              <TrendingUp size={18} className="text-primary-dark" />
               <div>
                 <p className="text-xs text-gray-600">Profit Margin</p>
                 <p className="text-sm font-bold text-gray-900">
@@ -713,7 +713,7 @@ export function ProductForm({
 
           
           disabled={isLoading}
-          className="px-8 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-primary-light text-white font-bold rounded-xl transition-all duration-300  disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>

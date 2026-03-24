@@ -126,8 +126,8 @@ export function ImageUpload({
           relative border-2 border-dashed rounded-xl p-8
           transition-all duration-300 ease-in-out
           ${dragActive 
-            ? 'border-[#E8A87C] bg-[#E8A87C]/10 scale-[1.02]' 
-            : 'border-gray-300 hover:border-[#E8A87C]/70 hover:bg-gray-50'
+            ? 'border-primary-light bg-primary-light/10 scale-[1.02]' 
+            : 'border-gray-300 hover:border-primary-light/70 hover:bg-gray-50'
           }
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${!canUploadMore ? 'bg-gray-100' : 'bg-white'}
@@ -152,7 +152,7 @@ export function ImageUpload({
           <div className={`
             w-16 h-16 rounded-full flex items-center justify-center
             ${canUploadMore && !disabled
-              ? 'bg-[#E8A87C]/10 text-[#E8A87C]' 
+              ? 'bg-primary-light/10 text-primary-light' 
               : 'bg-gray-100 text-gray-400'
             }
           `}>
@@ -169,7 +169,7 @@ export function ImageUpload({
             <p className="text-xs text-gray-500">
               JPG, PNG, or WEBP. Max size 2MB each.
             </p>
-            <p className="text-xs font-medium text-[#E8A87C]">
+            <p className="text-xs font-medium text-primary-light">
               {images.length + existingImages.length} / {maxImages} images uploaded
             </p>
           </div>

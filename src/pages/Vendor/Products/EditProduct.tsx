@@ -161,7 +161,7 @@ export default function EditProduct() {
         if (data.images.length > 1) {
           for (let i = 1; i < data.images.length; i++) {
             console.log(`  Added gallery image ${i}: ${data.images[i].name}`);
-            formData.append('gallery_images[]', data.images[i]);
+            formData.append('gal_img[]', data.images[i]);
           }
         }
       }
@@ -200,7 +200,7 @@ export default function EditProduct() {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 size={48} className="animate-spin text-[#E8A87C] mx-auto" />
+          <Loader2 size={48} className="animate-spin text-primary-light mx-auto" />
           <p className="text-gray-600">Loading product...</p>
         </div>
       </div>

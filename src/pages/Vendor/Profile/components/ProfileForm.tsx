@@ -82,7 +82,7 @@ export function ProfileForm({
         
         <div className="flex items-center gap-6">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-[#E8A87C] overflow-hidden bg-gray-50 flex items-center justify-center">
+            <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-primary-light overflow-hidden bg-gray-50 flex items-center justify-center">
               {imagePreview ? (
                 <img
                   src={imagePreview}
@@ -107,7 +107,7 @@ export function ProfileForm({
 
           <div className="flex-1">
             <label className="cursor-pointer inline-block">
-              <div className="px-6 py-3 bg-[#E8A87C] text-white font-bold rounded-xl hover:bg-[#C38D9E] transition-all duration-300 shadow-md hover:shadow-lg">
+              <div className="px-6 py-3 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
                 Choose Image
               </div>
               <input
@@ -126,7 +126,7 @@ export function ProfileForm({
 
       {/* Personal Information */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#E8A87C]/20">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary-light/20">
           Personal Information
         </h3>
 
@@ -140,7 +140,7 @@ export function ProfileForm({
               {...register('name')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="Enter your full name"
             />
             {errors.name && (
@@ -157,7 +157,7 @@ export function ProfileForm({
               {...register('email')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.email ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="your@email.com"
             />
             {errors.email && (
@@ -174,7 +174,7 @@ export function ProfileForm({
               {...register('mobile')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.mobile ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="+8801XXXXXXXXX"
             />
             {errors.mobile && (
@@ -186,7 +186,7 @@ export function ProfileForm({
 
       {/* Business Information */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#E8A87C]/20">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary-light/20">
           Business Information
         </h3>
 
@@ -200,7 +200,7 @@ export function ProfileForm({
               {...register('owner_name')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.owner_name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="Owner's full name"
             />
             {errors.owner_name && (
@@ -217,7 +217,7 @@ export function ProfileForm({
               {...register('business_name')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.business_name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="Your business name"
             />
             {errors.business_name && (
@@ -232,7 +232,7 @@ export function ProfileForm({
             <input
               type="tel"
               {...register('mobile_business')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
               placeholder="+8801XXXXXXXXX"
             />
           </div>
@@ -241,7 +241,7 @@ export function ProfileForm({
 
       {/* Location Details */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#E8A87C]/20">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary-light/20">
           Location Details
         </h3>
 
@@ -254,7 +254,7 @@ export function ProfileForm({
               {...register('country')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.country ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
             >
               <option value="">Select Country</option>
               {countries && countries.length > 0 ? (
@@ -280,7 +280,7 @@ export function ProfileForm({
               {...register('district')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.district ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
             >
               <option value="">Select District</option>
               {districts && districts.length > 0 ? (
@@ -317,7 +317,7 @@ export function ProfileForm({
               rows={3}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
                 errors.address ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all resize-none`}
+              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all resize-none`}
               placeholder="House, Road, Area..."
             />
             {errors.address && (
@@ -329,7 +329,7 @@ export function ProfileForm({
 
       {/* Social Links */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#E8A87C]/20">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary-light/20">
           Social Media Links
         </h3>
 
@@ -341,7 +341,7 @@ export function ProfileForm({
             <input
               type="url"
               {...register('website')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
               placeholder="https://yourwebsite.com"
             />
           </div>
@@ -353,7 +353,7 @@ export function ProfileForm({
             <input
               type="url"
               {...register('facebook')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
               placeholder="https://facebook.com/yourprofile"
             />
           </div>
@@ -365,7 +365,7 @@ export function ProfileForm({
             <input
               type="text"
               {...register('telegram')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
               placeholder="@username"
             />
           </div>
@@ -377,7 +377,7 @@ export function ProfileForm({
             <input
               type="tel"
               {...register('whatsapp')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A87C] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
               placeholder="+8801XXXXXXXXX"
             />
           </div>
@@ -389,7 +389,7 @@ export function ProfileForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 sm:flex-none px-8 py-3 bg-[#E8A87C] hover:bg-[#C38D9E] text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 sm:flex-none px-8 py-3 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary-light/30 hover:shadow-primary-dark/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </button>

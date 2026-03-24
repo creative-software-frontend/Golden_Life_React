@@ -85,13 +85,14 @@ export function useProductMutation() {
       }
 
       const response = await axios.post(
-        `${baseURL}/api/vendor/product/${id}`,
+        `${baseURL}/api/vendor/product/update`,
         formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
-          }
+          },
+          params: { product_id: id }
         }
       );
 
@@ -102,9 +103,12 @@ export function useProductMutation() {
                        response.data?.message?.toLowerCase().includes('success');
 
       if (isSuccess) {
+        toast.success('Product updated successfully!');
         return true;
       } else {
-        throw new Error(response.data?.message || 'Failed to update product');
+        const errorMessage = response.data?.message || 'Failed to update product';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (err: any) {
       console.error('Update product error:', err);

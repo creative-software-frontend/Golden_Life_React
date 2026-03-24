@@ -27,9 +27,9 @@ export default function VendorProfile() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E8A87C]/10 via-[#C38D9E]/10 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-light/10 via-primary-dark/10 to-white">
         <div className="text-center">
-          <Loader2 className="w-16 h-16 animate-spin text-[#E8A87C] mx-auto mb-4" />
+          <Loader2 className="w-16 h-16 animate-spin text-primary-light mx-auto mb-4" />
           <p className="text-gray-600 font-semibold">Loading profile...</p>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default function VendorProfile() {
   // Error state
   if (error || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E8A87C]/10 via-[#C38D9E]/10 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-light/10 via-primary-dark/10 to-white">
         <div className="text-center max-w-md px-6">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-10 h-10 text-red-600" />
@@ -48,7 +48,7 @@ export default function VendorProfile() {
           <p className="text-gray-600 mb-6">{error || 'Failed to load profile'}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#E8A87C] text-white font-bold rounded-xl hover:bg-[#C38D9E] transition-all"
+            className="px-6 py-3 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all"
           >
             Try Again
           </button>
@@ -63,7 +63,7 @@ export default function VendorProfile() {
   if (!user || !vendor) {
     console.error('❌ [VendorProfile] Missing required data:', { user, vendor });
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E8A87C]/10 via-[#C38D9E]/10 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-light/10 via-primary-dark/10 to-white">
         <div className="text-center max-w-md px-6">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <UserX className="w-10 h-10 text-red-600" />
@@ -72,7 +72,7 @@ export default function VendorProfile() {
           <p className="text-gray-600 mb-6">Invalid profile data received</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#E8A87C] text-white font-bold rounded-xl hover:bg-[#C38D9E] transition-all"
+            className="px-6 py-3 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all"
           >
             Try Again
           </button>
@@ -169,7 +169,7 @@ export default function VendorProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E8A87C]/10 via-[#C38D9E]/10 to-white py-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light/10 via-primary-dark/10 to-white py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
@@ -194,7 +194,7 @@ export default function VendorProfile() {
           <div className="lg:col-span-2 space-y-6">
             {isEditMode ? (
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-[#E8A87C]/20">
+                <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-primary-light/20">
                   <h2 className="text-2xl font-black text-gray-900">Edit Profile</h2>
                   <button
                     onClick={() => setIsEditMode(false)}
@@ -231,13 +231,13 @@ export default function VendorProfile() {
                 <div className="space-y-3">
                   <button
                     onClick={() => setIsEditMode(true)}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-[#E8A87C] text-white font-bold rounded-xl hover:bg-[#C38D9E] transition-all duration-300 shadow-lg shadow-[#E8A87C]/30 hover:shadow-[#C38D9E]/30"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary-light/30 hover:shadow-primary-dark/30"
                   >
                     <Edit2 size={18} />
                     Edit Profile
                   </button>
                   
-                  <button className="w-full px-6 py-3.5 bg-white border-2 border-[#E8A87C] text-[#E8A87C] font-bold rounded-xl hover:bg-[#E8A87C] hover:text-white transition-all duration-300">
+                  <button className="w-full px-6 py-3.5 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300">
                     Change Password
                   </button>
                   
