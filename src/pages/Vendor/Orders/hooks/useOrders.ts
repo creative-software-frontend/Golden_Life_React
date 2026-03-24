@@ -133,7 +133,7 @@ export function useOrders() {
   }, []);
 
   /**
-   * Update order status
+   * Update order status - tries multiple endpoint patterns with fallback
    */
   const updateOrderStatus = useCallback(async (orderNo: string, status: string): Promise<boolean> => {
     try {
@@ -148,37 +148,104 @@ export function useOrders() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      // Correct endpoint: POST /api/updatetStatus/order?id={order_no}
-      const response = await axios.post<UpdateStatusApiResponse>(
-        `${baseURL}/api/updatetStatus/order`,
-        { status },
+      // Try multiple endpoint patterns with fallback
+      const endpointsToTry = [
         {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
+          url: `${baseURL}/api/updatetStatus/order`,
+          config: {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            params: { id: orderNo }
           },
-          params: { id: orderNo }
+          body: { status },
+          name: 'Pattern 1: /api/updatetStatus/order?id={order_no}'
+        },
+        {
+          url: `${baseURL}/api/updateStatus/order`,
+          config: {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            params: { id: orderNo }
+          },
+          body: { status },
+          name: 'Pattern 2: /api/updateStatus/order?id={order_no} (typo fix)'
+        },
+        {
+          url: `${baseURL}/api/vendor/order/status`,
+          config: {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          },
+          body: { order_no: orderNo, status },
+          name: 'Pattern 3: /api/vendor/order/status'
+        },
+        {
+          url: `${baseURL}/api/order/update-status`,
+          config: {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          },
+          body: { order_no: orderNo, status },
+          name: 'Pattern 4: /api/order/update-status'
         }
-      );
+      ];
 
-      console.log('🟢 [API] Status update response:', response.data);
+      let lastError: any = null;
 
-      if (response.data.success) {
-        toast.success('Order status updated successfully!');
-        return true;
-      } else {
-        throw new Error(response.data.message || 'Failed to update order status');
+      for (const endpoint of endpointsToTry) {
+        try {
+          console.log(`🔵 [API] Trying ${endpoint.name}`);
+          
+          const response = await axios.post<UpdateStatusApiResponse>(
+            endpoint.url,
+            endpoint.body,
+            endpoint.config as any
+          );
+
+          console.log(`🟢 [API] Success with ${endpoint.name}:`, response.data);
+
+          if (response.data.success) {
+            toast.success('Order status updated successfully!');
+            return true;
+          } else {
+            throw new Error(response.data.message || 'Failed to update order status');
+          }
+        } catch (err: any) {
+          console.warn(`⚠️ [API] Failed with ${endpoint.name}:`, err.response?.status, err.message);
+          lastError = err;
+          
+          // If it's not a 404, stop trying other endpoints
+          if (err.response?.status !== 404) {
+            throw err;
+          }
+          // Continue to next endpoint pattern
+        }
       }
+
+      // All endpoints failed with 404
+      console.error('❌ [API] All endpoint patterns failed with 404');
+      throw new Error('Order status update endpoint not found. Please check API configuration.');
+
     } catch (err: any) {
       console.error('❌ [API] Update order status error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update order status';
       setError(errorMessage);
       
-      // Handle 404 specifically
+      // Handle specific error cases
       if (err.response?.status === 404) {
-        toast.error('Update endpoint not found. Please check API configuration.');
+        toast.error('Update endpoint not found. Please contact administrator to verify API endpoint.');
       } else if (err.response?.status === 401) {
         toast.error('Authentication failed. Please login again.');
+      } else if (err.response?.status === 500) {
+        toast.error('Server error. Please try again later.');
       } else {
         toast.error(errorMessage);
       }
