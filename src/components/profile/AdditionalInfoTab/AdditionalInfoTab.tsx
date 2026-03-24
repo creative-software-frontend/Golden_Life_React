@@ -13,7 +13,7 @@ import {
     Linkedin,
     Send,
     Twitter,
-    LucideIcon,
+
     Monitor,
     Zap,
     Camera,
@@ -21,24 +21,7 @@ import {
 } from 'lucide-react';
 import EditAdditionalInfoTabModal from '../EditAdditionalInfoTabModal/EditAdditionalInfoTabModal';
 import { AdditionalInfoData } from '../types/types';
-
-interface InfoCardProps {
-    icon: LucideIcon;
-    label: string;
-    value: string | null | undefined;
-}
-
-const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
-    <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors text-emerald-600">
-            <Icon size={20} />
-        </div>
-        <div className="break-words">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
-            <p className="text-sm font-bold text-slate-700 mt-1">{value || 'Not Disclosed'}</p>
-        </div>
-    </div>
-);
+import { InfoCard } from '../InfoCard/InfoCard';
 
 const SocialLink = ({ icon: Icon, label, url, color }: { icon: any, label: string, url: string | null, color: string }) => (
     <a
@@ -61,7 +44,8 @@ const SocialLink = ({ icon: Icon, label, url, color }: { icon: any, label: strin
 export default function AdditionalInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [infoData, setInfoData] = useState<AdditionalInfoData | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -76,9 +60,13 @@ export default function AdditionalInfoTab() {
     const token = getActiveToken();
 
     const fetchAdditionalInfo = async (signal?: AbortSignal) => {
-        if (!token || !baseURL) return;
+        if (!token || !baseURL) {
+            setLoading(false);
+            return;
+        }
 
         setLoading(true);
+        setError(false);
         try {
             const response = await axios.get(`${baseURL}/api/student/additional-info`, {
                 signal,
@@ -90,10 +78,13 @@ export default function AdditionalInfoTab() {
 
             if (response.data?.success) {
                 setInfoData(response.data.data);
+            } else {
+                setError(true);
             }
         } catch (error: any) {
             if (error.name !== 'CanceledError') {
                 console.error('❌ Additional info fetch failed:', error);
+                setError(true);
             }
         } finally {
             setLoading(false);
@@ -111,7 +102,7 @@ export default function AdditionalInfoTab() {
         fetchAdditionalInfo();
     };
 
-    if (loading || !infoData) {
+    if (loading) {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm font-inter">
                 <div className="relative">
@@ -126,30 +117,44 @@ export default function AdditionalInfoTab() {
         );
     }
 
-    return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8 font-inter">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+    if (error || !infoData) {
+        return (
+            <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm font-inter">
+                <div className="space-y-1">
+                    <p className="text-base font-bold text-slate-700 font-inter tracking-tight">Failed to load data</p>
+                    <p className="text-xs text-slate-400 font-medium font-inter">Could not retrieve your additional information</p>
+                </div>
+                <button
+                    onClick={() => fetchAdditionalInfo()}
+                    className="mt-2 px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-colors"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
 
-                <div className="relative z-10">
+    return (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+                <div className="relative">
                     <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">Lifestyle & Socials</h2>
-                    <p className="text-[10px] text-slate-400 font-black mt-2 uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
                         <Sparkles size={12} className="text-emerald-500" />
                         Professional & Digital Identity Overview
                     </p>
                 </div>
-
                 <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="relative z-10 flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 transition-all group/btn"
+                    className="relative flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn"
                 >
                     <Edit2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
                     <span className="uppercase tracking-widest text-xs">Update Profile</span>
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Professional & Education */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
@@ -159,9 +164,7 @@ export default function AdditionalInfoTab() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InfoCard icon={GraduationCap} label="Academic Education" value={infoData.education} />
                         <InfoCard icon={Briefcase} label="Current Profession" value={infoData.profession} />
-                        <div className="sm:col-span-2">
-                           <InfoCard icon={DollarSign} label="Monthly Income Bracket" value={infoData.monthly_income} />
-                        </div>
+                        <InfoCard icon={DollarSign} label="Monthly Income Bracket" value={infoData.monthly_income} />
                     </div>
                 </div>
 

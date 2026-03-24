@@ -118,7 +118,7 @@ export default function Cart() {
 
   // Total Quantity
   const totalItems = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
-  
+
   // Subtotal = sum of Merchant Prices (what the reseller pays)
   const subtotal = cartItems.reduce((acc, item) => acc + (getMerchantPrice(item) * (Number(item.quantity) || 0)), 0);
 
@@ -232,8 +232,8 @@ export default function Cart() {
                                   className="w-20 h-8 text-xs font-black text-emerald-600 border border-emerald-100 rounded-lg px-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-emerald-50/10"
                                   autoFocus
                                 />
-                                <button 
-                                  onClick={() => savePrice(item.id, merchantPrice, item.original_regular_price || customerPrice)} 
+                                <button
+                                  onClick={() => savePrice(item.id, merchantPrice, item.original_regular_price || customerPrice)}
                                   className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-sm shadow-emerald-200 active:scale-95 flex items-center justify-center"
                                   title="Save Price"
                                 >
@@ -301,7 +301,7 @@ export default function Cart() {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="flex justify-between items-end mt-1">
                   <div>
                     <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest leading-none block mb-1">Subtotal</span>

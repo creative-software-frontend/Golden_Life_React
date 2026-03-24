@@ -37,7 +37,7 @@ export default function DocumentInfoTab() {
     const [loading, setLoading] = useState(false);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-    
+
     // Helper to get correct path for documents
     const getDocUrl = (fileName: string, type: 'nid_front_page' | 'nid_back_page') => {
         if (!fileName) return null;
@@ -152,38 +152,38 @@ export default function DocumentInfoTab() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
-                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
-                            {documentData.nid_front_page ? (
-                                <>
-                                    <img src={getDocUrl(documentData.nid_front_page, 'nid_front_page') || ''} className="w-full h-full object-cover" alt="NID Front" />
-                                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Eye className="text-white" size={20} />
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
+                            <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
+                                {documentData.nid_front_page ? (
+                                    <>
+                                        <img src={getDocUrl(documentData.nid_front_page, 'nid_front_page') || ''} className="w-full h-full object-cover" alt="NID Front" />
+                                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Eye className="text-white" size={20} />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                                        <ImageIcon size={24} />
                                     </div>
-                                </>
-                            ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                                    <ImageIcon size={24} />
-                                </div>
-                            )}
-                          </div>
+                                )}
+                            </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Back</p>
-                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
-                            {documentData.nid_back_page ? (
-                                <>
-                                    <img src={getDocUrl(documentData.nid_back_page, 'nid_back_page') || ''} className="w-full h-full object-cover" alt="NID Back" />
-                                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Eye className="text-white" size={20} />
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Back</p>
+                            <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
+                                {documentData.nid_back_page ? (
+                                    <>
+                                        <img src={getDocUrl(documentData.nid_back_page, 'nid_back_page') || ''} className="w-full h-full object-cover" alt="NID Back" />
+                                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Eye className="text-white" size={20} />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                                        <ImageIcon size={24} />
                                     </div>
-                                </>
-                            ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                                    <ImageIcon size={24} />
-                                </div>
-                            )}
-                          </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -15,13 +15,13 @@ interface InfoCardProps {
 }
 
 const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
-            <Icon size={18} />
+    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/5 transition-all duration-300 group">
+        <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors duration-300">
+            <Icon size={18} className="group-hover:scale-110 transition-transform" />
         </div>
-        <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
-            <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">{value || 'Not Provided'}</p>
+        <div className="overflow-hidden">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+            <p className="text-base font-medium text-gray-800 mt-0.5 break-words tracking-tight">{value || 'Not Provided'}</p>
         </div>
     </div>
 );
@@ -123,7 +123,7 @@ export default function PersonalInfoTab({
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
                 <div className="relative">
@@ -142,7 +142,7 @@ export default function PersonalInfoTab({
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
                         <Users size={16} className="text-emerald-500" />
@@ -174,13 +174,13 @@ export default function PersonalInfoTab({
                 </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                <div className="p-3 bg-white rounded-xl text-emerald-600 shadow-sm">
-                    <MapPin size={20} />
+            <div className="p-6 rounded-3xl bg-slate-50/50 border border-slate-100 hover:border-emerald-600/20 transition-all duration-300 flex items-center gap-5 group">
+                <div className="p-4 bg-white rounded-2xl text-emerald-600 shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <MapPin size={24} />
                 </div>
-                <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Permanent Location</p>
-                    <p className="text-sm text-slate-700 font-semibold">{internalData.location || "Not specified"}</p>
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Permanent Location:</span>
+                    <span className="text-base text-slate-800 font-black tracking-tight">{internalData.location || "Not specified"}</span>
                 </div>
             </div>
 

@@ -12,7 +12,7 @@ const Register: React.FC = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   // Registration States
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -23,17 +23,16 @@ const Register: React.FC = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
-  
+
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    phone: '', 
-    referCode: refCode, 
+    mobile: '',
+    refer_code: refCode,
     password: '',
-    confirmPassword: '',
+    password_confirmation: '',
     acceptTerms: false
   });
 
@@ -41,11 +40,17 @@ const Register: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
+    let finalValue = value;
+    if (name === 'mobile' && value.length > 11) {
+      finalValue = value.slice(0, 11);
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : finalValue
     }));
-    
+
     if (errors[name]) {
       const newErrors = { ...errors };
       delete newErrors[name];
@@ -57,14 +62,13 @@ const Register: React.FC = () => {
   const validateForm = () => {
     let isValid = true;
     const newErrors: Record<string, string> = {};
-    if (!formData.firstName.trim()) { newErrors.firstName = 'Required'; isValid = false; }
-    if (!formData.lastName.trim()) { newErrors.lastName = 'Required'; isValid = false; }
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) { newErrors.email = 'Valid email required'; isValid = false; }
-    if (!formData.phone || !/^01\d{9}$/.test(formData.phone)) { newErrors.phone = 'Use 01XXXXXXXXX'; isValid = false; }
-    if (!formData.referCode.trim()) { newErrors.referCode = 'Referral code required'; isValid = false; }
-    if (formData.password.length < 8) { newErrors.password = 'Min 8 characters'; isValid = false; }
-    if (formData.password !== formData.confirmPassword) { newErrors.confirmPassword = 'Mismatch'; isValid = false; }
-    if (!formData.acceptTerms) { newErrors.acceptTerms = 'Required'; isValid = false; }
+    if (!formData.name.trim()) { newErrors.name = 'Full name is required'; isValid = false; }
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) { newErrors.email = 'Valid email is required'; isValid = false; }
+    if (!formData.mobile || !/^01\d{9}$/.test(formData.mobile)) { newErrors.mobile = 'Enter valid 11-digit mobile (01XXXXXXXXX)'; isValid = false; }
+    if (!formData.refer_code.trim()) { newErrors.refer_code = 'Referral code is required'; isValid = false; }
+    if (formData.password.length < 8) { newErrors.password = 'Password must be at least 8 characters'; isValid = false; }
+    if (formData.password !== formData.password_confirmation) { newErrors.password_confirmation = 'Passwords must match'; isValid = false; }
+    if (!formData.acceptTerms) { newErrors.acceptTerms = 'You must accept the terms'; isValid = false; }
     setErrors(newErrors);
     return isValid;
   };
@@ -73,26 +77,26 @@ const Register: React.FC = () => {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
-    setApiError(''); 
+    setApiError('');
 
     try {
       const response = await fetch(`${baseURL}/api/student/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          name: formData.name.trim(),
           email: formData.email,
-          mobile: formData.phone,
-          referral_code: formData.referCode, 
+          mobile: formData.mobile,
+          refer_code: formData.refer_code,
           password: formData.password,
-          password_confirmation: formData.confirmPassword, 
+          password_confirmation: formData.password_confirmation,
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         if (data.errors) {
           const firstError = Object.values(data.errors)[0] as string[];
@@ -103,9 +107,9 @@ const Register: React.FC = () => {
 
       // Store User ID for OTP step
       if (data.user_id) {
-          setUserId(data.user_id);
+        setUserId(data.user_id);
       } else if (data.data?.user_id) {
-          setUserId(data.data.user_id);
+        setUserId(data.data.user_id);
       }
 
       setOtp(["", "", "", ""]); // Reset OTP inputs
@@ -131,9 +135,9 @@ const Register: React.FC = () => {
     try {
       const response = await fetch(`${baseURL}/api/student/verify-otp`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Accept': 'application/json' 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           user_id: userId,
@@ -148,10 +152,10 @@ const Register: React.FC = () => {
         setOtp(["", "", "", ""]);
         setShowOtpModal(false);
         setOtpError("");
-        
+
         // Redirect to login
-        navigate('/login', { 
-          state: { message: "Account verified successfully! Please login." } 
+        navigate('/login', {
+          state: { message: "Account verified successfully! Please login." }
         });
       } else {
         throw new Error(data.message || "Invalid OTP Code.");
@@ -173,7 +177,7 @@ const Register: React.FC = () => {
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
-        otpInputRefs.current[index - 1]?.focus();
+      otpInputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -195,39 +199,36 @@ const Register: React.FC = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-                <InputGroup label="First Name" name="firstName" value={formData.firstName} error={errors.firstName} icon={<User size={18}/>} onChange={handleChange} placeholder="John" disabled={isLoading} required />
-                <InputGroup label="Last Name" name="lastName" value={formData.lastName} error={errors.lastName} icon={<User size={18}/>} onChange={handleChange} placeholder="Doe" disabled={isLoading} required />
-            </div>
+            <InputGroup label="Full Name" name="name" value={formData.name} error={errors.name} icon={<User size={18} />} onChange={handleChange} placeholder="John Doe" disabled={isLoading} required />
 
-            <InputGroup label="Email Address" name="email" type="email" value={formData.email} error={errors.email} icon={<Mail size={18}/>} onChange={handleChange} placeholder="john@example.com" disabled={isLoading} required />
-            
+            <InputGroup label="Email Address" name="email" type="email" value={formData.email} error={errors.email} icon={<Mail size={18} />} onChange={handleChange} placeholder="john@example.com" disabled={isLoading} required />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputGroup label="Mobile Number" name="phone" type="tel" value={formData.phone} error={errors.phone} icon={<Smartphone size={18}/>} onChange={handleChange} placeholder="017XXXXXXXX" disabled={isLoading} required />
-                <InputGroup label="Referral Code" name="referCode" value={formData.referCode} error={errors.referCode} icon={<TicketCheck size={18}/>} onChange={handleChange} placeholder="REQUIRED" disabled={isLoading} required />
+              <InputGroup label="Mobile Number" name="mobile" type="tel" value={formData.mobile} error={errors.mobile} icon={<Smartphone size={18} />} onChange={handleChange} placeholder="017XXXXXXXX" disabled={isLoading} required maxLength={11} />
+              <InputGroup label="Referral Code" name="refer_code" value={formData.refer_code} error={errors.refer_code} icon={<TicketCheck size={18} />} onChange={handleChange} placeholder="Enter code here" disabled={isLoading} required />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                    <InputGroup label="Password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} error={errors.password} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                </div>
-                <div className="relative">
-                    <InputGroup label="Confirm" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} error={errors.confirmPassword} icon={<Lock size={18}/>} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
-                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                </div>
+              <div className="relative">
+                <InputGroup label="Password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} error={errors.password} icon={<Lock size={18} />} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div className="relative">
+                <InputGroup label="Confirm Password" name="password_confirmation" type={showConfirmPassword ? 'text' : 'password'} value={formData.password_confirmation} error={errors.password_confirmation} icon={<Lock size={18} />} onChange={handleChange} placeholder="••••••••" disabled={isLoading} required />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-[42px] text-slate-400 hover:text-slate-600 transition-colors">
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-3">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="acceptTerms" checked={formData.acceptTerms} onChange={handleChange} className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500" />
-                    <span className="text-sm text-slate-600 font-medium">I accept the Terms & Conditions</span>
-                </label>
-                {errors.acceptTerms && <p className="text-xs text-red-500 font-bold ml-8">{errors.acceptTerms}</p>}
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" name="acceptTerms" checked={formData.acceptTerms} onChange={handleChange} className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500" />
+                <span className="text-sm text-slate-600 font-medium">I accept the Terms & Conditions</span>
+              </label>
+              {errors.acceptTerms && <p className="text-xs text-red-500 font-bold ml-8">{errors.acceptTerms}</p>}
             </div>
 
             <button type="submit" disabled={isLoading} className="w-full bg-[#FF8A00] hover:bg-orange-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2">
@@ -247,19 +248,19 @@ const Register: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-sm rounded-[40px] p-10 relative shadow-2xl animate-in zoom-in-95 duration-300">
             <button onClick={() => setShowOtpModal(false)} className="absolute top-6 right-6 text-slate-400 hover:bg-slate-50 p-2 rounded-full transition-all">
-                <X size={20} />
+              <X size={20} />
             </button>
 
             <div className="text-center space-y-2 mb-8">
-                <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-orange-100 shadow-inner">
-                    <ShieldCheck className="text-orange-500 w-8 h-8" />
-                </div>
-                <h2 className="text-2xl font-black text-slate-900">Verify OTP</h2>
-                <p className="text-slate-500 font-medium text-sm px-4">Code sent to <span className="text-slate-900 font-bold">{formData.phone}</span></p>
+              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-orange-100 shadow-inner">
+                <ShieldCheck className="text-orange-500 w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900">Verify OTP</h2>
+              <p className="text-slate-500 font-medium text-sm px-4">Code sent to <span className="text-slate-900 font-bold">{formData.mobile}</span></p>
             </div>
-            
+
             {otpError && <div className="mb-6 bg-red-50 text-red-600 p-3 rounded-xl text-center text-xs font-bold border border-red-100 italic">{otpError}</div>}
-            
+
             <div className="flex justify-center gap-3 mb-10">
               {otp.map((digit, index) => (
                 <input
@@ -273,17 +274,17 @@ const Register: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-                <button onClick={handleOtpSubmit} disabled={isOtpLoading} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">
+              <button onClick={handleOtpSubmit} disabled={isOtpLoading} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2">
                 {isOtpLoading ? <Loader2 className="animate-spin" /> : "Verify & Continue"}
-                </button>
+              </button>
 
-                <button 
-                  onClick={() => handleSubmit()} 
-                  disabled={isLoading} 
-                  className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-orange-500 font-bold text-xs py-2 transition-colors disabled:opacity-50"
-                >
-                    <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} /> Resend OTP
-                </button>
+              <button
+                onClick={() => handleSubmit()}
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-orange-500 font-bold text-xs py-2 transition-colors disabled:opacity-50"
+              >
+                <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} /> Resend OTP
+              </button>
             </div>
           </div>
         </div>
@@ -293,16 +294,16 @@ const Register: React.FC = () => {
 };
 
 const InputGroup = ({ label, icon, error, required, ...props }: any) => (
-    <div className="space-y-1.5 flex-1">
-        <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">
-            {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        <div className="relative group">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors">{icon}</span>
-            <input {...props} required={required} className={cn("w-full pl-11 pr-4 py-3.5 bg-slate-50 border-2 rounded-2xl outline-none transition-all font-semibold text-slate-700", error ? "border-red-200 bg-red-50 focus:border-red-500" : "border-transparent focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5")} />
-        </div>
-        {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
+  <div className="space-y-1.5 flex-1">
+    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">
+      {label} {required && <span className="text-red-500">*</span>}
+    </label>
+    <div className="relative group">
+      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors">{icon}</span>
+      <input {...props} required={required} className={cn("w-full pl-11 pr-4 py-3.5 bg-slate-50 border-2 rounded-2xl outline-none transition-all font-semibold text-slate-700", error ? "border-red-200 bg-red-50 focus:border-red-500" : "border-transparent focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/5")} />
     </div>
+    {error && <p className="text-[10px] text-red-500 font-bold ml-1">{error}</p>}
+  </div>
 );
 
 export default Register;

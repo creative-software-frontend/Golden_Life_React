@@ -8,7 +8,7 @@ interface InfoCardProps {
 }
 
 // 2. Move InfoCard OUTSIDE the main component to avoid re-creation on every render
-const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
+export const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
         <div className="p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
             <Icon size={18} />
@@ -16,7 +16,7 @@ const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
         <div className="overflow-hidden">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
             <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">
-                {value || '—'} 
+                {value || '—'}
             </p>
         </div>
     </div>
@@ -24,7 +24,7 @@ const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
 
 // 3. In your main PersonalInfoTab component:
 export default function PersonalInfoTab({ personalData, studentName, ...props }: any) {
-    
+
     // SAFETY CHECK: If personalData is null, show loading or empty state
     if (!personalData) {
         return <div className="p-10 text-center text-slate-500 font-medium">Loading details...</div>;

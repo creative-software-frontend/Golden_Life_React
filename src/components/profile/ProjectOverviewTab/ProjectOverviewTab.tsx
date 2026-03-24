@@ -13,7 +13,12 @@ import {
     Send,
     Twitter,
     Briefcase,
-    Globe
+    Globe,
+    Calendar,
+    Heart,
+    MapPin,
+    Activity,
+    Users
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -43,35 +48,6 @@ interface DashboardStats {
     recharge_balance: number | string;
 }
 
-const StatCard = ({ icon: Icon, label, value, color, description }: any) => {
-    const colors: any = {
-        blue: 'text-blue-600 bg-blue-50 group-hover:bg-blue-600',
-        emerald: 'text-emerald-600 bg-emerald-50 group-hover:bg-emerald-600',
-        amber: 'text-amber-600 bg-amber-50 group-hover:bg-amber-600'
-    };
-
-    return (
-        <motion.div
-            whileHover={{ y: -5 }}
-            className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden"
-        >
-            <div className="flex items-start justify-between mb-4 relative z-10">
-                <div className={`p-4 rounded-2xl ${colors[color] || colors.blue} group-hover:text-white group-hover:rotate-6 transition-all duration-500 shadow-sm`}>
-                    <Icon size={24} />
-                </div>
-                <div className="px-3 py-1 bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-widest rounded-full group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    Active
-                </div>
-            </div>
-            <div className="space-y-1 relative z-10">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">{label}</p>
-                <h4 className="text-2xl font-black text-slate-800 tracking-tight group-hover:scale-[1.02] transition-transform origin-left">${value}</h4>
-                <p className="text-[11px] text-slate-400 font-medium leading-relaxed">{description}</p>
-            </div>
-        </motion.div>
-    );
-};
-
 const SectionHeader = ({ icon: Icon, title, badge }: any) => (
     <div className="flex items-center justify-between mb-8 group/header">
         <div className="flex items-center gap-4">
@@ -91,14 +67,18 @@ const SectionHeader = ({ icon: Icon, title, badge }: any) => (
     </div>
 );
 
-const InfoGridItem = ({ label, value }: any) => (
-    <motion.div 
-        whileHover={{ x: 4 }}
-        className="p-5 rounded-2xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-all group"
-    >
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-primary transition-colors">{label}</p>
-        <p className="text-sm font-bold text-slate-700 break-words leading-relaxed">{value || 'Not Set'}</p>
-    </motion.div>
+const InfoCard = ({ icon: Icon, label, value }: any) => (
+    <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/5 transition-all duration-300 group">
+        <div className="flex items-center gap-4">
+            {Icon && (
+                <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors duration-300">
+                    <Icon size={18} className="group-hover:scale-110 transition-transform" />
+                </div>
+            )}
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
+        </div>
+        <p className="text-base font-medium text-gray-800 break-words text-right">{value || 'Not Provided'}</p>
+    </div>
 );
 
 export default function ProjectOverviewTab() {
@@ -166,85 +146,89 @@ export default function ProjectOverviewTab() {
             <div className="relative overflow-hidden bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-white border border-slate-800 shadow-2xl">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 blur-[100px] -mr-48 -mt-48 rounded-full opacity-50" />
 
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-10">
-                    <div className="relative shrink-0">
-                        <img
-                            src={`${baseURL}/uploads/student/image/${student.image}`}
-                            alt={student.name}
-                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl sm:rounded-[2.5rem] object-cover ring-4 ring-white/10 shadow-2xl"
-                        />
-                        <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 p-1.5 sm:p-2 bg-emerald-500 rounded-xl sm:rounded-2xl border-4 border-slate-900 shadow-lg text-white">
-                            <ShieldCheck size={16} className="sm:w-5 sm:h-5" />
-                        </div>
-                    </div>
-                    <div className="flex-1 text-center md:text-left space-y-3 sm:space-y-4">
-                        <div className="space-y-1">
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 mb-2">
-                                <span className="px-2.5 py-1 bg-primary/20 text-primary-light border border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Official Student</span>
-                                <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">{student.status}</span>
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-10">
+                    {/* Upper Left Side - Big */}
+                    <div className="flex-1 flex flex-col md:flex-row items-center gap-6 sm:gap-8 w-full md:w-auto">
+                        <div className="relative shrink-0">
+                            <img
+                                src={`${baseURL}/uploads/student/image/${student.image}`}
+                                alt={student.name}
+                                className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl sm:rounded-[2.5rem] object-cover ring-4 ring-white/10 shadow-2xl"
+                            />
+                            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 p-1.5 sm:p-2 bg-emerald-500 rounded-xl sm:rounded-2xl border-4 border-slate-900 shadow-lg text-white">
+                                <ShieldCheck size={16} className="sm:w-5 sm:h-5" />
                             </div>
-                            <h2 className="text-2xl sm:text-4xl font-black tracking-tight capitalize leading-tight sm:leading-none">Hello, {student.name}</h2>
-                            <p className="text-slate-400 font-medium max-w-xl text-xs sm:text-sm">Welcome back to your project command center. All systems are online.</p>
+                        </div>
+                        <div className="text-center md:text-left space-y-2">
+                            <h2 className="text-2xl sm:text-4xl font-black tracking-tight capitalize leading-tight">Hello, {student.name}</h2>
+                            <p className="text-slate-400 font-medium max-w-xl text-xs sm:text-sm">Welcome back to your project command center.</p>
                         </div>
                     </div>
-                    
-                    {/* Responsive Wallet & ID */}
-                    <div className="w-full md:w-auto flex justify-center md:justify-end gap-6 pt-6 md:pt-0 border-t md:border-t-0 border-white/5 md:border-l md:border-white/10 md:pl-10">
-                        <div className="text-center md:text-right">
-                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Wallet Balance</p>
-                            <p className="text-base sm:text-xl font-black text-primary">৳{walletBalance || '0.00'}</p>
+
+                    {/* Right Side - Small with Badges */}
+                    <div className="w-full md:w-auto flex flex-col items-center md:items-end gap-6 md:border-l md:border-white/10 md:pl-10">
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 sm:gap-3">
+                            <span className="px-2.5 py-1 bg-primary/20 text-primary-light border border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Official Student</span>
+                            <span className={`px-2.5 py-1 ${student.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'} border text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full`}>{student.status || 'Inactive'}</span>
                         </div>
-                        <div className="text-center md:text-right">
-                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
-                            <p className="text-base sm:text-xl font-black text-emerald-400">{student.affiliate_id}</p>
+                        <div className="flex items-center gap-8">
+                            <div className="text-center md:text-right">
+                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Wallet Balance</p>
+                                <p className="text-base sm:text-xl font-black text-primary">৳{walletBalance || '0.00'}</p>
+                            </div>
+                            <div className="text-center md:text-right">
+                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
+                                <p className="text-base sm:text-xl font-black text-emerald-400">{student.affiliate_id}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Metrics Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <StatCard icon={Wallet} label="Boucher Balance" value={stats?.boucher_balance || "0.00"} color="blue" description="Project credits available" />
-                <StatCard icon={TrendingUp} label="Total Earnings" value={stats?.earning_balance || "0.00"} color="emerald" description="Net profit accumulated" />
-                <StatCard icon={BadgeDollarSign} label="Recharge Total" value={stats?.recharge_balance || "0.00"} color="amber" description="Total lifetime funding" />
+            <div className="space-y-4">
+                <SectionHeader icon={TrendingUp} title="Account Statistics" />
+                <div className="grid grid-cols-1 gap-4">
+                    <InfoCard icon={Wallet} label="Boucher Balance" value={`৳${stats?.boucher_balance || "0.00"}`} />
+                    <InfoCard icon={TrendingUp} label="Total Earnings" value={`৳${stats?.earning_balance || "0.00"}`} />
+                    <InfoCard icon={BadgeDollarSign} label="Recharge Total" value={`৳${stats?.recharge_balance || "0.00"}`} />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
+            <div className="space-y-8">
                 {/* Personal & Family */}
                 <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={User} title="Personal & Family" badge="Identity Proof" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <InfoGridItem label="Father's Name" value={personal_info?.father_name} />
-                        <InfoGridItem label="Mother's Name" value={personal_info?.mother_name} />
-                        <InfoGridItem label="Date of Birth" value={personal_info?.date_of_birth} />
-                        <InfoGridItem label="Religion" value={personal_info?.religion} />
-                        <InfoGridItem label="Marital Status" value={personal_info?.marital_status} />
-                        <InfoGridItem label="Blood Group" value={personal_info?.blood_group} />
+                    <div className="grid grid-cols-1 gap-4">
+                        <InfoCard icon={User} label="Father's Name" value={personal_info?.father_name} />
+                        <InfoCard icon={User} label="Mother's Name" value={personal_info?.mother_name} />
+                        <InfoCard icon={Calendar} label="Date of Birth" value={personal_info?.date_of_birth} />
+                        <InfoCard icon={ShieldCheck} label="Religion" value={personal_info?.religion} />
+                        <InfoCard icon={Heart} label="Marital Status" value={personal_info?.marital_status} />
+                        <InfoCard icon={Activity} label="Blood Group" value={personal_info?.blood_group} />
                     </div>
                 </div>
 
                 {/* Professional & Lifestyle */}
                 <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={Briefcase} title="Professional & Lifestyle" badge="Engagement" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <InfoGridItem label="Profession" value={additional_info?.profession} />
-                        <InfoGridItem label="Monthly Income" value={additional_info?.monthly_income} />
-                        <InfoGridItem label="Hobby" value={additional_info?.hobby} />
-                        <InfoGridItem label="Interests" value={additional_info?.interest} />
-                        <div className="sm:col-span-2">
-                            <InfoGridItem label="Current Location" value={personal_info?.location} />
-                        </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <InfoCard icon={Briefcase} label="Profession" value={additional_info?.profession} />
+                        <InfoCard icon={Wallet} label="Monthly Income" value={additional_info?.monthly_income} />
+                        <InfoCard icon={Heart} label="Hobby" value={additional_info?.hobby} />
+                        <InfoCard icon={TrendingUp} label="Interests" value={additional_info?.interest} />
+                        <InfoCard icon={MapPin} label="Current Location" value={personal_info?.location} />
                     </div>
                 </div>
 
                 {/* Nominee details */}
                 <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={ShieldCheck} title="Nominee details" badge="Verified" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <InfoGridItem label="Nominee Name" value={nominee_info?.nominee_name} />
-                        <InfoGridItem label="Nominee Mobile" value={nominee_info?.nominee_mobile} />
-                        <InfoGridItem label="NID Number" value={nominee_info?.nominee_nid_number} />
-                        <InfoGridItem label="Relation" value={nominee_info?.relation_with} />
+                    <div className="grid grid-cols-1 gap-4">
+                        <InfoCard icon={User} label="Nominee Name" value={nominee_info?.nominee_name} />
+                        <InfoCard icon={Activity} label="Nominee Mobile" value={nominee_info?.nominee_mobile} />
+                        <InfoCard icon={ShieldCheck} label="NID Number" value={nominee_info?.nominee_nid_number} />
+                        <InfoCard icon={Users} label="Relation" value={nominee_info?.relation_with} />
                     </div>
                 </div>
 
