@@ -349,7 +349,7 @@ export default function UserLayout() {
         <SidebarProvider className=''>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
-                    <div className="flex items-center justify-center py-6 border-b h-24">
+                    <div className="flex items-center justify-center py-6 border-b h-[82px]">
                         {/* Increased h-17 to h-24 to provide more room for a bigger logo */}
                         <Link to="/dashboard">
                             <img
@@ -799,10 +799,11 @@ export default function UserLayout() {
                         </div>
                     </div>
                 </header>
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
+                    <Header />
+                </div>
+
                 <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
-                    <div className="hidden lg:block">
-                        <Header />
-                    </div>
 
                     <Cart />
                     <LiveChat />

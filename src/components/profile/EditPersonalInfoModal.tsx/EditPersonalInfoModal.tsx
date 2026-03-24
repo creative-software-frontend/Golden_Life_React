@@ -230,7 +230,7 @@ export default function EditPersonalInfoModal({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-[2] py-4 px-6 bg-primary text-white font-bold rounded-full shadow-[0_10px_30px_-10px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_15px_40px_-10px_rgba(var(--primary-rgb),0.6)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:translate-y-0"
+                  className="flex-[2] py-4 px-6 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:translate-y-0"
                 >
                   {isSubmitting ? (
                     <>
@@ -240,8 +240,8 @@ export default function EditPersonalInfoModal({
                   ) : (
                     <>
                       <span>Update Profile</span>
-                      <div className="p-1 bg-white/20 rounded-lg">
-                        <ChevronRight size={16} />
+                      <div className="p-1 px-2 bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
+                        <ChevronRight size={18} />
                       </div>
                     </>
                   )}

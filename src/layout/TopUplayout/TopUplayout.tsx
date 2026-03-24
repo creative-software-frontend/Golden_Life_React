@@ -240,6 +240,9 @@ export default function TopupLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
+                    <Header />
+                </div>
                 <main className="pt-6 ">
                     <button
                         onClick={changeCheckoutModal} // 1. Change this to alter click behavior
@@ -259,7 +262,6 @@ export default function TopupLayout() {
                         </div>
                     </button>
 
-                    <Header />
                     <Cart />
                     <LiveChat />
 

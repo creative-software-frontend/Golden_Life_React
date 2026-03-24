@@ -16,12 +16,12 @@ interface InfoCardProps {
 
 const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
     <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+        <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
             <Icon size={18} />
         </div>
-        <div className="overflow-hidden">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight truncate">{label}</p>
-            <p className="text-sm font-semibold text-slate-700 mt-0.5 truncate">{value || 'Not Provided'}</p>
+        <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
+            <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">{value || 'Not Provided'}</p>
         </div>
     </div>
 );
@@ -111,39 +111,42 @@ export default function PersonalInfoTab({
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
-                    <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full" />
-                    <Loader2 className="animate-spin text-primary relative" size={40} />
+                    <div className="absolute inset-0 bg-emerald-500/10 blur-2xl rounded-full" />
+                    <Loader2 className="animate-spin text-emerald-600 relative" size={40} />
                 </div>
                 <div className="space-y-1">
                     <p className="text-base font-bold text-slate-700">Loading profile details...</p>
-                    <p className="text-xs text-slate-400">Fetching your personal information from our secure servers</p>
+                    <p className="text-xs text-slate-400 font-medium">Fetching your personal information from our secure servers</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
                 <div className="relative">
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Personal Profile</h2>
-                    <p className="text-xs text-slate-400 font-medium mt-1 uppercase tracking-widest">Identification & Residential Records</p>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">Personal Profile</h2>
+                    <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
+                        <Users size={12} className="text-emerald-500" />
+                        Identification & Residential Records
+                    </p>
                 </div>
                 <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="relative flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn"
+                    className="relative flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn"
                 >
                     <Edit2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
-                    <span>Edit Profile</span>
+                    <span className="uppercase tracking-widest text-xs">Edit Profile</span>
                 </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
-                        <Users size={16} className="text-primary" />
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Family & Identity</h3>
+                        <Users size={16} className="text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Family & Identity</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InfoCard icon={User} label="Father's Name" value={internalData.father_name} />
@@ -157,8 +160,8 @@ export default function PersonalInfoTab({
 
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
-                        <Home size={16} className="text-primary" />
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Residential Details</h3>
+                        <Home size={16} className="text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Residential Details</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <InfoCard icon={Globe} label="Living Country" value={internalData.living_country} />
@@ -172,7 +175,7 @@ export default function PersonalInfoTab({
             </div>
 
             <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-4">
-                <div className="p-3 bg-white rounded-xl text-primary shadow-sm">
+                <div className="p-3 bg-white rounded-xl text-emerald-600 shadow-sm">
                     <MapPin size={20} />
                 </div>
                 <div>

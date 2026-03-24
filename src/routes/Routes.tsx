@@ -80,6 +80,7 @@ import DocumentInfoTab from "@/components/profile/DocumentInfoTab/DocumentInfoTa
 import NomineeInfoTab from "@/components/profile/NomineeInfoTab/NomineeInfoTab";
 import AdditionalInfoTab from "@/components/profile/AdditionalInfoTab/AdditionalInfoTab";
 import ProjectOverviewTab from "@/components/profile/ProjectOverviewTab/ProjectOverviewTab";
+import ChangePassward from "@/components/profile/ChangePassward/ChangePassward";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -231,6 +232,7 @@ export const routes = createBrowserRouter([
                             { path: "document-info", element: <DocumentInfoTab /> },
                             { path: "nominee-info", element: <NomineeInfoTab /> },
                             { path: "Additional-info", element: <AdditionalInfoTab /> },
+                            { path: "Change-passward", element: <ChangePassward /> },
                         ]
                     },
                     {

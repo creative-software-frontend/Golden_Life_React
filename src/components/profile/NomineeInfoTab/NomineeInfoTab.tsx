@@ -23,12 +23,12 @@ interface InfoCardProps {
 
 const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
     <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+        <div className="flex-shrink-0 p-3 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
             <Icon size={20} />
         </div>
-        <div className="overflow-hidden">
+        <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{label}</p>
-            <p className="text-sm font-bold text-slate-700 mt-1">{value || 'Not Provided'}</p>
+            <p className="text-sm font-bold text-slate-700 mt-1 break-words">{value || 'Not Provided'}</p>
         </div>
     </div>
 );
@@ -39,7 +39,12 @@ export default function NomineeInfoTab() {
     const [loading, setLoading] = useState(false);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-    const imageBaseUrl = `${baseURL}/uploads/student/image/`;
+    
+    // Helper to get correct path for nominee documents
+    const getNomineeDocUrl = (fileName: string, type: 'nominee_image' | 'nominee_nid_front_page' | 'nominee_nid_back_page') => {
+        if (!fileName) return null;
+        return `${baseURL}/uploads/student/${type}/${fileName}`;
+    };
 
     const getActiveToken = () => {
         const session = sessionStorage.getItem("student_session");
@@ -93,36 +98,37 @@ export default function NomineeInfoTab() {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
-                    <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full" />
-                    <Loader2 className="animate-spin text-primary relative" size={40} />
+                    <div className="absolute inset-0 bg-emerald-500/10 blur-2xl rounded-full" />
+                    <Loader2 className="animate-spin text-emerald-600 relative" size={40} />
                 </div>
                 <div className="space-y-1">
                     <p className="text-base font-bold text-slate-700">Loading nominee details...</p>
-                    <p className="text-xs text-slate-400">Syncing record for verification</p>
+                    <p className="text-xs text-slate-400 font-medium">Syncing record for verification</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 rounded-full -mr-24 -mt-24 transition-transform group-hover:scale-110" />
                 
                 <div className="flex items-center gap-6 relative">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-slate-50 bg-slate-100 shadow-sm">
+                    <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-white bg-slate-50 shadow-xl relative group/avatar">
                         {nomineeData.nominee_image ? (
-                            <img src={`${imageBaseUrl}${nomineeData.nominee_image}`} className="w-full h-full object-cover" alt="Nominee" />
+                            <img src={getNomineeDocUrl(nomineeData.nominee_image, 'nominee_image') || ''} className="w-full h-full object-cover" alt="Nominee" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                                 <User size={32} />
                             </div>
                         )}
+                        <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight">{nomineeData.nominee_name || 'Nominee Name'}</h2>
-                        <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-widest flex items-center gap-2">
-                             <Heart size={12} className="text-rose-400" />
+                        <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">{nomineeData.nominee_name || 'Nominee Name'}</h2>
+                        <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
+                             <Heart size={12} className="text-emerald-500" />
                              {nomineeData.relation_with || 'Relation'}
                         </p>
                     </div>
@@ -130,18 +136,18 @@ export default function NomineeInfoTab() {
 
                 <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="relative flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all group/btn"
+                    className="relative flex items-center justify-center gap-2 px-8 py-3.5 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 transition-all group/btn"
                 >
                     <Edit2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
-                    <span>Manage Nominee</span>
+                    <span className="uppercase tracking-widest text-xs">Manage Nominee</span>
                 </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
                     <div className="flex items-center gap-2 ml-1">
-                        <ShieldCheck size={16} className="text-primary" />
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Contact & Identification</h3>
+                        <ShieldCheck size={16} className="text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact & Identification</h3>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,13 +161,13 @@ export default function NomineeInfoTab() {
                         </div>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-blue-50/50 border border-blue-100 flex items-start gap-4">
-                        <div className="p-2 bg-white rounded-lg text-blue-500 shadow-sm mt-0.5">
+                    <div className="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex items-start gap-4">
+                        <div className="p-2 bg-white rounded-lg text-emerald-500 shadow-sm mt-0.5">
                             <ShieldCheck size={16} />
                         </div>
                         <div className="space-y-1">
-                            <p className="text-xs font-bold text-blue-900 tracking-tight">Security Notice</p>
-                            <p className="text-[10px] leading-relaxed text-blue-700/80 font-medium font-inter">
+                            <p className="text-[10px] font-black text-emerald-900 tracking-widest uppercase">Security Notice</p>
+                            <p className="text-[11px] leading-relaxed text-emerald-700/80 font-medium italic">
                                 Nominee information is required for account security and inheritance purposes. Ensure these details match official identification documents.
                             </p>
                         </div>
@@ -170,17 +176,17 @@ export default function NomineeInfoTab() {
 
                 <div className="space-y-6">
                     <div className="flex items-center gap-2 ml-1">
-                        <ImageIcon size={16} className="text-primary" />
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Document Previews</h3>
+                        <ImageIcon size={16} className="text-emerald-500" />
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Document Previews</h3>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
-                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img">
+                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
                             {nomineeData.nominee_nid_front_page ? (
                                 <>
-                                    <img src={`${imageBaseUrl}${nomineeData.nominee_nid_front_page}`} className="w-full h-full object-cover" alt="NID Front" />
+                                    <img src={getNomineeDocUrl(nomineeData.nominee_nid_front_page, 'nominee_nid_front_page') || ''} className="w-full h-full object-cover" alt="NID Front" />
                                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                                         <Eye className="text-white" size={20} />
                                     </div>
@@ -194,10 +200,10 @@ export default function NomineeInfoTab() {
                         </div>
                         <div className="space-y-2">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Back</p>
-                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img">
+                          <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">
                             {nomineeData.nominee_nid_back_page ? (
                                 <>
-                                    <img src={`${imageBaseUrl}${nomineeData.nominee_nid_back_page}`} className="w-full h-full object-cover" alt="NID Back" />
+                                    <img src={getNomineeDocUrl(nomineeData.nominee_nid_back_page, 'nominee_nid_back_page') || ''} className="w-full h-full object-cover" alt="NID Back" />
                                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                                         <Eye className="text-white" size={20} />
                                     </div>

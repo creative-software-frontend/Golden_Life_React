@@ -28,14 +28,14 @@ const InputField = ({ icon: Icon, label, value, onChange, placeholder, type = "t
   <div className="space-y-1.5">
     <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">{label}</label>
     <div className="relative group">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-primary/10 group-focus-within:text-primary transition-all">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-emerald-600/10 group-focus-within:text-emerald-600 transition-all">
         <Icon size={16} />
       </div>
       {options.length > 0 ? (
         <select
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all appearance-none text-slate-700 font-bold"
+          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-600/10 focus:border-emerald-600 outline-none transition-all appearance-none text-slate-700 font-bold"
         >
           <option value="" disabled>{placeholder}</option>
           {options.map((opt: any) => (
@@ -48,7 +48,7 @@ const InputField = ({ icon: Icon, label, value, onChange, placeholder, type = "t
           value={value || ''}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-slate-700 font-bold placeholder:text-slate-300"
+          className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-600/10 focus:border-emerald-600 outline-none transition-all text-slate-700 font-bold placeholder:text-slate-300"
         />
       )}
     </div>
@@ -81,7 +81,7 @@ export default function EditNomineeInfoTabModal({
     nid_back: null as string | null
   });
 
-  const imageBaseUrl = `${baseURL}/uploads/student/image/`;
+  const effectiveBaseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   useEffect(() => {
     if (data && isOpen) {
@@ -91,16 +91,22 @@ export default function EditNomineeInfoTabModal({
         nominee_nid_number: data.nominee_nid_number || '',
         relation_with: data.relation_with || ''
       });
+
+      // Correct preview paths for nominee documents
+      const imagePath = data.nominee_image ? `${effectiveBaseURL}/uploads/student/nominee_image/${data.nominee_image}` : null;
+      const frontPath = data.nominee_nid_front_page ? `${effectiveBaseURL}/uploads/student/nominee_nid_front_page/${data.nominee_nid_front_page}` : null;
+      const backPath = data.nominee_nid_back_page ? `${effectiveBaseURL}/uploads/student/nominee_nid_back_page/${data.nominee_nid_back_page}` : null;
+
       setPreviews({
-        nominee_image: data.nominee_image ? `${imageBaseUrl}${data.nominee_image}` : null,
-        nid_front: data.nominee_nid_front_page ? `${imageBaseUrl}${data.nominee_nid_front_page}` : null,
-        nid_back: data.nominee_nid_back_page ? `${imageBaseUrl}${data.nominee_nid_back_page}` : null
+        nominee_image: imagePath,
+        nid_front: frontPath,
+        nid_back: backPath
       });
       setNomineeImage(null);
       setNidFront(null);
       setNidBack(null);
     }
-  }, [data, isOpen]);
+  }, [data, isOpen, baseURL]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'front' | 'back') => {
     const file = e.target.files?.[0];
@@ -215,7 +221,7 @@ export default function EditNomineeInfoTabModal({
                         <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
                       </label>
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
+                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
                       <Camera size={14} />
                     </div>
                   </div>
@@ -233,14 +239,14 @@ export default function EditNomineeInfoTabModal({
               {/* NID Documents */}
               <div className="space-y-4 pt-4 border-t border-slate-50">
                 <div className="flex items-center gap-2 px-1">
-                  <FileText size={16} className="text-primary" />
+                  <FileText size={16} className="text-emerald-600" />
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identification Background</h4>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Front Page</p>
-                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_front_input')?.click()}>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_front_input')?.click()}>
                       {previews.nid_front ? (
                         <>
                           <img src={previews.nid_front} className="w-full h-full object-cover" alt="Front Preview" />
@@ -260,7 +266,7 @@ export default function EditNomineeInfoTabModal({
 
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Back Page</p>
-                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_back_input')?.click()}>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_back_input')?.click()}>
                       {previews.nid_back ? (
                         <>
                           <img src={previews.nid_back} className="w-full h-full object-cover" alt="Back Preview" />
@@ -285,7 +291,7 @@ export default function EditNomineeInfoTabModal({
               <button
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e as any)}
-                className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
+                className="w-full h-14 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
               >
                 {isSubmitting ? (
                   <>

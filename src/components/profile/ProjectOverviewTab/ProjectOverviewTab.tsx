@@ -104,6 +104,7 @@ const InfoGridItem = ({ label, value }: any) => (
 export default function ProjectOverviewTab() {
     const [profile, setProfile] = useState<FullProfileData | null>(null);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [walletBalance, setWalletBalance] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -119,9 +120,10 @@ export default function ProjectOverviewTab() {
             const headers = { Authorization: `Bearer ${token}` };
 
             try {
-                const [profileRes, dashRes] = await Promise.all([
+                const [profileRes, dashRes, walletRes] = await Promise.all([
                     axios.get(`${baseURL}/api/student/profile`, { headers }).catch(() => null),
-                    axios.get(`${baseURL}/api/student/dashboard`, { headers }).catch(() => null)
+                    axios.get(`${baseURL}/api/student/dashboard`, { headers }).catch(() => null),
+                    axios.get(`${baseURL}/api/wallet-balance`, { headers }).catch(() => null)
                 ]);
 
                 if (profileRes?.data?.status === "success") {
@@ -133,6 +135,9 @@ export default function ProjectOverviewTab() {
                         earning_balance: dashRes.data.data.earning_balance || 0,
                         recharge_balance: dashRes.data.data.recharge_balance || 0
                     });
+                }
+                if (walletRes?.data?.success) {
+                    setWalletBalance(walletRes.data.data.balance);
                 }
             } catch (err) {
                 console.error("ProjectOverview: Fetch failed", err);
@@ -153,60 +158,62 @@ export default function ProjectOverviewTab() {
         );
     }
 
-    const { student, personal_info, document_info, nominee_info, additional_info } = profile;
+    const { student, personal_info, nominee_info, additional_info } = profile;
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-10">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-10">
             {/* Header Hero */}
-            <div className="relative overflow-hidden bg-slate-900 rounded-[3rem] p-10 text-white border border-slate-800 shadow-2xl">
+            <div className="relative overflow-hidden bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-white border border-slate-800 shadow-2xl">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 blur-[100px] -mr-48 -mt-48 rounded-full opacity-50" />
 
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
-                    <div className="relative">
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 sm:gap-10">
+                    <div className="relative shrink-0">
                         <img
                             src={`${baseURL}/uploads/student/image/${student.image}`}
                             alt={student.name}
-                            className="w-32 h-32 rounded-[2.5rem] object-cover ring-4 ring-white/10 shadow-2xl"
+                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl sm:rounded-[2.5rem] object-cover ring-4 ring-white/10 shadow-2xl"
                         />
-                        <div className="absolute -bottom-2 -right-2 p-2 bg-emerald-500 rounded-2xl border-4 border-slate-900 shadow-lg text-white">
-                            <ShieldCheck size={20} />
+                        <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 p-1.5 sm:p-2 bg-emerald-500 rounded-xl sm:rounded-2xl border-4 border-slate-900 shadow-lg text-white">
+                            <ShieldCheck size={16} className="sm:w-5 sm:h-5" />
                         </div>
                     </div>
-                    <div className="flex-1 text-center md:text-left space-y-4">
+                    <div className="flex-1 text-center md:text-left space-y-3 sm:space-y-4">
                         <div className="space-y-1">
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
-                                <span className="px-3 py-1 bg-primary/20 text-primary-light border border-primary/30 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Official Student</span>
-                                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">{student.status}</span>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 mb-2">
+                                <span className="px-2.5 py-1 bg-primary/20 text-primary-light border border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Official Student</span>
+                                <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">{student.status}</span>
                             </div>
-                            <h2 className="text-4xl font-black tracking-tight capitalize leading-none">Hello, {student.name}</h2>
-                            <p className="text-slate-400 font-medium max-w-xl text-sm">Welcome back to your project command center. All systems are online.</p>
+                            <h2 className="text-2xl sm:text-4xl font-black tracking-tight capitalize leading-tight sm:leading-none">Hello, {student.name}</h2>
+                            <p className="text-slate-400 font-medium max-w-xl text-xs sm:text-sm">Welcome back to your project command center. All systems are online.</p>
                         </div>
                     </div>
-                    <div className="flex gap-4">
-                        <div className="text-right border-r border-white/10 pr-6 hidden lg:block">
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Referral Code</p>
-                            <p className="text-lg font-black text-primary">{student.refer_code}</p>
+                    
+                    {/* Responsive Wallet & ID */}
+                    <div className="w-full md:w-auto flex justify-center md:justify-end gap-6 pt-6 md:pt-0 border-t md:border-t-0 border-white/5 md:border-l md:border-white/10 md:pl-10">
+                        <div className="text-center md:text-right">
+                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Wallet Balance</p>
+                            <p className="text-base sm:text-xl font-black text-primary">৳{walletBalance || '0.00'}</p>
                         </div>
-                        <div className="text-right hidden lg:block">
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
-                            <p className="text-lg font-black text-emerald-400">{student.affiliate_id}</p>
+                        <div className="text-center md:text-right">
+                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
+                            <p className="text-base sm:text-xl font-black text-emerald-400">{student.affiliate_id}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Metrics Overview (Previous Design Keep) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Metrics Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <StatCard icon={Wallet} label="Boucher Balance" value={stats?.boucher_balance || "0.00"} color="blue" description="Project credits available" />
                 <StatCard icon={TrendingUp} label="Total Earnings" value={stats?.earning_balance || "0.00"} color="emerald" description="Net profit accumulated" />
                 <StatCard icon={BadgeDollarSign} label="Recharge Total" value={stats?.recharge_balance || "0.00"} color="amber" description="Total lifetime funding" />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
                 {/* Personal & Family */}
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={User} title="Personal & Family" badge="Identity Proof" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <InfoGridItem label="Father's Name" value={personal_info?.father_name} />
                         <InfoGridItem label="Mother's Name" value={personal_info?.mother_name} />
                         <InfoGridItem label="Date of Birth" value={personal_info?.date_of_birth} />
@@ -217,9 +224,9 @@ export default function ProjectOverviewTab() {
                 </div>
 
                 {/* Professional & Lifestyle */}
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={Briefcase} title="Professional & Lifestyle" badge="Engagement" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <InfoGridItem label="Profession" value={additional_info?.profession} />
                         <InfoGridItem label="Monthly Income" value={additional_info?.monthly_income} />
                         <InfoGridItem label="Hobby" value={additional_info?.hobby} />
@@ -231,9 +238,9 @@ export default function ProjectOverviewTab() {
                 </div>
 
                 {/* Nominee details */}
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm">
                     <SectionHeader icon={ShieldCheck} title="Nominee details" badge="Verified" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <InfoGridItem label="Nominee Name" value={nominee_info?.nominee_name} />
                         <InfoGridItem label="Nominee Mobile" value={nominee_info?.nominee_mobile} />
                         <InfoGridItem label="NID Number" value={nominee_info?.nominee_nid_number} />
@@ -242,7 +249,7 @@ export default function ProjectOverviewTab() {
                 </div>
 
                 {/* Digital Presence */}
-                <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm space-y-6">
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6">
                     <SectionHeader icon={Globe} title="Digital Presence" badge="Social" />
                     <div className="flex flex-wrap gap-2">
                         {additional_info?.facebook_url && <a href={additional_info.facebook_url} target="_blank" rel="noreferrer" className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Facebook size={20} /></a>}

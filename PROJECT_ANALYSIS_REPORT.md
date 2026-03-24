@@ -174,7 +174,7 @@ src/
 │   │   ├── CoursesCategory/
 │   │   ├── Faq/
 │   │   ├── FeaturedCourse/
-│   │   ├── FreshSell/
+│   │   ├──                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ell/
 │   │   ├── HSC/
 │   │   ├── HeroSection/
 │   │   ├── Home/
