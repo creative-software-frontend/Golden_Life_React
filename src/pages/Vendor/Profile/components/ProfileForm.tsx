@@ -26,13 +26,6 @@ export function ProfileForm({
   onImageChange,
   onImageRemove
 }: ProfileFormProps) {
-  // Debug logging for form data
-  console.log('📝 [ProfileForm] Initializing with:', {
-    userName: user?.name,
-    businessName: vendor?.business_name || vendor?.businee_name,
-    districtsCount: districts?.length || 0,
-    countriesCount: countries?.length || 0
-  });
   const {
     register,
     handleSubmit,
@@ -44,7 +37,7 @@ export function ProfileForm({
       email: user?.email || '',
       mobile: user?.mobile || '',
       owner_name: vendor?.owner_name || '',
-      business_name: vendor?.businee_name || vendor?.business_name || '',
+      businee_name: vendor?.businee_name || '',  // ✅ Fixed field name
       mobile_business: vendor?.mobile || '',
       country: vendor?.country || '',
       district: vendor?.district || '',
@@ -55,17 +48,6 @@ export function ProfileForm({
       whatsapp: vendor?.whatsapp || '',
     }
   });
-  
-  console.log('[ProfileForm] Form default values set:', {
-    name: user?.name,
-    business_name: vendor?.businee_name || vendor?.business_name
-  });
-
-  // Debug: Log available countries and districts
-  console.log('Countries from API:', countries);
-  console.log('Districts from API:', districts);
-  console.log('Number of countries:', countries?.length);
-  console.log('Number of districts:', districts?.length);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,6 +69,12 @@ export function ProfileForm({
                 <img
                   src={imagePreview}
                   alt="Profile preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : vendor?.image ? (
+                <img
+                  src={`https://api.goldenlife.my/uploads/vendor/image/${vendor.image}`}
+                  alt="Current profile"
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -155,10 +143,8 @@ export function ProfileForm({
             <input
               type="email"
               {...register('email')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.email ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
-              placeholder="your@email.com"
+              disabled
+              className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed"
             />
             {errors.email && (
               <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
@@ -172,10 +158,8 @@ export function ProfileForm({
             <input
               type="tel"
               {...register('mobile')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.mobile ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
-              placeholder="+8801XXXXXXXXX"
+              disabled
+              className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed"
             />
             {errors.mobile && (
               <p className="mt-1 text-xs text-red-500">{errors.mobile.message}</p>
@@ -214,14 +198,14 @@ export function ProfileForm({
             </label>
             <input
               type="text"
-              {...register('business_name')}
+              {...register('businee_name')}
               className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.business_name ? 'border-red-500' : 'border-gray-200'
+                errors.businee_name ? 'border-red-500' : 'border-gray-200'
               } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="Your business name"
             />
-            {errors.business_name && (
-              <p className="mt-1 text-xs text-red-500">{errors.business_name.message}</p>
+            {errors.businee_name && (
+              <p className="mt-1 text-xs text-red-500">{errors.businee_name.message}</p>
             )}
           </div>
 
@@ -290,7 +274,6 @@ export function ProfileForm({
                   </option>
                 ))
               ) : (
-                // Default Bangladesh districts if API doesn't provide data
                 <>
                   <option value="Dhaka">Dhaka</option>
                   <option value="Chittagong">Chittagong</option>

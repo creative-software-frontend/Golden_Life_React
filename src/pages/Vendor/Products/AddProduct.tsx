@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ProductForm } from './components/ProductForm';
+import { AddProductForm } from './components/AddProductForm';
 import { useProductMutation } from './hooks/useProductMutation';
 import { ProductFormData } from './types/product.types';
 
@@ -10,18 +10,20 @@ export default function AddProduct() {
   const navigate = useNavigate();
   const { createProduct, isLoading } = useProductMutation();
 
-  const handleSubmit = async (data: ProductFormData) => {
+  console.log('🟢 [ADD PAGE] AddProduct component rendered');
+
+  const handleSubmit = async (data: any) => {
     try {
       const formData = new FormData();
 
-      console.log('📊 === SUBMITTING PRODUCT ===');
+      console.log('📊 === SUBMITTING PRODUCT (ADD MODE) ===');
       console.log('📋 Full form data received:', data);
       console.log('🖼️ Main images array:', data.images);
-      console.log('📸 Gallery images array:', (data as any).gallery_images);
+      console.log('📸 Gallery images array:', data.gallery_images);
 
       // Append all text fields
       Object.keys(data).forEach((key) => {
-        if (key !== 'images' && key !== 'existing_images' && key !== 'removed_images' && key !== 'gallery_images') {
+        if (key !== 'images' && key !== 'gallery_images') {
           const value = data[key as keyof ProductFormData];
           if (value !== undefined && value !== null) {
             formData.append(key, value.toString());
@@ -35,8 +37,8 @@ export default function AddProduct() {
         console.log('✅ Added main product_image:', data.images[0].name);
       }
 
-      // Handle gallery images from ProductForm - API expects 'gal_img[]'
-      const galleryImages = (data as any).gallery_images || [];
+      // Handle gallery images - API expects 'gal_img[]'
+      const galleryImages = data.gallery_images || [];
       console.log('📸 Processing gallery images:', galleryImages.length, 'files');
       
       if (galleryImages && galleryImages.length > 0) {
@@ -98,10 +100,9 @@ export default function AddProduct() {
       </div>
 
       {/* Product Form */}
-      <ProductForm
+      <AddProductForm
         onSubmit={handleSubmit}
         isLoading={isLoading}
-        mode="add"
       />
     </div>
   );

@@ -62,6 +62,9 @@ export function useProductMutation() {
   };
 
   const updateProduct = async (id: number, formData: FormData): Promise<boolean> => {
+    console.log('🟢 [API] updateProduct CALLED with ID:', id);
+    console.log('🟢 [API] FormData keys:', Array.from(formData.keys()));
+    
     try {
       setIsLoading(true);
       setError(null);
@@ -74,8 +77,9 @@ export function useProductMutation() {
 
       formData.append('_method', 'PUT');
 
-      console.log('Sending update request for product ID:', id);
-      console.log('FormData entries:');
+      console.log('🟢 [API] Sending update request for product ID:', id);
+      console.log('🟢 [API] Full API URL:', `${baseURL}/api/vendor/product/update?product_id=${id}`);
+      console.log('🟢 [API] FormData entries:');
       for (const [key, value] of formData.entries()) {
         if (value instanceof File) {
           console.log(`  ${key}: File - ${value.name} (${value.size} bytes)`);
@@ -96,7 +100,8 @@ export function useProductMutation() {
         }
       );
 
-      console.log('Update response:', response.data);
+      console.log('🟢 [API] Update response received:', response.data);
+      console.log('🟢 [API] Checking success criteria...');
 
       const isSuccess = response.data?.success === true || 
                        response.data?.status === 'success' ||
@@ -176,6 +181,7 @@ export function useProductMutation() {
         sku: productData.sku || '',
         stock: parseInt(productData.stock) || 0,
         video_link: productData.video_link || '',
+        ebook: productData.ebook ?? '0',
         images: [],
         existing_images: [
           productData.product_image,
