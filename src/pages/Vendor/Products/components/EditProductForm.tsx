@@ -82,6 +82,18 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   const offerPrice = watch('offer_price');
   const productTitleEnglish = watch('product_title_english');
 
+  // Auto-calculate prices when seller price changes
+  useEffect(() => {
+    if (sellerPrice && sellerPrice > 0) {
+      const seller = Number(sellerPrice);
+      const regular = seller + (seller * 30 / 100);
+      const offer = seller + (seller * 20 / 100);
+      
+      setValue('regular_price', parseFloat(regular.toFixed(2)));
+      setValue('offer_price', parseFloat(offer.toFixed(2)));
+    }
+  }, [sellerPrice, setValue]);
+
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
   const discount = calculateDiscount(regularPrice, offerPrice);
