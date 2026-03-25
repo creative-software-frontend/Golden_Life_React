@@ -15,7 +15,6 @@ import {
   Send,
   Twitter,
   ChevronRight,
-  User,
   Globe
 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -127,13 +126,13 @@ export default function EditAdditionalInfoTabModal({
           />
 
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 30 }}
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 30 }}
-            className="relative bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 max-h-[92vh] flex flex-col"
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[85vh] overflow-y-auto flex flex-col"
           >
             {/* Header */}
-            <div className="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+            <div className="px-6 sm:px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 bg-emerald-50 rounded-[1.5rem] flex items-center justify-center text-emerald-600 shadow-inner">
                   <Sparkles size={28} />
@@ -148,32 +147,48 @@ export default function EditAdditionalInfoTabModal({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-10 space-y-12 overflow-y-auto custom-scrollbar">
-              {/* Professional & Education Section */}
-              <div className="space-y-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-8 bg-emerald-500 rounded-full" />
-                  <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Career & Education</h4>
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8 overflow-y-auto custom-scrollbar">
+              {/* Professional Section */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                    <Briefcase size={18} />
+                  </div>
+                  <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Professional Life</h4>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <InputField icon={GraduationCap} label="Highest Qualification" value={formData.education} onChange={(v: string) => updateField('education', v)} placeholder="e.g. Master in CSE" />
                   <InputField icon={Briefcase} label="Current Profession" value={formData.profession} onChange={(v: string) => updateField('profession', v)} placeholder="e.g. Software Engineer" />
                   <InputField icon={DollarSign} label="Monthly Income" value={formData.monthly_income} onChange={(v: string) => updateField('monthly_income', v)} placeholder="Earnings" />
-                  <InputField icon={Heart} label="Main Hobby" value={formData.hobby} onChange={(v: string) => updateField('hobby', v)} placeholder="e.g. Reading" />
-                  <InputField icon={Sparkles} label="Interests" value={formData.interest} onChange={(v: string) => updateField('interest', v)} placeholder="Technology" />
-                  <div className="md:col-span-2">
-                    <InputField icon={Heart} label="Lifestyle" value={formData.lifestyle} onChange={(v: string) => updateField('lifestyle', v)} placeholder="Simple" />
+                </div>
+              </div>
+
+              {/* Personal Interests Section */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                    <Heart size={18} />
                   </div>
+                  <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Personal Interests</h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <InputField icon={Heart} label="Hobby" value={formData.hobby} onChange={(v: string) => updateField('hobby', v)} placeholder="e.g. Reading" />
+                  <InputField icon={Sparkles} label="Interest" value={formData.interest} onChange={(v: string) => updateField('interest', v)} placeholder="e.g. Technology" />
+                  <InputField icon={Globe} label="Lifestyle" value={formData.lifestyle} onChange={(v: string) => updateField('lifestyle', v)} placeholder="e.g. Active" />
                 </div>
               </div>
 
               {/* Digital Presence Section */}
-              <div className="space-y-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-8 bg-blue-500 rounded-full" />
+              <div className="space-y-6 pt-4 border-t border-slate-50">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                    <Facebook size={18} />
+                  </div>
                   <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Digital Presence</h4>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <InputField icon={Facebook} label="Facebook URL" value={formData.facebook_url} onChange={(v: string) => updateField('facebook_url', v)} placeholder="https://facebook.com/..." />
                   <InputField icon={Twitter} label="Twitter / X Profile" value={formData.x_url} onChange={(v: string) => updateField('x_url', v)} placeholder="https://x.com/..." />
                   <InputField icon={Youtube} label="YouTube Channel" value={formData.youtube_url} onChange={(v: string) => updateField('youtube_url', v)} placeholder="https://youtube.com/..." />

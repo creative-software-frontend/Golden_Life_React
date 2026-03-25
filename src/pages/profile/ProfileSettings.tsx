@@ -78,15 +78,15 @@ export default function ProfileSettings() {
                 </div>
 
                 {/* Main Layout Grid */}
-                <div className="flex flex-col md:flex-row gap-6 lg:gap-8 items-start">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
                     
                     {/* Left Side: Your beautiful custom Sidebar */}
-                    <div className="w-full md:w-auto">
+                    <div className="w-full lg:w-auto">
                         <ProfileSidebar />
                     </div>
 
                     {/* Right Side: The Content Area */}
-                    <div className="flex-1 w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 md:p-8 min-h-[500px]">
+                    <div className="flex-1 w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 lg:p-8 min-h-[500px]">
                         {/* <Outlet /> is where React Router injects the components for 
                             /basic-info, /personal-info, /security, etc., based on the URL!
                         */}

@@ -6,11 +6,11 @@ import {
   Loader2,
   FileText,
   Upload,
-  Image as ImageIcon,
   Check,
   ChevronRight,
   Info,
-  Camera
+  Camera,
+  Hash
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { DocumentData } from '../types/types';
@@ -47,17 +47,14 @@ export default function EditDocumentInfoTabModal({
   useEffect(() => {
     if (data && isOpen) {
       setNidNumber(data.nid_number || '');
-
-      // Correct preview paths for NID documents
       const frontUrl = data.nid_front_page ? `${effectiveBaseURL}/uploads/student/nid_front_page/${data.nid_front_page}` : null;
       const backUrl = data.nid_back_page ? `${effectiveBaseURL}/uploads/student/nid_back_page/${data.nid_back_page}` : null;
-
       setFrontPreview(frontUrl);
       setBackPreview(backUrl);
       setFrontPage(null);
       setBackPage(null);
     }
-  }, [data, isOpen, baseURL]);
+  }, [data, isOpen, effectiveBaseURL]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back') => {
     const file = e.target.files?.[0];
@@ -80,16 +77,16 @@ export default function EditDocumentInfoTabModal({
     }
     setIsSubmitting(true);
 
-    const formData = new FormData();
-    formData.append('student_id', data.student_id);
-    formData.append('nid_number', nidNumber);
-    if (frontPage) formData.append('nid_front_page', frontPage);
-    if (backPage) formData.append('nid_back_page', backPage);
+    const formDataToSend = new FormData();
+    formDataToSend.append('student_id', data.student_id);
+    formDataToSend.append('nid_number', nidNumber);
+    if (frontPage) formDataToSend.append('nid_front_page', frontPage);
+    if (backPage) formDataToSend.append('nid_back_page', backPage);
 
     try {
       const response = await axios.post(
-        `${baseURL}/api/student/document-info?id=${data.student_id}`,
-        formData,
+        `${effectiveBaseURL}/api/student/document-info?id=${data.student_id}`,
+        formDataToSend,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -98,16 +95,14 @@ export default function EditDocumentInfoTabModal({
         }
       );
 
-      if (response.data?.status === "success" || response.data?.success) {
-        toast.success(response.data.message || "Document information updated successfully!");
+      if (response.data?.success) {
+        toast.success("Documents updated successfully!");
         onSuccess(response.data.data);
         onClose();
-      } else {
-        toast.error(response.data?.message || "Failed to update documents.");
       }
     } catch (error: any) {
-      console.error("Update Error:", error.response?.data);
-      toast.error(error.response?.data?.message || "An error occurred while saving.");
+      console.error('❌ Update failed:', error);
+      toast.error(error.response?.data?.message || "Failed to update documents.");
     } finally {
       setIsSubmitting(false);
     }
@@ -116,7 +111,7 @@ export default function EditDocumentInfoTabModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => !isSubmitting && onClose()}
@@ -127,16 +122,16 @@ export default function EditDocumentInfoTabModal({
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[90vh] flex flex-col"
+            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[85vh] overflow-y-auto flex flex-col"
           >
             {/* Header */}
-            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
+            <div className="px-6 sm:px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-emerald-600/10 rounded-2xl text-emerald-600">
                   <FileText size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-slate-800 tracking-tight">Document Verification</h3>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Identity Records</h3>
                   <p className="text-xs text-slate-400 font-medium">Update your identification documents</p>
                 </div>
               </div>
@@ -149,7 +144,7 @@ export default function EditDocumentInfoTabModal({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8 overflow-y-auto">
               <div className="p-5 rounded-3xl bg-blue-50/50 border border-blue-100 flex items-start gap-4">
                 <div className="p-2 bg-white rounded-lg text-blue-500 shadow-sm mt-0.5">
                   <Info size={16} />
@@ -157,37 +152,37 @@ export default function EditDocumentInfoTabModal({
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-blue-900 tracking-tight">Verification Notice</p>
                   <p className="text-[11px] leading-relaxed text-blue-700/80 font-medium">
-                    Please ensure your NID number matches the image provided. Files should be clear and readable for faster verification. Maximum file size: 2MB.
+                    Please ensure your NID number matches the image provided. Clear and readable scans speed up the verification process.
                   </p>
                 </div>
               </div>
 
               {/* NID Number Field */}
               <div className="space-y-1.5 px-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Number</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">National ID Number</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-emerald-600/10 group-focus-within:text-emerald-600 transition-all">
-                    <FileText size={16} />
+                    <Hash size={16} />
                   </div>
                   <input
                     type="text"
                     value={nidNumber}
                     onChange={(e) => setNidNumber(e.target.value)}
                     className="w-full pl-14 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-600/10 focus:border-emerald-600 outline-none transition-all font-semibold text-slate-700 placeholder:text-slate-300"
-                    placeholder="Enter your National ID Number"
+                    placeholder="Enter your NID Number"
                     required
                   />
                 </div>
               </div>
 
               {/* Document Uploads */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4">
                 {/* Front Page */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Front Page</label>
                   <div
                     onClick={() => !isSubmitting && frontInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
+                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload shadow-inner"
                   >
                     {frontPreview ? (
                       <>
@@ -201,12 +196,9 @@ export default function EditDocumentInfoTabModal({
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-emerald-600 transition-all duration-300">
-                          <Upload size={24} />
-                        </div>
+                        <Upload size={24} />
                         <div className="text-center">
-                          <p className="text-xs font-bold text-slate-700">Upload Front Page</p>
-                          <p className="text-[10px] uppercase tracking-tighter mt-1">Click to browse files</p>
+                          <p className="text-xs font-bold text-slate-700">Upload Front</p>
                         </div>
                       </div>
                     )}
@@ -219,7 +211,7 @@ export default function EditDocumentInfoTabModal({
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Back Page</label>
                   <div
                     onClick={() => !isSubmitting && backInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
+                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload shadow-inner"
                   >
                     {backPreview ? (
                       <>
@@ -233,12 +225,9 @@ export default function EditDocumentInfoTabModal({
                       </>
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <div className="p-4 bg-white rounded-2xl shadow-sm group-hover/upload:scale-110 group-hover/upload:text-emerald-600 transition-all duration-300">
-                          <Upload size={24} />
-                        </div>
+                        <Upload size={24} />
                         <div className="text-center">
-                          <p className="text-xs font-bold text-slate-700">Upload Back Page</p>
-                          <p className="text-[10px] uppercase tracking-tighter mt-1">Click to browse files</p>
+                          <p className="text-xs font-bold text-slate-700">Upload Back</p>
                         </div>
                       </div>
                     )}
@@ -246,29 +235,28 @@ export default function EditDocumentInfoTabModal({
                   </div>
                 </div>
               </div>
-            </form>
 
-            <div className="p-8 border-t border-slate-50 bg-slate-50/30">
-              <button
-                disabled={isSubmitting}
-                onClick={(e) => handleSubmit(e as any)}
-                className="w-full h-14 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={20} />
-                    <span className="uppercase tracking-widest text-xs">Securing Documents...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="uppercase tracking-widest text-xs">Confirm Identification</span>
-                    <div className="p-1 bg-white/20 rounded-lg group-hover/btn:bg-white/30 transition-colors">
-                      <ChevronRight size={18} />
-                    </div>
-                  </>
-                )}
-              </button>
-            </div>
+              {/* Submit Button */}
+              <div className="pt-2 sticky bottom-0 bg-white">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-14 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      <span className="uppercase tracking-widest text-xs">Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="uppercase tracking-widest text-xs">Verify Documents</span>
+                      <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </motion.div>
         </div>
       )}

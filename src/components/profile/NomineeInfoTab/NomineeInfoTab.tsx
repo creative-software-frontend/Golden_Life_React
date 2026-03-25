@@ -4,7 +4,6 @@ import {
     User,
     ShieldCheck,
     Loader2,
-    LucideIcon,
     Edit2,
     CheckCircle2,
     Image as ImageIcon,
@@ -15,23 +14,7 @@ import {
 import EditNomineeInfoTabModal from '../EditNomineeInfoTabModal/EditNomineeInfoTabModal';
 import { NomineeData } from '../types/types';
 
-interface InfoCardProps {
-    icon: LucideIcon;
-    label: string;
-    value: string | null | undefined;
-}
-
-const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/5 transition-all duration-300 group">
-        <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors duration-300">
-            <Icon size={18} className="group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="overflow-hidden">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
-            <p className="text-base font-medium text-gray-800 mt-0.5 break-words tracking-tight">{value || 'Not Provided'}</p>
-        </div>
-    </div>
-);
+import { InfoCard } from '../InfoCard/InfoCard';
 
 export default function NomineeInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -113,43 +96,29 @@ export default function NomineeInfoTab() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
-
-                <div className="flex items-center gap-5 relative">
-                    <div className="w-20 h-20 rounded-3xl overflow-hidden border-4 border-white bg-slate-50 shadow-xl relative group/avatar">
-                        {nomineeData.nominee_image ? (
-                            <img src={getNomineeDocUrl(nomineeData.nominee_image, 'nominee_image') || ''} className="w-full h-full object-cover" alt="Nominee" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                <User size={28} />
-                            </div>
-                        )}
-                        <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
-                    </div>
-                    <div className="relative">
-                        <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">{nomineeData.nominee_name || 'Nominee Name'}</h2>
-                        <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
-                            <Heart size={12} className="text-emerald-500" />
-                            {nomineeData.relation_with || 'Relation'}
-                        </p>
-                    </div>
+                <div className="relative">
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight italic">Nominee Details</h2>
+                    <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
+                        <ShieldCheck size={12} className="text-emerald-500" />
+                        Legal Representative & Inheritance Record
+                    </p>
                 </div>
-
                 <button
                     onClick={() => setIsEditModalOpen(true)}
                     className="relative flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn"
                 >
                     <Edit2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
-                    <span className="uppercase tracking-widest text-xs">Manage Nominee</span>
+                    <span className="uppercase tracking-widest text-xs">Edit Nominee</span>
                 </button>
             </div>
 
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
-                        <ShieldCheck size={16} className="text-emerald-500" />
+                        <User size={16} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact & Identification</h3>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoCard icon={User} label="Full Name" value={nomineeData.nominee_name} />
                         <InfoCard icon={Phone} label="Mobile Number" value={nomineeData.nominee_mobile} />
                         <InfoCard icon={Heart} label="Relation Profile" value={nomineeData.relation_with} />
@@ -174,7 +143,7 @@ export default function NomineeInfoTab() {
                         <ImageIcon size={16} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Document Previews</h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
                             <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">

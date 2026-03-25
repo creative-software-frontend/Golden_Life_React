@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -80,6 +80,10 @@ export default function EditNomineeInfoTabModal({
     nid_front: null as string | null,
     nid_back: null as string | null
   });
+
+  const nomineeRef = useRef<HTMLInputElement>(null);
+  const nidFrontRef = useRef<HTMLInputElement>(null);
+  const nidBackRef = useRef<HTMLInputElement>(null);
 
   const effectiveBaseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -189,10 +193,10 @@ export default function EditNomineeInfoTabModal({
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[90vh] flex flex-col"
+            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[85vh] overflow-y-auto flex flex-col"
           >
             {/* Header */}
-            <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
+            <div className="px-6 sm:px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-rose-50 rounded-2xl text-rose-500">
                   <Heart size={24} />
@@ -207,60 +211,53 @@ export default function EditNomineeInfoTabModal({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto">
-              {/* Photo & Basic Info */}
-              <div className="grid grid-cols-1 md:grid-cols-[140px_1fr] gap-8">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative group/avatar">
-                    <div className="w-32 h-32 rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 shadow-lg relative group-hover/avatar:scale-[1.02] transition-transform duration-500">
-                      {previews.nominee_image ? (
-                        <img src={previews.nominee_image} className="w-full h-full object-cover" alt="Nominee" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                          <User size={40} />
-                        </div>
-                      )}
-                      <label className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                        <Camera size={24} className="text-white" />
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'image')} />
-                      </label>
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-600 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
-                      <Camera size={14} />
-                    </div>
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8 overflow-y-auto">
+              {/* Profile Photo Section */}
+              <div className="flex flex-col items-center gap-4">
+                <div
+                  onClick={() => !isSubmitting && nomineeRef.current?.click()}
+                  className="relative group cursor-pointer"
+                >
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-slate-50">
+                    {previews.nominee_image ? (
+                      <img src={previews.nominee_image} className="w-full h-full object-cover" alt="Nominee" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-300">
+                        <User size={40} />
+                      </div>
+                    )}
                   </div>
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] text-center">Nominee Photo</p>
+                  <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl flex items-center justify-center">
+                    <Camera className="text-white" size={24} />
+                  </div>
                 </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nominee Photo</p>
+                <input type="file" ref={nomineeRef} className="hidden" onChange={(e) => handleFileChange(e, 'nominee_image')} accept="image/*" />
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <InputField icon={User} label="Nominee Name" value={formData.nominee_name} onChange={(v: any) => setFormData(p => ({ ...p, nominee_name: v }))} placeholder="Full Legal Name" />
-                  <InputField 
-                    icon={Phone} 
-                    label="Mobile Number" 
-                    value={formData.nominee_mobile} 
-                    onChange={(v: string) => {
-                      if (v.length <= 11) {
-                        setFormData(p => ({ ...p, nominee_mobile: v }));
-                      }
-                    }} 
-                    placeholder="Contact Number" 
-                  />
-                  <InputField icon={Heart} label="Relation" value={formData.relation_with} onChange={(v: any) => setFormData(p => ({ ...p, relation_with: v }))} placeholder="Select Relation" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
-                  <InputField icon={FileText} label="Nominee NID" value={formData.nominee_nid_number} onChange={(v: any) => setFormData(p => ({ ...p, nominee_nid_number: v }))} placeholder="National ID Number" />
+              {/* Data Section */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <InputField icon={User} label="Nominee Full Name" value={formData.nominee_name} onChange={(v:any) => setFormData({...formData, nominee_name: v})} placeholder="Full name" />
+                  <InputField icon={Phone} label="Mobile" value={formData.nominee_mobile} onChange={(v:any) => setFormData({...formData, nominee_mobile: v.slice(0,11)})} placeholder="11-digit mobile" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <InputField icon={FileText} label="Nominee NID Number" value={formData.nominee_nid_number} onChange={(v:any) => setFormData({...formData, nominee_nid_number: v})} placeholder="NID Number" />
+                  <InputField icon={Heart} label="Relation Profile" value={formData.relation_with} onChange={(v:any) => setFormData({...formData, relation_with: v})} placeholder="e.g. Spouse / Brother" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
                 </div>
               </div>
 
-              {/* NID Documents */}
-              <div className="space-y-4 pt-4 border-t border-slate-50">
-                <div className="flex items-center gap-2 px-1">
-                  <FileText size={16} className="text-emerald-600" />
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identification Background</h4>
+              {/* Document Scan Section */}
+              <div className="space-y-6 pt-4 border-t border-slate-50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Camera size={16} className="text-emerald-500" />
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Identity Documents</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Front Page</p>
-                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_front_input')?.click()}>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => nidFrontRef.current?.click()}>
                       {previews.nid_front ? (
                         <>
                           <img src={previews.nid_front} className="w-full h-full object-cover" alt="Front Preview" />
@@ -274,13 +271,13 @@ export default function EditNomineeInfoTabModal({
                           <p className="text-[10px] font-bold uppercase tracking-widest">Upload Front</p>
                         </div>
                       )}
-                      <input id="nid_front_input" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'front')} />
+                      <input ref={nidFrontRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'front')} />
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Back Page</p>
-                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => document.getElementById('nid_back_input')?.click()}>
+                    <div className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload" onClick={() => nidBackRef.current?.click()}>
                       {previews.nid_back ? (
                         <>
                           <img src={previews.nid_back} className="w-full h-full object-cover" alt="Back Preview" />
@@ -294,7 +291,7 @@ export default function EditNomineeInfoTabModal({
                           <p className="text-[10px] font-bold uppercase tracking-widest">Upload Back</p>
                         </div>
                       )}
-                      <input id="nid_back_input" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'back')} />
+                      <input ref={nidBackRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'back')} />
                     </div>
                   </div>
                 </div>

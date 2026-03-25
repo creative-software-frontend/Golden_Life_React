@@ -119,11 +119,11 @@ export default function AdditionalInfoTab() {
 
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
                 <div className="relative">
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">Lifestyle & Socials</h2>
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight italic">Lifestyle & Socials</h2>
                     <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
                         <Sparkles size={12} className="text-emerald-500" />
                         Professional & Digital Identity Overview
@@ -145,7 +145,7 @@ export default function AdditionalInfoTab() {
                         <Monitor size={16} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Growth & Profession</h3>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoCard icon={GraduationCap} label="Academic Education" value={infoData.education} />
                         <InfoCard icon={Briefcase} label="Current Profession" value={infoData.profession} />
                         <InfoCard icon={DollarSign} label="Monthly Income Bracket" value={infoData.monthly_income} />
@@ -158,7 +158,7 @@ export default function AdditionalInfoTab() {
                         <Zap size={16} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lifestyle & Interest</h3>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoCard icon={Heart} label="Personal Hobby" value={infoData.hobby} />
                         <InfoCard icon={Sparkles} label="Area of Interest" value={infoData.interest} />
                         <InfoCard icon={Camera} label="Lifestyle Profile" value={infoData.lifestyle} />

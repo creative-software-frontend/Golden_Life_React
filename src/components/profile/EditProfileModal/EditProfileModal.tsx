@@ -220,7 +220,7 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">Affiliate ID</label>
                                             <div className="relative group">
