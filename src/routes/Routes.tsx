@@ -16,6 +16,7 @@ import AllProduct from "@/pages/Home/AllProducts/AllProducts";
 import Trending from "@/pages/Home/TrendingCategory/Trending";
 // import AdminLayout from "@/layout/AdminLAyout/AdminLayout";
 // import Overview from "@/pages/Dashboard/Overview/Overview";
+import SearchResults from "@/pages/Home/Search/SearchResults";
 import AllCourses from "@/pages/Home/AllCourses/AllCourses";
 import CourseViewPage from "@/pages/Home/CourseViewPage/CourseViewPage";
 import CourseLayout from "@/layout/CourseLayout/CourseLayout";
@@ -45,14 +46,41 @@ import Register from "@/pages/common/Register/Register";
 import Landing from "@/pages/Landing/Landing";
 import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
+import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
-import ProtectedRoute from "@/components/ProtectedRoute/ProtectedRoute";
+import StudentProtectedRoute from "@/components/ProtectedRoute/StudentProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
 import ForgotPassword from "@/pages/common/ForgotPassword/ForgotPassword";
 import VendorLayout from "@/layout/VendorLayout/VendorLayout";
 import VendorHome from "@/pages/VendorHome/VendorHome";
+import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
+import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
+
+// Vendor Profile
+import VendorProfile from "@/pages/Vendor/Profile/index";
+import Products from "@/pages/Vendor/ProductManagement/index";
+import AddProduct from "@/pages/Vendor/Products/AddProduct";
+import EditProduct from "@/pages/Vendor/Products/EditProduct";
+// import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails"; 
+
+// Vendor Orders
+import Orders from "@/pages/Vendor/Orders/index";
+import VendorOrderDetails from "@/pages/Vendor/Orders/OrderDetails"; 
+
+import WalletSend from "@/pages/Wallet/WalletSend/WalletSend";
+import WalletWithdraw from "@/pages/Wallet/WalletWithdraw/WalletWithdraw";
+import TransactionHistory from "@/pages/Wallet/TransactionHistory/TransactionHistory";
+import WalletPurchase from "@/pages/Dashboard/WalletPurchase/WalletPurchase";
+import OrderHistory from "@/pages/common/Orders/OrderHistory";
+import BasicInfoTab from "@/components/profile/BasicInfoTab/BasicInfoTab";
+import PersonalInfoTab from "@/components/profile/PersonalInfoTab/PersonalInfoTab";
+import DocumentInfoTab from "@/components/profile/DocumentInfoTab/DocumentInfoTab";
+import NomineeInfoTab from "@/components/profile/NomineeInfoTab/NomineeInfoTab";
+import AdditionalInfoTab from "@/components/profile/AdditionalInfoTab/AdditionalInfoTab";
+import ProjectOverviewTab from "@/components/profile/ProjectOverviewTab/ProjectOverviewTab";
+import ChangePassward from "@/components/profile/ChangePassward/ChangePassward";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -72,10 +100,10 @@ export const routes = createBrowserRouter([
             },
             {
 
-                path:"/forgot-password" ,
-                element:<ForgotPassword />
+                path: "/forgot-password",
+                element: <ForgotPassword />
             }
-                
+
         ],
     },
 
@@ -126,64 +154,204 @@ export const routes = createBrowserRouter([
             }
         ]
     },
- // Inside your routes array
-{
-    element: <ProtectedRoute />, // The Gatekeeper
-    children: [
-        {
-            path: '/dashboard',
-            element: <UserLayout />,
-            children: [
-                {
-                    path: '',
-                    element: <Home />
-                },
-                {
-                    path: 'allcategories',
-                    element: <AllCategories />
-                },
-                {
-                    path: 'all-courses',
-                    element: <AllCourses2 />
-                },
-                {
-                    path: 'productpage',
-                    element: <ProductPage />,
-                },
-                {
-                    path: 'allProducts',
-                    element: <AllProduct />,
-                },
-                {
-                    path: 'product/:id',
-                    element: <ProductDetails />,
-                },
-                {
-                    path: "category/:id",
-                    element: <CategoryPage />,
-                },
-                { path: "profile/settings", element: <ProfileSettings /> },
-            ]
-        }
-    ]
-},
-{
-    path: '/vendor',
-    element: <VendorLayout />, // VendorLayout now acts as the primary wrapper
-    children: [
-        {
-            // Optional: Redirects '/vendor' to '/vendor/dashboard'
-            index: true, 
-            element: <Navigate to="dashboard" replace /> 
-        },
-        {
-            path: 'dashboard', // This was missing!
-            element: <VendorHome/> 
-        },
-      
-        // Add more vendor-specific sub-routes here as needed
-    ]
-},
+    // Inside your routes array
+    {
+        element: <StudentProtectedRoute />, // The Gatekeeper
+        children: [
+            {
+                path: '/dashboard',
+                element: <UserLayout />,
+                children: [
+                    {
+                        path: '',
+                        element: <Home />
+                    },
+                    {
+                        path: 'allcategories',
+                        element: <AllCategories />
+                    },
+                    {
+                        path: 'all-courses',
+                        element: <AllCourses2 />
+                    },
+                    {
+                        path: 'productpage',
+                        element: <ProductPage />,
+                    },
+                    {
+                        path: 'allProducts',
+                        element: <AllProduct />,
+                    },
+                    {
+                        path: 'product/:id',
+                        element: <ProductDetails />,
+                    },
+                    {
+                        path: "category/:id",
+                        element: <CategoryPage />,
+                    },
+                    {
+                        path: 'wallet/add',
+                        element: <WalletAdd />
+                    },
+                    {
+                        path: 'wallet/send',
+                        element: <WalletSend />
+                    },
+                    {
+                        path: 'wallet/withdraw',
+                        element: <WalletWithdraw />
+                    },
+                    {
+                        path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <WalletPurchase />
+                    },
+                    {
+                        path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                        element: <TransactionHistory />
+                    },
+                    {
+                        path: 'order', // REMOVED THE SLASH HERE
+                        element: <OrderHistory />
+                    },
+                    {
+                        path: 'order-details',  // Separate route for Help page
+                        element: <OrderDetails />,
+                    },
+                    // Inside your routes array, replacing the old profile/settings line:
+                    {
+                        path: "profile/settings",
+                        element: <ProfileSettings />,
+                        children: [
+                            // Redirect the base URL to basic-info by default
+                            { index: true, element: <Navigate to="basic-info" replace /> },
+                            { path: "project-overview-info", element: <ProjectOverviewTab /> },
+                            // These will render inside the <Outlet /> in ProfileSettings.tsx
+                            { path: "basic-info", element: <BasicInfoTab /> },
+                            { path: "personal-info", element: <PersonalInfoTab /> },
+                            { path: "document-info", element: <DocumentInfoTab /> },
+                            { path: "nominee-info", element: <NomineeInfoTab /> },
+                            { path: "Additional-info", element: <AdditionalInfoTab /> },
+                            { path: "Change-passward", element: <ChangePassward /> },
+                        ]
+                    },
+                    {
+                        path: 'help', // This creates /dashboard/help
+                        element: <HelpLayout />, // Ensure this layout has an <Outlet />
+                        children: [
+                            {
+                                index: true, // Default view: /dashboard/help
+                                element: <Faq />
+                            },
+                            {
+                                path: 'profile/settings', // Becomes /dashboard/help/profile/settings
+                                element: <ProfileSettings />
+                            },
+                            {
+                                path: 'our-story',
+                                element: <Story />,
+                            },
+                            {
+                                path: 'contact',
+                                element: <Contact />,
+                            }
+                        ]
+                    },
+                    {
+                        path: 'search',
+                        element: <SearchResults />
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        path: '/vendor',
+        element: <VendorProtectedRoute />,
+        children: [
+            {
+                element: <VendorLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="dashboard" replace />
+                    },
+                    {
+                        path: 'dashboard', // <-- Parent path
+                        children: [
+                            {
+                                index: true, // Renders at /vendor/dashboard
+                                element: <VendorHome />
+                            },
+
+                            // Vendor Profile Route
+                            {
+                                path: 'profile',
+                                element: <VendorProfile />
+                            },
+
+                            // Vendor Products Route
+                            {
+                                path: 'products',
+                                element: <Products />
+                            },
+
+                            // NEW: Product Add/Edit Routes
+                            {
+                                path: 'products/add',
+                                element: <AddProduct />
+                            },
+                            {
+                                path: 'products/edit/:id',
+                                element: <EditProduct />
+                            },
+                            {
+                                path: 'products/:id',
+                                element: <VendorProductDetails />
+                            },
+
+                            // NEW: Vendor Order Management Routes
+                            {
+                                path: 'orders',
+                                element: <Orders />
+                            },
+                            {
+                                path: 'orders/:order_no',
+                                element: <VendorOrderDetails />
+                            },
+
+                            // Existing wallet routes
+                            {
+                                path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
+                                element: <WalletAdd />
+                            },
+
+                            {
+                                path: 'wallet/withdraw', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletWithdraw />
+                            },
+                            {
+                                path: 'wallet/send', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletSend />
+                            },
+                            {
+                                path: 'wallet/purchase', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <WalletPurchase />
+                            },
+                            {
+                                path: 'wallet/all', // Renders at /vendor/dashboard/wallet/withdraw
+                                element: <TransactionHistory />
+                            },
+                            //  {
+                            //     path: 'wallet/receiveHistory', // Renders at /vendor/dashboard/wallet/withdraw
+                            //     element: <WalletReceiveHistory />
+                            // },
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
     {
         path: '/courses',
         element: <CourseLayout />,
@@ -261,43 +429,7 @@ export const routes = createBrowserRouter([
     },
 
 
-    {
-        path: '/help',
-        element: <HelpLayout />,
 
-
-        children: [
-
-            {
-                path: '/help',
-                element: <Faq />
-            },
-            {
-                path: 'our-story',  // Separate route for Help page
-                element: <Story />,
-            },
-            {
-                path: 'career',  // Separate route for Help page
-                element: <Career />,
-            },
-            {
-                path: 'contact',  // Separate route for Help page
-                element: <Contact />,
-            },
-            {
-                path: 'privacy-policy',  // Separate route for Help page
-                element: <PrivacyPolicy />,
-            },
-            {
-                path: 'terms',  // Separate route for Help page
-                element: <TermsOfUse />,
-            },
-
-
-
-        ]
-
-    },
     // {
     //     path: '/dashboard',
     //     element: <AdminLayout />, // Layout for dashboard panel
@@ -346,10 +478,7 @@ export const routes = createBrowserRouter([
         path: '/allcourses',  // Separate route for Help page
         element: <AllCourses />,
     },
-    {
-        path: '/orderdetails',  // Separate route for Help page
-        element: <OrderDetails />,
-    },
+
     {
         path: '/trending',  // Separate route for Help page
         element: <Trending />,

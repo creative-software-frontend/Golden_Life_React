@@ -48,7 +48,7 @@ export default function PercelLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 
@@ -220,6 +220,9 @@ export default function PercelLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
+                    <Header />
+                </div>
                 <main className="pt-6 ">
                     <button
                         onClick={changeCheckoutModal}
@@ -235,7 +238,6 @@ export default function PercelLayout() {
                         </div>
                     </button>
 
-                    <Header />
                     <Cart />
                     <LiveChat />
 

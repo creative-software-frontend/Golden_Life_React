@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/sidebar"
 import Header from "@/pages/common/Header/Header"
 import Footer from "@/pages/common/Footer/Footer"
+import { useTranslation } from "react-i18next"
 
 interface Category {
     id: string
@@ -82,6 +83,7 @@ const data: {
 }
 
 export default function ShoppingLayout() {
+    const { t } = useTranslation("global")
     const [activeCategory, setActiveCategory] = React.useState<string>("shopping")
     const navigate = useNavigate()
 
@@ -89,7 +91,7 @@ export default function ShoppingLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 
@@ -233,8 +235,10 @@ export default function ShoppingLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
-                <main className="pt-6 -ms-20">
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
                     <Header />
+                </div>
+                <main className="pt-6 -ms-20">
                     <Outlet />
                     <Footer />
                 </main>

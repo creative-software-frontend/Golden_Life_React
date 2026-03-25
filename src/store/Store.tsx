@@ -1,21 +1,48 @@
 import { create } from 'zustand';
 
+// Shared student profile shape used by ProfileSidebar and BasicInfoTab
+export interface StudentProfileData {
+    id?: number;
+    name: string;
+    email?: string;
+    image: string | null;
+    status?: string;
+    mobile?: string;
+    affiliate_id?: string;
+    refer_code?: string | null;
+}
+
 interface ModalStore {
+    isCheckoutBookModalOpen: boolean;
     isCheckoutModalOpen: boolean;
     isLoginModalOpen: boolean;
     isAnotherModalOpen: boolean;
     isCourseModalOpen: boolean;
     isBuyNowClicked: boolean;
     clicked: boolean;
-    
+    buyNowProduct: any | null;
+
     // --- ADDED: Wallet trigger states ---
     walletUpdateTrigger: number;
 
+    // --- ADDED: Profile image update trigger ---
+    profileUpdateTrigger: number;
+
+    // --- ADDED: Shared student profile data ---
+    studentProfile: StudentProfileData | null;
+    setStudentProfile: (data: StudentProfileData) => void;
+
+    // --- ADDED: Blob preview URL from FileReader after a successful image upload ---
+    profileBlobPreview: string | null;
+    setProfileBlobPreview: (url: string | null) => void;
+
     // Toggle state methods
     toggleClicked: () => void;
-    
+    setCartOpen: (isOpen: boolean) => void;
+    setCheckoutModalOpen: (isOpen: boolean) => void;
+
     //methods for buy now
-    openBuyNow: () => void;
+    openBuyNow: (product: any) => void;
     closeBuyNow: () => void;
     toggleBuyNow: () => void;
 
@@ -41,30 +68,48 @@ interface ModalStore {
 
     // Alternative change method for Checkout Modal
     changeCheckoutModal: () => void;
-    
+
     // --- ADDED: Wallet trigger method ---
     triggerWalletUpdate: () => void;
+
+    // --- ADDED: Profile update trigger method ---
+    triggerProfileUpdate: () => void;
 }
 
 const useModalStore = create<ModalStore>((set) => ({
     // Initial states
+    isCheckoutBookModalOpen: false,
     isCheckoutModalOpen: false,
     isLoginModalOpen: false,
     isAnotherModalOpen: false,
     isCourseModalOpen: false,
     isBuyNowClicked: false,
     clicked: false,
-    
+    buyNowProduct: null,
+
     // --- ADDED: Initial state for wallet trigger ---
     walletUpdateTrigger: 0,
 
+    // --- ADDED: Initial state for profile update trigger ---
+    profileUpdateTrigger: 0,
+
+    // --- ADDED: Initial student profile state ---
+    studentProfile: null,
+    setStudentProfile: (data) => set({ studentProfile: data }),
+
+    // --- ADDED: Initial blob preview state ---
+    profileBlobPreview: null,
+    setProfileBlobPreview: (url) => set({ profileBlobPreview: url }),
+
     // Toggle clicked state
     toggleClicked: () => set((state) => ({ clicked: !state.clicked })),
+    setCartOpen: (isOpen: boolean) => set({ clicked: isOpen }),
+    setCheckoutModalOpen: (isOpen: boolean) => set({ isCheckoutModalOpen: isOpen }),
 
     // Buy Now Controls
-    openBuyNow: () => set({ isBuyNowClicked: true }),
-    closeBuyNow: () => set({ isBuyNowClicked: false }),
-    toggleBuyNow: () => set((state) => ({ isBuyNowClicked: !state.isBuyNowClicked })),
+    openBuyNow: (product: any) => set({ buyNowProduct: product, isCheckoutBookModalOpen: true }),
+    closeBuyNow: () => set({ buyNowProduct: null, isCheckoutBookModalOpen: false }),
+    toggleBuyNow: () => set((state) => ({ isCheckoutBookModalOpen: !state.isCheckoutBookModalOpen })),
 
     // Checkout Modal Controls
     openCheckoutModal: () => set({ isCheckoutModalOpen: true }),
@@ -88,8 +133,13 @@ const useModalStore = create<ModalStore>((set) => ({
     toggleCourseModal: () => set((state) => ({ isCourseModalOpen: !state.isCourseModalOpen })),
 
     // --- ADDED: Method to trigger wallet update ---
-    triggerWalletUpdate: () => set((state) => ({ 
-        walletUpdateTrigger: state.walletUpdateTrigger + 1 
+    triggerWalletUpdate: () => set((state) => ({
+        walletUpdateTrigger: state.walletUpdateTrigger + 1
+    })),
+
+    // --- ADDED: Method to trigger profile image refresh across the app ---
+    triggerProfileUpdate: () => set((state) => ({
+        profileUpdateTrigger: state.profileUpdateTrigger + 1
     })),
 }));
 

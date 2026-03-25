@@ -1,0 +1,207 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Package, Search, RefreshCw } from 'lucide-react';
+import { useOrders } from './hooks/useOrders';
+import { Order, OrderStatus, OrderFilters } from './types/order.types';
+import { OrderTable } from './components/OrderTable';
+import { StatusUpdateModal } from './components/StatusUpdateModal';
+
+export default function Orders() {
+  const navigate = useNavigate();
+  const { fetchOrders, updateOrderStatus, isLoading } = useOrders();
+  
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [filters, setFilters] = useState<OrderFilters>({
+    search: '',
+    status: 'All',
+    page: 1,
+    limit: 10
+  });
+  
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<{ orderNo: string; status: OrderStatus } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const loadOrders = async () => {
+    setIsRefreshing(true);
+    try {
+      console.log('🔵 [Orders] Loading orders with filters:', filters);
+      const data = await fetchOrders(filters);
+      console.log('🟢 [Orders] Orders loaded:', data.length, 'orders');
+      setOrders(data);
+    } catch (error) {
+      console.error('❌ [Orders] Failed to load orders:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  const handleSearch = (value: string) => {
+    setFilters((prev: OrderFilters) => ({ ...prev, search: value, page: 1 }));
+  };
+
+  const handleStatusFilter = (value: string) => {
+    setFilters((prev: OrderFilters) => ({ ...prev, status: value as OrderStatus | 'All', page: 1 }));
+  };
+
+  const handleLimitChange = (value: string) => {
+    setFilters((prev: OrderFilters) => ({ ...prev, limit: parseInt(value), page: 1 }));
+  };
+
+  const handleViewDetails = (orderNo: string) => {
+    navigate(`/vendor/dashboard/orders/${orderNo}`);
+  };
+
+  const handleUpdateStatus = (orderNo: string, currentStatus: string) => {
+    setSelectedOrder({ orderNo, status: currentStatus as OrderStatus });
+    setIsStatusModalOpen(true);
+  };
+
+  const handleStatusUpdate = async (newStatus: OrderStatus) => {
+    if (!selectedOrder) return;
+    
+    console.log('🔵 [Orders] Updating status:', { orderNo: selectedOrder.orderNo, newStatus });
+    const success = await updateOrderStatus(selectedOrder.orderNo, newStatus);
+    console.log('🟢 [Orders] Update result:', success);
+    if (success) {
+      await loadOrders();
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-primary-light/10 flex items-center justify-center">
+            <Package className="w-6 h-6 text-primary-light" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
+            <p className="text-sm text-gray-500">Track and manage customer orders</p>
+          </div>
+        </div>
+        <Button
+          onClick={loadOrders}
+          disabled={isRefreshing}
+          variant="outline"
+          className="gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Filters</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* Search */}
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Search Orders
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search by order number or customer name..."
+                  value={filters.search}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Filter by Status
+              </label>
+              <Select value={filters.status} onValueChange={handleStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Statuses</SelectItem>
+                  <SelectItem value="Packaging">Packaging</SelectItem>
+                  <SelectItem value="On The Way">On The Way</SelectItem>
+                  <SelectItem value="Delivered">Delivered</SelectItem>
+                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Results count and limit */}
+          <div className="flex items-center justify-between mt-4 pt-4 border-t">
+            <p className="text-sm text-gray-600">
+              Showing <span className="font-semibold">{orders.length}</span> orders
+            </p>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">Per page:</label>
+              <Select value={filters.limit?.toString() || '10'} onValueChange={handleLimitChange}>
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Orders Table */}
+      <Card>
+        <CardContent className="p-6">
+          {isLoading && !isRefreshing ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw className="w-8 h-8 animate-spin text-primary-light" />
+            </div>
+          ) : (
+            <OrderTable
+              orders={orders}
+              onViewDetails={handleViewDetails}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Status Update Modal */}
+      {selectedOrder && (
+        <StatusUpdateModal
+          isOpen={isStatusModalOpen}
+          onClose={() => {
+            setIsStatusModalOpen(false);
+            setSelectedOrder(null);
+          }}
+          currentStatus={selectedOrder.status}
+          onUpdate={handleStatusUpdate}
+          orderNo={selectedOrder.orderNo}
+        />
+      )}
+    </div>
+  );
+}

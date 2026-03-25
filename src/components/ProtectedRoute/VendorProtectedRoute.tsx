@@ -1,11 +1,13 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
-const ProtectedRoute = () => {
+const VendorProtectedRoute = () => {
     const location = useLocation();
 
     const isAuthenticated = () => {
-        const session = localStorage.getItem("student_session");
+        const session = sessionStorage.getItem("vendor_session");
+      
+        
         if (!session) return false;
 
         try {
@@ -22,8 +24,8 @@ const ProtectedRoute = () => {
     return isAuthenticated() ? (
         <Outlet />
     ) : (
-        <Navigate to="/login" state={{ from: location }} replace />
+        <Navigate to="/vendor/login" state={{ from: location }} replace />
     );
 };
 
-export default ProtectedRoute;
+export default VendorProtectedRoute;

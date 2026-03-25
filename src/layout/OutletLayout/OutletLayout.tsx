@@ -47,7 +47,7 @@ export default function OutletLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-        localStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 
@@ -66,7 +66,7 @@ export default function OutletLayout() {
             avatar: "/avatars/shadcn.jpg",
         },
         categories: [
-            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashborad" },
+            { id: "shopping", name: t("categories2.title"), icon: ShoppingCart, path: "/dashboard" },
             { id: "courses", name: t("categories2.title1"), icon: GraduationCap, path: "/courses" },
             { id: "percel", name: t("categories2.title2"), icon: Package, path: "/percel" },
             { id: "topup", name: t("categories2.title3"), icon: Package, path: "/topup" },
@@ -237,6 +237,9 @@ export default function OutletLayout() {
                 <SidebarRail />
             </Sidebar>
             <SidebarInset>
+                <div className="hidden lg:block sticky top-0 z-40 bg-white">
+                    <Header />
+                </div>
                 <main className="pt-6 ">
                     <button
                         onClick={changeCheckoutModal}
@@ -252,7 +255,6 @@ export default function OutletLayout() {
                         </div>
                     </button>
 
-                    <Header />
                     <Cart />
                     <LiveChat />
 
