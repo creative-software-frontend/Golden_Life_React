@@ -20,7 +20,7 @@ import {
     Activity,
     Users
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import useModalStore from '@/store/Store';
 
 interface FullProfileData {
     student: {
@@ -87,6 +87,9 @@ export default function ProjectOverviewTab() {
     const [walletBalance, setWalletBalance] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const profileUpdateTrigger = useModalStore((s) => s.profileUpdateTrigger);
+    const profileBlobPreview = useModalStore((s) => s.profileBlobPreview);
+
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     useEffect(() => {
@@ -127,7 +130,7 @@ export default function ProjectOverviewTab() {
         };
 
         fetchData();
-    }, [baseURL]);
+    }, [baseURL, profileUpdateTrigger]);
 
     if (loading || !profile) {
         return (
@@ -140,60 +143,91 @@ export default function ProjectOverviewTab() {
 
     const { student, personal_info, nominee_info, additional_info } = profile;
 
+    const serverImageUrl = student?.image
+        ? `${baseURL}/uploads/student/image/${student.image}?t=${profileUpdateTrigger}_${Date.now()}`
+        : null;
+    const avatarUrl = profileBlobPreview ?? serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+
     return (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-10">
-            {/* Header Hero */}
-            <div className="relative overflow-hidden bg-slate-900 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-white border border-slate-800 shadow-2xl">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 blur-[100px] -mr-48 -mt-48 rounded-full opacity-50" />
+            {/* ── Hero Banner ── */}
+            <div className="relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] border border-white/5 shadow-2xl" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f172a 100%)' }}>
 
-                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-10">
-                    {/* Upper Left Side - Big */}
-                    <div className="flex-1 flex flex-col md:flex-row items-center gap-6 sm:gap-8 w-full md:w-auto">
-                        <div className="relative shrink-0">
+                {/* Decorative ambient orbs */}
+                <div className="pointer-events-none absolute inset-0">
+                    <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-30" style={{ background: 'radial-gradient(circle, #10b98166 0%, transparent 70%)' }} />
+                    <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #6366f166 0%, transparent 70%)' }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                </div>
+
+                <div className="relative z-10 flex flex-col lg:flex-row items-center gap-0">
+
+                    {/* ── Left: Avatar + Greeting ── */}
+                    <div className="flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-6 p-6 sm:p-10">
+                        {/* Avatar with glow ring */}
+                        <div className="relative shrink-0 group">
+                            <div className="absolute -inset-1 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-emerald-500/60 via-teal-400/30 to-transparent blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
                             <img
-                                src={`${baseURL}/uploads/student/image/${student.image}`}
+                                src={avatarUrl}
                                 alt={student.name}
-                                className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl sm:rounded-[2.5rem] object-cover ring-4 ring-white/10 shadow-2xl"
+                                className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-[1.5rem] sm:rounded-[2rem] object-cover ring-2 ring-white/10 shadow-2xl"
                             />
-                            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 p-1.5 sm:p-2 bg-emerald-500 rounded-xl sm:rounded-2xl border-4 border-slate-900 shadow-lg text-white">
-                                <ShieldCheck size={16} className="sm:w-5 sm:h-5" />
+                            <div className="absolute -bottom-2 -right-2 flex items-center justify-center w-8 h-8 bg-emerald-500 rounded-xl border-[3px] border-[#0f172a] shadow-lg shadow-emerald-500/40">
+                                <ShieldCheck size={14} className="text-white" />
                             </div>
                         </div>
-                        <div className="text-center md:text-left space-y-2">
-                            <h2 className="text-2xl sm:text-4xl font-black tracking-tight capitalize leading-tight">Hello, {student.name}</h2>
-                            <p className="text-slate-400 font-medium max-w-xl text-xs sm:text-sm">Welcome back to your project command center.</p>
+
+                        {/* Text */}
+                        <div className="text-center sm:text-left space-y-2">
+                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400/80">Dashboard Overview</p>
+                            <h2 className="text-3xl sm:text-[2.75rem] font-black tracking-tight text-white leading-[1.05] capitalize">
+                                Hello, {student.name}
+                            </h2>
+                            <p className="text-slate-400 text-xs sm:text-sm font-medium leading-relaxed max-w-xs">
+                                Welcome back to your project command center.
+                            </p>
                         </div>
                     </div>
 
-                    {/* Right Side - Small with Badges */}
-                    <div className="w-full md:w-auto flex flex-col items-center md:items-end gap-6 md:border-l md:border-white/10 md:pl-10">
-                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2 sm:gap-3">
-                            <span className="px-2.5 py-1 bg-primary/20 text-primary-light border border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Official Student</span>
-                            <span className={`px-2.5 py-1 ${student.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'} border text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full`}>{student.status || 'Inactive'}</span>
+                    {/* ── Vertical Divider ── */}
+                    <div className="hidden lg:block w-px self-stretch my-8" style={{ background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.08), transparent)' }} />
+
+                    {/* ── Right: 3 Rows — Badges / Wallet / Affiliate ── */}
+                    <div className="w-full lg:w-auto flex flex-col items-stretch divide-y divide-white/5 border-t lg:border-t-0 border-white/5">
+                        {/* Row 1 — Badges */}
+                        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 px-6 sm:px-10 py-5 lg:py-6">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-[10px] font-black uppercase tracking-widest text-primary-light backdrop-blur-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                Official Student
+                            </span>
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest backdrop-blur-sm ${student.status === 'Active' ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' : 'border-rose-500/40 bg-rose-500/10 text-rose-400'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${student.status === 'Active' ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                                {student.status || 'Inactive'}
+                            </span>
                         </div>
-                        <div className="flex items-center gap-8">
-                            <div className="text-center md:text-right">
-                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Wallet Balance</p>
-                                <p className="text-base sm:text-xl font-black text-primary">৳{walletBalance || '0.00'}</p>
-                            </div>
-                            <div className="text-center md:text-right">
-                                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Affiliate ID</p>
-                                <p className="text-base sm:text-xl font-black text-emerald-400">{student.affiliate_id}</p>
-                            </div>
+                        {/* Row 2 — Wallet Balance */}
+                        <div className="flex flex-col justify-center px-6 sm:px-10 py-5 lg:py-6 hover:bg-white/[0.02] transition-colors">
+                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1.5">Wallet Balance</p>
+                            <p className="text-xl sm:text-2xl font-black tracking-tight" style={{ color: '#f59e0b' }}>৳{walletBalance || '0.00'}</p>
+                        </div>
+                        {/* Row 3 — Affiliate ID */}
+                        <div className="flex flex-col justify-center px-6 sm:px-10 py-5 lg:py-6 hover:bg-white/[0.02] transition-colors">
+                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1.5">Affiliate ID</p>
+                            <p className="text-xl sm:text-2xl font-black tracking-tight" style={{ color: '#34d399' }}>{student.affiliate_id}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Metrics Overview */}
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
                 <SectionHeader icon={TrendingUp} title="Account Statistics" />
                 <div className="grid grid-cols-1 gap-4">
                     <InfoCard icon={Wallet} label="Boucher Balance" value={`৳${stats?.boucher_balance || "0.00"}`} />
                     <InfoCard icon={TrendingUp} label="Total Earnings" value={`৳${stats?.earning_balance || "0.00"}`} />
                     <InfoCard icon={BadgeDollarSign} label="Recharge Total" value={`৳${stats?.recharge_balance || "0.00"}`} />
                 </div>
-            </div>
+            </div> */}
 
             <div className="space-y-8">
                 {/* Personal & Family */}

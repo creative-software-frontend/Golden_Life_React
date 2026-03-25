@@ -47,11 +47,11 @@ export default function EditDocumentInfoTabModal({
   useEffect(() => {
     if (data && isOpen) {
       setNidNumber(data.nid_number || '');
-      
+
       // Correct preview paths for NID documents
       const frontUrl = data.nid_front_page ? `${effectiveBaseURL}/uploads/student/nid_front_page/${data.nid_front_page}` : null;
       const backUrl = data.nid_back_page ? `${effectiveBaseURL}/uploads/student/nid_back_page/${data.nid_back_page}` : null;
-      
+
       setFrontPreview(frontUrl);
       setBackPreview(backUrl);
       setFrontPage(null);
@@ -140,8 +140,8 @@ export default function EditDocumentInfoTabModal({
                   <p className="text-xs text-slate-400 font-medium">Update your identification documents</p>
                 </div>
               </div>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 disabled={isSubmitting}
                 className="p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"
               >
@@ -185,7 +185,7 @@ export default function EditDocumentInfoTabModal({
                 {/* Front Page */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Front Page</label>
-                  <div 
+                  <div
                     onClick={() => !isSubmitting && frontInputRef.current?.click()}
                     className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
                   >
@@ -217,7 +217,7 @@ export default function EditDocumentInfoTabModal({
                 {/* Back Page */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Back Page</label>
-                  <div 
+                  <div
                     onClick={() => !isSubmitting && backInputRef.current?.click()}
                     className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
                   >

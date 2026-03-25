@@ -53,6 +53,7 @@ export default function ProfileSidebar() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
     const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfoData | null>(null);
     const [stats, setStats] = useState<DashboardStats>({ boucher: 0, earning: 0, recharge: 0 });
+    const [wallet, setWallet] = useState<string | number>(0);
 
     const profileUpdateTrigger = useModalStore((s) => s.profileUpdateTrigger);
     const storedProfile = useModalStore((s) => s.studentProfile);
@@ -107,19 +108,25 @@ export default function ProfileSidebar() {
                     setAdditionalInfo(additionalRes.data.data);
                 }
 
+                // Fetch Wallet Balance
+                const walletRes = await axios.get(`${baseURL}/api/wallet-balance`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (walletRes.data?.success) {
+                    setWallet(walletRes.data.data.balance || 0);
+                }
+
             } catch (err) {
                 console.error('ProfileSidebar: Data fetch failed:', err);
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchData();
     }, [baseURL, profileUpdateTrigger]);
 
-    const displayProfile = storedProfile ?? profile;
+    const displayProfile = profile ?? storedProfile;
     const serverImageUrl = displayProfile?.image
-        ? `${baseURL}/uploads/student/image/${displayProfile.image}?t=${profileUpdateTrigger}`
+        ? `${baseURL}/uploads/student/image/${displayProfile.image}?t=${profileUpdateTrigger}_${Date.now()}`
         : null;
     const avatarUrl = profileBlobPreview ?? serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(displayProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
 
@@ -182,7 +189,7 @@ export default function ProfileSidebar() {
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Boucher</p>
                     </div>
                     <div className="space-y-1.5 border-r border-slate-100">
-                        <p className="text-sm font-black text-slate-800">{stats.earning}</p>
+                        <p className="text-sm font-black text-slate-800">{wallet}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Earning</p>
                     </div>
                     <div className="space-y-1.5">

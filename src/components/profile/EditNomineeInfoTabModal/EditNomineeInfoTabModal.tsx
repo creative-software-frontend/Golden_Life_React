@@ -127,14 +127,18 @@ export default function EditNomineeInfoTabModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data?.student_id) {
+    
+    // Fix: Use data.id as a fallback if student_id is missing
+    const effectiveStudentId = data?.student_id || data?.id?.toString();
+
+    if (!effectiveStudentId) {
       toast.error("Student ID missing.");
       return;
     }
     setIsSubmitting(true);
 
     const submitData = new FormData();
-    submitData.append('student_id', data.student_id);
+    submitData.append('student_id', effectiveStudentId);
     submitData.append('nominee_name', formData.nominee_name);
     submitData.append('nominee_mobile', formData.nominee_mobile);
     submitData.append('nominee_nid_number', formData.nominee_nid_number);
@@ -146,7 +150,7 @@ export default function EditNomineeInfoTabModal({
 
     try {
       const response = await axios.post(
-        `${baseURL}/api/student/nominee-info?id=${data.student_id}`,
+        `${baseURL}/api/student/nominee-info?id=${effectiveStudentId}`,
         submitData,
         {
           headers: {
@@ -230,7 +234,17 @@ export default function EditNomineeInfoTabModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <InputField icon={User} label="Nominee Name" value={formData.nominee_name} onChange={(v: any) => setFormData(p => ({ ...p, nominee_name: v }))} placeholder="Full Legal Name" />
-                  <InputField icon={Phone} label="Mobile Number" value={formData.nominee_mobile} onChange={(v: any) => setFormData(p => ({ ...p, nominee_mobile: v }))} placeholder="Contact Number" />
+                  <InputField 
+                    icon={Phone} 
+                    label="Mobile Number" 
+                    value={formData.nominee_mobile} 
+                    onChange={(v: string) => {
+                      if (v.length <= 11) {
+                        setFormData(p => ({ ...p, nominee_mobile: v }));
+                      }
+                    }} 
+                    placeholder="Contact Number" 
+                  />
                   <InputField icon={Heart} label="Relation" value={formData.relation_with} onChange={(v: any) => setFormData(p => ({ ...p, relation_with: v }))} placeholder="Select Relation" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
                   <InputField icon={FileText} label="Nominee NID" value={formData.nominee_nid_number} onChange={(v: any) => setFormData(p => ({ ...p, nominee_nid_number: v }))} placeholder="National ID Number" />
                 </div>
@@ -242,7 +256,7 @@ export default function EditNomineeInfoTabModal({
                   <FileText size={16} className="text-emerald-600" />
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identification Background</h4>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Front Page</p>

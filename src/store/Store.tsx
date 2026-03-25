@@ -13,12 +13,14 @@ export interface StudentProfileData {
 }
 
 interface ModalStore {
+    isCheckoutBookModalOpen: boolean;
     isCheckoutModalOpen: boolean;
     isLoginModalOpen: boolean;
     isAnotherModalOpen: boolean;
     isCourseModalOpen: boolean;
     isBuyNowClicked: boolean;
     clicked: boolean;
+    buyNowProduct: any | null;
 
     // --- ADDED: Wallet trigger states ---
     walletUpdateTrigger: number;
@@ -40,7 +42,7 @@ interface ModalStore {
     setCheckoutModalOpen: (isOpen: boolean) => void;
 
     //methods for buy now
-    openBuyNow: () => void;
+    openBuyNow: (product: any) => void;
     closeBuyNow: () => void;
     toggleBuyNow: () => void;
 
@@ -76,12 +78,14 @@ interface ModalStore {
 
 const useModalStore = create<ModalStore>((set) => ({
     // Initial states
+    isCheckoutBookModalOpen: false,
     isCheckoutModalOpen: false,
     isLoginModalOpen: false,
     isAnotherModalOpen: false,
     isCourseModalOpen: false,
     isBuyNowClicked: false,
     clicked: false,
+    buyNowProduct: null,
 
     // --- ADDED: Initial state for wallet trigger ---
     walletUpdateTrigger: 0,
@@ -103,9 +107,9 @@ const useModalStore = create<ModalStore>((set) => ({
     setCheckoutModalOpen: (isOpen: boolean) => set({ isCheckoutModalOpen: isOpen }),
 
     // Buy Now Controls
-    openBuyNow: () => set({ isBuyNowClicked: true }),
-    closeBuyNow: () => set({ isBuyNowClicked: false }),
-    toggleBuyNow: () => set((state) => ({ isBuyNowClicked: !state.isBuyNowClicked })),
+    openBuyNow: (product: any) => set({ buyNowProduct: product, isCheckoutBookModalOpen: true }),
+    closeBuyNow: () => set({ buyNowProduct: null, isCheckoutBookModalOpen: false }),
+    toggleBuyNow: () => set((state) => ({ isCheckoutBookModalOpen: !state.isCheckoutBookModalOpen })),
 
     // Checkout Modal Controls
     openCheckoutModal: () => set({ isCheckoutModalOpen: true }),

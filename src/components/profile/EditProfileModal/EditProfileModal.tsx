@@ -62,7 +62,7 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!student?.student_id) {
+        if (!student?.id) {
             toast.error("Student ID is missing. Cannot update.");
             return;
         }
@@ -76,14 +76,20 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
 
         setIsSubmitting(true);
         const dataToSend = new FormData();
-        dataToSend.append('student_id', student.student_id);
+        dataToSend.append('student_id', student.id.toString());
+        dataToSend.append('name', formData.name);
+        dataToSend.append('email', formData.email);
+        dataToSend.append('mobile', formData.mobile);
+        dataToSend.append('affiliate_id', formData.affiliate_id);
+        dataToSend.append('refer_code', formData.refer_code);
+
         if (formData.image) {
             dataToSend.append('image', formData.image);
         }
 
         try {
             const response = await axios.post(
-                `${baseURL}/api/student/profile?id=${student.student_id}`,
+                `${baseURL}/api/student/basic-info?id=${student.id}`,
                 dataToSend,
                 {
                     headers: {
@@ -94,14 +100,16 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
             );
 
             if (response.data?.status === "success" || response.data?.success) {
-                toast.success(response.data.message || "Profile photo updated successfully!");
-                
-                // Set global blob preview for instant refresh in other components
-                if (previewUrl) {
+                toast.success(response.data.message || "Basic profile updated successfully!");
+
+                // Set global blob preview for instant refresh ONLY if it's a new image
+                if (formData.image && previewUrl) {
                     setProfileBlobPreview(previewUrl);
+                } else {
+                    setProfileBlobPreview(null);
                 }
-                
-                // Trigger global refresh
+
+                // Trigger global refresh to force all components to re-fetch and cache-bust
                 triggerProfileUpdate();
                 onClose();
             } else {
@@ -232,17 +240,17 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
                             </div>
 
                             <div className="pt-6 flex gap-4 sticky bottom-0 bg-white">
-                                <button 
-                                    type="button" 
-                                    onClick={onClose} 
+                                <button
+                                    type="button"
+                                    onClick={onClose}
                                     className="flex-1 py-4 px-6 border-2 border-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 hover:border-slate-200 transition-all flex items-center justify-center gap-2"
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button
                                     onClick={handleSubmit}
                                     disabled={isSubmitting}
-                                    type="button" 
+                                    type="button"
                                     className="flex-[2] py-4 px-6 bg-primary text-white font-bold rounded-2xl shadow-[0_10px_30px_-10px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_15px_40px_-10px_rgba(var(--primary-rgb),0.6)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:translate-y-0"
                                 >
                                     {isSubmitting ? (

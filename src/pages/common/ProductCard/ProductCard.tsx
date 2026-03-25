@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false }: ProductCardProps) => {
-    const { setCartOpen, setCheckoutModalOpen } = useModalStore();
+    const { openBuyNow } = useModalStore();
 
     if (isSkeleton) {
         return (
@@ -31,11 +31,7 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
     const handleBuyNow = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (onAddToCart) {
-            onAddToCart(product);
-        }
-        setCartOpen(false);          // Close the cart sidebar
-        setCheckoutModalOpen(true); // Open the checkout modal
+        openBuyNow(product);
     };
 
     const discount = product.regular_price > product.offer_price
@@ -93,7 +89,7 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
 
                 <div className="flex flex-col gap-1 mt-2 mb-4">
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Merchant Price:</span>
+                        <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Member Price:</span>
                         <span className="text-[16px] sm:text-[18px] font-black text-emerald-600">
                             ৳{product.offer_price}
                         </span>

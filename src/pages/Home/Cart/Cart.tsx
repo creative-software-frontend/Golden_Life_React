@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import CheckoutModal from "../CheckoutModal/CheckoutModal";
+import CheckoutBookModal from "../CheckoutModal/CheckoutBookModal";
 
 export default function Cart() {
   const { t } = useTranslation('global');
@@ -92,7 +93,7 @@ export default function Cart() {
     }
 
     if (newPrice < merchantPrice) {
-      toast.error(`Price cannot be less than Merchant Price (৳${formatBDT(merchantPrice)})`);
+      toast.error(`Price cannot be less than Member Price (৳${formatBDT(merchantPrice)})`);
       return;
     }
 
@@ -216,7 +217,7 @@ export default function Cart() {
                         <div className="mt-2 space-y-2">
                           {/* MERCHANT PRICE */}
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Merchant Price:</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Member Price:</span>
                             <span className="text-xs font-black text-slate-500">৳{formatBDT(merchantPrice)}</span>
                           </div>
 
@@ -242,10 +243,10 @@ export default function Cart() {
                               </div>
                             ) : (
                               <div className="flex items-center gap-2 group/price cursor-pointer" onClick={() => startEditing(item.id, customerPrice)}>
-                                <span className="text-sm font-black text-emerald-600 group-hover/price:text-emerald-700 transition-colors">৳{formatBDT(customerPrice)}</span>
                                 <div className="p-1.5 text-slate-300 group-hover/price:text-emerald-600 group-hover/price:bg-emerald-50 rounded-lg transition-all border border-transparent group-hover/price:border-emerald-100 shadow-none group-hover/price:shadow-sm">
                                   <Pencil size={12} />
                                 </div>
+                                <span className="text-sm font-black text-emerald-600 group-hover/price:text-emerald-700 transition-colors">৳{formatBDT(customerPrice)}</span>
                               </div>
                             )}
                           </div>
@@ -255,7 +256,7 @@ export default function Cart() {
                           <div className="flex items-center gap-1.5">
                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Adjustment:</p>
                             <span className={`text-[11px] font-black ${adjustmentValue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-                              {adjustmentValue >= 0 ? '+' : ''}৳{formatBDT(adjustmentValue)}
+                              {adjustmentValue >= 0 ? '-' : ''}৳{formatBDT(adjustmentValue)}
                             </span>
                           </div>
 
@@ -297,7 +298,7 @@ export default function Cart() {
                   <div className="flex justify-between items-center text-xs font-bold text-gray-400">
                     <span className="uppercase tracking-widest">Adjustment Total</span>
                     <span className={totalSavings >= 0 ? "text-emerald-600" : "text-rose-500"}>
-                      {totalSavings >= 0 ? "+" : ""}৳{formatBDT(totalSavings)}
+                      {totalSavings >= 0 ? "-" : ""}৳{formatBDT(totalSavings)}
                     </span>
                   </div>
                 )}
@@ -356,6 +357,7 @@ export default function Cart() {
       </aside>
 
       <CheckoutModal />
+      <CheckoutBookModal />
     </>
   );
 }
