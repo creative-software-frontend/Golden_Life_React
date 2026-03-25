@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
-import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check } from 'lucide-react';
+import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check, ShieldCheck } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
 import EditProfileModal from '../EditProfileModal/EditProfileModal';
 import useModalStore from '@/store/Store';
 
-// Exporting the interface so the modal can use it
 export interface StudentData {
     id: number;
     name: string;
@@ -56,13 +54,10 @@ export default function BasicInfoTab() {
 
             if (response.data?.success) {
                 const fetchedStudent = response.data.data.student;
-
-                const safeStudent: StudentData = {
+                setStudent({
                     ...fetchedStudent,
                     refer_code: fetchedStudent.refer_code ?? null
-                };
-
-                setStudent(safeStudent);
+                });
             }
         } catch (error) {
             console.error('❌ Dashboard fetch failed:', error);
@@ -77,82 +72,92 @@ export default function BasicInfoTab() {
 
     if (loading) return <LoadingSkeleton />;
 
-    const displayReferCode = student?.refer_code
-        ? student.refer_code
-        : 'Not generated yet';
+    const displayReferCode = student?.refer_code || 'Not generated yet';
 
     return (
-        <div className="w-full max-w-5xl mx-auto">
-            <motion.div initial="hidden" animate="visible" variants={containerVariants}>
-                {/* Header Section */}
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse" />
+        <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse" />
 
-                    <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-white shadow-xl relative bg-slate-50">
-                                {student?.image ? (
-                                    <img
-                                        src={`${baseURL}/uploads/student/image/${student.image}`}
-                                        alt={student.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                        <UserIcon size={40} />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
-                                <Check size={14} />
-                            </div>
+                <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl overflow-hidden border-4 border-white shadow-xl relative bg-slate-50">
+                            {student?.image ? (
+                                <img
+                                    src={`${baseURL}/uploads/student/image/${student.image}?t=${Date.now()}`}
+                                    alt={student.name}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                    <UserIcon size={40} />
+                                </div>
+                            )}
                         </div>
-
-                        <div className="text-center sm:text-left space-y-1">
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">{student?.name || 'Loading...'}</h2>
-                            <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-2">
-                                <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg border border-primary/10">
-                                    Verified Student
-                                </span>
-
-                            </div>
+                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
+                            <Check size={14} />
                         </div>
                     </div>
 
-                    <motion.button
-                        onClick={() => setIsEditModalOpen(true)}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="relative flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl text-sm font-black shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all group/btn"
-                    >
-                        <Edit2 size={18} className="transition-transform group-hover/btn:rotate-12" />
-                        <span>Update Identity</span>
-                    </motion.button>
-                </motion.div>
+                    <div className="text-center sm:text-left space-y-1">
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{student?.name || 'Loading...'}</h2>
+                        <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-2">
+                            <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg border border-primary/10">
+                                Verified Member
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                {/* Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card title="Personal Identity" icon={<UserIcon size={20} />} color="primary">
+                <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="relative flex items-center justify-center gap-2 px-6 py-4 bg-primary text-black font-black rounded-2xl shadow-xl shadow-primary/10 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group/btn w-full sm:w-auto overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
+                    <Edit2 size={18} className="relative z-10 group-hover/btn:rotate-12 transition-transform" />
+                    <span className="relative z-10 uppercase tracking-widest text-[10px]">Edit Account</span>
+                </button>
+            </div>
+
+            {/* Content Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                {/* Personal Identity */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
+                            <UserIcon size={20} />
+                        </div>
+                        <h3 className="font-bold text-slate-800 tracking-tight">Personal Identity</h3>
+                    </div>
+                    <div className="space-y-1">
                         <DataRow label="Full Name" value={student?.name || '—'} icon={<UserIcon size={14} />} />
                         <DataRow label="Email Address" value={student?.email || '—'} icon={<Mail size={14} />} />
                         <DataRow label="Mobile" value={student?.mobile || '—'} icon={<Phone size={14} />} isLast />
-                    </Card>
+                    </div>
+                </div>
 
-                    <Card title="Account Affiliation" icon={<Fingerprint size={20} />} color="secondary">
+                {/* Account Affiliation */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm space-y-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
+                            <Fingerprint size={20} />
+                        </div>
+                        <h3 className="font-bold text-slate-800 tracking-tight">Account Affiliation</h3>
+                    </div>
+                    <div className="space-y-1">
                         <DataRow
                             label="Referral Code"
                             value={displayReferCode}
                             icon={<Hash size={14} />}
-                            className={student?.refer_code ? '' : 'text-amber-600 font-medium'}
                         />
-                        <DataRow label="Affiliate ID" value={student?.affiliate_id || '—'} icon={<Fingerprint size={14} />} />
+                        <DataRow label="Affiliate ID" value={student?.affiliate_id || '—'} icon={<ShieldCheck size={14} />} />
                         <DataRow label="Status" icon={<Activity size={14} />} value={<StatusBadge status={student?.status} />} isLast />
-                    </Card>
+                    </div>
                 </div>
-            </motion.div>
+            </div>
 
-            {/* EDIT MODAL – Now with image refresh key */}
             <EditProfileModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
@@ -162,26 +167,6 @@ export default function BasicInfoTab() {
         </div>
     );
 }
-
-// ──────────────────────────────────────────────────────────────
-// UI SUB-COMPONENTS (unchanged)
-// ──────────────────────────────────────────────────────────────
-
-const Card = ({ title, icon, children, color }: any) => (
-    <motion.div
-        variants={itemVariants}
-        whileHover={{ y: -4 }}
-        className="group bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
-    >
-        <div className="flex items-center gap-3 mb-6">
-            <div className={`p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300 ${color === 'primary' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
-                {icon}
-            </div>
-            <h3 className="font-bold text-slate-800">{title}</h3>
-        </div>
-        <div className="space-y-1">{children}</div>
-    </motion.div>
-);
 
 const StatusBadge = ({ status }: { status?: string }) => {
     const isActive = status?.toLowerCase() === 'active';
@@ -198,26 +183,22 @@ const StatusBadge = ({ status }: { status?: string }) => {
     );
 };
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
-};
-
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 24 } }
-};
-
 function LoadingSkeleton() {
     return (
-        <div className="w-full animate-pulse space-y-8">
-            <div className="flex justify-between items-center">
-                <div className="h-10 bg-slate-200 rounded-lg w-1/3" />
-                <div className="h-10 bg-slate-200 rounded-lg w-24" />
+        <div className="w-full max-w-5xl mx-auto space-y-8 pb-10">
+            <div className="flex justify-between items-center bg-white p-8 rounded-3xl border border-slate-100 animate-pulse">
+                <div className="flex items-center gap-6">
+                    <div className="w-24 h-24 bg-slate-100 rounded-3xl" />
+                    <div className="space-y-3">
+                        <div className="h-8 bg-slate-100 rounded-lg w-48" />
+                        <div className="h-4 bg-slate-50 rounded-lg w-32" />
+                    </div>
+                </div>
+                <div className="h-14 bg-slate-100 rounded-2xl w-40 hidden sm:block" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="h-64 bg-slate-100 rounded-2xl" />
-                <div className="h-64 bg-slate-100 rounded-2xl" />
+                <div className="h-64 bg-white rounded-3xl border border-slate-100 animate-pulse" />
+                <div className="h-64 bg-white rounded-3xl border border-slate-100 animate-pulse" />
             </div>
         </div>
     );

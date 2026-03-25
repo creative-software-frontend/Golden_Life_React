@@ -146,7 +146,7 @@ export default function EditPersonalInfoModal({
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[90vh] flex flex-col"
+            className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 max-h-[85vh] overflow-y-auto flex flex-col"
           >
             {/* Header */}
             <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-10">
@@ -173,7 +173,7 @@ export default function EditPersonalInfoModal({
                   <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Family & Identity</h4>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <InputField icon={User} label="Father's Name" value={formData.father_name} onChange={(v: string) => updateField('father_name', v)} placeholder="Full name of father" />
                   <InputField icon={User} label="Mother's Name" value={formData.mother_name} onChange={(v: string) => updateField('mother_name', v)} placeholder="Full name of mother" />
                   <InputField icon={Calendar} label="Date of Birth" type="date" value={formData.date_of_birth} onChange={(v: string) => updateField('date_of_birth', v)} />
@@ -194,13 +194,13 @@ export default function EditPersonalInfoModal({
                   <h4 className="text-sm font-black text-slate-700 uppercase tracking-widest">Residential Details</h4>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <InputField icon={Globe} label="Living Country" value={formData.living_country} onChange={(v: string) => updateField('living_country', v)} placeholder="Current Country" />
                   <InputField icon={MapPin} label="Division" value={formData.division} onChange={(v: string) => updateField('division', v)} placeholder="State/Division" />
                   <InputField icon={MapPin} label="District" value={formData.district} onChange={(v: string) => updateField('district', v)} placeholder="City/District" />
                   <InputField icon={MapPin} label="Upazila/Thana" value={formData.upazila_thana_name} onChange={(v: string) => updateField('upazila_thana_name', v)} placeholder="Sub-district/Area" />
                   <InputField icon={MapPin} label="Union/Ward" value={formData.union_word_name} onChange={(v: string) => updateField('union_word_name', v)} placeholder="Ward/Union name" />
-                  <div className="md:col-span-2">
+                  <div className="sm:col-span-2">
                     <InputField icon={MapPin} label="Permanent Location" value={formData.location} onChange={(v: string) => updateField('location', v)} placeholder="Full address" />
                   </div>
                 </div>

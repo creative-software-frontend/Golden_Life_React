@@ -4,7 +4,6 @@ import {
     FileText,
     ShieldCheck,
     Loader2,
-    LucideIcon,
     Edit2,
     CheckCircle2,
     Image as ImageIcon,
@@ -12,24 +11,7 @@ import {
 } from 'lucide-react';
 import EditDocumentInfoTabModal from '../EditDocumentInfoTabModal/EditDocumentInfoTabModal';
 import { DocumentData } from '../types/types';
-
-interface InfoCardProps {
-    icon: LucideIcon;
-    label: string;
-    value: string | null | undefined;
-}
-
-const InfoCard = ({ icon: Icon, label, value }: InfoCardProps) => (
-    <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all group">
-        <div className="p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
-            <Icon size={18} />
-        </div>
-        <div className="overflow-hidden">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{label}</p>
-            <p className="text-sm font-semibold text-slate-700 mt-0.5 break-words">{value || 'Not Provided'}</p>
-        </div>
-    </div>
-);
+import { InfoCard } from '../InfoCard/InfoCard';
 
 export default function DocumentInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -109,11 +91,11 @@ export default function DocumentInfoTab() {
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
                 <div className="relative">
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight italic">Identity Documents</h2>
+                    <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight italic">Identity Documents</h2>
                     <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
                         <ShieldCheck size={12} className="text-emerald-500" />
                         Verification & Compliance Status
@@ -150,7 +132,7 @@ export default function DocumentInfoTab() {
                         <ImageIcon size={16} className="text-emerald-500" />
                         <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Document Previews</h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight ml-1">NID Front</p>
                             <div className="relative aspect-[3/2] rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 group/img shadow-sm hover:shadow-md transition-shadow">

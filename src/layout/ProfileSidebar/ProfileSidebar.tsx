@@ -142,7 +142,7 @@ export default function ProfileSidebar() {
     ];
 
     return (
-        <div className="w-full md:w-80 bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 shrink-0 h-fit sticky top-24">
+        <div className="w-full lg:w-80 bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sm:p-6 shrink-0 h-fit lg:sticky lg:top-24">
             {/* Header section with photo and name */}
             <div className="flex flex-col items-center pb-6 border-b border-slate-50">
                 <div className="relative mb-4 group">
