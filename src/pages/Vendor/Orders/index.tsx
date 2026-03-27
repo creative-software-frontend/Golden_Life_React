@@ -67,20 +67,26 @@ export default function Orders() {
     navigate(`/vendor/dashboard/orders/${orderNo}`);
   };
 
-  const handleUpdateStatus = (orderNo: string, currentStatus: string) => {
-    setSelectedOrder({ orderNo, status: currentStatus as OrderStatus });
+  const handleUpdateStatus = (order: Order) => {
+    setSelectedOrder({ orderNo: order.order_no, status: order.status });
     setIsStatusModalOpen(true);
+    // Store the order ID for status update
+    (window as any).__selectedOrderId = order.id;
   };
 
   const handleStatusUpdate = async (newStatus: OrderStatus) => {
     if (!selectedOrder) return;
     
-    console.log('🔵 [Orders] Updating status:', { orderNo: selectedOrder.orderNo, newStatus });
-    const success = await updateOrderStatus(selectedOrder.orderNo, newStatus);
+    // Use order.id (primary key) for status update, not order_no
+    const orderId = (window as any).__selectedOrderId || selectedOrder.orderNo;
+    console.log('🔵 [Orders] Updating status:', { orderId, orderNo: selectedOrder.orderNo, newStatus });
+    const success = await updateOrderStatus(orderId, newStatus);
     console.log('🟢 [Orders] Update result:', success);
     if (success) {
       await loadOrders();
     }
+    // Clean up
+    delete (window as any).__selectedOrderId;
   };
 
   return (
@@ -141,10 +147,9 @@ export default function Orders() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All Statuses</SelectItem>
+                  <SelectItem value="Order Placed">Order Placed</SelectItem>
+                  <SelectItem value="Processing">Processing</SelectItem>
                   <SelectItem value="Packaging">Packaging</SelectItem>
-                  <SelectItem value="On The Way">On The Way</SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
-                  <SelectItem value="Cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
