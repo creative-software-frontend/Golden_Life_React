@@ -10,7 +10,7 @@ import {
   Truck,
   ShoppingBag,
   ExternalLink,
-  FileText,
+  Download,
   ArrowRight,
 } from 'lucide-react';
 
@@ -353,8 +353,8 @@ const OrderHistory = () => {
                                   }}
                                   className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm shadow-indigo-100 no-print"
                                 >
-                                  <FileText size={12} />
-                                  ACCESS CONTENT
+                                  <Download size={12} />
+                                  DOWNLOAD
                                 </button>
                               ) : item.ebook === "1" ? (
                                 <span className="text-[10px] text-amber-600 font-bold mt-1 uppercase tracking-tighter italic">Digitizing...</span>

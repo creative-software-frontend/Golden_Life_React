@@ -34,7 +34,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     setValue,
     watch,
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchemaWithValidation) as any, 
+    resolver: zodResolver(productSchemaWithValidation) as any,
     defaultValues: {
       product_title_english: '',
       product_title_bangla: '',
@@ -50,7 +50,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
       sku: '',
       stock: 0,
       video_link: '',
-      ebook: '0', 
+      ebook: '0',
       images: [],
     },
   });
@@ -67,7 +67,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
       const seller = Number(sellerPrice);
       const regular = seller + (seller * 30 / 100);
       const offer = seller + (seller * 20 / 100);
-      
+
       setValue('regular_price', parseFloat(regular.toFixed(2)));
       setValue('offer_price', parseFloat(offer.toFixed(2)));
     }
@@ -106,7 +106,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
     console.log('🚀 [ADD FORM] Form submitted');
-    
+
     // Prepare submit data for ADD mode - only gallery_images, no existing/removed
     const submitData: any = {
       ...data,
@@ -117,7 +117,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     console.log('📦 [ADD FORM] Submit data prepared:');
     console.log('  - Main images:', submitData.images?.length || 0);
     console.log('  - Gallery images:', submitData.gallery_images?.length || 0);
-    
+
     await onSubmit(submitData);
   };
 
@@ -128,7 +128,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     setGalleryImages([]);
     setActiveTab('short-en');
     setIsEbook(false);
-    
+
     setValue('product_title_english', '');
     setValue('product_title_bangla', '');
     setValue('category_id', 0);
@@ -143,13 +143,13 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     setValue('sku', '');
     setValue('stock', 0);
     setValue('video_link', '');
-    setValue('ebook', '0'); 
+    setValue('ebook', '0');
     setValue('images', []);
   };
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-      
+
       {/* Basic Information */}
       <Card>
         <CardHeader>
@@ -174,7 +174,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
                 </p>
               )}
             </div>
-            
+
             {/* Product Title Bangla */}
             <div>
               <Label htmlFor="product_title_bangla" className="font-semibold">
@@ -383,7 +383,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
                 Regular Price (MRP) *
               </Label>
               <Input
-                id="regular_price"
+                id="offer_price"
                 type="number"
                 step="0.01"
                 {...register('regular_price', { valueAsNumber: true })}
@@ -400,8 +400,9 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
               <Label htmlFor="offer_price" className="font-semibold">
                 Offer Price (Selling) *
               </Label>
+
               <Input
-                id="offer_price"
+                id="regular_price"
                 type="number"
                 step="0.01"
                 {...register('offer_price', { valueAsNumber: true })}
@@ -526,7 +527,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
           )}
         </CardContent>
       </Card>
-      
+
       {/* Media Upload */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Main Image Upload */}

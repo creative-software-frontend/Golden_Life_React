@@ -2,10 +2,165 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Package, Truck, MapPin, CreditCard, CheckCircle2,
-  User, Phone, ArrowLeft, Printer, Contact, Mail, Calendar, FileText
+  User, Phone, ArrowLeft, Printer, Contact, Mail, Calendar, Download
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+
+/* ─── Print-only Invoice Component ───────────────────────────── */
+const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems, baseURL }: any) => {
+  const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  return (
+    <div className="print-only" style={{
+      display: 'none',
+      fontFamily: 'Arial, sans-serif',
+      color: '#111',
+      background: '#fff',
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      padding: '12mm',
+      margin: '0',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      boxSizing: 'border-box'
+    }}>
+      {/* ─── Header ─── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
+        <div>
+          <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain', marginBottom: '8px' }} />
+          <p style={{ fontSize: '11px', color: '#555', margin: 0 }}>No #1 Digital Business &amp; Reseller Platform in Bangladesh</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ fontWeight: 800, fontSize: '15px', margin: '0 0 4px' }}>Creative Software</p>
+          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>+1 (555) 123-4567</p>
+          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>support@goldenlife.my</p>
+        </div>
+      </div>
+
+      {/* ─── Invoice Title ─── */}
+      <div style={{ marginBottom: '16px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 900, margin: '0 0 2px', color: '#111' }}>Invoice</h1>
+        <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
+        <p style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
+      </div>
+
+      {/* ─── Billing + Shipping ─── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
+        {/* Billing */}
+        <div>
+          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Billing Address</p>
+          {buyerProfile ? (
+            <>
+              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{buyerProfile.student?.name}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.personal_info?.location || buyerProfile.personal_info?.district || '—'}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.student?.email}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{buyerProfile.student?.mobile}</p>
+            </>
+          ) : (
+            <p style={{ fontSize: '13px', color: '#999' }}>Not provided</p>
+          )}
+        </div>
+        {/* Shipping */}
+        <div>
+          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Shipping Address</p>
+          {shippingInfo ? (
+            <>
+              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{shippingInfo.name}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{shippingInfo.address}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{shippingInfo.phone}</p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.user_address}</p>
+              <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Product Table ─── */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px', fontSize: '12px' }}>
+        <thead>
+          <tr style={{ background: '#f5d800' }}>
+            <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
+            <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Quantity</th>
+            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Unit Price</th>
+            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Delivery</th>
+            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {order.products?.map((item: any, idx: number) => {
+            const qty = Number(item.quantity) || 1;
+            const itemTotal = Number(item.subtotal) || 0;
+            const unitPrice = qty > 0 ? (itemTotal / qty) : itemTotal;
+            return (
+              <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img
+                      src={`${baseURL}/uploads/ecommarce/product_image/${item.product_image}`}
+                      alt={item.product_name}
+                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee', flexShrink: 0 }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
+                    />
+                    <span style={{ fontWeight: 600, color: '#222' }}>{item.product_name}</span>
+                  </div>
+                </td>
+                <td style={{ padding: '8px 12px', textAlign: 'center', color: '#444' }}>{qty}</td>
+                <td style={{ padding: '8px 12px', textAlign: 'right', color: '#444' }}>৳{unitPrice.toFixed(2)}</td>
+                <td style={{ padding: '8px 12px', textAlign: 'right', color: '#444' }}>—</td>
+                <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700 }}>৳{itemTotal.toFixed(2)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {/* ─── Totals ─── */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', pageBreakInside: 'avoid' }}>
+        <div style={{ width: '280px', fontSize: '13px' }}>
+          {[
+            { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
+            { label: 'Delivery Fee', value: `৳${Number(order.delivery_charge).toFixed(2)}` },
+            { label: 'Total Amount Paid', value: `৳${Number(order.total).toFixed(2)}`, bold: true },
+            { label: 'Total Due', value: '৳0', bold: true },
+          ].map(({ label, value, bold }) => (
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+              <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
+              <span style={{ fontWeight: bold ? 800 : 600 }}>{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Payment Info */}
+      {order.payment && (
+        <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '14px 18px', marginBottom: '28px', fontSize: '12px', color: '#555' }}>
+          <span style={{ fontWeight: 700, color: '#333' }}>Payment: </span>
+          {order.payment.payment_method}
+          {order.payment.transaction_number && (
+            <span> &nbsp;|&nbsp; TXN: {order.payment.transaction_number}</span>
+          )}
+        </div>
+      )}
+
+      {/* ─── Footer Note ─── */}
+      <div style={{ borderTop: '1px solid #eee', paddingTop: '14px', fontSize: '10px', color: '#777', lineHeight: 1.6, pageBreakInside: 'avoid' }}>
+        <p style={{ margin: '0 0 4px' }}>Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days.</p>
+        <p style={{ margin: '0 0 4px' }}>Please go through the return instructions as well as warranty period of the products upon receiving.</p>
+        <p style={{ margin: '0 0 10px' }}>For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my</p>
+        <p style={{ fontWeight: 700, color: '#333', margin: 0 }}>Thank you for shopping!</p>
+      </div>
+    </div>
+  );
+};
 
 // ─── Types ────────────────────────────────────────────────
 interface Product {
@@ -203,43 +358,58 @@ const OrderDetails = () => {
   const isReturned = order.status.toLowerCase().includes("returned");
 
   return (
-    <div className="min-h-screen bg-slate-50/40">
+    <div className="min-h-screen bg-slate-50/40 print-wrapper">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 space-y-6 lg:space-y-8">
         {/* Print styles */}
         <style>{`
           @media print {
-            @page { margin: 12mm; size: auto; }
-            .no-print, header, nav, footer, .fixed, .backdrop-blur { display: none !important; }
-            body { background: white !important; color: black !important; }
-            .shadow-* { box-shadow: none !important; border: 1px solid #ddd !important; }
-            .rounded-2xl { border-radius: 8px !important; }
+            @page { margin: 10mm; size: A4 portrait; }
+            .no-print, header, nav, footer, .fixed, .backdrop-blur,
+            .screen-only { display: none !important; }
+            .print-only { display: block !important; }
+            body, html { background: white !important; color: black !important; margin: 0 !important; padding: 0 !important; }
+            .print-wrapper { all: unset; display: block !important; }
+            .print-wrapper > * { all: unset; display: block !important; }
           }
         `}</style>
 
-        {/* Header */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 no-print flex flex-col sm:flex-row justify-between items-center gap-4">
-          <img
-            src="/image/logo/logo.jpg"
-            alt="Logo"
-            className="h-10 sm:h-12 object-contain"
-          />
+        {/* Print Invoice — hidden on screen, visible when printing */}
+        <PrintInvoice
+          order={order}
+          shippingInfo={shippingInfo}
+          buyerProfile={buyerProfile}
+          subtotal={subtotal}
+          totalItems={totalItems}
+          baseURL={baseURL}
+        />
+
+        {/* ── Screen Header (no-print) ── */}
+        <div className="screen-only bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+          {/* Left: logo + tagline */}
+          <div className="flex items-center gap-3">
+            <img src="/image/logo/logo.jpg" alt="Golden Life" className="h-10 sm:h-12 object-contain" />
+            <div className="hidden sm:block">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No #1 Digital Business &amp; Reseller Platform</p>
+            </div>
+          </div>
+          {/* Right: company info + print button */}
           <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-right">
-              <p className="font-bold text-slate-800 text-sm">{t("orderDetails.companyName") || "Golden Life"}</p>
-              <p className="text-xs text-slate-500">{t("orderDetails.companyPhone") || "+880 1234-567890"}</p>
+            <div className="text-right hidden sm:block">
+              <p className="font-bold text-slate-800 text-sm leading-tight">Creative Software</p>
+              <p className="text-xs text-slate-500">+1 (555) 123-4567</p>
             </div>
             <button
               onClick={() => window.print()}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium transition"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition shadow-sm"
             >
-              <Printer size={16} />
+              <Printer size={15} />
               Print
             </button>
           </div>
         </div>
 
         {/* Title + Status */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="screen-only flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
@@ -247,9 +417,9 @@ const OrderDetails = () => {
               </h1>
               <span
                 className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${isReturned ? 'bg-red-100 text-red-700' :
-                    order.status.toLowerCase().includes('delivered') ? 'bg-emerald-100 text-emerald-700' :
-                      order.status.toLowerCase().includes('way') || order.status.toLowerCase().includes('courier') ? 'bg-blue-100 text-blue-700' :
-                        'bg-amber-100 text-amber-800'
+                  order.status.toLowerCase().includes('delivered') ? 'bg-emerald-100 text-emerald-700' :
+                    order.status.toLowerCase().includes('way') || order.status.toLowerCase().includes('courier') ? 'bg-blue-100 text-blue-700' :
+                      'bg-amber-100 text-amber-800'
                   }`}
               >
                 {order.status}
@@ -274,8 +444,8 @@ const OrderDetails = () => {
           </Link>
         </div>
 
-        {/* Progress Tracker - more responsive */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 no-print">
+        {/* Progress Tracker */}
+        <div className="screen-only bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-6">
             Order Progress
           </h3>
@@ -293,10 +463,10 @@ const OrderDetails = () => {
                 <div key={status} className="relative z-10 flex flex-col items-center flex-1 min-w-[70px] sm:min-w-0">
                   <div
                     className={`w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-sm transition-all ${isReturned && idx === statuses.length - 1
-                        ? 'bg-red-500 text-white ring-2 ring-red-200'
-                        : isActive
-                          ? 'bg-emerald-500 text-white ring-2 ring-emerald-200'
-                          : 'bg-slate-100 text-slate-400'
+                      ? 'bg-red-500 text-white ring-2 ring-red-200'
+                      : isActive
+                        ? 'bg-emerald-500 text-white ring-2 ring-emerald-200'
+                        : 'bg-slate-100 text-slate-400'
                       }`}
                   >
                     {idx === statuses.length - 1 ? <CheckCircle2 size={18} /> : <Truck size={16} />}
@@ -311,8 +481,8 @@ const OrderDetails = () => {
           </div>
         </div>
 
-        {/* Main content - stacked on mobile, side-by-side on larger screens */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        {/* Main content */}
+        <div className="screen-only grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Left - Items + Summary (takes 3/4 on xl) */}
           <div className="xl:col-span-3 space-y-6">
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -373,8 +543,8 @@ const OrderDetails = () => {
                           onClick={() => window.open(item.video_link, '_blank', 'noopener,noreferrer')}
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs sm:text-sm font-medium flex items-center gap-2 transition no-print whitespace-nowrap"
                         >
-                          <FileText size={14} />
-                          Access Content
+                          <Download size={14} />
+                          Download
                         </button>
                       ) : item.ebook === "1" ? (
                         <p className="text-xs text-amber-700 italic">Coming soon</p>

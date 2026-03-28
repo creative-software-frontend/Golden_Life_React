@@ -503,6 +503,11 @@ export default function UserLayout() {
                                                 <span className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Account Hub</span>
                                             </div>
 
+                                            <Link to="/dashboard/order" className="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 transition-all group/item">
+                                                <div className="p-2 rounded-lg bg-emerald-50/50 group-hover/item:bg-white shadow-sm"><Package size={18} /></div>
+                                                <span className="text-[13px] font-bold">Order History</span>
+                                            </Link>
+
                                             <Link to="/dashboard/profile/settings" className="flex items-center gap-3 p-2 rounded-xl hover:bg-secondary/10 text-slate-600 hover:text-secondary transition-all group/item">
                                                 <div className="p-2 rounded-lg bg-secondary/5 group-hover/item:bg-white shadow-sm"><UserCircle size={18} /></div>
                                                 <span className="text-[13px] font-bold">Manage Profile</span>
@@ -659,8 +664,38 @@ export default function UserLayout() {
                                                 </div>
 
 
+                                                {/* Premium Order History Item (Matching design reference) */}
+                                                <div className="p-2">
+                                                    <Link 
+                                                        to="/dashboard/order" 
+                                                        onClick={() => setIsMobileProfileOpen(false)}
+                                                        className="flex items-center gap-4 p-3 rounded-[20px] bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-100/60 transition-all group/order"
+                                                    >
+                                                        <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center shadow-sm shadow-emerald-100/50 border border-emerald-50 group-hover/order:scale-105 transition-transform">
+                                                            <Package className="h-5 w-5 text-emerald-600" />
+                                                        </div>
+                                                        <span className="text-[14px] font-bold text-emerald-700">
+                                                            Order History
+                                                        </span>
+                                                    </Link>
+                                                </div>
+
+                                                <div className="px-2 pb-2">
+                                                    <Link to="/dashboard/profile/settings" onClick={() => setIsMobileProfileOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-600 transition-all">
+                                                        <UserCircle size={18} className="text-slate-400" />
+                                                        <span className="text-[13px] font-bold">Manage Profile</span>
+                                                    </Link>
+                                                    <Link to="/dashboard/help" onClick={() => setIsMobileProfileOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-slate-600 transition-all">
+                                                        <HelpCircle size={18} className="text-slate-400" />
+                                                        <span className="text-[13px] font-bold">Support Center</span>
+                                                    </Link>
+                                                    <button onClick={handleLogout} className="flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-red-50 text-red-500 transition-all mt-1">
+                                                        <LogOut size={18} />
+                                                        <span className="text-[13px] font-bold">Sign Out</span>
+                                                    </button>
                                             </div>
                                         </div>
+                                    </div>
                                     </>
                                 )}
                             </div>

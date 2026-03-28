@@ -25,10 +25,10 @@ const containerVariants = {
 
 const itemVariants = {
     hidden: { opacity: 0, y: 15 },
-    visible: { 
-        opacity: 1, 
-        y: 0, 
-        transition: { type: "spring", stiffness: 60, damping: 15 } 
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { type: "spring", stiffness: 60, damping: 15 }
     }
 };
 
@@ -116,9 +116,9 @@ export default function Categories() {
     return (
         <section className="w-full py-10 px-4 bg-white">
             <div className="container mx-auto">
-                
+
                 {/* Modern Minimal Header */}
-                <motion.div 
+                <motion.div
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
@@ -126,13 +126,13 @@ export default function Categories() {
                 >
                     <div className="flex flex-col gap-1">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-secondary tracking-tight">
-                           {t("header.categories", "Categories")}
+                            {t("header.categories", "Categories")}
                         </h2>
                         <p className="text-sm text-slate-500 font-medium">
                             Find the perfect professional program for your career
                         </p>
                     </div>
-                    
+
                     <Link
                         to="allcategories"
                         className="group flex items-center gap-2 text-sm font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 px-5 py-2.5 rounded-full transition-all duration-300"
@@ -150,7 +150,7 @@ export default function Categories() {
                         return (
                             <Link
                                 key={category.id}
-                                to={`/category/${category.id}`} 
+                                to={`/dashboard/category/${category.id}`}
                                 className="group relative flex flex-col items-center text-center outline-none"
                             >
                                 {/* --- Tooltip Addition --- */}
@@ -166,19 +166,19 @@ export default function Categories() {
                                 {/* Circle Container */}
                                 <div className="relative w-16 h-16 md:w-20 md:h-20 mb-3">
                                     <div className="absolute inset-0 bg-gray-50 rounded-full group-hover:bg-[#5ca367]/10 transition-colors duration-500 scale-100 group-hover:scale-110" />
-                                    
+
                                     <div className="relative z-10 w-full h-full rounded-full border border-gray-100 bg-white p-3 shadow-sm flex items-center justify-center transition-all duration-500 group-hover:shadow-[0_10px_25px_-5px_rgba(92,163,103,0.3)] group-hover:-translate-y-1">
                                         <img
                                             src={category.icon}
                                             alt={displayName}
                                             className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
-                                            onError={(e) => { 
-                                                (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/1170/1170628.png"; 
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = "https://cdn-icons-png.flaticon.com/512/1170/1170628.png";
                                             }}
                                         />
                                     </div>
                                 </div>
-                                
+
                                 {/* Label */}
                                 <span className="text-gray-600 font-bold text-[11px] md:text-xs uppercase tracking-tight group-hover:text-[#5ca367] transition-colors duration-300 line-clamp-1 px-1">
                                     {displayName}

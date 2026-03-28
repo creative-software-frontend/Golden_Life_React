@@ -49,18 +49,18 @@ interface DashboardStats {
 }
 
 const SectionHeader = ({ icon: Icon, title, badge }: any) => (
-    <div className="flex items-center justify-between mb-8 group/header">
-        <div className="flex items-center gap-4">
-            <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl group-hover/header:bg-emerald-600 group-hover/header:text-white group-hover/header:rotate-3 transition-all duration-500 shadow-sm">
-                <Icon size={20} />
+    <div className="flex flex-wrap items-center justify-between gap-y-3 mb-6 sm:mb-8 group/header">
+        <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-3 sm:p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl group-hover/header:bg-emerald-600 group-hover/header:text-white group-hover/header:rotate-3 transition-all duration-500 shadow-sm shrink-0">
+                <Icon size={18} />
             </div>
             <div className="space-y-0.5">
-                <h3 className="font-black text-lg text-slate-800 tracking-tight uppercase">{title}</h3>
+                <h3 className="font-black text-base sm:text-lg text-slate-800 tracking-tight uppercase">{title}</h3>
                 <div className="h-1 w-8 bg-emerald-500 rounded-full scale-x-0 group-hover/header:scale-x-100 transition-transform origin-left duration-500" />
             </div>
         </div>
         {badge && (
-            <span className="px-4 py-1.5 bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-slate-100 shadow-inner">
+            <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-slate-100 shadow-inner whitespace-nowrap">
                 {badge}
             </span>
         )}
@@ -68,16 +68,16 @@ const SectionHeader = ({ icon: Icon, title, badge }: any) => (
 );
 
 const InfoCard = ({ icon: Icon, label, value }: any) => (
-    <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/5 transition-all duration-300 group">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/5 transition-all duration-300 group">
+        <div className="flex items-center gap-3 sm:gap-4">
             {Icon && (
                 <div className="flex-shrink-0 p-2.5 bg-slate-50 text-slate-400 rounded-xl group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors duration-300">
-                    <Icon size={18} className="group-hover:scale-110 transition-transform" />
+                    <Icon size={16} className="group-hover:scale-110 transition-transform" />
                 </div>
             )}
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</p>
         </div>
-        <p className="text-base font-medium text-gray-800 break-words text-right">{value || 'Not Provided'}</p>
+        <p className="text-sm sm:text-base font-medium text-gray-800 break-all sm:break-words sm:text-right pl-11 sm:pl-0">{value || 'Not Provided'}</p>
     </div>
 );
 
@@ -163,7 +163,7 @@ export default function ProjectOverviewTab() {
                 <div className="relative z-10 flex flex-col lg:flex-row items-center gap-0">
 
                     {/* ── Left: Avatar + Greeting ── */}
-                    <div className="flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-6 p-6 sm:p-10">
+                    <div className="flex-1 flex flex-col sm:flex-row items-center gap-5 p-5 sm:p-10">
                         {/* Avatar with glow ring */}
                         <div className="relative shrink-0 group">
                             <div className="absolute -inset-1 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-emerald-500/60 via-teal-400/30 to-transparent blur-md opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
@@ -180,7 +180,7 @@ export default function ProjectOverviewTab() {
                         {/* Text */}
                         <div className="text-center sm:text-left space-y-2">
                             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400/80">Dashboard Overview</p>
-                            <h2 className="text-3xl sm:text-[2.75rem] font-black tracking-tight text-white leading-[1.05] capitalize">
+                            <h2 className="text-2xl sm:text-[2.75rem] font-black tracking-tight text-white leading-[1.1] capitalize">
                                 Hello, {student.name}
                             </h2>
                             <p className="text-slate-400 text-xs sm:text-sm font-medium leading-relaxed max-w-xs">
@@ -195,7 +195,7 @@ export default function ProjectOverviewTab() {
                     {/* ── Right: 3 Rows — Badges / Wallet / Affiliate ── */}
                     <div className="w-full lg:w-auto flex flex-col items-stretch divide-y divide-white/5 border-t lg:border-t-0 border-white/5">
                         {/* Row 1 — Badges */}
-                        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 px-6 sm:px-10 py-5 lg:py-6">
+                        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 px-4 sm:px-10 py-4 lg:py-6">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/40 bg-primary/10 text-[10px] font-black uppercase tracking-widest text-primary-light backdrop-blur-sm">
                                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                 Official Student
@@ -205,15 +205,18 @@ export default function ProjectOverviewTab() {
                                 {student.status || 'Inactive'}
                             </span>
                         </div>
-                        {/* Row 2 — Wallet Balance */}
-                        <div className="flex flex-col justify-center px-6 sm:px-10 py-5 lg:py-6 hover:bg-white/[0.02] transition-colors">
-                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1.5">Wallet Balance</p>
-                            <p className="text-xl sm:text-2xl font-black tracking-tight" style={{ color: '#f59e0b' }}>৳{walletBalance || '0.00'}</p>
-                        </div>
-                        {/* Row 3 — Affiliate ID */}
-                        <div className="flex flex-col justify-center px-6 sm:px-10 py-5 lg:py-6 hover:bg-white/[0.02] transition-colors">
-                            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1.5">Affiliate ID</p>
-                            <p className="text-xl sm:text-2xl font-black tracking-tight" style={{ color: '#34d399' }}>{student.affiliate_id}</p>
+                        {/* Row 2 & 3 — Wallet + Affiliate side by side on mobile */}
+                        <div className="grid grid-cols-2 lg:grid-cols-1 divide-x lg:divide-x-0 lg:divide-y divide-white/5">
+                            {/* Wallet Balance */}
+                            <div className="flex flex-col justify-center px-4 sm:px-10 py-4 lg:py-6 hover:bg-white/[0.02] transition-colors">
+                                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Wallet Balance</p>
+                                <p className="text-lg sm:text-2xl font-black tracking-tight" style={{ color: '#f59e0b' }}>৳{walletBalance || '0.00'}</p>
+                            </div>
+                            {/* Affiliate ID */}
+                            <div className="flex flex-col justify-center px-4 sm:px-10 py-4 lg:py-6 hover:bg-white/[0.02] transition-colors">
+                                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Affiliate ID</p>
+                                <p className="text-lg sm:text-2xl font-black tracking-tight truncate" style={{ color: '#34d399' }}>{student.affiliate_id}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
