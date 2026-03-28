@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProfile } from './hooks/useProfile';
 import { ProfileHeader } from './components/ProfileHeader';
 import { ProfileInfo } from './components/ProfileInfo';
@@ -9,6 +10,7 @@ import { toast } from 'react-toastify';
 import { Edit2, Loader2, AlertCircle, UserX } from 'lucide-react';
 
 export default function VendorProfile() {
+  const navigate = useNavigate();
   const { data, isLoading, error, updateProfile } = useProfile();
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -237,7 +239,10 @@ export default function VendorProfile() {
                     Edit Profile
                   </button>
                   
-                  <button className="w-full px-6 py-3.5 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300">
+                  <button
+                    onClick={() => navigate('/vendor/dashboard/change-password')}
+                    className="w-full px-6 py-3.5 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300"
+                  >
                     Change Password
                   </button>
                   

@@ -37,7 +37,7 @@ export function ProfileForm({
       email: user?.email || '',
       mobile: user?.mobile || '',
       owner_name: vendor?.owner_name || '',
-      businee_name: vendor?.businee_name || '',  // ✅ Fixed field name
+      businee_name: vendor?.businee_name || '',  
       mobile_business: vendor?.mobile || '',
       country: vendor?.country || '',
       district: vendor?.district || '',
