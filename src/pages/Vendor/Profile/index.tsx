@@ -221,6 +221,15 @@ export default function VendorProfile() {
             ) : (
               <ProfileInfo user={user} vendor={vendor} />
             )}
+
+            <div className="">
+              <SocialLinks
+                website={vendor.website}
+                facebook={vendor.facebook}
+                telegram={vendor.telegram}
+                whatsapp={vendor.whatsapp}
+              />
+            </div>
           </div>
 
           {/* Right Column - Actions & Social */}
@@ -274,13 +283,8 @@ export default function VendorProfile() {
               </div>
             )}
 
-            {/* Social Links */}
-            <SocialLinks
-              website={vendor.website}
-              facebook={vendor.facebook}
-              telegram={vendor.telegram}
-              whatsapp={vendor.whatsapp}
-            />
+            
+
           </div>
         </div>
       </div>
