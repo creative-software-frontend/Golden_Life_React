@@ -9,6 +9,15 @@ import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
 
+// Helper function to format address (temporary fix for ID vs text issue)
+const formatAddress = (address: string | undefined) => {
+  if (!address) return 'Not provided';
+  if (!isNaN(Number(address))) {
+    return 'Address not available';
+  }
+  return address;
+};
+
 /* ─── Print-only Invoice ─────────────────────────────────────── */
 const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: string) => string }) => {
   const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
@@ -43,13 +52,13 @@ const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: str
         <div>
           <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Billing Address</p>
           <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
-          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.user_address}</p>
+          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{formatAddress(order.user_address)}</p>
           <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
         </div>
         <div>
           <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Shipping Address</p>
           <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
-          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.user_address}</p>
+          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{formatAddress(order.user_address)}</p>
           <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
         </div>
       </div>
@@ -406,8 +415,13 @@ export default function OrderDetails() {
                   <span className="text-sm font-medium">Delivery Address</span>
                 </div>
                 <p className="text-base text-gray-900 pl-6">
-                  {order.user_address}
+                  {formatAddress(order.user_address)}
                 </p>
+                {order?.user_address && !isNaN(Number(order.user_address)) && (
+                  <p className="text-xs text-amber-600 mt-1 pl-6">
+                    ⚠️ Address ID showing. Backend needs to return actual address text.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
