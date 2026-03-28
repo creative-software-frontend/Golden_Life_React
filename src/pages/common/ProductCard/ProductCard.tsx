@@ -34,8 +34,8 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
         openBuyNow(product);
     };
 
-    const discount = product.regular_price > product.offer_price
-        ? Math.round(((product.regular_price - product.offer_price) / product.regular_price) * 100)
+    const discount = Number(product.regular_price) > Number(product.offer_price)
+        ? Math.round(((Number(product.regular_price) - Number(product.offer_price)) / Number(product.regular_price)) * 100)
         : 0;
 
     return (
@@ -94,7 +94,7 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
                             ৳{product.offer_price}
                         </span>
                     </div>
-                    {product.regular_price && parseFloat(product.regular_price) > parseFloat(product.offer_price) && (
+                    {product.regular_price && Number(product.regular_price) > Number(product.offer_price) && (
                         <div className="flex items-center gap-1.5">
                             <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Customer Price:</span>
                             <span className="text-[11px] sm:text-[12px] font-bold text-slate-500 line-through tracking-tight">

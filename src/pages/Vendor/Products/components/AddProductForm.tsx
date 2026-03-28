@@ -33,6 +33,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     formState: { errors },
     setValue,
     watch,
+    getValues,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchemaWithValidation) as any,
     defaultValues: {
@@ -65,18 +66,30 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
   useEffect(() => {
     if (sellerPrice && sellerPrice > 0) {
       const seller = Number(sellerPrice);
-      const regular = seller + (seller * 30 / 100);
-      const offer = seller + (seller * 20 / 100);
 
-      setValue('regular_price', parseFloat(regular.toFixed(2)));
-      setValue('offer_price', parseFloat(offer.toFixed(2)));
+      // Higher markup (30%)
+      const highMarkup = seller + (seller * 30 / 100);
+      // Lower markup (20%)
+      const lowMarkup = seller + (seller * 20 / 100);
+
+      const currentRegular = getValues('regular_price');
+      const currentOffer = getValues('offer_price');
+
+      // This value appears in the "Regular Price (MRP)" input
+      if (!currentRegular || currentRegular === 0) {
+        setValue('regular_price', parseFloat(highMarkup.toFixed(2)), { shouldValidate: true });
+      }
+
+      // This value appears in the "Offer Price (Selling)" input
+      if (!currentOffer || currentOffer === 0) {
+        setValue('offer_price', parseFloat(lowMarkup.toFixed(2)), { shouldValidate: true });
+      }
     }
-  }, [sellerPrice, setValue]);
+  }, [sellerPrice, setValue, getValues]);
 
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
   const discount = calculateDiscount(regularPrice, offerPrice);
-
   // Auto-generate SKU handler
   const handleAutoGenerateSKU = () => {
     if (productTitleEnglish) {
@@ -359,31 +372,23 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
-            {/* Seller Price */}
+            {/* Seller Price remains same */}
             <div>
-              <Label htmlFor="seller_price" className="font-semibold">
-                Seller Price (Cost) *
-              </Label>
+              <Label htmlFor="seller_price">Seller Price (Cost) *</Label>
               <Input
                 id="seller_price"
                 type="number"
                 step="0.01"
                 {...register('seller_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.seller_price ? 'border-red-500' : ''}
               />
-              {errors.seller_price && (
-                <p className="mt-1 text-xs text-red-500">{errors.seller_price.message}</p>
-              )}
             </div>
 
-            {/* Regular Price */}
+            {/* Regular Price Label */}
             <div>
-              <Label htmlFor="regular_price" className="font-semibold">
-                Regular Price (MRP) *
-              </Label>
+              <Label htmlFor="regular_price_field">Regular Price (MRP) *</Label>
               <Input
-                id="offer_price"
+                id="regular_price_field"
                 type="number"
                 step="0.01"
                 {...register('regular_price', { valueAsNumber: true })}
@@ -395,14 +400,11 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
               )}
             </div>
 
-            {/* Offer Price */}
+            {/* Offer Price Label */}
             <div>
-              <Label htmlFor="offer_price" className="font-semibold">
-                Offer Price (Selling) *
-              </Label>
-
+              <Label htmlFor="offer_price_field">Offer Price (Selling) *</Label>
               <Input
-                id="regular_price"
+                id="offer_price_field"
                 type="number"
                 step="0.01"
                 {...register('offer_price', { valueAsNumber: true })}
@@ -414,7 +416,6 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
               )}
             </div>
           </div>
-
           {/* Price Calculations Display */}
           <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-2">
