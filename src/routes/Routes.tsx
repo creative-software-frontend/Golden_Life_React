@@ -60,6 +60,7 @@ import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 
 // Vendor Profile
 import VendorProfile from "@/pages/Vendor/Profile/index";
+import ChangePassword from "@/pages/Vendor/Profile/ChangePassword";
 import Products from "@/pages/Vendor/ProductManagement/index";
 import AddProduct from "@/pages/Vendor/Products/AddProduct";
 import EditProduct from "@/pages/Vendor/Products/EditProduct";
@@ -288,6 +289,12 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'profile',
                                 element: <VendorProfile />
+                            },
+
+                            // Vendor Change Password Route
+                            {
+                                path: 'change-password',
+                                element: <ChangePassword />
                             },
 
                             // Vendor Products Route
