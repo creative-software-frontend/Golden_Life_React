@@ -21,6 +21,7 @@ export default function Orders() {
   const { fetchOrders, updateOrderStatus, isLoading } = useOrders();
   
   const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [filters, setFilters] = useState<OrderFilters>({
     search: '',
     status: 'All',
@@ -39,6 +40,7 @@ export default function Orders() {
       const data = await fetchOrders(filters);
       console.log('🟢 [Orders] Orders loaded:', data.length, 'orders');
       setOrders(data);
+      applyFilters(data, filters);
     } catch (error) {
       console.error('❌ [Orders] Failed to load orders:', error);
     } finally {
@@ -46,8 +48,35 @@ export default function Orders() {
     }
   };
 
+  const applyFilters = (data: Order[], currentFilters: OrderFilters) => {
+    let filtered = [...data];
+
+    // Apply status filter
+    if (currentFilters.status && currentFilters.status !== 'All') {
+      if (currentFilters.status === 'today') {
+        const today = new Date().toISOString().split('T')[0];
+        filtered = filtered.filter(order => 
+          new Date(order.created_at).toISOString().split('T')[0] === today
+        );
+      } else {
+        filtered = filtered.filter(order => order.status === currentFilters.status);
+      }
+    }
+
+    // Apply search filter
+    if (currentFilters.search) {
+      const searchTerm = currentFilters.search.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.order_no.toLowerCase().includes(searchTerm) ||
+        order.user_name.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    setFilteredOrders(filtered);
+  };
+
   useEffect(() => {
-    loadOrders();
+    applyFilters(orders, filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
@@ -146,10 +175,11 @@ export default function Orders() {
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All">All Statuses</SelectItem>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="today">Today's Orders</SelectItem>
                   <SelectItem value="Order Placed">Order Placed</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Processing">Processing</SelectItem>
-                  <SelectItem value="Packaging">Packaging</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -158,7 +188,7 @@ export default function Orders() {
           {/* Results count and limit */}
           <div className="flex items-center justify-between mt-4 pt-4 border-t">
             <p className="text-sm text-gray-600">
-              Showing <span className="font-semibold">{orders.length}</span> orders
+              Showing <span className="font-semibold">{filteredOrders.length}</span> orders
             </p>
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700">Per page:</label>
@@ -186,7 +216,7 @@ export default function Orders() {
             </div>
           ) : (
             <OrderTable
-              orders={orders}
+              orders={filteredOrders}
               onViewDetails={handleViewDetails}
               onUpdateStatus={handleUpdateStatus}
             />
