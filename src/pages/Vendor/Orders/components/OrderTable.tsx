@@ -13,7 +13,7 @@ import {
 interface OrderTableProps {
   orders: Order[];
   onViewDetails: (orderNo: string) => void;
-  onUpdateStatus: (orderNo: string, currentStatus: string) => void;
+  onUpdateStatus: (order: Order) => void;
 }
 
 export function OrderTable({ orders, onViewDetails, onUpdateStatus }: OrderTableProps) {
@@ -86,7 +86,7 @@ export function OrderTable({ orders, onViewDetails, onUpdateStatus }: OrderTable
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() => onUpdateStatus(order.order_no, order.status)}
+                    onClick={() => onUpdateStatus(order)}
                     className="text-sm bg-primary-light hover:bg-primary-light/90"
                   >
                     Update

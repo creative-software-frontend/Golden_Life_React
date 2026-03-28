@@ -33,7 +33,7 @@ export interface Order {
   status_history?: StatusHistory[];
 }
 
-export type OrderStatus = 'Packaging' | 'On The Way' | 'Delivered' | 'Cancelled';
+export type OrderStatus = 'Order Placed' | 'Processing' | 'Packaging';
 
 export interface OrdersApiResponse {
   success: boolean;

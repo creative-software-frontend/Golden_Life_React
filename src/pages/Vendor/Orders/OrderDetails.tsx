@@ -142,8 +142,9 @@ export default function OrderDetails() {
   const handleUpdateStatus = async (newStatus: OrderStatus) => {
     if (!order) return;
     
-    console.log('🔵 [OrderDetails] Updating status:', { orderNo: order.order_no, newStatus });
-    const success = await updateOrderStatus(order.order_no, newStatus);
+    // Use order.id (primary key) for status update, not order_no
+    console.log('🔵 [OrderDetails] Updating status:', { orderId: order.id, orderNo: order.order_no, newStatus });
+    const success = await updateOrderStatus(order.id, newStatus);
     console.log('🟢 [OrderDetails] Update result:', success);
     if (success) {
       await loadOrderDetails(order.order_no);

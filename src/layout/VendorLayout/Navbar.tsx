@@ -60,22 +60,26 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
         const fetchBalance = async () => {
             setIsLoading(true);
             try {
-                const session = sessionStorage.getItem("student_session");
-                const token = session ? JSON.parse(session).token : null;
+                const token = getVendorToken();
 
                 if (!token) {
                     setIsLoading(false);
                     return;
                 }
 
-                const response = await axios.get(`${baseURL}/api/vendor/wallet-balance`, {
+                const response = await axios.get(`${baseURL}/api/vendor/wallet`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                const fetchedBalance = response.data?.data?.balance || response.data?.balance || 0;
-                setWalletBalance(Number(fetchedBalance).toFixed(2));
+                if (response.data?.success) {
+                    const fetchedBalance = response.data.data.balance || 0;
+                    setWalletBalance(Number(fetchedBalance).toFixed(2));
+                } else {
+                    setWalletBalance('0.00');
+                }
             } catch (error) {
                 console.error("Failed to fetch wallet balance:", error);
+                setWalletBalance('0.00');
             } finally {
                 setIsLoading(false);
             }
