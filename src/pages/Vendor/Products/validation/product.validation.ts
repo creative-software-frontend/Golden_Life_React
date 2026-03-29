@@ -37,18 +37,15 @@ export const productSchema = z.object({
     .optional()
     .or(z.literal('')),
   ebook: z.string().default('0'), // Default value '0' for regular products
-  images: z.array(z.instanceof(File)).min(1, 'At least one product image is required').optional(),
+  images: z.array(z.instanceof(File)).optional(),
   existing_images: z.array(z.string()).optional(),
   removed_images: z.array(z.string()).optional(),
 });
 
-// Refine to check that offer price is not greater than regular price
-export const productSchemaWithValidation = productSchema.refine(
-  (data) => data.offer_price <= data.regular_price,
-  {
-    message: 'Offer price cannot be greater than Regular price',
-    path: ['offer_price'],
-  }
-);
+// Refine to check that offer price is strictly less than regular price
+export const productSchemaWithValidation = productSchema.refine((data) => data.offer_price < data.regular_price, {
+  message: "Offer Price (Selling) must be strictly less than Regular Price (MRP)",
+  path: ["offer_price"],
+});
 
 export type ProductFormData = z.infer<typeof productSchema>;

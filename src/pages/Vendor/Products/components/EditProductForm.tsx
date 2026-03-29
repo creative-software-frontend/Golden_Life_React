@@ -51,9 +51,10 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     control,
     formState: { errors },
     setValue,
+    getValues,
     watch,
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchemaWithValidation) as any, 
+    resolver: zodResolver(productSchemaWithValidation) as any,
     defaultValues: {
       product_title_english: initialData?.product_title_english || '',
       product_title_bangla: initialData?.product_title_bangla || '',
@@ -69,7 +70,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
       sku: initialData?.sku || '',
       stock: initialData?.stock || 0,
       video_link: initialData?.video_link || '',
-      ebook: initialData?.ebook || '0', 
+      ebook: initialData?.ebook || '0',
       images: [],
       existing_images: initialData?.existing_images || [],
       removed_images: [],
@@ -83,16 +84,26 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   const productTitleEnglish = watch('product_title_english');
 
   // Auto-calculate prices when seller price changes
+  // Auto-calculate prices when seller price changes
   useEffect(() => {
     if (sellerPrice && sellerPrice > 0) {
       const seller = Number(sellerPrice);
       const regular = seller + (seller * 30 / 100);
       const offer = seller + (seller * 20 / 100);
-      
-      setValue('regular_price', parseFloat(regular.toFixed(2)));
-      setValue('offer_price', parseFloat(offer.toFixed(2)));
+
+      const currentRegular = getValues('regular_price');
+      const currentOffer = getValues('offer_price');
+
+      // regular calculation now goes to 'regular_price' field
+      if (!currentRegular || currentRegular === 0) {
+        setValue('regular_price', parseFloat(regular.toFixed(2)), { shouldValidate: true });
+      }
+      // offer calculation now goes to 'offer_price' field
+      if (!currentOffer || currentOffer === 0) {
+        setValue('offer_price', parseFloat(offer.toFixed(2)), { shouldValidate: true });
+      }
     }
-  }, [sellerPrice, setValue]);
+  }, [sellerPrice, setValue, getValues]);
 
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
@@ -134,7 +145,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   // Submit handler
   const onFormSubmit = async (data: ProductFormData) => {
     console.log('🔴 [EDIT FORM] onFormSubmit CALLED');
-    
+
     // Prepare submit data for EDIT mode
     const submitData: any = {
       ...data,
@@ -149,7 +160,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     console.log('  - New gallery images:', submitData.gallery_images?.length || 0);
     console.log('  - Existing gallery images:', submitData.existing_gallery_images?.length || 0);
     console.log('  - Removed gallery images:', submitData.removed_gallery_images?.length || 0);
-    
+
     await onSubmit(submitData);
   };
 
@@ -161,7 +172,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     setRemovedGalleryImages([]);
     setActiveTab('short-en');
     setIsEbook(initialData?.ebook === '1');
-    
+
     setValue('product_title_english', initialData?.product_title_english || '');
     setValue('product_title_bangla', initialData?.product_title_bangla || '');
     setValue('category_id', initialData?.category_id || 0);
@@ -176,7 +187,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     setValue('sku', initialData?.sku || '');
     setValue('stock', initialData?.stock || 0);
     setValue('video_link', initialData?.video_link || '');
-    setValue('ebook', initialData?.ebook || '0'); 
+    setValue('ebook', initialData?.ebook || '0');
     setValue('images', []);
     setValue('existing_images', initialData?.existing_images || []);
     setValue('removed_images', []);
@@ -207,7 +218,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                 </p>
               )}
             </div>
-            
+
             <div>
               <Label htmlFor="product_title_bangla" className="font-semibold">
                 Product Title (Bangla) *
@@ -357,6 +368,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-3 gap-4">
+            {/* Seller Price remains same */}
             <div>
               <Label htmlFor="seller_price">Seller Price (Cost) *</Label>
               <Input
@@ -365,32 +377,39 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                 step="0.01"
                 {...register('seller_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.seller_price ? 'border-red-500' : ''}
               />
             </div>
 
+            {/* Regular Price Label */}
             <div>
-              <Label htmlFor="regular_price">Regular Price (MRP) *</Label>
+              <Label htmlFor="regular_price_field">Regular Price (MRP) *</Label>
               <Input
-                id="regular_price"
+                id="regular_price_field"
                 type="number"
                 step="0.01"
                 {...register('regular_price', { valueAsNumber: true })}
                 placeholder="৳"
                 className={errors.regular_price ? 'border-red-500' : ''}
               />
+              {errors.regular_price && (
+                <p className="mt-1 text-xs text-red-500">{errors.regular_price.message}</p>
+              )}
             </div>
 
+            {/* Offer Price Label */}
             <div>
-              <Label htmlFor="offer_price">Offer Price (Selling) *</Label>
+              <Label htmlFor="offer_price_field">Offer Price (Selling) *</Label>
               <Input
-                id="offer_price"
+                id="offer_price_field"
                 type="number"
                 step="0.01"
                 {...register('offer_price', { valueAsNumber: true })}
                 placeholder="৳"
                 className={errors.offer_price ? 'border-red-500' : ''}
               />
+              {errors.offer_price && (
+                <p className="mt-1 text-xs text-red-500">{errors.offer_price.message}</p>
+              )}
             </div>
           </div>
 
@@ -493,7 +512,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
           )}
         </CardContent>
       </Card>
-      
+
       {/* Media Upload */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Main Image Upload */}

@@ -5,6 +5,7 @@ import {
     BarChart3, LogOut, Store, X, 
     ClipboardList,
 } from 'lucide-react';
+import Logo from '@/pages/common/Logo';
 
 interface SidebarProps { 
     isOpen: boolean; 
@@ -59,21 +60,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     }
                 `}
             >
-                {/* Header Section */}
-                <div className="px-6 py-5 flex items-center justify-between border-b border-secondary-foreground/20 whitespace-nowrap overflow-hidden">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center bg-background text-secondary shadow-lg">
-                            <Store size={22} strokeWidth={2.5} />
-                        </div>
-                        <span className={`font-black text-2xl tracking-tight transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 md:hidden'}`}>
-                            Golden Life
-                        </span>
+                {/* Header Section - Logo Design */}
+                <div className="px-6 py-4 border-b border-secondary-foreground/20 bg-white whitespace-nowrap overflow-hidden">
+                    <div className="flex flex-col items-start gap-1 ">
+                        {/* Main Logo Text */}
+                        <Logo />
                     </div>
 
                     {/* Mobile Close Button */}
                     {isOpen && (
-                        <button onClick={toggleSidebar} className="md:hidden p-1 hover:bg-background/20 rounded-lg">
-                            <X size={24} />
+                        <button onClick={toggleSidebar} className="absolute top-4 right-4 md:hidden p-1 hover:bg-background/20 rounded-lg">
+                            <X size={20} />
                         </button>
                     )}
                 </div>

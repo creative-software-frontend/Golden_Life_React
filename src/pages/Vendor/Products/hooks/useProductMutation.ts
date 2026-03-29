@@ -75,9 +75,9 @@ export function useProductMutation() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      formData.append('_method', 'PUT');
 
-      console.log('🟢 [API] Sending update request for product ID:', id);
+      // Ensure product_id is in the form data, matching API expectations
+      formData.append('product_id', id.toString());      console.log('🟢 [API] Sending update request for product ID:', id);
       console.log('🟢 [API] Full API URL:', `${baseURL}/api/vendor/product/update?product_id=${id}`);
       console.log('🟢 [API] FormData entries:');
       for (const [key, value] of formData.entries()) {
@@ -95,8 +95,7 @@ export function useProductMutation() {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
-          },
-          params: { product_id: id }
+          }
         }
       );
 

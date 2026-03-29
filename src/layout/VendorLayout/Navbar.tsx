@@ -9,6 +9,7 @@ import {
 import ImageUploadModal from '@/components/shared/ImageUploadModal';
 import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/hooks/useVendorProfile';
 import VendorNotificationBell from '@/pages/Vendor/VendorHeader/NotificationBell';
+import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -38,6 +39,9 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     // --- Fetch Vendor Profile ---
     const { profile, isLoading: isProfileLoading } = useVendorProfile();
     const profileRef = useRef<HTMLDivElement>(null);
+    
+    // Profile completion check
+    const { percentage: profilePercentage, isComplete: isProfileComplete } = useProfileCompletion(profile?.vendor);
 
     // --- State for Wallet ---
     const [isLoading, setIsLoading] = useState(true);
@@ -60,22 +64,26 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
         const fetchBalance = async () => {
             setIsLoading(true);
             try {
-                const session = sessionStorage.getItem("student_session");
-                const token = session ? JSON.parse(session).token : null;
+                const token = getVendorToken();
 
                 if (!token) {
                     setIsLoading(false);
                     return;
                 }
 
-                const response = await axios.get(`${baseURL}/api/vendor/wallet-balance`, {
+                const response = await axios.get(`${baseURL}/api/vendor/wallet`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                const fetchedBalance = response.data?.data?.balance || response.data?.balance || 0;
-                setWalletBalance(Number(fetchedBalance).toFixed(2));
+                if (response.data?.success) {
+                    const fetchedBalance = response.data.data.balance || 0;
+                    setWalletBalance(Number(fetchedBalance).toFixed(2));
+                } else {
+                    setWalletBalance('0.00');
+                }
             } catch (error) {
                 console.error("Failed to fetch wallet balance:", error);
+                setWalletBalance('0.00');
             } finally {
                 setIsLoading(false);
             }
@@ -302,6 +310,25 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                 <div className="px-4 py-3 bg-muted/50 border-b border-border">
                                     <p className="text-sm font-bold text-foreground">{getVendorDisplayName(profile)}</p>
                                     <p className="text-xs text-muted-foreground truncate">Seller ID: {profile?.vendor?.seller_id || 'N/A'}</p>
+                                    
+                                    {/* Profile Completion Badge */}
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                            <div
+                                                className={`h-full transition-all duration-500 ease-out rounded-full ${
+                                                    isProfileComplete 
+                                                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' 
+                                                        : 'bg-gradient-to-r from-amber-500 to-amber-600'
+                                                }`}
+                                                style={{ width: `${profilePercentage}%` }}
+                                            />
+                                        </div>
+                                        <span className={`text-xs font-bold ${
+                                            isProfileComplete ? 'text-emerald-600' : 'text-amber-600'
+                                        }`}>
+                                            {profilePercentage}%
+                                        </span>
+                                    </div>
                                 </div>
                                 
                                 {/* Menu Items */}

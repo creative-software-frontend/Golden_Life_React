@@ -152,7 +152,7 @@ export default function Categories() {
                                     </AnimatePresence>
 
                                     <Link
-                                        to={`/category/${category.id}`}
+                                        to={`/dashboard/category/${category.id}`}
                                         className="group flex flex-col items-center justify-center p-5 bg-white rounded-[20px] border border-slate-100 shadow-sm 
                                     hover:shadow-[0_15px_35px_-10px_rgba(0,0,0,0.1)] hover:border-emerald-500/30
                                     transition-all duration-500 transform hover:-translate-y-1.5 h-full"

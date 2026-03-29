@@ -25,10 +25,9 @@ interface StatusUpdateModalProps {
 }
 
 const statusOptions: OrderStatus[] = [
-  'Packaging',
-  'On The Way',
-  'Delivered',
-  'Cancelled'
+  'Order Placed',
+  'Processing',
+  'Packaging'
 ];
 
 export function StatusUpdateModal({
