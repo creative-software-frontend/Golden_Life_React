@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,22 +31,20 @@ export default function Orders() {
   
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<{ orderNo: string; status: OrderStatus } | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
-  const loadOrders = async () => {
-    setIsRefreshing(true);
+  const loadOrders = useCallback(async () => {
     try {
       console.log('🔵 [Orders] Loading orders with filters:', filters);
       const data = await fetchOrders(filters);
       console.log('🟢 [Orders] Orders loaded:', data.length, 'orders');
       setOrders(data);
       applyFilters(data, filters);
+      setLastRefreshed(new Date());
     } catch (error) {
       console.error('❌ [Orders] Failed to load orders:', error);
-    } finally {
-      setIsRefreshing(false);
     }
-  };
+  }, [filters, fetchOrders]);
 
   const applyFilters = (data: Order[], currentFilters: OrderFilters) => {
     let filtered = [...data];
@@ -74,6 +72,21 @@ export default function Orders() {
 
     setFilteredOrders(filtered);
   };
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadOrders();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [loadOrders]);
+
+  // Initial load
+  useEffect(() => {
+    loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     applyFilters(orders, filters);
@@ -131,15 +144,9 @@ export default function Orders() {
             <p className="text-sm text-gray-500">Track and manage customer orders</p>
           </div>
         </div>
-        <Button
-          onClick={loadOrders}
-          disabled={isRefreshing}
-          variant="outline"
-          className="gap-2"
-        >
-          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="text-xs text-gray-400">
+          Last updated: {lastRefreshed.toLocaleTimeString()}
+        </div>
       </div>
 
       {/* Filters */}
@@ -210,7 +217,7 @@ export default function Orders() {
       {/* Orders Table */}
       <Card>
         <CardContent className="p-6">
-          {isLoading && !isRefreshing ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw className="w-8 h-8 animate-spin text-primary-light" />
             </div>

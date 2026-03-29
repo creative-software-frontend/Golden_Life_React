@@ -13,9 +13,12 @@ const VendorLayout: React.FC = () => {
     
     // Profile completion states
     const [showProfilePopup, setShowProfilePopup] = useState(false);
-    const [hasDismissedPopup, setHasDismissedPopup] = useState(false);
+    const [hasDismissedPopup, setHasDismissedPopup] = useState(() => {
+        // Load dismissal state from localStorage on mount
+        return localStorage.getItem('profile_popup_dismissed') === 'true';
+    });
     const navigate = useNavigate();
-    const { data: profileData } = useProfile();
+    const { data: profileData, isLoading } = useProfile();
     const { percentage, missingFields, isComplete } = useProfileCompletion(profileData?.vendor);
 
     // 2. The Toggle Function 
@@ -23,17 +26,18 @@ const VendorLayout: React.FC = () => {
         setIsSidebarOpen((prev) => !prev);
     };
 
-    // Check profile completion on mount and route change
+    // Check profile completion ONLY after data is loaded
     useEffect(() => {
-        if (profileData?.vendor && !isComplete && !hasDismissedPopup) {
+        // Only check completion AFTER data is loaded and vendor exists
+        if (!isLoading && profileData?.vendor && !isComplete && !hasDismissedPopup) {
             // Show popup after a short delay
             const timer = setTimeout(() => {
                 setShowProfilePopup(true);
-            }, 1000);
+            }, 500);
             
             return () => clearTimeout(timer);
         }
-    }, [profileData, isComplete, hasDismissedPopup]);
+    }, [isLoading, profileData, isComplete, hasDismissedPopup]);
 
     const handleCompleteProfile = () => {
         setShowProfilePopup(false);
@@ -43,6 +47,8 @@ const VendorLayout: React.FC = () => {
     const handleDismissPopup = () => {
         setShowProfilePopup(false);
         setHasDismissedPopup(true);
+        // Persist dismissal to localStorage
+        localStorage.setItem('profile_popup_dismissed', 'true');
     };
 
     return (

@@ -1,15 +1,15 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard, Package, 
-    BarChart3, LogOut, Store, X, 
+    LayoutDashboard, Package,
+    BarChart3, LogOut, Store, X,
     ClipboardList,
 } from 'lucide-react';
 import Logo from '@/pages/common/Logo';
 
-interface SidebarProps { 
-    isOpen: boolean; 
-    toggleSidebar?: () => void; 
+interface SidebarProps {
+    isOpen: boolean;
+    toggleSidebar?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
@@ -30,16 +30,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
     const handleLogout = () => {
         console.log("Logging out...");
-        navigate('/login'); 
+        navigate('/login');
     };
 
     return (
         <>
             {/* Mobile Overlay */}
-            <div 
-                className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${
-                    isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-                }`}
+            <div
+                className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                    }`}
                 onClick={toggleSidebar}
             />
 
@@ -54,17 +53,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     /* THE BULLETPROOF RESPONSIVE LOGIC: */
                     /* Mobile: slides off-screen when closed (-translate-x-full) */
                     /* Desktop: stays on screen (translate-x-0) but shrinks to w-20 when closed */
-                    ${isOpen 
-                        ? 'w-64 translate-x-0' 
+                    ${isOpen
+                        ? 'w-64 translate-x-0'
                         : 'w-64 -translate-x-full md:w-20 md:translate-x-0'
                     }
                 `}
             >
-                {/* Header Section - Logo Design */}
                 <div className="px-6 py-4 border-b border-secondary-foreground/20 bg-white whitespace-nowrap overflow-hidden">
-                    <div className="flex flex-col items-start gap-1 ">
-                        {/* Main Logo Text */}
-                        <Logo />
+                    <div className="flex flex-col items-start gap-1">
+                        {!isOpen ? (
+                            // Collapsed state - only icon
+                            <img
+                                src="/image/logo/icon.png"
+                                alt="Icon"
+                                className="h-8 w-8 mx-auto"
+                            />
+                        ) : (
+                            // Expanded state - full logo
+                            <Logo />
+                        )}
                     </div>
 
                     {/* Mobile Close Button */}
