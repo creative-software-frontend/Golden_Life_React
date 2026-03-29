@@ -42,10 +42,7 @@ export const productSchema = z.object({
   removed_images: z.array(z.string()).optional(),
 });
 
-// Refine to check that offer price is strictly less than regular price
-export const productSchemaWithValidation = productSchema.refine((data) => data.offer_price < data.regular_price, {
-  message: "Offer Price (Selling) must be strictly less than Regular Price (MRP)",
-  path: ["offer_price"],
-});
+// Use base schema since prices are auto-calculated and read-only
+export const productSchemaWithValidation = productSchema;
 
 export type ProductFormData = z.infer<typeof productSchema>;

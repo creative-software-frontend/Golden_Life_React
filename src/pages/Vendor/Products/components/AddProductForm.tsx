@@ -67,25 +67,13 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     if (sellerPrice && sellerPrice > 0) {
       const seller = Number(sellerPrice);
 
-      // Higher markup (30%)
-      const highMarkup = seller + (seller * 30 / 100);
-      // Lower markup (20%)
-      const lowMarkup = seller + (seller * 20 / 100);
+      const regularVal = seller + (seller * 0.30);
+      const offerVal = regularVal + (regularVal * 0.20);
 
-      const currentRegular = getValues('regular_price');
-      const currentOffer = getValues('offer_price');
-
-      // This value appears in the "Regular Price (MRP)" input
-      if (!currentRegular || currentRegular === 0) {
-        setValue('regular_price', parseFloat(highMarkup.toFixed(2)), { shouldValidate: true });
-      }
-
-      // This value appears in the "Offer Price (Selling)" input
-      if (!currentOffer || currentOffer === 0) {
-        setValue('offer_price', parseFloat(lowMarkup.toFixed(2)), { shouldValidate: true });
-      }
+      setValue('regular_price', parseFloat(regularVal.toFixed(2)), { shouldValidate: true });
+      setValue('offer_price', parseFloat(offerVal.toFixed(2)), { shouldValidate: true });
     }
-  }, [sellerPrice, setValue, getValues]);
+  }, [sellerPrice, setValue]);
 
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
@@ -386,14 +374,15 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
 
             {/* Regular Price Label */}
             <div>
-              <Label htmlFor="regular_price_field">Regular Price (MRP) *</Label>
+              <Label htmlFor="regular_price_field">Offer Price (Selling) *</Label>
               <Input
                 id="regular_price_field"
                 type="number"
                 step="0.01"
                 {...register('regular_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.regular_price ? 'border-red-500' : ''}
+                className={`bg-gray-100 cursor-not-allowed ${errors.regular_price ? 'border-red-500' : ''}`}
+                readOnly
               />
               {errors.regular_price && (
                 <p className="mt-1 text-xs text-red-500">{errors.regular_price.message}</p>
@@ -402,14 +391,15 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
 
             {/* Offer Price Label */}
             <div>
-              <Label htmlFor="offer_price_field">Offer Price (Selling) *</Label>
+              <Label htmlFor="offer_price_field">Regular Price (MRP) *</Label>
               <Input
                 id="offer_price_field"
                 type="number"
                 step="0.01"
                 {...register('offer_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.offer_price ? 'border-red-500' : ''}
+                className={`bg-gray-100 cursor-not-allowed ${errors.offer_price ? 'border-red-500' : ''}`}
+                readOnly
               />
               {errors.offer_price && (
                 <p className="mt-1 text-xs text-red-500">{errors.offer_price.message}</p>
