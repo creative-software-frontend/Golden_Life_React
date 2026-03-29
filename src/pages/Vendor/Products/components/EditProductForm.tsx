@@ -49,7 +49,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     getValues,
     watch,
@@ -83,27 +83,18 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   const offerPrice = watch('offer_price');
   const productTitleEnglish = watch('product_title_english');
 
-  // Auto-calculate prices when seller price changes
-  // Auto-calculate prices when seller price changes
+  // Auto-calculate prices ONLY when seller price is manually changed by user
   useEffect(() => {
-    if (sellerPrice && sellerPrice > 0) {
+    if (dirtyFields.seller_price && sellerPrice && sellerPrice > 0) {
       const seller = Number(sellerPrice);
-      const regular = seller + (seller * 30 / 100);
-      const offer = seller + (seller * 20 / 100);
 
-      const currentRegular = getValues('regular_price');
-      const currentOffer = getValues('offer_price');
+      const offerVal = seller + (seller * 0.30);
+      const regularVal = offerVal + (offerVal * 0.20);
 
-      // regular calculation now goes to 'regular_price' field
-      if (!currentRegular || currentRegular === 0) {
-        setValue('regular_price', parseFloat(regular.toFixed(2)), { shouldValidate: true });
-      }
-      // offer calculation now goes to 'offer_price' field
-      if (!currentOffer || currentOffer === 0) {
-        setValue('offer_price', parseFloat(offer.toFixed(2)), { shouldValidate: true });
-      }
+      setValue('offer_price', parseFloat(offerVal.toFixed(2)), { shouldValidate: true });
+      setValue('regular_price', parseFloat(regularVal.toFixed(2)), { shouldValidate: true });
     }
-  }, [sellerPrice, setValue, getValues]);
+  }, [sellerPrice, dirtyFields.seller_price, setValue]);
 
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
@@ -114,11 +105,13 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     if (productTitleEnglish) {
       const sku = generateSKU(productTitleEnglish);
       setValue('sku', sku);
+      console.log('🔧 [EDIT FORM] Auto-generated SKU:', sku);
     }
   };
 
   // Handle main image change
   const handleMainImageChange = (file: File | null) => {
+    console.log('🖼️ [EDIT FORM] Main image changed:', file?.name || 'No file');
     setMainImage(file);
     if (file) {
       setValue('images', [file]);
@@ -129,6 +122,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
 
   // Handle gallery images change
   const handleGalleryImagesChange = (files: File[]) => {
+    console.log('📸 [EDIT FORM] Gallery images changed:', files.length, 'files');
     setGalleryImages(files);
   };
 
@@ -389,7 +383,8 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                 step="0.01"
                 {...register('regular_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.regular_price ? 'border-red-500' : ''}
+                className={`bg-gray-100 cursor-not-allowed ${errors.regular_price ? 'border-red-500' : ''}`}
+                readOnly
               />
               {errors.regular_price && (
                 <p className="mt-1 text-xs text-red-500">{errors.regular_price.message}</p>
@@ -405,13 +400,15 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                 step="0.01"
                 {...register('offer_price', { valueAsNumber: true })}
                 placeholder="৳"
-                className={errors.offer_price ? 'border-red-500' : ''}
+                className={`bg-gray-100 cursor-not-allowed ${errors.offer_price ? 'border-red-500' : ''}`}
+                readOnly
               />
               {errors.offer_price && (
                 <p className="mt-1 text-xs text-red-500">{errors.offer_price.message}</p>
               )}
             </div>
           </div>
+
 
           <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-2">
