@@ -191,34 +191,6 @@ const VendorHome: React.FC = () => {
     const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
     const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
 
-    // Bottom Cards Data (count and amount in same line with space)
-    const orderCards = [
-        { 
-            title: "Total Parcel", 
-            value: `${totalOrders}  ${totalAmount.toFixed(2)} BDT`, 
-            subtext: "Orders & Amount", 
-            icon: Package 
-        },
-        { 
-            title: "Delivered", 
-            value: `${deliveredOrders}  ${deliveredAmount.toFixed(2)} BDT`, 
-            subtext: "Orders & Amount", 
-            icon: CheckCircle2 
-        },
-        { 
-            title: "Pending", 
-            value: `${pendingOrders}  ${pendingAmount.toFixed(2)} BDT`, 
-            subtext: "Orders & Amount", 
-            icon: Clock 
-        },
-        { 
-            title: "Cancel", 
-            value: `${cancelledOrders} (${cancelPercentage}%)  ${cancelledAmount.toFixed(2)} BDT`, 
-            subtext: "Orders & Amount", 
-            icon: AlertCircle 
-        }
-    ];
-
     const businessName = vendorData?.businee_name || vendorData?.business_name || 'Vendor';
     const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
     const recentOrders = filteredOrders.slice(0, 4);
@@ -381,7 +353,7 @@ const VendorHome: React.FC = () => {
                 </div>
             </div>
 
-                        {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
+            {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
             <div className="mt-8 bg-card rounded-xl p-6 shadow-sm border">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
