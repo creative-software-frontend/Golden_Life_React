@@ -19,7 +19,7 @@ const formatAddress = (address: string | undefined) => {
 };
 
 /* ─── Print-only Invoice ─────────────────────────────────────── */
-const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: string) => string }) => {
+const PrintInvoice = ({ order, formatDate, fullAddressText }: { order: Order; formatDate: (d: string) => string; fullAddressText?: string | null }) => {
   const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
   const baseURL = 'https://api.goldenlife.my';
 
@@ -29,36 +29,31 @@ const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: str
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
         <div>
           <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain', marginBottom: '6px' }} />
-          <p style={{ fontSize: '11px', color: '#555', margin: 0 }}>No #1 Digital Business &amp; Reseller Platform in Bangladesh</p>
+
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontWeight: 800, fontSize: '15px', margin: '0 0 4px' }}>Creative Software</p>
-          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>+1 (555) 123-4567</p>
-          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>support@goldenlife.my</p>
+          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
+          <p style={{ fontSize: '12px', color: '#777', marginTop: '6px' }}>
+            Date: {formatDate(order.created_at)} &nbsp;|&nbsp; Status: {order.status}
+          </p>
         </div>
       </div>
 
-      {/* Invoice Title */}
-      <div style={{ marginBottom: '28px' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-        <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-        <p style={{ fontSize: '12px', color: '#777', marginTop: '6px' }}>
-          Date: {formatDate(order.created_at)} &nbsp;|&nbsp; Status: {order.status}
-        </p>
-      </div>
+
 
       {/* Billing + Shipping */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', borderTop: '1px solid #eee', paddingTop: '20px', marginBottom: '28px' }}>
         <div>
           <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Billing Address</p>
           <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
-          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{formatAddress(order.user_address)}</p>
+          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{fullAddressText || formatAddress(order.user_address)}</p>
           <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
         </div>
         <div>
           <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Shipping Address</p>
           <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
-          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{formatAddress(order.user_address)}</p>
+          <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{fullAddressText || formatAddress(order.user_address)}</p>
           <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
         </div>
       </div>
@@ -88,7 +83,7 @@ const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: str
                 </div>
               </td>
               <td style={{ padding: '12px 14px', textAlign: 'center', color: '#444' }}>{product.quantity}</td>
-              <td style={{ padding: '12px 14px', textAlign: 'right', color: '#444' }}>৳{parseFloat(product.price).toFixed(2)}</td>
+              <td style={{ padding: '12px 14px', textAlign: 'right', color: '#444' }}>৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</td>
               <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700 }}>৳{parseFloat(product.subtotal).toFixed(2)}</td>
             </tr>
           ))}
@@ -113,11 +108,15 @@ const PrintInvoice = ({ order, formatDate }: { order: Order; formatDate: (d: str
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#777', lineHeight: 1.7 }}>
-        <p style={{ margin: '0 0 4px' }}>Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days.</p>
-        <p style={{ margin: '0 0 4px' }}>Please go through the return instructions as well as warranty period of the products upon receiving.</p>
-        <p style={{ margin: '0 0 10px' }}>For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my</p>
-        <p style={{ fontWeight: 700, color: '#333', margin: 0 }}>Thank you for shopping!</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '30px', borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#777', lineHeight: 1.7 }}>
+        <div>
+          Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
+        </div>
+      </div>
+
+      {/* Added marginTop: '15px' here for vertical gap */}
+      <div style={{ marginTop: '15px', fontWeight: 700, color: '#333', fontSize: '12px', whiteSpace: 'nowrap' }}>
+        Thank you for shopping!
       </div>
     </div>
   );
@@ -127,9 +126,55 @@ export default function OrderDetails() {
   const { order_no } = useParams<{ order_no: string }>();
   const navigate = useNavigate();
   const { fetchOrderDetails, updateOrderStatus, isLoading } = useOrders();
-  
+
   const [order, setOrder] = useState<Order | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [fullAddressText, setFullAddressText] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (order?.user_address && !isNaN(Number(order.user_address))) {
+      const fetchAddress = async () => {
+        try {
+          const session = sessionStorage.getItem('vendor_session');
+          let token = '';
+          if (session) {
+            token = JSON.parse(session).token;
+          }
+
+          const payload: any = {};
+          if (order?.user_id) {
+            payload.id = order.user_id;
+          }
+
+          const response = await fetch('https://api.goldenlife.my/api/getAll-OderAddress', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json();
+          if (data.status === 'success' && data.addresses) {
+            const addr = data.addresses.find((a: any) => a.id.toString() === order.user_address?.toString());
+            if (addr) {
+              setFullAddressText(addr.address);
+            } else {
+              setFullAddressText('Address not found');
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch addresses:', error);
+          setFullAddressText('Address not available');
+        }
+      };
+      fetchAddress();
+    } else if (order?.user_address) {
+      setFullAddressText(order.user_address);
+    } else {
+      setFullAddressText('Not provided');
+    }
+  }, [order?.user_address]);
 
   useEffect(() => {
     if (order_no) {
@@ -150,7 +195,7 @@ export default function OrderDetails() {
 
   const handleUpdateStatus = async (newStatus: OrderStatus) => {
     if (!order) return;
-    
+
     // Use order.id (primary key) for status update, not order_no
     console.log('🔵 [OrderDetails] Updating status:', { orderId: order.id, orderNo: order.order_no, newStatus });
     const success = await updateOrderStatus(order.id, newStatus);
@@ -173,7 +218,7 @@ export default function OrderDetails() {
 
   // Order progress steps
   const progressSteps: OrderStatus[] = ['Order Placed', 'Processing', 'Packaging'];
-  
+
   const getCurrentStepIndex = () => {
     if (!order) return -1;
     const index = progressSteps.indexOf(order.status as OrderStatus);
@@ -219,7 +264,7 @@ export default function OrderDetails() {
       `}</style>
 
       {/* Print invoice — hidden on screen */}
-      <PrintInvoice order={order} formatDate={formatDate} />
+      <PrintInvoice order={order} formatDate={formatDate} fullAddressText={fullAddressText} />
 
       {/* Back Button */}
       <div className="screen-only">
@@ -269,17 +314,16 @@ export default function OrderDetails() {
           {progressSteps.map((step, index) => {
             const isCompleted = index < currentStepIndex || order.status === step;
             const isActive = index === currentStepIndex;
-            
+
             return (
               <div key={step} className="flex-1 flex items-center">
                 <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 ${
-                    isActive
-                      ? 'bg-primary-light text-white shadow-lg scale-110'
-                      : isCompleted
+                  className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 ${isActive
+                    ? 'bg-primary-light text-white shadow-lg scale-110'
+                    : isCompleted
                       ? 'bg-green-500 text-white'
                       : 'bg-gray-200 text-gray-500'
-                  }`}
+                    }`}
                 >
                   {isCompleted ? (
                     <Check className="w-5 h-5" />
@@ -288,17 +332,15 @@ export default function OrderDetails() {
                   )}
                 </div>
                 <span
-                  className={`ml-2 md:ml-3 text-sm font-medium hidden sm:block ${
-                    isActive ? 'text-primary-light font-semibold' : 'text-gray-600'
-                  }`}
+                  className={`ml-2 md:ml-3 text-sm font-medium hidden sm:block ${isActive ? 'text-primary-light font-semibold' : 'text-gray-600'
+                    }`}
                 >
                   {step}
                 </span>
                 {index < progressSteps.length - 1 && (
                   <div
-                    className={`flex-1 h-px mx-2 md:mx-4 transition-all duration-300 ${
-                      index < currentStepIndex ? 'bg-green-500' : 'bg-gray-200'
-                    }`}
+                    className={`flex-1 h-px mx-2 md:mx-4 transition-all duration-300 ${index < currentStepIndex ? 'bg-green-500' : 'bg-gray-200'
+                      }`}
                   />
                 )}
               </div>
@@ -351,7 +393,7 @@ export default function OrderDetails() {
                         </h3>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                           <span className="font-medium">
-                            Price: ৳{parseFloat(product.price).toFixed(2)}
+                            Price: ৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}
                           </span>
                           <span className="flex items-center gap-1">
                             Quantity:{' '}
@@ -415,13 +457,8 @@ export default function OrderDetails() {
                   <span className="text-sm font-medium">Delivery Address</span>
                 </div>
                 <p className="text-base text-gray-900 pl-6">
-                  {formatAddress(order.user_address)}
+                  {fullAddressText || "Loading address..."}
                 </p>
-                {order?.user_address && !isNaN(Number(order.user_address)) && (
-                  <p className="text-xs text-amber-600 mt-1 pl-6">
-                    ⚠️ Address ID showing. Backend needs to return actual address text.
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>

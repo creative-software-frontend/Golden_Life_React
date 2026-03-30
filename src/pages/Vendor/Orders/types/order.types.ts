@@ -22,6 +22,7 @@ export interface StatusHistory {
 export interface Order {
   id: number;
   order_no: string;
+  user_id?: string;
   user_name: string;
   user_phone: string;
   user_address: string;

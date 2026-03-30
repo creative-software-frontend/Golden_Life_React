@@ -33,21 +33,20 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
         <div>
           <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain', marginBottom: '8px' }} />
-          <p style={{ fontSize: '11px', color: '#555', margin: 0 }}>No #1 Digital Business &amp; Reseller Platform in Bangladesh</p>
+
         </div>
+
         <div style={{ textAlign: 'right' }}>
-          <p style={{ fontWeight: 800, fontSize: '15px', margin: '0 0 4px' }}>Creative Software</p>
-          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>+1 (555) 123-4567</p>
-          <p style={{ fontSize: '12px', color: '#555', margin: 0 }}>support@goldenlife.my</p>
+          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
+          <p style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
         </div>
+
+
+
       </div>
 
       {/* ─── Invoice Title ─── */}
-      <div style={{ marginBottom: '16px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 900, margin: '0 0 2px', color: '#111' }}>Invoice</h1>
-        <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-        <p style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
-      </div>
 
       {/* ─── Billing + Shipping ─── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
@@ -152,13 +151,18 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       )}
 
       {/* ─── Footer Note ─── */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '14px', fontSize: '10px', color: '#777', lineHeight: 1.6, pageBreakInside: 'avoid' }}>
-        <p style={{ margin: '0 0 4px' }}>Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days.</p>
-        <p style={{ margin: '0 0 4px' }}>Please go through the return instructions as well as warranty period of the products upon receiving.</p>
-        <p style={{ margin: '0 0 10px' }}>For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my</p>
-        <p style={{ fontWeight: 700, color: '#333', margin: 0 }}>Thank you for shopping!</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '30px', borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#777', lineHeight: 1.7 }}>
+        <div>
+          Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
+        </div>
+      </div>
+
+      {/* Added marginTop: '15px' here for vertical gap */}
+      <div style={{ marginTop: '15px', fontWeight: 700, color: '#333', fontSize: '12px', whiteSpace: 'nowrap' }}>
+        Thank you for shopping!
       </div>
     </div>
+
   );
 };
 
@@ -389,15 +393,12 @@ const OrderDetails = () => {
           <div className="flex items-center gap-3">
             <img src="/image/logo/logo.jpg" alt="Golden Life" className="h-10 sm:h-12 object-contain" />
             <div className="hidden sm:block">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No #1 Digital Business &amp; Reseller Platform</p>
+
             </div>
           </div>
           {/* Right: company info + print button */}
           <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="font-bold text-slate-800 text-sm leading-tight">Creative Software</p>
-              <p className="text-xs text-slate-500">+1 (555) 123-4567</p>
-            </div>
+
             <button
               onClick={() => window.print()}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition shadow-sm"

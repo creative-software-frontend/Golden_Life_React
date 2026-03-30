@@ -127,19 +127,24 @@ export function useOrders() {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      const response = await axios.get<OrderTrackingApiResponse>(
-        `${baseURL}/api/vendor/order/tracking`,
+      const response = await axios.get<OrdersApiResponse>(
+        `${baseURL}/api/vendor/orders/history`,
         {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { order_no: orderNo }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
-      console.log('🟢 [API] Order details response:', response.data);
+      console.log('🟢 [API] Order details response (from history):', response.data);
 
-      if (response.data.status) {
-        const order = response.data.order || null;
+      if (response.data.success) {
+        // Filter by order_no to find the specific order
+        const order = response.data.orders?.find((o: Order) => o.order_no === orderNo) || null;
         console.log('✅ [API] Order loaded successfully:', order?.order_no);
+        
+        if (!order) {
+          throw new Error('Order not found in history');
+        }
+        
         return order;
       } else {
         throw new Error(response.data.message || 'Failed to fetch order details');
