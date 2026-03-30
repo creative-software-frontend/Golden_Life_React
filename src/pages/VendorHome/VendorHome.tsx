@@ -1,57 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Package, 
-    Truck, 
-    RefreshCcw, 
-    ArrowRightLeft, 
     CheckCircle2, 
-    CalendarDays,
+    Clock,
     AlertCircle,
     TrendingUp,
-    Percent,
     DollarSign,
     ShoppingCart,
     Star,
     Plus,
     FileText,
-    Headphones,
-    Clock
+    Headphones
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-// New Stat Card Component (like 2nd image)
-const StatCardNew = ({ title, value, subValue, icon: Icon, bgColor, textColor }: any) => (
-    <div className={`${bgColor} rounded-2xl p-5 shadow-sm border-0`}>
-        <div className="flex justify-between items-start">
-            <div>
-                <p className="text-sm font-medium opacity-80">{title}</p>
-                <p className={`text-2xl font-bold mt-2 ${textColor}`}>{value}</p>
-                {subValue && <p className={`text-sm font-medium mt-1 ${textColor} opacity-80`}>{subValue}</p>}
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-white" />
-            </div>
-        </div>
-    </div>
-);
-
-// Performance Metric Card Component (4 cards design like image)
-const MetricCard = ({ title, value, subtext, trend, trendValue }: any) => (
-    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
-        <div className="flex flex-col">
-            <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-            <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-bold text-foreground">{value}</span>
-                {trend && (
-                    <span className={`text-xs font-semibold ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {trend === 'up' ? '↑' : '↓'} {trendValue}
-                    </span>
-                )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">{subtext}</p>
-        </div>
-    </div>
-);
+import axios from 'axios';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -68,7 +30,7 @@ const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: 
     );
 };
 
-// Recent Orders Component (Stacked view)
+// Recent Orders Component
 const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
     return (
         <div className="space-y-3">
@@ -78,7 +40,7 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
                         <p className="font-medium text-sm text-foreground">{order.order_no}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{order.status}</p>
                     </div>
-                    <p className="font-semibold text-sm text-foreground">${order.total}</p>
+                    <p className="font-semibold text-sm text-foreground">${parseFloat(order.total).toFixed(2)}</p>
                 </div>
             ))}
             <button 
@@ -118,73 +80,148 @@ const SalesChart = () => {
     );
 };
 
-// Inventory Alert Component
-const InventoryAlert = ({ items }: { items: any[] }) => {
-    return (
-        <div className="space-y-3">
-            {items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                    <div>
-                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">{item.label}</p>
-                        <p className="text-xs text-red-500 dark:text-red-500">{item.subtext}</p>
-                    </div>
-                    <p className="text-xl font-bold text-red-600 dark:text-red-400">{item.count}</p>
-                </div>
-            ))}
-        </div>
-    );
-};
-
 const VendorHome: React.FC = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Today');
     const [loading, setLoading] = useState(true);
-    const [dashboardData] = useState({
-        parcelStats: {
-            total: { count: 12, amount: 11980 },
-            delivered: { count: 7, amount: 6230 },
-            pending: { count: 0, amount: 0 },
-            cancel: { count: 5, amount: 5750, percentage: 42 }
-        },
-        metrics: [
-            { title: "Today Pickup Request", value: 92, subtext: "Total pickup requests today" },
-            { title: "Today Delivery Request", value: 20, subtext: "Delivery requests for today" },
-            { title: "Today Return Request", value: 0, subtext: "Return requests today" },
-            { title: "Pickup Collect Ratio", value: "7.86%", subtext: "Overall collection ratio", trend: "up", trendValue: "2%" }
-        ],
-        greeting: {
-            name: 'Vendor',
-            performance: 12
-        },
-        revenue: {
-            total: 45780.00,
-            change: 4970.00
-        },
-        activeOrders: 152,
-        storeRating: 4.8,
-        recentOrders: [
-            { order_no: 'Apr 0021', status: 'Delivered', total: 229.00 },
-            { order_no: 'Apr 0022', status: 'Pending', total: 75.00 },
-            { order_no: 'Apr 0023', status: 'Processing', total: 99.95 },
-            { order_no: 'Apr 0024', status: 'Shipped', total: 149.50 }
-        ],
-        inventoryAlerts: [
-            { count: 100, label: 'Low Stock Alert', subtext: 'Camera - X100' },
-            { count: 20, label: 'Out of Stock', subtext: 'Headphones - Pro' }
-        ]
-    });
+    const [orders, setOrders] = useState<any[]>([]);
+    const [vendorData, setVendorData] = useState<any>(null);
+    
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-    const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
+    const getAuthToken = () => {
+        const session = sessionStorage.getItem('vendor_session');
+        if (!session) return null;
+        try {
+            const parsed = JSON.parse(session);
+            return parsed.token || null;
+        } catch {
+            return null;
+        }
+    };
+
+    const fetchVendorProfile = async () => {
+        try {
+            const token = getAuthToken();
+            if (!token) return;
+            
+            const response = await axios.get(`${baseURL}/api/vendor/profile`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (response.data?.vendor) {
+                setVendorData(response.data.vendor);
+            }
+        } catch (error) {
+            console.error('Error fetching vendor profile:', error);
+        }
+    };
+
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const token = getAuthToken();
+            
+            if (!token) {
+                console.error('No authentication token found');
+                setLoading(false);
+                return;
+            }
+
+            const response = await axios.get(`${baseURL}/api/vendor/orders/history`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data?.success) {
+                setOrders(response.data.orders || []);
+            } else {
+                setOrders([]);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            setOrders([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            setTimeout(() => setLoading(false), 500);
-        };
-        loadData();
-    }, [activeTab]);
+        fetchVendorProfile();
+        fetchOrders();
+    }, []);
 
-    const { parcelStats, metrics, greeting, revenue, activeOrders, storeRating, recentOrders, inventoryAlerts } = dashboardData;
+    const getFilteredOrders = () => {
+        const now = new Date();
+        let startDate: Date;
+        
+        switch(activeTab) {
+            case 'Today':
+                startDate = new Date(now.setHours(0, 0, 0, 0));
+                break;
+            case 'Weekly':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'Monthly':
+                startDate = new Date(now.setDate(now.getDate() - 30));
+                break;
+            case 'Yearly':
+                startDate = new Date(now.setDate(now.getDate() - 365));
+                break;
+            default:
+                startDate = new Date(0);
+        }
+        
+        return orders.filter(order => {
+            const orderDate = new Date(order.created_at);
+            return orderDate >= startDate;
+        });
+    };
+
+    const filteredOrders = getFilteredOrders();
+    
+    // Calculate metrics
+    const totalOrders = filteredOrders.length;
+    const deliveredOrders = filteredOrders.filter(o => o.status === "Delivered").length;
+    const pendingOrders = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").length;
+    const cancelledOrders = filteredOrders.filter(o => o.status === "Cancelled").length;
+    
+    const totalAmount = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const deliveredAmount = filteredOrders.filter(o => o.status === "Delivered").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const pendingAmount = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
+
+    // Bottom Cards Data (count and amount in same line with space)
+    const orderCards = [
+        { 
+            title: "Total Parcel", 
+            value: `${totalOrders}  ${totalAmount.toFixed(2)} BDT`, 
+            subtext: "Orders & Amount", 
+            icon: Package 
+        },
+        { 
+            title: "Delivered", 
+            value: `${deliveredOrders}  ${deliveredAmount.toFixed(2)} BDT`, 
+            subtext: "Orders & Amount", 
+            icon: CheckCircle2 
+        },
+        { 
+            title: "Pending", 
+            value: `${pendingOrders}  ${pendingAmount.toFixed(2)} BDT`, 
+            subtext: "Orders & Amount", 
+            icon: Clock 
+        },
+        { 
+            title: "Cancel", 
+            value: `${cancelledOrders} (${cancelPercentage}%)  ${cancelledAmount.toFixed(2)} BDT`, 
+            subtext: "Orders & Amount", 
+            icon: AlertCircle 
+        }
+    ];
+
+    const businessName = vendorData?.businee_name || vendorData?.business_name || 'Vendor';
+    const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
+    const recentOrders = filteredOrders.slice(0, 4);
 
     if (loading) {
         return (
@@ -197,13 +234,13 @@ const VendorHome: React.FC = () => {
     return (
         <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto">
             
-            {/* Greeting Section */}
-            <div className="mb-6">
+            {/* Welcome Section */}
+            <div className="mb-8">
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                    Good Morning, {greeting.name}!
+                    Welcome back, <span className="text-primary">{businessName}</span>!
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                    Your store is performing {greeting.performance}% better this week.
+                    {filteredOrders.length} orders found for {activeTab.toLowerCase()}
                 </p>
             </div>
 
@@ -213,54 +250,16 @@ const VendorHome: React.FC = () => {
                 {/* ========== LEFT COLUMN (takes 2/3 width) ========== */}
                 <div className="lg:col-span-2 space-y-6">
                     
-                    {/* Parcel Stats Cards - 4 Cards */}
-                    {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <StatCardNew 
-                            title="Total Parcel" 
-                            value={parcelStats.total.count}
-                            subValue={`${parcelStats.total.amount} BDT`}
-                            icon={Package}
-                            bgColor="bg-emerald-500"
-                            textColor="text-white"
-                        />
-                        <StatCardNew 
-                            title="Delivered" 
-                            value={parcelStats.delivered.count}
-                            subValue={`${parcelStats.delivered.amount} BDT`}
-                            icon={CheckCircle2}
-                            bgColor="bg-green-500"
-                            textColor="text-white"
-                        />
-                        <StatCardNew 
-                            title="Pending" 
-                            value={parcelStats.pending.count}
-                            subValue={`${parcelStats.pending.amount} BDT`}
-                            icon={Clock}
-                            bgColor="bg-yellow-500"
-                            textColor="text-white"
-                        />
-                        <StatCardNew 
-                            title="Cancel" 
-                            value={`${parcelStats.cancel.count} (${parcelStats.cancel.percentage}%)`}
-                            subValue={`${parcelStats.cancel.amount} BDT`}
-                            icon={AlertCircle}
-                            bgColor="bg-red-500"
-                            textColor="text-white"
-                        />
-                    </div> */}
-
-                    {/* Stats Cards (3 in a row) */}
+                    {/* Top Stats Cards (3 in a row) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">
-                                        ${revenue.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                                    </p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">$0.00</p>
                                     <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
                                         <TrendingUp className="w-4 h-4" />
-                                        ${revenue.change.toLocaleString('en-US', { minimumFractionDigits: 2 })} ↑
+                                        Coming soon
                                     </p>
                                 </div>
                                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
@@ -273,10 +272,12 @@ const VendorHome: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">{activeOrders}</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">
+                                        {filteredOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length}
+                                    </p>
                                     <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
                                         <TrendingUp className="w-4 h-4" />
-                                        ↑ {activeOrders}
+                                        Active orders
                                     </p>
                                 </div>
                                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
@@ -289,12 +290,12 @@ const VendorHome: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">{storeRating}</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
                                     <div className="flex text-yellow-500 mt-2">
                                         {[...Array(5)].map((_, i) => (
                                             <Star 
                                                 key={i} 
-                                                className={`w-4 h-4 ${i < Math.floor(storeRating) ? 'fill-current' : 'stroke-current'}`}
+                                                className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
                                             />
                                         ))}
                                     </div>
@@ -319,44 +320,9 @@ const VendorHome: React.FC = () => {
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>Daily Sales ($)</span>
-                                <span className="text-primary font-semibold">Target: $500</span>
+                                <span className="text-primary font-semibold">Coming soon</span>
                             </div>
                             <SalesChart />
-                        </div>
-                    </div>
-
-                    {/* Performance Metrics - 4 Cards Design */}
-                    <div className="bg-card rounded-xl p-6 shadow-sm border">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-foreground">Performance Metrics</h2>
-                            <div className="flex gap-2">
-                                {tabs.map((tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                                            activeTab === tab
-                                                ? 'bg-primary text-primary-foreground shadow-sm'
-                                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                        }`}
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {metrics.map((metric, index) => (
-                                <MetricCard 
-                                    key={index}
-                                    title={metric.title}
-                                    value={metric.value}
-                                    subtext={metric.subtext}
-                                    trend={metric.trend}
-                                    trendValue={metric.trendValue}
-                                />
-                            ))}
                         </div>
                     </div>
                 </div>
@@ -395,13 +361,126 @@ const VendorHome: React.FC = () => {
                             <h3 className="font-semibold text-lg text-foreground">Inventory Status</h3>
                             <AlertCircle className="w-5 h-5 text-red-500" />
                         </div>
-                        <InventoryAlert items={inventoryAlerts} />
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                <div>
+                                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">Low Stock Alert</p>
+                                    <p className="text-xs text-red-500 dark:text-red-500">Coming soon</p>
+                                </div>
+                                <p className="text-xl font-bold text-red-600 dark:text-red-400">-</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Recent Orders */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Orders</h3>
+                        <span className="text-xs text-muted-foreground">{filteredOrders.length} orders</span>
                         <RecentOrdersStack orders={recentOrders} />
+                    </div>
+                </div>
+            </div>
+
+                        {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
+            <div className="mt-8 bg-card rounded-xl p-6 shadow-sm border">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
+                    <div className="flex gap-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                                    activeTab === tab
+                                        ? 'bg-primary text-primary-foreground shadow-sm'
+                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Total Parcel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Total Parcel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Package className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{totalOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{totalAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Delivered Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Delivered</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <CheckCircle2 className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{deliveredOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{deliveredAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pending Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{pendingOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{pendingAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cancel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Cancel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <AlertCircle className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{cancelledOrders} ({cancelPercentage}%)</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{cancelledAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
