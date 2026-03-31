@@ -21,7 +21,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
   error,
   loginMethod,
 }) => {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [resendTimer, setResendTimer] = useState(60); // 60 seconds countdown
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -66,7 +66,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
     setOtp(newOtp);
 
     // Auto-focus next input
-    if (cleanValue && index < 5) {
+    if (cleanValue && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -81,14 +81,14 @@ export const OtpModal: React.FC<OtpModalProps> = ({
   // Handle paste
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').substring(0, 6);
+    const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').substring(0, 4);
     
-    if (pastedData.length === 6) {
+    if (pastedData.length === 4) {
       const newOtp = pastedData.split('');
       setOtp(newOtp);
       
       // Focus last input or verify button
-      inputRefs.current[5]?.focus();
+      inputRefs.current[3]?.focus();
     }
   };
 
@@ -98,14 +98,14 @@ export const OtpModal: React.FC<OtpModalProps> = ({
     
     const otpCode = otp.join('');
     
-    if (otpCode.length !== 6) {
+    if (otpCode.length !== 4) {
       return;
     }
 
     try {
       await onVerify(otpCode);
       // Clear OTP on success (modal will close via parent)
-      setOtp(['', '', '', '', '', '']);
+      setOtp(['', '', '', '']);
     } catch (error) {
       // Error handled by parent
     }
@@ -121,7 +121,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
       setResendTimer(60);
       setCanResend(false);
       // Clear OTP inputs
-      setOtp(['', '', '', '', '', '']);
+      setOtp(['', '', '', '']);
       // Focus first input
       inputRefs.current[0]?.focus();
     } catch (error) {
@@ -131,7 +131,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
 
   // Close modal and reset state
   const handleClose = () => {
-    setOtp(['', '', '', '', '', '']);
+    setOtp(['', '', '', '']);
     setResendTimer(60);
     setCanResend(false);
     onClose();
@@ -140,7 +140,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
   if (!isOpen) return null;
 
   const otpCode = otp.join('');
-  const isComplete = otpCode.length === 6;
+  const isComplete = otpCode.length === 4;
 
   return (
     <div className="fixed inset-0 z-[300] overflow-y-auto">
@@ -173,7 +173,7 @@ export const OtpModal: React.FC<OtpModalProps> = ({
             </h2>
             
             <p className="text-gray-500 text-sm">
-              We've sent a 6-digit verification code to your {loginMethod}
+              We've sent a 4-digit verification code to your {loginMethod}
             </p>
           </div>
 
@@ -206,8 +206,6 @@ export const OtpModal: React.FC<OtpModalProps> = ({
                 />
               ))}
             </div>
-
-            {/* Verify Button */}
             <Button
               type="submit"
               disabled={!isComplete || isLoading}

@@ -17,7 +17,7 @@ const OtpVerificationModal = ({
   onVerifySuccess, 
   onBack 
 }: OtpVerificationModalProps) => {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(60); // 60 seconds countdown
@@ -52,7 +52,7 @@ const OtpVerificationModal = ({
     setError(null);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -67,7 +67,7 @@ const OtpVerificationModal = ({
   // Handle paste
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+    const pastedData = e.clipboardData.getData('text').slice(0, 4);
     
     if (!/^\d+$/.test(pastedData)) {
       setError('OTP must contain only numbers');
@@ -76,13 +76,13 @@ const OtpVerificationModal = ({
 
     const newOtp = [...otp];
     pastedData.split('').forEach((char, index) => {
-      if (index < 6) newOtp[index] = char;
+      if (index < 4) newOtp[index] = char;
     });
     setOtp(newOtp);
 
     // Focus on the next empty input or last input
     const nextEmptyIndex = newOtp.findIndex((val) => val === '');
-    const focusIndex = nextEmptyIndex !== -1 ? nextEmptyIndex : 5;
+    const focusIndex = nextEmptyIndex !== -1 ? nextEmptyIndex : 3;
     inputRefs.current[focusIndex]?.focus();
   };
 
@@ -92,8 +92,8 @@ const OtpVerificationModal = ({
 
     const otpValue = otp.join('');
 
-    if (otpValue.length !== 6) {
-      setError('Please enter complete 6-digit OTP');
+    if (otpValue.length !== 4) {
+      setError('Please enter complete 4-digit OTP');
       return;
     }
 
@@ -210,7 +210,7 @@ const OtpVerificationModal = ({
           </div>
         </div>
         <p className="text-gray-600">
-          We've sent a 6-digit OTP to your mobile number
+          We've sent a 4-digit OTP to your mobile number
         </p>
         <p className="text-sm font-medium text-gray-800">
           {mobile.replace(/(\d{3})(\d{3})(\d{4})/, '+88 $1-$2-$3')}
@@ -244,7 +244,7 @@ const OtpVerificationModal = ({
             ))}
           </div>
           {error && (
-            <div className="flex items-center gap-2 text-red-600 text-sm justify-center">
+            <div className="flex items-center gap-2 text-red-600 text-sm justify-center mt-2">
               <AlertCircle className="w-4 h-4" />
               <span>{error}</span>
             </div>

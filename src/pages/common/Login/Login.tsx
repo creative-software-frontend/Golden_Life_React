@@ -192,6 +192,13 @@ const Login: React.FC = () => {
               {isLoading ? "Processing..." : loginMethod === 'mobile' ? 'Login via OTP' : 'Login'}
             </button>
 
+            {/* Forgot Password Link */}
+            <div className="text-center pt-2">
+              <Link to="/forgot-password" className="text-sm text-gray-600 hover:text-[#FF8A00] font-medium transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+
             <p className="text-center text-gray-600 pt-2">
               Don't have an account? <Link to="/register" className="text-[#FF8A00] font-bold hover:underline">Register</Link>
             </p>
