@@ -25,21 +25,56 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
   const baseURL = 'https://api.goldenlife.my';
 
   return (
-    <div className="print-only" style={{
-      display: 'none',
-      fontFamily: 'Arial, sans-serif',
-      color: '#111',
-      background: '#fff',
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      padding: '12mm',
-      margin: '0',
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden',
-      boxSizing: 'border-box'
-    }}>
+    <>
+      <style>{`
+        @media screen {
+          .print-only { display: none !important; }
+        }
+        @media print {
+          /* Hide dashboard, show only invoice */
+          body * { visibility: hidden; }
+          .print-only, .print-only * { visibility: visible; }
+          
+          /* Force the invoice to break out of any scroll containers */
+          .print-only {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            padding: 0 !important; /* Managed by @page */
+            margin: 0 !important;
+          }
+          
+          /* Ensure the table headers repeat on every new page */
+          .print-only table {
+            page-break-inside: auto;
+          }
+          .print-only tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          .print-only thead {
+            display: table-header-group;
+          }
+          
+          /* Prevent summary blocks from breaking across pages if possible without huge gaps */
+          .no-break {
+            page-break-inside: auto;
+          }
+          
+          @page { margin: 15mm; }
+        }
+      `}</style>
+
+      <div className="print-only" style={{
+        fontFamily: 'Arial, sans-serif',
+        color: '#111',
+        background: '#fff',
+        boxSizing: 'border-box'
+      }}>
       {/* ─── Header ─── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
         <div>
@@ -132,7 +167,8 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
           Thank you for shopping!
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

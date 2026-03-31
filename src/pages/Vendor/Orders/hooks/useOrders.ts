@@ -6,7 +6,7 @@ import { Order, OrderFilters, OrdersApiResponse, OrderTrackingApiResponse, Updat
 export function useOrders() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   const getAuthToken = () => {
@@ -31,7 +31,7 @@ export function useOrders() {
       console.log('🔵 [API] Fetching orders with filters:', filters);
 
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
@@ -57,7 +57,7 @@ export function useOrders() {
       for (const endpoint of endpointsToTry) {
         try {
           console.log(`🔵 [API] Trying endpoint: ${endpoint}`);
-          
+
           const response = await axios.get<OrdersApiResponse>(
             endpoint,
             {
@@ -68,7 +68,7 @@ export function useOrders() {
 
           console.log(`🟢 [API] Success with endpoint: ${endpoint}`, response.data);
 
-          if (response.data.success) {
+          if (response.data.status === 'success') {
             const orders = response.data.orders || [];
             console.log('✅ [API] Orders loaded successfully:', orders.length, 'orders');
             return orders;
@@ -78,7 +78,7 @@ export function useOrders() {
         } catch (err: any) {
           console.warn(`⚠️ Failed with endpoint ${endpoint}:`, err.response?.status, err.message);
           lastError = err;
-          
+
           // If it's not a 404, stop trying other endpoints
           if (err.response?.status !== 404) {
             throw err;
@@ -95,7 +95,7 @@ export function useOrders() {
       console.error('❌ [API] Fetch orders error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch orders';
       setError(errorMessage);
-      
+
       // Handle 404 specifically
       if (err.response?.status === 404) {
         toast.error('Orders endpoint not found. Please contact administrator.');
@@ -104,7 +104,7 @@ export function useOrders() {
       } else {
         toast.error(errorMessage);
       }
-      
+
       return [];
     } finally {
       setIsLoading(false);
@@ -122,7 +122,7 @@ export function useOrders() {
       console.log('🔵 [API] Fetching order details for:', orderNo);
 
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
@@ -136,15 +136,16 @@ export function useOrders() {
 
       console.log('🟢 [API] Order details response (from history):', response.data);
 
-      if (response.data.success) {
+
+      if (response.data.status === 'success') {
         // Filter by order_no to find the specific order
         const order = response.data.orders?.find((o: Order) => o.order_no === orderNo) || null;
         console.log('✅ [API] Order loaded successfully:', order?.order_no);
-        
+
         if (!order) {
           throw new Error('Order not found in history');
         }
-        
+
         return order;
       } else {
         throw new Error(response.data.message || 'Failed to fetch order details');
@@ -153,14 +154,14 @@ export function useOrders() {
       console.error('❌ [API] Fetch order details error:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch order details';
       setError(errorMessage);
-      
+
       // Handle 404 specifically
       if (err.response?.status === 404) {
         toast.error('Order not found. The order number may be invalid.');
       } else {
         toast.error(errorMessage);
       }
-      
+
       return null;
     } finally {
       setIsLoading(false);
@@ -177,11 +178,11 @@ export function useOrders() {
       setError(null);
 
       console.log('🔵 [API] updateStatus called with:', { orderId, status });
-      
+
       const token = getAuthToken();
       console.log('🔵 [API] Token present:', !!token);
       console.log('🔵 [API] Token value (first 20 chars):', token?.substring(0, 20));
-      
+
       if (!token) {
         console.error('❌ [API] NO TOKEN FOUND!');
         toast.error('Session expired. Please login again.');
@@ -246,9 +247,9 @@ export function useOrders() {
           console.log(`🔵 [API] Trying ${endpoint.name}`);
           console.log(`🔵 [API] Full URL: ${endpoint.url}`);
           console.log(`🔵 [API] Request config:`, endpoint.config);
-          
+
           const axiosConfig: any = {
-            headers: { 
+            headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
@@ -261,7 +262,7 @@ export function useOrders() {
 
           // Determine HTTP method
           const method = endpoint.config.method || 'POST';
-          
+
           const response = await axios.request<UpdateStatusApiResponse>({
             method,
             url: endpoint.url,
@@ -284,7 +285,7 @@ export function useOrders() {
         } catch (err: any) {
           console.warn(`⚠️ Failed with ${endpoint.name}:`, err.response?.status, err.response?.data);
           lastError = err;
-          
+
           // If it's not a 404 or 405, stop trying other endpoints
           if (err.response?.status !== 404 && err.response?.status !== 405) {
             console.error(`❌ Stopping at ${endpoint.name} due to error ${err.response?.status}`);
@@ -311,10 +312,10 @@ export function useOrders() {
       console.error('❌ [API] Update order status error:', err);
       console.error('❌ [API] Error response:', err.response?.data);
       console.error('❌ [API] Error status:', err.response?.status);
-      
+
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update order status';
       setError(errorMessage);
-      
+
       // Handle specific error cases
       if (err.response?.status === 404) {
         console.error('❌ [API] Endpoint not found - Check if backend route exists');
@@ -331,7 +332,7 @@ export function useOrders() {
       } else {
         toast.error(errorMessage);
       }
-      
+
       return false;
     } finally {
       setIsLoading(false);

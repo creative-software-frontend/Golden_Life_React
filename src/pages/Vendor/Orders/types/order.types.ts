@@ -41,7 +41,7 @@ export interface Order {
 export type OrderStatus = 'Order Placed' | 'Pending' | 'Processing' | 'Packaging' | 'Ready to Ship' | 'Delivered' | 'Cancelled';
 
 export interface OrdersApiResponse {
-  success: boolean;
+  status: boolean;
   orders: Order[];
   message?: string;
 }
