@@ -4,8 +4,6 @@ import axios from "axios";
 import ProductCard from "./ProductCard"; // Ensure you have this component
 
 // --- Interfaces ---
-
-// Updated based on your JSON snippet
 interface Category {
   id: number;
   category_name: string;
@@ -55,31 +53,27 @@ const Products: React.FC = () => {
       try {
         const token = getAuthToken();
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        
-        // HIT THE API
-        const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
-        
-        // LOGIC: Access the 'categories' array specifically
-        // Handling: response.data.categories OR response.data.data.categories
-        const fetchedCats = response.data?.categories || response.data?.data?.categories || [];
 
-        // Manually add "All" button at the beginning
-        const allOption: Category = { 
-            id: 0, 
-            category_name: "All" 
+        const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
+
+        // From your JSON: "data": { "categories": [...] }
+        const fetchedCats = response.data?.data?.categories || response.data?.categories || [];
+
+        const allOption: Category = {
+          id: 0,
+          category_name: "All"
         };
-        
+
         setCategories([allOption, ...fetchedCats]);
 
       } catch (error) {
         console.error("Error fetching categories:", error);
-        // Fallback to just "All" if API fails
         setCategories([{ id: 0, category_name: "All" }]);
       }
     };
 
     fetchCategories();
-  }, []);
+  }, [baseURL]);
 
   // ---------------------------------------------------------
   // 2. Fetch Products (Runs when selectedCategoryId changes)
@@ -93,20 +87,29 @@ const Products: React.FC = () => {
 
         let url = "";
 
-        // If ID is 0, fetch ALL products. Otherwise, fetch by ID.
+        // --- THE FIX IS HERE ---
         if (selectedCategoryId === 0) {
+          // Uses the exact endpoint you provided for "All" products
           url = `${baseURL}/api/products`;
         } else {
+          // Uses the category-specific endpoint
           url = `${baseURL}/api/student/products/category?id=${selectedCategoryId}`;
         }
 
         const response = await axios.get(url, config);
-        const data = response.data?.data?.products || response.data?.data || [];
-        
+
+        // Extract array based on your exact JSON snippet structure 
+        // { "data": { "products": [...] } }
+        const data =
+          response.data?.data?.products ||
+          response.data?.data ||
+          response.data?.products ||
+          response.data;
+
         setProducts(Array.isArray(data) ? data : []);
 
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      } catch (error: any) {
+        console.error(`Error fetching products for category ${selectedCategoryId}:`, error.response?.status, error.response?.data || error.message);
         setProducts([]);
       } finally {
         setIsProductLoading(false);
@@ -114,7 +117,7 @@ const Products: React.FC = () => {
     };
 
     fetchProducts();
-  }, [selectedCategoryId]);
+  }, [selectedCategoryId, baseURL]);
 
   const getCardColorClass = (index: number) => cardColors[index % cardColors.length];
 
@@ -127,7 +130,7 @@ const Products: React.FC = () => {
   return (
     <section className="py-24 bg-[#FFF8DC] min-h-[800px]">
       <div className="container mx-auto px-4">
-        
+
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4">
@@ -143,8 +146,8 @@ const Products: React.FC = () => {
               onClick={() => setSelectedCategoryId(cat.id)}
               className={`
                 px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 border shadow-sm capitalize
-                ${selectedCategoryId === cat.id 
-                  ? "bg-orange-500 text-white border-orange-600 scale-105 shadow-md" 
+                ${selectedCategoryId === cat.id
+                  ? "bg-orange-500 text-white border-orange-600 scale-105 shadow-md"
                   : "bg-white text-gray-600 border-gray-100 hover:bg-orange-50 hover:border-orange-200"
                 }
               `}
@@ -158,15 +161,19 @@ const Products: React.FC = () => {
         <div className="min-h-[500px]">
           <AnimatePresence mode="wait">
             {isProductLoading ? (
-              // Loading State
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <motion.div
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+              >
                 {[...Array(10)].map((_, i) => (
                   <div key={i} className="bg-white border rounded-3xl p-4 h-72 animate-pulse" />
                 ))}
-              </div>
+              </motion.div>
             ) : (
-              // Data State
-              <motion.div 
+              <motion.div
                 key={selectedCategoryId}
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
                 variants={containerVariants}
@@ -175,14 +182,14 @@ const Products: React.FC = () => {
               >
                 {products.length > 0 ? (
                   products.map((product, index) => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
-                      bgColorClass={getCardColorClass(index)} 
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      bgColorClass={getCardColorClass(index)}
                     />
                   ))
                 ) : (
-                  <div className="col-span-full text-center py-20 text-gray-400">
+                  <div className="col-span-full text-center py-20 text-gray-400 font-medium">
                     No products found in this category.
                   </div>
                 )}

@@ -122,6 +122,7 @@ const Register: React.FC = () => {
   };
 
   // 2. Verify OTP API Call
+  // 2. Verify OTP API Call
   const handleOtpSubmit = async () => {
     const otpCode = otp.join("");
     if (otpCode.length !== 4) {
@@ -146,17 +147,24 @@ const Register: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log("OTP API Response:", data); // Add this line!
 
       if (response.ok) {
-        // SUCCESS CLEANUP
-        setOtp(["", "", "", ""]);
-        setShowOtpModal(false);
-        setOtpError("");
+        // --- ADD THIS BLOCK ---
+        // Save the authentication token so the dashboard knows you are logged in.
+        // Make sure 'data.token' matches whatever your API actually returns (e.g., data.data.token, data.access_token)
+        const token = data.token || data.data?.token;
 
-        // Redirect to login
-        navigate('/login', {
-          state: { message: "Account verified successfully! Please login." }
-        });
+        if (token) {
+          setOtp(["", "", "", ""]);
+          setShowOtpModal(false);
+          handleAuthSuccess(token);
+        } else {
+          throw new Error("Verification successful but no token received.");
+        }
+        // ----------------------
+
+
       } else {
         throw new Error(data.message || "Invalid OTP Code.");
       }
@@ -166,7 +174,6 @@ const Register: React.FC = () => {
       setIsOtpLoading(false);
     }
   };
-
   const handleOtpChange = (index: number, value: string) => {
     const cleanValue = value.replace(/[^0-9]/g, "").substring(0, 1);
     const newOtp = [...otp];
@@ -179,6 +186,18 @@ const Register: React.FC = () => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
     }
+  };
+  const handleAuthSuccess = (token: string) => {
+    const expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000));
+
+    document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
+    sessionStorage.setItem('student_session', JSON.stringify({
+      token: token,
+      expiry: expirationDate.getTime()
+    }));
+
+    navigate('/dashboard');
   };
 
   return (
