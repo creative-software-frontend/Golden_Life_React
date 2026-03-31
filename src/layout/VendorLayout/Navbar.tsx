@@ -10,6 +10,7 @@ import ImageUploadModal from '@/components/shared/ImageUploadModal';
 import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/hooks/useVendorProfile';
 import VendorNotificationBell from '@/pages/Vendor/VendorHeader/NotificationBell';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
+import { useVendorAuth } from '@/hooks/useVendorAuth';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -35,6 +36,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     const [isImageSearchOpen, setIsImageSearchOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const navigate = useNavigate();
+    const { handleLogout } = useVendorAuth();
 
     // --- Fetch Vendor Profile ---
     const { profile, isLoading: isProfileLoading } = useVendorProfile();
@@ -352,8 +354,8 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                     <button
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
                                         onClick={() => {
-                                            sessionStorage.removeItem('vendor_session');
-                                            navigate('/vendor/login');
+                                            setIsProfileMenuOpen(false);
+                                            handleLogout();
                                         }}
                                     >
                                         <LogOut className="h-4 w-4" />

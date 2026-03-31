@@ -6,6 +6,7 @@ import {
     ClipboardList,
 } from 'lucide-react';
 import Logo from '@/pages/common/Logo';
+import { useVendorAuth } from '@/hooks/useVendorAuth';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { handleLogout } = useVendorAuth();
 
     const menuItems = [
         { name: 'Dashboard', path: '/vendor/dashboard', icon: LayoutDashboard },
@@ -27,11 +29,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         // { name: 'Reschedule Order', path: '/vendor/reschedule', icon: CalendarClock },
         { name: 'Report', path: '/vendor/report', icon: BarChart3 },
     ];
-
-    const handleLogout = () => {
-        console.log("Logging out...");
-        navigate('/login');
-    };
 
     return (
         <>

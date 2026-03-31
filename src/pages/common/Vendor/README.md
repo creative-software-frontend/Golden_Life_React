@@ -1,17 +1,31 @@
-# 🔐 Vendor Forgot Password & Reset Password Implementation
+# 🔐 Vendor Authentication - Complete Documentation
 
 ## 📋 Overview
 
-Complete implementation of Forgot Password and Reset Password functionality for Vendor Dashboard with OTP verification.
+Complete authentication system for Vendor Dashboard including Login, Forgot Password, Reset Password, and Logout functionality.
 
 ---
 
-## 🎯 Features Implemented
+## 🎯 Features
 
+### 1. **Login System**
+- Email/password authentication
+- Session management
+- Token-based authentication
+
+### 2. **Password Recovery**
 ✅ **Three-Step Process:**
 1. **Mobile Number Input** - Send OTP to vendor's mobile
 2. **OTP Verification** - Verify 6-digit OTP
 3. **Password Reset** - Set new password
+
+### 3. **Logout System**
+✅ **Key Features:**
+- API integration for secure logout
+- Session cleanup
+- Cookie clearing
+- Toast notifications
+- Redirect to login page
 
 ✅ **Key Features:**
 - Mobile number validation (Bangladesh format)
@@ -37,6 +51,13 @@ src/pages/common/Vendor/
 │   ├── ResetPasswordForm.tsx             # Step 3: New password form
 │   └── index.ts                          # Component exports
 └── LoginForm.tsx                         # Updated with Forgot Password link
+
+src/hooks/
+└── useVendorAuth.ts                      # Authentication hook (logout, token management)
+
+src/layout/VendorLayout/
+├── Sidebar.tsx                           # Updated with logout functionality
+└── Navbar.tsx                            # Updated with logout in profile dropdown
 ```
 
 ---
@@ -91,6 +112,21 @@ Content-Type: application/json
 {
   "success": true,
   "message": "Password reset successfully"
+}
+```
+
+### 4. Vendor Logout
+```http
+POST /api/vendor/logout
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
 }
 ```
 
@@ -307,6 +343,74 @@ const [otp, setOtp] = useState(['', '', '', '']); // 4 digits
 In `OtpVerificationModal.tsx`:
 ```typescript
 const [timeLeft, setTimeLeft] = useState(120); // 120 seconds
+```
+
+---
+
+## 🔓 Logout Implementation Details
+
+### useVendorAuth Hook
+
+The `useVendorAuth` hook provides centralized authentication management:
+
+```typescript
+import { useVendorAuth } from '@/hooks/useVendorAuth';
+
+function MyComponent() {
+  const { handleLogout, getAuthToken, isAuthenticated, getCurrentVendor } = useVendorAuth();
+  
+  return (
+    <button onClick={handleLogout}>
+      Logout
+    </button>
+  );
+}
+```
+
+### Available Methods
+
+1. **handleLogout** - Async function to logout vendor
+   - Calls `/api/vendor/logout` API
+   - Clears sessionStorage and cookies
+   - Shows success toast
+   - Redirects to `/vendor/login`
+
+2. **getAuthToken** - Get current auth token from session
+3. **isAuthenticated** - Check if vendor is logged in
+4. **getCurrentVendor** - Get current vendor info from session
+
+### Usage in Components
+
+#### Sidebar.tsx Example:
+```typescript
+import { useVendorAuth } from '@/hooks/useVendorAuth';
+
+const Sidebar = () => {
+  const { handleLogout } = useVendorAuth();
+  
+  return (
+    <button onClick={handleLogout}>
+      <LogOut />
+      Logout
+    </button>
+  );
+};
+```
+
+#### Navbar.tsx Example:
+```typescript
+import { useVendorAuth } from '@/hooks/useVendorAuth';
+
+const Navbar = () => {
+  const { handleLogout } = useVendorAuth();
+  
+  return (
+    <DropdownMenuItem onClick={handleLogout}>
+      <LogOut />
+      Logout
+    </DropdownMenuItem>
+  );
+};
 ```
 
 ---
