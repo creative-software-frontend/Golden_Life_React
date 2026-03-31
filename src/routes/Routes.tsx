@@ -82,6 +82,11 @@ import NomineeInfoTab from "@/components/profile/NomineeInfoTab/NomineeInfoTab";
 import AdditionalInfoTab from "@/components/profile/AdditionalInfoTab/AdditionalInfoTab";
 import ProjectOverviewTab from "@/components/profile/ProjectOverviewTab/ProjectOverviewTab";
 import ChangePassward from "@/components/profile/ChangePassward/ChangePassward";
+
+// Vendor Wallet
+import VendorAddMoney from "@/pages/Vendor/Wallet/VendorAddMoney";
+import VendorWithdraw from "@/pages/Vendor/Wallet/VendorWithdraw";
+import VendorTransactions from "@/pages/Vendor/Wallet/VendorTransactions";
 // import SendMoney from './../pages/Dashboard/SendMoney/SendMoney';
 
 
@@ -331,6 +336,18 @@ export const routes = createBrowserRouter([
                             {
                                 path: 'wallet/add', // Renders at /vendor/dashboard/wallet/add
                                 element: <WalletAdd />
+                            },
+                            {
+                                path: 'wallet/vendor_add',
+                                element: <VendorAddMoney />
+                            },
+                            {
+                                path: 'wallet/vendor_withdraw',
+                                element: <VendorWithdraw />
+                            },
+                            {
+                                path: 'wallet/vendor_all',
+                                element: <VendorTransactions />
                             },
 
                             {

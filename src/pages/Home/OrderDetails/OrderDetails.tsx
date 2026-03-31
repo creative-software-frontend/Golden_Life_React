@@ -30,29 +30,23 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       boxSizing: 'border-box'
     }}>
       {/* ─── Header ─── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
         <div>
-          <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain', marginBottom: '8px' }} />
-
+          <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
         </div>
 
         <div style={{ textAlign: 'right' }}>
           <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
           <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-          <p style={{ fontSize: '11px', color: '#777', marginTop: '4px' }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
+          <p style={{ fontSize: '11px', color: '#777', marginTop: '4px', marginBottom: 0 }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
         </div>
-
-
-
       </div>
-
-      {/* ─── Invoice Title ─── */}
 
       {/* ─── Billing + Shipping ─── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
         {/* Billing */}
         <div>
-          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Billing Address</p>
+          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Address</p>
           {buyerProfile ? (
             <>
               <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{buyerProfile.student?.name}</p>
@@ -61,12 +55,12 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
               <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{buyerProfile.student?.mobile}</p>
             </>
           ) : (
-            <p style={{ fontSize: '13px', color: '#999' }}>Not provided</p>
+            <p style={{ fontSize: '13px', color: '#999', margin: 0 }}>Not provided</p>
           )}
         </div>
         {/* Shipping */}
         <div>
-          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#888', textTransform: 'uppercase', marginBottom: '10px' }}>Shipping Address</p>
+          <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Address</p>
           {shippingInfo ? (
             <>
               <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{shippingInfo.name}</p>
@@ -86,12 +80,11 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       {/* ─── Product Table ─── */}
       <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px', fontSize: '12px' }}>
         <thead>
-          <tr style={{ background: '#f5d800' }}>
-            <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
+          <tr>
+            <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
             <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Quantity</th>
             <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Unit Price</th>
-            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Delivery</th>
-            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Total</th>
+            <th style={{ padding: '10px 14px 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Total</th>
           </tr>
         </thead>
         <tbody>
@@ -99,23 +92,23 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
             const qty = Number(item.quantity) || 1;
             const itemTotal = Number(item.subtotal) || 0;
             const unitPrice = qty > 0 ? (itemTotal / qty) : itemTotal;
+
             return (
-              <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                <td style={{ padding: '8px 12px', verticalAlign: 'middle' }}>
+              <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', borderTop: '1px solid #eee' }}>
+                <td style={{ padding: '12px 12px 12px 0', verticalAlign: 'middle' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img
                       src={`${baseURL}/uploads/ecommarce/product_image/${item.product_image}`}
                       alt={item.product_name}
-                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee', flexShrink: 0 }}
+                      style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
                     />
-                    <span style={{ fontWeight: 600, color: '#222' }}>{item.product_name}</span>
+                    <span style={{ fontWeight: 700, color: '#111' }}>{item.product_name}</span>
                   </div>
                 </td>
-                <td style={{ padding: '8px 12px', textAlign: 'center', color: '#444' }}>{qty}</td>
-                <td style={{ padding: '8px 12px', textAlign: 'right', color: '#444' }}>৳{unitPrice.toFixed(2)}</td>
-                <td style={{ padding: '8px 12px', textAlign: 'right', color: '#444' }}>—</td>
-                <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700 }}>৳{itemTotal.toFixed(2)}</td>
+                <td style={{ padding: '12px', textAlign: 'center', color: '#555' }}>{qty}</td>
+                <td style={{ padding: '12px', textAlign: 'right', color: '#555' }}>৳{unitPrice.toFixed(2)}</td>
+                <td style={{ padding: '12px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{itemTotal.toFixed(2)}</td>
               </tr>
             );
           })}
@@ -123,7 +116,7 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       </table>
 
       {/* ─── Totals ─── */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', pageBreakInside: 'avoid' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px', pageBreakInside: 'avoid' }}>
         <div style={{ width: '280px', fontSize: '13px' }}>
           {[
             { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
@@ -131,9 +124,9 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
             { label: 'Total Amount Paid', value: `৳${Number(order.total).toFixed(2)}`, bold: true },
             { label: 'Total Due', value: '৳0', bold: true },
           ].map(({ label, value, bold }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
               <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
-              <span style={{ fontWeight: bold ? 800 : 600 }}>{value}</span>
+              <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
             </div>
           ))}
         </div>
@@ -141,8 +134,8 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
 
       {/* Payment Info */}
       {order.payment && (
-        <div style={{ background: '#f8f8f8', borderRadius: '8px', padding: '14px 18px', marginBottom: '28px', fontSize: '12px', color: '#555' }}>
-          <span style={{ fontWeight: 700, color: '#333' }}>Payment: </span>
+        <div style={{ padding: '0', marginBottom: '32px', fontSize: '12px', color: '#555' }}>
+          <span style={{ fontWeight: 800, color: '#111' }}>Payment: </span>
           {order.payment.payment_method}
           {order.payment.transaction_number && (
             <span> &nbsp;|&nbsp; TXN: {order.payment.transaction_number}</span>
@@ -151,15 +144,13 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
       )}
 
       {/* ─── Footer Note ─── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '30px', borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#777', lineHeight: 1.7 }}>
-        <div>
+      <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6 }}>
+        <p style={{ margin: '0 0 15px 0' }}>
           Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
-        </div>
-      </div>
-
-      {/* Added marginTop: '15px' here for vertical gap */}
-      <div style={{ marginTop: '15px', fontWeight: 700, color: '#333', fontSize: '12px', whiteSpace: 'nowrap' }}>
-        Thank you for shopping!
+        </p>
+        <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
+          Thank you for shopping!
+        </p>
       </div>
     </div>
 

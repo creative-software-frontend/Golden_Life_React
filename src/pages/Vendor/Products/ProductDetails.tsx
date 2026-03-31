@@ -44,8 +44,10 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetailsData | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Lightbox modal state
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -112,7 +114,7 @@ export default function ProductDetails() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isLightboxOpen) return;
-      
+
       if (e.key === 'ArrowLeft') {
         goToPreviousImage();
       } else if (e.key === 'ArrowRight') {
@@ -126,7 +128,6 @@ export default function ProductDetails() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, galleryImages.length]);
 
-  // Get auth token
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
     if (!session) return null;
@@ -138,6 +139,64 @@ export default function ProductDetails() {
     }
   };
 
+  const getCategoryName = (cid: string | number | undefined) => {
+    if (!cid) return 'N/A';
+    const category = categories.find(c => c.id.toString() === cid.toString());
+    return category ? category.category_name : cid;
+  };
+
+  const getSubcategoryName = (scid: string | number | undefined) => {
+    if (!scid) return 'N/A';
+    const subcategory = subcategories.find(s => s.id.toString() === scid.toString());
+    return subcategory ? subcategory.subcategory_name : scid;
+  };
+
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(
+          `${baseURL}/api/vendor/ecommerce/categories`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        if (response.data?.status === true) {
+          setCategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch categories error:', err);
+      }
+    };
+    fetchCategories();
+  }, [baseURL]);
+
+  // Fetch Subcategories
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (!product?.category_id) return;
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(
+          `${baseURL}/api/vendor/ecommerce/subcategories`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { category_id: product.category_id }
+          }
+        );
+        if (response.data?.status === true) {
+          setSubcategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch subcategories error:', err);
+      }
+    };
+    fetchSubcategories();
+  }, [baseURL, product?.category_id]);
+
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) {
@@ -148,9 +207,9 @@ export default function ProductDetails() {
 
       try {
         console.log('🔄 Fetching product details for ID:', id);
-        
+
         const token = getAuthToken();
-        
+
         const response = await axios.get(
           `${baseURL}/api/vendor/product/details`,
           {
@@ -159,14 +218,14 @@ export default function ProductDetails() {
               'Content-Type': 'application/json'
             },
             params: {
-              product_id: Number(id)  
+              product_id: Number(id)
             }
           }
         );
 
         console.log('✅ Product details fetched successfully');
         console.log('Response data:', response.data);
-        
+
         // Extract product and gallery from response
         // Expected structure: { status: true, data: { product: {...}, gallery: [...] } }
         if (response.data?.data?.product) {
@@ -177,13 +236,13 @@ export default function ProductDetails() {
         } else {
           throw new Error('Invalid response structure - product data not found');
         }
-        
+
       } catch (err: any) {
         console.error('❌ Fetch product details error:', err);
         console.error('Error response:', err.response?.data);
-        
+
         let errorMessage = 'Failed to load product details';
-        
+
         if (err.response?.status === 404) {
           errorMessage = 'Product not found.';
         } else if (err.response?.status === 401) {
@@ -191,7 +250,7 @@ export default function ProductDetails() {
         } else if (err.response?.status === 500) {
           errorMessage = 'Server error. Please try again later.';
         }
-        
+
         toast.error(errorMessage);
         setTimeout(() => {
           navigate('/vendor/dashboard/products');
@@ -231,7 +290,7 @@ export default function ProductDetails() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
-      
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
@@ -262,7 +321,7 @@ export default function ProductDetails() {
               <CardTitle className="text-lg font-bold">Product Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div 
+              <div
                 className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 cursor-pointer group relative"
                 onClick={() => openLightbox(0)}
               >
@@ -275,7 +334,7 @@ export default function ProductDetails() {
                     e.currentTarget.src = '/assets/default-vendor.png';
                   }}
                 />
-                
+
                 {/* Gallery count badge */}
                 {galleryImages.length > 0 && (
                   <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2">
@@ -283,7 +342,7 @@ export default function ProductDetails() {
                     <span>{galleryImages.length + 1} Photos</span>
                   </div>
                 )}
-                
+
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm">
@@ -291,7 +350,7 @@ export default function ProductDetails() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Gallery Thumbnails Grid */}
               {galleryImages.length > 0 && (
                 <div className="mt-4">
@@ -332,7 +391,7 @@ export default function ProductDetails() {
                   {product.status === '1' ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Hash size={16} className="text-gray-500" />
                 <div>
@@ -407,61 +466,67 @@ export default function ProductDetails() {
                 <p className="text-2xl font-bold">{formatNumber(product.stock)}</p>
                 <p className="text-xs text-gray-500">units</p>
               </div>
-              
+
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-gray-500" />
-                  <label className="text-xs text-gray-500">Category ID</label>
+                  <label className="text-xs text-gray-500">Category</label>
                 </div>
                 <p className="text-sm font-semibold">
-                  {product.category_id || 'N/A'}
+                  {getCategoryName(product.category_id)}
                 </p>
-                <p className="text-xs text-gray-500">
-                  → Subcategory ID: {product.subcategory_id || 'N/A'}
-                </p>
+                <div className="text-xs text-gray-500 mt-1 flex flex-col gap-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-400">→</span>
+                    <span className="font-medium text-gray-600">Subcategory:</span>
+                    <span className="text-primary-light font-semibold">
+                      {getSubcategoryName(product.subcategory_id)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Descriptions */}
-          {(product.short_description_english || product.long_description_english || 
+          {(product.short_description_english || product.long_description_english ||
             product.short_description_bangla || product.long_description_bangla) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-bold">Product Descriptions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {product.short_description_english && (
-                  <div>
-                    <label className="text-xs text-gray-500">Short Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
-                  </div>
-                )}
-                {product.short_description_bangla && (
-                  <div>
-                    <label className="text-xs text-gray-500">Short Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
-                  </div>
-                )}
-                {product.long_description_english && (
-                  <div>
-                    <label className="text-xs text-gray-500">Long Description (English)</label>
-                    <div className="prose prose-sm max-w-none mt-1">
-                      <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Product Descriptions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {product.short_description_english && (
+                    <div>
+                      <label className="text-xs text-gray-500">Short Description (English)</label>
+                      <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
                     </div>
-                  </div>
-                )}
-                {product.long_description_bangla && (
-                  <div>
-                    <label className="text-xs text-gray-500">Long Description (Bangla)</label>
-                    <div className="prose prose-sm max-w-none mt-1">
-                      <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                  )}
+                  {product.short_description_bangla && (
+                    <div>
+                      <label className="text-xs text-gray-500">Short Description (Bangla)</label>
+                      <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  )}
+                  {product.long_description_english && (
+                    <div>
+                      <label className="text-xs text-gray-500">Long Description (English)</label>
+                      <div className="prose prose-sm max-w-none mt-1">
+                        <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+                      </div>
+                    </div>
+                  )}
+                  {product.long_description_bangla && (
+                    <div>
+                      <label className="text-xs text-gray-500">Long Description (Bangla)</label>
+                      <div className="prose prose-sm max-w-none mt-1">
+                        <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
           {/* Video Link */}
           {product.video_link && (
@@ -580,9 +645,8 @@ export default function ProductDetails() {
                 {/* Main image thumbnail */}
                 <button
                   onClick={() => setCurrentImageIndex(0)}
-                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                    currentImageIndex === 0 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
-                  }`}
+                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === 0 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                    }`}
                 >
                   <img
                     src={getProductImageUrl(product.product_image)}
@@ -590,15 +654,14 @@ export default function ProductDetails() {
                     className="w-full h-full object-cover"
                   />
                 </button>
-                
+
                 {/* Gallery thumbnails */}
                 {galleryImages.map((galImg, index) => (
                   <button
                     key={galImg.id || index}
                     onClick={() => setCurrentImageIndex(index + 1)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                      currentImageIndex === index + 1 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
-                    }`}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index + 1 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
+                      }`}
                   >
                     <img
                       src={getGalleryImageUrl(galImg.gal_img)}

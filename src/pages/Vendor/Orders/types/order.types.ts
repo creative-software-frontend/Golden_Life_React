@@ -32,6 +32,10 @@ export interface Order {
   created_at: string;
   products: OrderProduct[];
   status_history?: StatusHistory[];
+  payment?: {
+    payment_method: string;
+    transaction_number: string;
+  };
 }
 
 export type OrderStatus = 'Order Placed' | 'Pending' | 'Processing' | 'Packaging' | 'Ready to Ship' | 'Delivered' | 'Cancelled';

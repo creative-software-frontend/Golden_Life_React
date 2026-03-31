@@ -13,10 +13,11 @@ interface ConfirmWithdrawModalProps {
     attachment: File | null;
     baseURL: string;
     token: string | null;
+    role?: string;
 }
 
 export default function ConfirmWithdrawModal({ 
-    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token 
+    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token, role 
 }: ConfirmWithdrawModalProps) {
     
     const [pinCode, setPinCode] = useState<string>('');
@@ -39,6 +40,10 @@ export default function ConfirmWithdrawModal({
             
             formData.append('password', pinCode); 
             formData.append('pin_code', pinCode); 
+            
+            if (role) {
+                formData.append('role', role);
+            }
 
             if (attachment) {
                 formData.append('attachment', attachment);
