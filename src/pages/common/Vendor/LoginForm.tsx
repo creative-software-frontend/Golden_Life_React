@@ -10,6 +10,7 @@ import Logo from "../Logo";
 import { SendOtpForm } from "./components/SendOtpForm";
 import { OtpModal } from "./components/OtpModal";
 import { useVendorOtp } from "./hooks/useVendorOtp";
+import ForgotPassword from "./ForgotPassword";
 
 // Scroll Animation Variants
 const scrollVariant = {
@@ -32,6 +33,9 @@ const LoginForm = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  
+  // Forgot Password states
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   
   // API Feedback States
   const [apiError, setApiError] = useState("");
@@ -228,6 +232,12 @@ const LoginForm = () => {
         )}
       </AnimatePresence>
 
+      {/* Forgot Password Modal - Rendered at root level */}
+      <ForgotPassword
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+      />
+
       {/* OUTER WRAPPER: Native CSS injected to completely hide scrollbars across ALL browsers */}
       <div className="h-screen w-full overflow-y-auto relative bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         
@@ -326,12 +336,13 @@ const LoginForm = () => {
               >
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-sm font-medium text-gray-700">Password</label>
-                  <Link 
-                    to="/vendor/forgot-password" 
+                  <button 
+                    type="button"
+                    onClick={() => setIsForgotPasswordOpen(true)}
                     className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors"
                   >
-                    Forgot?
-                  </Link>
+                    Forgot Password?
+                  </button>
                 </div>
                 <div className="relative">
                   <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${apiError ? 'text-red-400' : 'text-gray-400'}`} />
