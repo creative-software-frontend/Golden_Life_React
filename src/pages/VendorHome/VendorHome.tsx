@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Package, 
-    Truck, 
-    RefreshCcw, 
-    ArrowRightLeft, 
     CheckCircle2, 
-    CalendarDays,
+    Clock,
     AlertCircle,
     TrendingUp,
-    Percent,
     DollarSign,
     ShoppingCart,
     Star,
@@ -17,30 +13,7 @@ import {
     Headphones
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-// Reusable StatCard Component
-const StatCard = ({ title, value, subtext, icon: Icon, trend, trendValue, colorClass, customColor }: any) => (
-    <div className="bg-background rounded-xl border border-border p-4 sm:p-6 flex justify-between items-start shadow-sm hover:shadow-md transition-shadow duration-200 group">
-        <div className="flex flex-col min-w-0">
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground/70 truncate">{title}</h3>
-            <div className="flex items-baseline gap-2 mt-1 sm:mt-2 flex-wrap">
-                <span className="text-xl sm:text-3xl font-black text-foreground">{value}</span>
-                {trend && (
-                    <span className={`text-xs font-semibold flex items-center gap-0.5 ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                        {trend === 'up' ? '↑' : '↓'} {trendValue}
-                    </span>
-                )}
-            </div>
-            <p className="text-[10px] sm:text-xs text-foreground/50 mt-1 line-clamp-1">{subtext}</p>
-        </div>
-        <div 
-            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-primary-foreground flex-shrink-0 shadow-sm ml-2 transition-transform group-hover:scale-105 ${colorClass || ''}`}
-            style={customColor ? { backgroundColor: `hsl(var(${customColor}))` } : {}}
-        >
-            <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
-        </div>
-    </div>
-);
+import axios from 'axios';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -57,29 +30,17 @@ const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: 
     );
 };
 
-// Recent Orders Component (Stacked view)
+// Recent Orders Component
 const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
-    const getStatusColor = (status: string): string => {
-        const statusMap: Record<string, string> = {
-            '1B10': 'text-green-600',
-            '1JR0': 'text-yellow-500',
-            'Processing': 'text-blue-500'
-        };
-        return statusMap[status] || 'text-gray-500';
-    };
-
     return (
         <div className="space-y-3">
-            {orders.slice(0, 3).map((order, idx) => (
-                <div key={idx} className="flex justify-between items-center p-2 hover:bg-muted/50 rounded-lg transition-colors">
+            {orders.map((order, idx) => (
+                <div key={idx} className="flex justify-between items-center p-2 hover:bg-muted/50 rounded-lg transition-colors border-b border-border last:border-0">
                     <div>
                         <p className="font-medium text-sm text-foreground">{order.order_no}</p>
-                        <p className={`text-xs flex items-center gap-1 mt-0.5 ${getStatusColor(order.status)}`}>
-                            <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            {order.status}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{order.status}</p>
                     </div>
-                    <p className="font-semibold text-sm text-foreground">${order.total}</p>
+                    <p className="font-semibold text-sm text-foreground">${parseFloat(order.total).toFixed(2)}</p>
                 </div>
             ))}
             <button 
@@ -100,38 +61,21 @@ const SalesChart = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-end h-48 gap-2">
+            <div className="flex justify-between items-end h-40 gap-1">
                 {salesData.map((sale, idx) => (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1">
                         <div 
-                            className="w-full bg-primary/70 hover:bg-primary transition-all duration-300 rounded-t-lg"
+                            className="w-full bg-primary/70 hover:bg-primary transition-all duration-300 rounded-t"
                             style={{ height: `${(sale / maxSale) * 100}%`, minHeight: '4px' }}
                         />
-                        <span className="text-xs text-muted-foreground">{days[idx]}</span>
+                        <span className="text-[10px] text-muted-foreground">{days[idx]}</span>
                     </div>
                 ))}
             </div>
-            <div className="flex justify-between mt-4 pt-2 border-t border-border">
-                <span className="text-xs text-muted-foreground">Week</span>
-                <span className="text-xs font-semibold text-primary">↑ 12% vs last week</span>
+            <div className="flex justify-between mt-3 text-xs text-muted-foreground">
+                <span>Lowest: $218</span>
+                <span>Highest: $450</span>
             </div>
-        </div>
-    );
-};
-
-// Inventory Alert Component
-const InventoryAlert = ({ items }: { items: any[] }) => {
-    return (
-        <div className="space-y-3">
-            {items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                    <div>
-                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">{item.label}</p>
-                        <p className="text-xs text-red-500 dark:text-red-500">{item.subtext || 'Needs attention'}</p>
-                    </div>
-                    <p className="text-xl font-bold text-red-600 dark:text-red-400">{item.count}</p>
-                </div>
-            ))}
         </div>
     );
 };
@@ -140,54 +84,116 @@ const VendorHome: React.FC = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Today');
     const [loading, setLoading] = useState(true);
-    const [dashboardData] = useState({
-        stats: {
-            today_pickup_request: 92,
-            today_delivery_request: 20,
-            today_return_request: 0,
-            today_transfer_request: 0,
-            today_delivery: 0,
-            monthly_delivery: 0,
-            total_pickup_request: 314,
-            total_delivery_request: 136,
-            total_return_request: 14,
-            total_transfer_request: 42,
-            pickup_collect_ratio: 7.86,
-            success_delivery_ratio: 5
-        },
-        greeting: {
-            name: 'Vendor',
-            performance: 12
-        },
-        revenue: {
-            total: 45780.00,
-            change: 4970.00
-        },
-        activeOrders: 152,
-        storeRating: 4.8,
-        recentOrders: [
-            { order_no: 'Apr 0021', status: '1B10', total: 229.00 },
-            { order_no: 'Apr 0022', status: '1JR0', total: 75.00 },
-            { order_no: 'Apr 0023', status: '1B10', total: 99.95 },
-            { order_no: 'Apr 0024', status: 'Processing', total: 149.50 }
-        ],
-        inventoryAlerts: [
-            { count: 100, label: 'Low Stock Alert', subtext: 'Camera - X100' },
-            { count: 20, label: 'Out of Stock', subtext: 'Headphones - Pro' }
-        ]
-    });
+    const [orders, setOrders] = useState<any[]>([]);
+    const [vendorData, setVendorData] = useState<any>(null);
+    
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-    const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
+    const getAuthToken = () => {
+        const session = sessionStorage.getItem('vendor_session');
+        if (!session) return null;
+        try {
+            const parsed = JSON.parse(session);
+            return parsed.token || null;
+        } catch {
+            return null;
+        }
+    };
+
+    const fetchVendorProfile = async () => {
+        try {
+            const token = getAuthToken();
+            if (!token) return;
+            
+            const response = await axios.get(`${baseURL}/api/vendor/profile`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (response.data?.vendor) {
+                setVendorData(response.data.vendor);
+            }
+        } catch (error) {
+            console.error('Error fetching vendor profile:', error);
+        }
+    };
+
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const token = getAuthToken();
+            
+            if (!token) {
+                console.error('No authentication token found');
+                setLoading(false);
+                return;
+            }
+
+            const response = await axios.get(`${baseURL}/api/vendor/orders/history`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data?.success) {
+                setOrders(response.data.orders || []);
+            } else {
+                setOrders([]);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            setOrders([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            setTimeout(() => setLoading(false), 500);
-        };
-        loadData();
-    }, [activeTab]);
+        fetchVendorProfile();
+        fetchOrders();
+    }, []);
 
-    const { stats, greeting, revenue, activeOrders, storeRating, recentOrders, inventoryAlerts } = dashboardData;
+    const getFilteredOrders = () => {
+        const now = new Date();
+        let startDate: Date;
+        
+        switch(activeTab) {
+            case 'Today':
+                startDate = new Date(now.setHours(0, 0, 0, 0));
+                break;
+            case 'Weekly':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'Monthly':
+                startDate = new Date(now.setDate(now.getDate() - 30));
+                break;
+            case 'Yearly':
+                startDate = new Date(now.setDate(now.getDate() - 365));
+                break;
+            default:
+                startDate = new Date(0);
+        }
+        
+        return orders.filter(order => {
+            const orderDate = new Date(order.created_at);
+            return orderDate >= startDate;
+        });
+    };
+
+    const filteredOrders = getFilteredOrders();
+    
+    // Calculate metrics
+    const totalOrders = filteredOrders.length;
+    const deliveredOrders = filteredOrders.filter(o => o.status === "Delivered").length;
+    const pendingOrders = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").length;
+    const cancelledOrders = filteredOrders.filter(o => o.status === "Cancelled").length;
+    
+    const totalAmount = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const deliveredAmount = filteredOrders.filter(o => o.status === "Delivered").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const pendingAmount = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
+    const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
+
+    const businessName = vendorData?.businee_name || vendorData?.business_name || 'Vendor';
+    const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
+    const recentOrders = filteredOrders.slice(0, 4);
 
     if (loading) {
         return (
@@ -198,121 +204,104 @@ const VendorHome: React.FC = () => {
     }
 
     return (
-        <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
+        <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto">
             
-            {/* Greeting Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                        Good Morning, {greeting.name}!
-                    </h1>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Your store is performing {greeting.performance}% better this week.
-                    </p>
-                </div>
-                <div className="flex items-center gap-3 bg-card rounded-xl p-4 border shadow-sm">
-                    <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Store Rating</p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-2xl font-bold text-foreground">{storeRating}</span>
-                            <div className="flex text-yellow-500">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star 
-                                        key={i} 
-                                        className={`w-4 h-4 ${i < Math.floor(storeRating) ? 'fill-current' : 'stroke-current'}`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Welcome Section */}
+            <div className="mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                    Welcome back, <span className="text-primary">{businessName}</span>!
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                    {filteredOrders.length} orders found for {activeTab.toLowerCase()}
+                </p>
             </div>
 
-            {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-                            <p className="text-3xl font-bold text-foreground mt-2">
-                                ${revenue.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                            </p>
-                            <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
-                                <TrendingUp className="w-4 h-4" />
-                                ${revenue.change.toLocaleString('en-US', { minimumFractionDigits: 2 })} ↑
-                            </p>
-                        </div>
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                            <DollarSign className="w-6 h-6 text-primary" />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
-                            <p className="text-3xl font-bold text-foreground mt-2">{activeOrders}</p>
-                            <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
-                                <TrendingUp className="w-4 h-4" />
-                                ↑ {activeOrders}
-                            </p>
-                        </div>
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                            <ShoppingCart className="w-6 h-6 text-primary" />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
-                            <p className="text-3xl font-bold text-foreground mt-2">{storeRating}</p>
-                            <div className="flex text-yellow-500 mt-2">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star 
-                                        key={i} 
-                                        className={`w-4 h-4 ${i < Math.floor(storeRating) ? 'fill-current' : 'stroke-current'}`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                            <Star className="w-6 h-6 text-primary" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Two Column Layout: Left = Sales Chart, Right = Stacked (Quick Actions + Inventory + Recent Orders) */}
+            {/* Two Column Layout */}
             <div className="grid lg:grid-cols-3 gap-6">
-                {/* Left Column - Sales Chart (takes 2/3 width) */}
-                <div className="lg:col-span-2 bg-card rounded-xl p-5 shadow-sm border">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-semibold text-lg text-foreground">Sales Performance (Last 30 Days)</h3>
-                        <div className="flex gap-1">
-                            <button className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary">Week</button>
-                            <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Month</button>
-                            <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Year</button>
+                
+                {/* ========== LEFT COLUMN (takes 2/3 width) ========== */}
+                <div className="lg:col-span-2 space-y-6">
+                    
+                    {/* Top Stats Cards (3 in a row) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">$0.00</p>
+                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
+                                        <TrendingUp className="w-4 h-4" />
+                                        Coming soon
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <DollarSign className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">
+                                        {filteredOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length}
+                                    </p>
+                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
+                                        <TrendingUp className="w-4 h-4" />
+                                        Active orders
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <ShoppingCart className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
+                                    <div className="flex text-yellow-500 mt-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star 
+                                                key={i} 
+                                                className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <Star className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="space-y-4">
-                        <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                            <span>Daily Sales ($)</span>
-                            <span className="text-primary font-semibold">Target: $500</span>
+
+                    {/* Sales Chart */}
+                    <div className="bg-card rounded-xl p-5 shadow-sm border">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-semibold text-lg text-foreground">Sales Performance (Last 30 Days)</h3>
+                            <div className="flex gap-1">
+                                <button className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary">Week</button>
+                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Month</button>
+                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Year</button>
+                            </div>
                         </div>
-                        <SalesChart />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-2 pt-2 border-t">
-                            <span>Lowest: $218</span>
-                            <span>Highest: $450</span>
-                            <span>Average: $350</span>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Daily Sales ($)</span>
+                                <span className="text-primary font-semibold">Coming soon</span>
+                            </div>
+                            <SalesChart />
                         </div>
                     </div>
                 </div>
 
-                {/* Right Column - Stacked Items (takes 1/3 width) */}
+                {/* ========== RIGHT COLUMN (takes 1/3 width) ========== */}
                 <div className="space-y-6">
+                    
                     {/* Quick Actions */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Actions</h3>
@@ -344,21 +333,30 @@ const VendorHome: React.FC = () => {
                             <h3 className="font-semibold text-lg text-foreground">Inventory Status</h3>
                             <AlertCircle className="w-5 h-5 text-red-500" />
                         </div>
-                        <InventoryAlert items={inventoryAlerts} />
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                <div>
+                                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">Low Stock Alert</p>
+                                    <p className="text-xs text-red-500 dark:text-red-500">Coming soon</p>
+                                </div>
+                                <p className="text-xl font-bold text-red-600 dark:text-red-400">-</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Recent Orders */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Orders</h3>
+                        <span className="text-xs text-muted-foreground">{filteredOrders.length} orders</span>
                         <RecentOrdersStack orders={recentOrders} />
                     </div>
                 </div>
             </div>
 
-            {/* Performance Metrics */}
-            <div className="bg-card rounded-xl p-6 shadow-sm border mt-6">
+            {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
+            <div className="mt-8 bg-card rounded-xl p-6 shadow-sm border">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-foreground">Performance Metrics</h2>
+                    <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
                     <div className="flex gap-2">
                         {tabs.map((tab) => (
                             <button
@@ -376,91 +374,86 @@ const VendorHome: React.FC = () => {
                     </div>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard 
-                        title="Today Pickup Request" 
-                        value={stats.today_pickup_request} 
-                        subtext="Total pickup requests today" 
-                        icon={Package} 
-                        customColor="--chart-1" 
-                    />
-                    <StatCard 
-                        title="Today Delivery Request" 
-                        value={stats.today_delivery_request} 
-                        subtext="Delivery requests for today" 
-                        icon={Truck} 
-                        customColor="--secondary" 
-                    />
-                    <StatCard 
-                        title="Today Return Request" 
-                        value={stats.today_return_request} 
-                        subtext="Return requests today" 
-                        icon={RefreshCcw} 
-                        customColor="--destructive" 
-                    />
-                    <StatCard 
-                        title="Today Transfer Request" 
-                        value={stats.today_transfer_request} 
-                        subtext="Transfer requests today" 
-                        icon={ArrowRightLeft} 
-                        customColor="--chart-4" 
-                    />
-                    <StatCard 
-                        title="Today Delivery" 
-                        value={stats.today_delivery} 
-                        subtext="Completed deliveries today" 
-                        icon={CheckCircle2} 
-                        customColor="--chart-2" 
-                    />
-                    <StatCard 
-                        title="Monthly Delivery" 
-                        value={stats.monthly_delivery} 
-                        subtext="Deliveries this month" 
-                        icon={CalendarDays} 
-                        customColor="--chart-1" 
-                    />
-                    <StatCard 
-                        title="Total Pickup Request" 
-                        value={stats.total_pickup_request} 
-                        subtext="All pickup requests" 
-                        icon={Package} 
-                        customColor="--chart-1" 
-                    />
-                    <StatCard 
-                        title="Total Delivery Request" 
-                        value={stats.total_delivery_request} 
-                        subtext="All delivery requests" 
-                        icon={Truck} 
-                        customColor="--secondary" 
-                    />
-                    <StatCard 
-                        title="Total Return Request" 
-                        value={stats.total_return_request} 
-                        subtext="All return requests" 
-                        icon={AlertCircle} 
-                        customColor="--destructive" 
-                    />
-                    <StatCard 
-                        title="Total Transfer Request" 
-                        value={stats.total_transfer_request} 
-                        subtext="All transfer requests" 
-                        icon={ArrowRightLeft} 
-                        customColor="--chart-4" 
-                    />
-                    <StatCard 
-                        title="Pickup Collect Ratio" 
-                        value={`${stats.pickup_collect_ratio}%`} 
-                        subtext="Overall collection ratio" 
-                        icon={TrendingUp} 
-                        customColor="--primary" 
-                    />
-                    <StatCard 
-                        title="Success Delivery Ratio" 
-                        value={`${stats.success_delivery_ratio}%`} 
-                        subtext="Overall success ratio" 
-                        icon={Percent} 
-                        customColor="--chart-3" 
-                    />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Total Parcel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Total Parcel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Package className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{totalOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{totalAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Delivered Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Delivered</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <CheckCircle2 className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{deliveredOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{deliveredAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pending Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{pendingOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{pendingAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cancel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Cancel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <AlertCircle className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{cancelledOrders} ({cancelPercentage}%)</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{cancelledAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
