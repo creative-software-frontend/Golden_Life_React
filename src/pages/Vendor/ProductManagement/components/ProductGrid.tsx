@@ -184,10 +184,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => onEdit(product)} className="cursor-pointer">
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <span>Edit</span>
-                </DropdownMenuItem>
+                {product.status === '0' && (
+                  <DropdownMenuItem onClick={() => onEdit(product)} className="cursor-pointer">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    <span>Edit</span>
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </CardFooter>

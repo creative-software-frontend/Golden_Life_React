@@ -31,6 +31,7 @@ const RegisterForm = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [apiToken, setApiToken] = useState(""); // <-- State to hold the API token
   const [otpError, setOtpError] = useState("");
+  const [userId, setUserId] = useState<number | null>(null); // Store user_id from registration
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // API Feedback States
@@ -157,6 +158,12 @@ const RegisterForm = () => {
       if (data.token) {
         setApiToken(data.token);
       }
+      
+      // Capture user_id if returned (needed for OTP verification)
+      if (data.user_id) {
+        setUserId(data.user_id);
+        console.log('✅ [Register] User ID captured:', data.user_id);
+      }
 
       setSuccessMessage("Account created successfully! OTP sent.");
       setTimeout(() => setSuccessMessage(""), 4000);
@@ -191,8 +198,38 @@ const RegisterForm = () => {
     }
   };
 
+  // --- RESEND OTP ---
+  const handleResendOtp = async () => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const endpoint = `${baseUrl}/api/vendor/register/send-otp?mobile=${encodeURIComponent(formData.mobile)}`;
+      
+      console.log('🔵 [Register] Resending OTP to:', formData.mobile);
+      
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setSuccessMessage("OTP resent successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+        console.log('✅ [Register] OTP resent successfully');
+      } else {
+        setOtpError(data.message || "Failed to resend OTP");
+      }
+    } catch (error: any) {
+      console.error('❌ [Register] Failed to resend OTP:', error);
+      setOtpError("Failed to resend OTP. Please try again.");
+    }
+  };
+
   // --- VERIFY OTP & SAVE TO SESSION STORAGE ---
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const otpCode = otp.join("");
@@ -204,28 +241,55 @@ const RegisterForm = () => {
     setIsVerifying(true);
     setOtpError("");
     
-    // Simulate API call for OTP Verification
-    setTimeout(() => {
-      // 1. Determine the token to save
-      const finalToken = apiToken || "demo_vendor_session_token_xyz";
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
       
-      // 2. Save to SessionStorage instead of LocalStorage
-      sessionStorage.setItem("vendor_token", finalToken);
-      sessionStorage.setItem("vendor_session", JSON.stringify({
-        token: finalToken,
-        isVerified: true,
-        expiry: new Date().getTime() + 86400000 // Expires in 24 hours
-      }));
-
-      // 3. Save to Browser Cookies (Optional, but good for backend requests)
-      document.cookie = `vendor_token=${finalToken}; path=/; max-age=86400; SameSite=Strict; Secure`;
-
+      // Use user_id from state (captured during registration)
+      if (!userId) {
+        throw new Error("User ID not found. Please register again.");
+      }
+      
+      const endpoint = `${baseUrl}/api/vendor/verify-otp`;
+      const queryParams = `?user_id=${userId}&otp=${encodeURIComponent(otpCode)}`;
+      
+      console.log('🔵 [Register] Verifying OTP:', { userId, otp: otpCode });
+      console.log('📍 [Register] Endpoint:', endpoint + queryParams);
+      
+      const response = await fetch(endpoint + queryParams, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      
+      const data = await response.json();
+      console.log('📥 [Register] Verification Response:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid OTP. Please try again.");
+      }
+      
+      if (data.success) {
+        setSuccessMessage("Account verified successfully! Redirecting to login...");
+        
+        // DO NOT auto-login - redirect to login page
+        setTimeout(() => {
+          navigate("/vendor/login", { 
+            state: { 
+              message: "Account verified! Please login with your credentials.",
+              mobile: formData.mobile 
+            }
+          });
+        }, 1500);
+      } else {
+        throw new Error(data.message || "Verification failed");
+      }
+    } catch (error: any) {
+      console.error('❌ [Register] Verification Error:', error);
+      setOtpError(error.message);
+    } finally {
       setIsVerifying(false);
-      setShowOtpModal(false);
-      
-      // 4. Redirect to dashboard securely!
-      navigate("/vendor/dashboard");
-    }, 1500);
+    }
   };
 
   const businessTypes = [
@@ -465,7 +529,15 @@ const RegisterForm = () => {
                 </button>
                 
                 <p className="text-center text-sm text-gray-500 mt-6 font-medium">
-                  Didn't receive the code? <button type="button" className="text-[#FF8A00] hover:underline hover:text-orange-700 transition-colors">Resend in 30s</button>
+                  Didn't receive the code?{' '}
+                  <button 
+                    type="button" 
+                    onClick={handleResendOtp}
+                    disabled={isVerifying}
+                    className="text-[#FF8A00] hover:underline hover:text-orange-700 transition-colors font-medium disabled:opacity-50"
+                  >
+                    Resend OTP
+                  </button>
                 </p>
               </form>
             </div>

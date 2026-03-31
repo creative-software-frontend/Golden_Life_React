@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -66,7 +65,8 @@ export default function Orders() {
       const searchTerm = currentFilters.search.toLowerCase();
       filtered = filtered.filter(order =>
         order.order_no.toLowerCase().includes(searchTerm) ||
-        order.user_name.toLowerCase().includes(searchTerm)
+        order.user_name.toLowerCase().includes(searchTerm) ||
+        order.user_phone.toLowerCase().includes(searchTerm)
       );
     }
 

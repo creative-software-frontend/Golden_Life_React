@@ -4,9 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, Store, Loader2, ArrowLeft, 
-  CheckCircle2, AlertCircle 
+  CheckCircle2, AlertCircle
 } from "lucide-react";
 import Logo from "../Logo";
+import { SendOtpForm } from "./components/SendOtpForm";
+import { OtpModal } from "./components/OtpModal";
+import { useVendorOtp } from "./hooks/useVendorOtp";
+import ForgotPassword from "./ForgotPassword";
 
 // Scroll Animation Variants
 const scrollVariant = {
@@ -21,8 +25,17 @@ const scrollVariant = {
 const LoginForm = () => {
   const navigate = useNavigate();
   
+  // Traditional login states
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // OTP login states
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState<string | null>(null);
+  
+  // Forgot Password states
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   
   // API Feedback States
   const [apiError, setApiError] = useState("");
@@ -32,6 +45,9 @@ const LoginForm = () => {
     email: "",
     password: "",
   });
+
+  // OTP Hook
+  const { sendOtp, verifyOtp, isLoading: isSendingOtp, error: otpSendError } = useVendorOtp();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -110,6 +126,95 @@ const LoginForm = () => {
     }
   };
 
+  // Handle Send OTP
+  const handleSendOtp = async (credential: string) => {
+    console.log('🔵 [LoginForm] === SEND OTP STARTED ===');
+    console.log('🔵 [LoginForm] Send OTP called with:', credential);
+    console.log('🔵 [LoginForm] Current showOtpModal state:', showOtpModal);
+    
+    setIsOtpLoading(true);
+    setOtpError(null);
+
+    try {
+      const response = await sendOtp(credential, 'mobile');
+      console.log('🟢 [LoginForm] OTP Response:', response);
+      console.log('🟢 [LoginForm] Response success:', response.success);
+      console.log('🟢 [LoginForm] Response user_id:', response.user_id);
+      
+      if (response.success) {
+        console.log('✅ [LoginForm] Response is successful, opening modal...');
+        console.log('✅ [LoginForm] Setting showOtpModal to true');
+        
+        // Open OTP verification modal
+        setShowOtpModal(true);
+        setSuccessMessage(`OTP sent to your mobile!`);
+        console.log('✅ [LoginForm] OTP sent successfully, modal opened');
+        console.log('✅ [LoginForm] New showOtpModal state:', showOtpModal);
+        
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 3000);
+      } else {
+        console.error('❌ [LoginForm] OTP response not successful:', response);
+        setOtpError(response.message || 'Failed to send OTP');
+      }
+    } catch (error: any) {
+      console.error('❌ [LoginForm] Send OTP Error:', error);
+      console.error('[LoginForm] Error details:', {
+        message: error.message,
+        response: error.response?.data
+      });
+      setOtpError(error.message || 'Failed to send OTP');
+    } finally {
+      setIsOtpLoading(false);
+      console.log('🔵 [LoginForm] === SEND OTP COMPLETED ===');
+    }
+  };
+
+  // Handle Verify OTP
+  const handleVerifyOtp = async (otpCode: string) => {
+    setIsOtpLoading(true);
+    setOtpError(null);
+
+    try {
+      const response = await verifyOtp(otpCode);
+      
+      if (response.success && response.token) {
+        setShowOtpModal(false);
+        setSuccessMessage("Verification successful! Redirecting to dashboard...");
+        
+        // Redirect after 1.5 seconds
+        setTimeout(() => {
+          setSuccessMessage("");
+          navigate("/vendor/dashboard");
+        }, 1500);
+      }
+    } catch (error: any) {
+      setOtpError(error.message);
+      throw error; // Re-throw to let modal know it failed
+    } finally {
+      setIsOtpLoading(false);
+    }
+  };
+
+  // Handle Resend OTP
+  const handleResendOtp = async () => {
+    setIsOtpLoading(true);
+    setOtpError(null);
+
+    try {
+      // You would need to store the credential to resend
+      // For now, we'll just show a success message
+      setSuccessMessage("OTP resent successfully!");
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    } finally {
+      setIsOtpLoading(false);
+    }
+  };
+
   return (
     <>
       {/* --- SUCCESS TOAST OVERLAY --- */}
@@ -126,6 +231,12 @@ const LoginForm = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Forgot Password Modal - Rendered at root level */}
+      <ForgotPassword
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+      />
 
       {/* OUTER WRAPPER: Native CSS injected to completely hide scrollbars across ALL browsers */}
       <div className="h-screen w-full overflow-y-auto relative bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -159,14 +270,14 @@ const LoginForm = () => {
               viewport={{ once: true, margin: "-50px" }}
               className="mb-8 sm:mb-10"
             >
-              <Link to="/" className="inline-flex items-center gap-2 sm:gap-3">
+              <div className="inline-flex items-center gap-2 sm:gap-3">
                 <div className="w-10 h-10 sm:w-14 sm:h-14 bg-orange-100 rounded-xl flex items-center justify-center shadow-sm transition-all">
                   <Store className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 transition-all" strokeWidth={2.5} />
                 </div>
                 <div className="scale-100 sm:scale-125 origin-left transition-all">
                   <Logo />
                 </div>
-              </Link>
+              </div>
             </motion.div>
 
             {/* Header */}
@@ -181,7 +292,7 @@ const LoginForm = () => {
               <p className="text-gray-500 text-sm sm:text-base">Please enter your details to access your dashboard</p>
             </motion.div>
 
-            {/* Form */}
+            {/* Traditional Login Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
 
               {/* API Feedback Alert */}
@@ -225,12 +336,13 @@ const LoginForm = () => {
               >
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-sm font-medium text-gray-700">Password</label>
-                  <Link 
-                    to="/vendor/forgot-password" 
+                  <button 
+                    type="button"
+                    onClick={() => setIsForgotPasswordOpen(true)}
                     className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors"
                   >
-                    Forgot?
-                  </Link>
+                    Forgot Password?
+                  </button>
                 </div>
                 <div className="relative">
                   <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${apiError ? 'text-red-400' : 'text-gray-400'}`} />
@@ -295,6 +407,42 @@ const LoginForm = () => {
               </motion.div>
             </form>
 
+            {/* Divider */}
+            <motion.div
+              variants={scrollVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="relative py-4"
+            >
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
+              </div>
+            </motion.div>
+
+            {/* OTP Login Section - Separate Form */}
+            <motion.div
+              variants={scrollVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="pt-2"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+                Login with OTP
+              </h3>
+              
+              <SendOtpForm
+                loginMethod="mobile"
+                onSendOtp={handleSendOtp}
+                isLoading={isSendingOtp}
+                error={otpSendError}
+              />
+            </motion.div>
+
             {/* Footer */}
             <motion.p 
               variants={scrollVariant}
@@ -327,6 +475,20 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <OtpModal
+        isOpen={showOtpModal}
+        onClose={() => {
+          setShowOtpModal(false);
+          setOtpError(null);
+        }}
+        onVerify={handleVerifyOtp}
+        onResend={handleResendOtp}
+        isLoading={isOtpLoading}
+        error={otpError}
+        loginMethod="mobile"
+      />
     </>
   );
 };

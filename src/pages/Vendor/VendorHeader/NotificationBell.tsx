@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Bell, Package, CheckCheck, Wallet, Info, BellOff } from 'lucide-react';
 import { useVendorNotifications, NotificationItem } from '@/hooks/useVendorNotifications';
 
@@ -21,6 +21,49 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
   } = useVendorNotifications(baseURL, token);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Check if click is outside the dropdown container AND outside the button
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    // Add listener only when dropdown is open
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, setIsOpen]);
+
+  // Close dropdown when pressing ESC key
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscKey);
+    return () => document.removeEventListener('keydown', handleEscKey);
+  }, [isOpen, setIsOpen]);
+
+  // Toggle dropdown (prevent event bubbling)
+  const toggleDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+  };
 
   const getIcon = (notif: NotificationItem) => {
     const base = 'w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110';
@@ -36,7 +79,8 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={toggleDropdown}
         className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${
           isOpen
             ? 'bg-primary-light/10 text-primary-light shadow-inner'

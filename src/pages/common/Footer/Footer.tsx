@@ -96,7 +96,7 @@ const Footer = () => {
                 <div className="md:col-span-1 flex flex-col justify-center border-t md:border-t-0 pt-6 md:pt-0 border-gray-200">
                     <div className="flex items-center text-gray-800 mb-1.5">
                         <Phone className="h-5 w-5 mr-2 text-emerald-600 shrink-0" />
-                        <p className="text-xl md:text-2xl font-black tracking-tighter">0000000000000</p>
+                        <p className="text-xl md:text-2xl font-black tracking-tighter">09649 866 966</p>
                     </div>
                     <p className="text-gray-500 text-sm font-medium italic opacity-80">
                         or support@goldenlife.com

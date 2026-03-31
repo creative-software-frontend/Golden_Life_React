@@ -68,6 +68,7 @@ const Products: React.FC = () => {
 
   // Handle filters change
   const handleFiltersChange = useCallback((newFilters: ProductFiltersType) => {
+    console.log('🔵 [ProductManagement.index] Filters changed:', newFilters);
     setFilters(newFilters);
     applyFilters(newFilters);
   }, [applyFilters]);

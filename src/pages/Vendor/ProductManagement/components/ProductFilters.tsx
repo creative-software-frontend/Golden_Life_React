@@ -23,6 +23,24 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     onFiltersChange({ ...filters, search: e.target.value });
   };
 
+  const handleStatusChange = (value: string) => {
+    console.log('🔵 [ProductFilters] Status filter changed to:', value);
+    console.log('🔵 [ProductFilters] Current filters before change:', filters);
+    const newFilters = { ...filters, status: value as any };
+    console.log('🔵 [ProductFilters] New filters object:', newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  const handleStockChange = (value: string) => {
+    console.log('🔵 [ProductFilters] Stock filter changed to:', value);
+    onFiltersChange({ ...filters, stock: value as any });
+  };
+
+  const handleSortChange = (value: string) => {
+    console.log('🔵 [ProductFilters] Sort filter changed to:', value);
+    onFiltersChange({ ...filters, sort: value as any });
+  };
+
   return (
     <div className="bg-card rounded-xl border border-border p-4 sm:p-6 shadow-sm">
       <div className="flex flex-col gap-4">
@@ -54,7 +72,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             {/* Status Filter */}
             <Select
               value={filters.status}
-              onValueChange={(value: any) => onFiltersChange({ ...filters, status: value })}
+              onValueChange={handleStatusChange}
             >
               <SelectTrigger className="w-full sm:w-[160px] h-10 rounded-xl">
                 <SelectValue placeholder="Status" />
@@ -71,7 +89,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             {/* Stock Filter */}
             <Select
               value={filters.stock}
-              onValueChange={(value: any) => onFiltersChange({ ...filters, stock: value })}
+              onValueChange={handleStockChange}
             >
               <SelectTrigger className="w-full sm:w-[160px] h-10 rounded-xl">
                 <SelectValue placeholder="Stock Level" />
@@ -88,7 +106,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             {/* Sort Filter */}
             <Select
               value={filters.sort}
-              onValueChange={(value: any) => onFiltersChange({ ...filters, sort: value })}
+              onValueChange={handleSortChange}
             >
               <SelectTrigger className="w-full sm:w-[180px] h-10 rounded-xl">
                 <SelectValue placeholder="Sort by" />
