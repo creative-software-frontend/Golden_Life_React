@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package, Trash2 } from 'lucide-react'; // Added Trash2
-import { Address, PaymentMethod } from './CheckoutModal'; 
+import { Address, PaymentMethod } from './CheckoutModal';
 import useModalStore from '@/store/Store';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 interface Props {
-    data: { subTotal: number | string; totalItems: number }; 
+    data: { subTotal: number | string; totalItems: number };
     selectedAddress?: Address;
     paymentMethod: PaymentMethod;
     setPaymentMethod: (m: PaymentMethod) => void;
@@ -44,12 +44,12 @@ const CheckoutSummaryView = ({
     deliveryFee
 }: Props) => {
     const { changeCheckoutModal, toggleClicked, triggerWalletUpdate } = useModalStore();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState(false);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-    
+
     // --- CART ITEMS STATE ---
     const [cartItems, setCartItems] = useState<any[]>([]);
 
@@ -58,7 +58,7 @@ const CheckoutSummaryView = ({
     const [isFetchingBalance, setIsFetchingBalance] = useState(true);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-    
+
     // Fetch Initial Cart & Wallet Balance
     useEffect(() => {
         const fetchWalletBalance = async () => {
@@ -84,7 +84,7 @@ const CheckoutSummaryView = ({
 
         try {
             const items = JSON.parse(localStorage.getItem('cart') || '[]');
-            setCartItems(items); 
+            setCartItems(items);
         } catch (err) {
             console.error("Error loading cart", err);
         }
@@ -121,7 +121,7 @@ const CheckoutSummaryView = ({
     const safeDeliveryFee = Number(deliveryFee) || 0;
     const total = currentSubTotal + safeDeliveryFee;
     const remainingBalance = walletBalance - total;
-    
+
     const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
 
     // --- HANDLERS ---
@@ -212,7 +212,7 @@ const CheckoutSummaryView = ({
                     triggerWalletUpdate?.();
                 }
 
-                onConfirm(); 
+                onConfirm();
 
                 if (orderNo) {
                     navigate(`/dashboard/order-details?order=${orderNo}`);
@@ -312,35 +312,43 @@ const CheckoutSummaryView = ({
 
                                 return (
                                     <div key={item.id || idx} className="flex justify-between items-center gap-3">
-                                        <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center group">
-                                            <img 
-                                                src={imageUrl || "/placeholder.svg"} 
-                                                alt={item.product_title_english || item.name || "Product"} 
-                                                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
-                                            />
-                                        </div>
+                                        <div className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 mb-3">
 
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[14px] font-bold text-gray-800 truncate">
-                                                {item.name || item.product_title_english || item.product_name || "Unknown Item"}
-                                            </p>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <p className="text-[11px] font-medium text-gray-400">
-                                                    Qty: {qty} × ৳{activePrice.toFixed(2)} (Member)
+                                            {/* Image Section */}
+                                            <div className="w-14 h-14 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center group">
+                                                <img
+                                                    src={imageUrl || "/placeholder.svg"}
+                                                    alt={item.product_title_english || item.name || "Product"}
+                                                    className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                            </div>
+
+                                            {/* Details Section */}
+                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                                {/* Title */}
+                                                <p className="text-[14px] font-bold text-gray-800 truncate mb-1">
+                                                    {item.name || item.product_title_english || item.product_name || "Unknown Item"}
                                                 </p>
-                                                <span className="w-1 h-1 rounded-full bg-gray-200" />
-                                                <p className="text-[11px] font-bold text-emerald-600">
+
+                                                {/* 1st Row: Qty & Member Price */}
+                                                <p className="text-[12px] font-medium text-gray-500 mb-0.5">
+                                                    Qty: <span className="font-semibold text-gray-700">{qty}</span> × ৳{activePrice.toFixed(2)} <span className="text-gray-400 font-normal">(Member)</span>
+                                                </p>
+
+                                                {/* 2nd Row: Customer Price */}
+                                                <p className="text-[12px] font-bold text-emerald-600">
                                                     Customer: ৳{origPrice.toFixed(2)}
                                                 </p>
                                             </div>
+
                                         </div>
-                                        
+
                                         {/* NEW: Updated Price Column with Delete Button */}
                                         <div className="flex flex-col items-end shrink-0">
                                             <span className="text-[14px] font-black text-gray-900">
                                                 ৳{itemTotal.toFixed(2)}
                                             </span>
-                                            <button 
+                                            <button
                                                 onClick={() => handleRemoveItem(item.id)}
                                                 className="mt-1 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
                                                 title="Remove item"
@@ -371,7 +379,7 @@ const CheckoutSummaryView = ({
                         <span>Total Customer Price:</span>
                         <span className="text-gray-900">৳{originalTotal.toFixed(2)}</span>
                     </div>
-                    
+
                     <div className="flex justify-between text-[13px] font-bold text-gray-500">
                         <span>Delivery Fee:</span>
                         <span className="text-gray-900">৳{safeDeliveryFee.toFixed(2)}</span>
@@ -389,7 +397,7 @@ const CheckoutSummaryView = ({
                         <span className="text-[15px] font-black text-gray-900 uppercase tracking-tight">Final Total</span>
                         <span className="text-2xl font-black text-[#5C9C72] tracking-tight">৳{total.toFixed(2)}</span>
                     </div>
-                    
+
                     {/* DISPLAY WALLET BALANCE */}
                     <div className="pt-3 mt-3 border-t border-dashed border-gray-200 flex flex-col gap-2">
                         <div className="flex justify-between items-center">
@@ -404,7 +412,7 @@ const CheckoutSummaryView = ({
 
             {/* --- FIXED FOOTER --- */}
             <div className="p-4 border-t border-gray-200 bg-white space-y-4 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.08)] z-20">
-                
+
                 {/* 4. Payment Option */}
                 <div>
                     <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5 px-1">Choose Payment Method</h4>
@@ -417,10 +425,10 @@ const CheckoutSummaryView = ({
                                     onClick={() => setPaymentMethod(method)}
                                     disabled={isDisabled}
                                     className={`flex-1 min-w-[85px] py-3.5 px-2 rounded-xl text-[14px] font-black transition-all border-2 flex items-center justify-center whitespace-nowrap ${isDisabled
-                                            ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed opacity-60"
-                                            : paymentMethod === method
-                                                ? "bg-[#5C9C72] text-white border-[#5C9C72] shadow-md scale-[1.02]"
-                                                : "bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                                        ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed opacity-60"
+                                        : paymentMethod === method
+                                            ? "bg-[#5C9C72] text-white border-[#5C9C72] shadow-md scale-[1.02]"
+                                            : "bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
                                         }`}
                                 >
                                     {method}
@@ -467,11 +475,10 @@ const CheckoutSummaryView = ({
                     <button
                         onClick={handleConfirm}
                         disabled={isPlacingOrder || isInsufficientBalance || cartItems.length === 0}
-                        className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                            (isPlacingOrder || isInsufficientBalance || cartItems.length === 0)
+                        className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${(isPlacingOrder || isInsufficientBalance || cartItems.length === 0)
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
                                 : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
-                        }`}
+                            }`}
                     >
                         {isPlacingOrder ? <Loader2 className="animate-spin w-6 h-6" /> : `Confirm Order — ৳${total.toFixed(2)}`}
                     </button>

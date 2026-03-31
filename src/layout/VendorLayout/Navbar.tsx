@@ -39,7 +39,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     // --- Fetch Vendor Profile ---
     const { profile, isLoading: isProfileLoading } = useVendorProfile();
     const profileRef = useRef<HTMLDivElement>(null);
-    
+
     // Profile completion check
     const { percentage: profilePercentage, isComplete: isProfileComplete } = useProfileCompletion(profile?.vendor);
 
@@ -142,19 +142,15 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
             {/* Dropdown Options */}
             <div className={`absolute mt-2 bg-background rounded-2xl shadow-xl border border-border transition-all duration-200 overflow-hidden ${isWalletMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'} ${isMobile ? 'top-full left-0 w-full' : 'top-full right-0 w-60'}`}>
                 <div className="p-2 flex flex-col gap-1">
-                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/add" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
+                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/vendor_add" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
                         <PlusCircle className="h-4 w-4 text-emerald-500" /> Add Money
                     </Link>
-                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/send" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
-                        <Send className="h-4 w-4 text-blue-500" /> Send Money
-                    </Link>
-                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/withdraw" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
+
+                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/vendor_withdraw" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
                         <Landmark className="h-4 w-4 text-orange-500" /> Withdraw Money
                     </Link>
-                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/purchase" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
-                        <ShoppingBag className="h-4 w-4 text-purple-500" /> Purchase History
-                    </Link>
-                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/all" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
+
+                    <Link onClick={() => setIsWalletMenuOpen(false)} to="/vendor/dashboard/wallet/vendor_all" className={`flex items-center gap-3 px-3 hover:bg-muted rounded-xl font-bold text-foreground transition-colors py-2.5 ${isMobile ? 'text-sm' : 'text-[13px]'}`}>
                         <History className="h-4 w-4 text-indigo-500" /> All Transactions
                     </Link>
                 </div>
@@ -234,7 +230,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
 
                 {/* RIGHT SIDE ICONS */}
                 <div className="flex items-center gap-2 sm:gap-4 xl:gap-6 ml-auto flex-shrink-0">
-                    
+
                     {/* Search Trigger for Mobile/Tablet */}
                     <button
                         onClick={() => setIsMobileSearchOpen(true)}
@@ -250,14 +246,14 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                     </div>
 
                     {/* Notification Bell */}
-                    <VendorNotificationBell 
+                    <VendorNotificationBell
                         baseURL={baseURL}
                         token={getVendorToken()}
                     />
 
                     {/* User Profile with Dropdown */}
                     <div className="relative" ref={profileRef}>
-                        <div 
+                        <div
                             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                             className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border cursor-pointer group flex-shrink-0 hover:bg-muted/50 rounded-xl pr-3 py-2 transition-all"
                         >
@@ -289,7 +285,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* Name - Desktop Only */}
                             <div className="text-right hidden sm:block max-w-[120px] xl:max-w-none">
                                 <p className="text-sm xl:text-base font-bold text-foreground leading-none truncate">
@@ -299,7 +295,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                     Available
                                 </p>
                             </div>
-                            
+
                             <ChevronDown size={18} className="text-muted-foreground group-hover:text-foreground transition-colors hidden sm:block flex-shrink-0" />
                         </div>
 
@@ -310,27 +306,25 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                 <div className="px-4 py-3 bg-muted/50 border-b border-border">
                                     <p className="text-sm font-bold text-foreground">{getVendorDisplayName(profile)}</p>
                                     <p className="text-xs text-muted-foreground truncate">Seller ID: {profile?.vendor?.seller_id || 'N/A'}</p>
-                                    
+
                                     {/* Profile Completion Badge */}
                                     <div className="mt-2 flex items-center gap-2">
                                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                                             <div
-                                                className={`h-full transition-all duration-500 ease-out rounded-full ${
-                                                    isProfileComplete 
-                                                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' 
+                                                className={`h-full transition-all duration-500 ease-out rounded-full ${isProfileComplete
+                                                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
                                                         : 'bg-gradient-to-r from-amber-500 to-amber-600'
-                                                }`}
+                                                    }`}
                                                 style={{ width: `${profilePercentage}%` }}
                                             />
                                         </div>
-                                        <span className={`text-xs font-bold ${
-                                            isProfileComplete ? 'text-emerald-600' : 'text-amber-600'
-                                        }`}>
+                                        <span className={`text-xs font-bold ${isProfileComplete ? 'text-emerald-600' : 'text-amber-600'
+                                            }`}>
                                             {profilePercentage}%
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 {/* Menu Items */}
                                 <div className="py-2">
                                     <Link
@@ -341,7 +335,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                         <User className="h-4 w-4 text-primary-light" />
                                         <span>My Profile</span>
                                     </Link>
-                                    
+
                                     <button
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
                                         onClick={() => {
@@ -352,9 +346,9 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                         <Settings className="h-4 w-4 text-primary-dark" />
                                         <span>Settings</span>
                                     </button>
-                                    
+
                                     <div className="my-2 border-t border-border" />
-                                    
+
                                     <button
                                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full text-left"
                                         onClick={() => {

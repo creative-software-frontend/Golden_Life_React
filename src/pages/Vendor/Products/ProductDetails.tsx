@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ArrowLeft, Loader2, Package, Tag, DollarSign, Hash, Calendar, Image, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -44,11 +44,14 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetailsData | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Lightbox modal state
+
+  // Lightbox modal & Slider state
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // For Lightbox
+  const [currentIndex, setCurrentIndex] = useState(0); // For Slider
 
   const baseURL = import.meta.env.VITE_BASE_URL || 'https://api.goldenlife.my';
 
@@ -79,7 +82,6 @@ export default function ProductDetails() {
     }
   };
 
-  // Get image URLs
   const getProductImageUrl = (filename: string | null | undefined): string => {
     if (!filename) return '/assets/default-vendor.png';
     return filename.startsWith('http') ? filename : `${baseURL}/uploads/ecommarce/product_image/${filename}`;
@@ -91,28 +93,12 @@ export default function ProductDetails() {
   };
 
   // Lightbox handlers
-  const openLightbox = (index: number) => {
-    setCurrentImageIndex(index);
-    setIsLightboxOpen(true);
-  };
-
-  const closeLightbox = () => {
-    setIsLightboxOpen(false);
-  };
-
-  const goToPreviousImage = () => {
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
-  };
-
-  const goToNextImage = () => {
-    setCurrentImageIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
-  };
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isLightboxOpen) return;
-      
+
       if (e.key === 'ArrowLeft') {
         goToPreviousImage();
       } else if (e.key === 'ArrowRight') {
@@ -126,7 +112,6 @@ export default function ProductDetails() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLightboxOpen, galleryImages.length]);
 
-  // Get auth token
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
     if (!session) return null;
@@ -138,6 +123,64 @@ export default function ProductDetails() {
     }
   };
 
+  const getCategoryName = (cid: string | number | undefined) => {
+    if (!cid) return 'N/A';
+    const category = categories.find(c => c.id.toString() === cid.toString());
+    return category ? category.category_name : cid;
+  };
+
+  const getSubcategoryName = (scid: string | number | undefined) => {
+    if (!scid) return 'N/A';
+    const subcategory = subcategories.find(s => s.id.toString() === scid.toString());
+    return subcategory ? subcategory.subcategory_name : scid;
+  };
+
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(
+          `${baseURL}/api/vendor/ecommerce/categories`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        if (response.data?.status === true) {
+          setCategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch categories error:', err);
+      }
+    };
+    fetchCategories();
+  }, [baseURL]);
+
+  // Fetch Subcategories
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (!product?.category_id) return;
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(
+          `${baseURL}/api/vendor/ecommerce/subcategories`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { category_id: product.category_id }
+          }
+        );
+        if (response.data?.status === true) {
+          setSubcategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch subcategories error:', err);
+      }
+    };
+    fetchSubcategories();
+  }, [baseURL, product?.category_id]);
+
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) {
@@ -148,9 +191,9 @@ export default function ProductDetails() {
 
       try {
         console.log('🔄 Fetching product details for ID:', id);
-        
+
         const token = getAuthToken();
-        
+
         const response = await axios.get(
           `${baseURL}/api/vendor/product/details`,
           {
@@ -159,14 +202,14 @@ export default function ProductDetails() {
               'Content-Type': 'application/json'
             },
             params: {
-              product_id: Number(id)  
+              product_id: Number(id)
             }
           }
         );
 
         console.log('✅ Product details fetched successfully');
         console.log('Response data:', response.data);
-        
+
         // Extract product and gallery from response
         // Expected structure: { status: true, data: { product: {...}, gallery: [...] } }
         if (response.data?.data?.product) {
@@ -177,13 +220,13 @@ export default function ProductDetails() {
         } else {
           throw new Error('Invalid response structure - product data not found');
         }
-        
+
       } catch (err: any) {
         console.error('❌ Fetch product details error:', err);
         console.error('Error response:', err.response?.data);
-        
+
         let errorMessage = 'Failed to load product details';
-        
+
         if (err.response?.status === 404) {
           errorMessage = 'Product not found.';
         } else if (err.response?.status === 401) {
@@ -191,11 +234,151 @@ export default function ProductDetails() {
         } else if (err.response?.status === 500) {
           errorMessage = 'Server error. Please try again later.';
         }
-        
+
         toast.error(errorMessage);
         setTimeout(() => {
           navigate('/vendor/dashboard/products');
         }, 2000);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, baseURL, navigate]);
+  // --- MERGE IMAGES FOR SLIDER & LIGHTBOX ---
+  const allImages = useMemo(() => {
+    if (!product) return [];
+
+    const images = [{
+      type: 'main',
+      src: getProductImageUrl(product.product_image),
+      id: 'main'
+    }];
+
+    if (galleryImages && galleryImages.length > 0) {
+      galleryImages.forEach((galImg, index) => {
+        images.push({
+          type: 'gallery',
+          src: getGalleryImageUrl(galImg.gal_img),
+          id: galImg.id ? galImg.id.toString() : `gallery-${index}`
+        });
+      });
+    }
+    return images;
+  }, [product, galleryImages, baseURL]);
+
+  // --- AUTO-SLIDE LOGIC ---
+  useEffect(() => {
+    if (allImages.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % allImages.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [allImages.length]);
+
+  // --- LIGHTBOX HANDLERS ---
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      if (e.key === 'ArrowLeft') goToPreviousImage();
+      else if (e.key === 'ArrowRight') goToNextImage();
+      else if (e.key === 'Escape') closeLightbox();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, allImages.length]);
+
+  // --- DATA FETCHING ---
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(`${baseURL}/api/vendor/ecommerce/categories`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data?.status === true) {
+          setCategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch categories error:', err);
+      }
+    };
+    fetchCategories();
+  }, [baseURL]);
+
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (!product?.category_id) return;
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(`${baseURL}/api/vendor/ecommerce/subcategories`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { category_id: product.category_id }
+        });
+        if (response.data?.status === true) {
+          setSubcategories(response.data.data || []);
+        }
+      } catch (err) {
+        console.error('❌ Fetch subcategories error:', err);
+      }
+    };
+    fetchSubcategories();
+  }, [baseURL, product?.category_id]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) {
+        toast.error('Product ID is required');
+        navigate('/vendor/dashboard/products');
+        return;
+      }
+
+      try {
+        const token = getAuthToken();
+        const response = await axios.get(`${baseURL}/api/vendor/product/details`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          params: { product_id: Number(id) }
+        });
+
+        if (response.data?.data?.product) {
+          setProduct(response.data.data.product);
+          setGalleryImages(response.data.data.gallery || []);
+        } else {
+          throw new Error('Invalid response structure - product data not found');
+        }
+      } catch (err: any) {
+        console.error('❌ Fetch product details error:', err);
+        let errorMessage = 'Failed to load product details';
+        if (err.response?.status === 404) errorMessage = 'Product not found.';
+        else if (err.response?.status === 401) errorMessage = 'Authentication failed. Please login again.';
+        else if (err.response?.status === 500) errorMessage = 'Server error. Please try again later.';
+
+        toast.error(errorMessage);
+        setTimeout(() => navigate('/vendor/dashboard/products'), 2000);
       } finally {
         setIsLoading(false);
       }
@@ -215,7 +398,6 @@ export default function ProductDetails() {
     );
   }
 
-  // Always show product (real or mock)
   if (!product) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -231,7 +413,6 @@ export default function ProductDetails() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
-      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
@@ -254,92 +435,116 @@ export default function ProductDetails() {
 
       {/* Product Details Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left Column - Image & Basic Info */}
+
+        {/* Left Column - Image Slider */}
+        {/* Left Column - Image Slider */}
         <div className="lg:col-span-1 space-y-6">
-          {/* Product Image */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-bold">Product Image</CardTitle>
+              <CardTitle className="text-lg font-bold">Product Images</CardTitle>
             </CardHeader>
             <CardContent>
-              <div 
-                className="aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 cursor-pointer group relative"
-                onClick={() => openLightbox(0)}
-              >
-                <img
-                  src={getProductImageUrl(product.product_image)}
-                  alt={product.product_title_english}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    console.error('Failed to load product image');
-                    e.currentTarget.src = '/assets/default-vendor.png';
-                  }}
-                />
-                
+              {/* SLIDER WRAPPER */}
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 group">
+                {/* Automatic Slider Track */}
+                <div
+                  className="w-full h-full flex transition-transform duration-500 ease-in-out cursor-pointer"
+                  style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                  onClick={() => openLightbox(currentIndex)}
+                >
+                  {allImages.map((img, index) => (
+                    <div key={img.id} className="w-full h-full shrink-0 relative">
+                      <img
+                        src={img.src}
+                        alt={`${product.product_title_english} - Slide ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Failed to load image');
+                          e.currentTarget.src = '/assets/default-vendor.png';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
                 {/* Gallery count badge */}
-                {galleryImages.length > 0 && (
-                  <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2">
+                {allImages.length > 1 && (
+                  <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 z-10">
                     <Image size={16} />
-                    <span>{galleryImages.length + 1} Photos</span>
+                    <span>{allImages.length} Photos</span>
                   </div>
                 )}
-                
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm">
-                    Click to view gallery
-                  </div>
-                </div>
-              </div>
-              
-              {/* Gallery Thumbnails Grid */}
-              {galleryImages.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-semibold mb-2 text-gray-700">Gallery Images ({galleryImages.length})</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {galleryImages.map((galImg, index) => (
-                      <div
-                        key={galImg.id || index}
-                        className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-primary-light hover:shadow-md transition-all duration-200"
-                        onClick={() => openLightbox(index)}
+
+                {/* Slider Navigation Dots */}
+                {/* Slider Navigation Dots (On the Main Page) */}
+                {allImages.length > 1 && (
+                  <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
+                    {allImages.map((img, index) => (
+                      <button
+                        key={`thumb-${img.id}`}
+                        onClick={() => {
+                          // 1. Updates the main slider image
+                          setCurrentIndex(index);
+
+                          // 2. Instantly pops open the full-screen modal!
+                          openLightbox(index);
+                        }}
+                        className={`relative group flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentIndex === index
+                          ? 'border-primary opacity-100 ring-2 ring-primary ring-offset-1'
+                          : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-400'
+                          }`}
                       >
                         <img
-                          src={getGalleryImageUrl(galImg.gal_img)}
-                          alt={`${product.product_title_english} ${index + 1}`}
+                          src={img.src}
+                          alt={`Thumbnail ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.error('Failed to load gallery image');
                             e.currentTarget.src = '/assets/default-vendor.png';
                           }}
                         />
-                      </div>
+
+                        {/* Hover overlay with an icon to indicate it opens full screen */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200 flex items-center justify-center">
+                          <span className="opacity-0 group-hover:opacity-100 text-white transition-opacity duration-200">
+                            <Image size={20} />
+                          </span>
+                        </div>
+                      </button>
                     ))}
                   </div>
+                )}gi
+                {/* Hover overlay instruction */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center pointer-events-none z-0">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm shadow-lg pointer-events-auto">
+                    Click to view full screen
+                  </div>
+                </div>
+              </div>
+
+              {/* NEW: THUMBNAIL GALLERY STRIP BELOW SLIDER */}
+              {allImages.length > 1 && (
+                <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
+                  {allImages.map((img, index) => (
+                    <button
+                      key={`thumb-${img.id}`}
+                      onClick={() => setCurrentIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentIndex === index
+                        ? 'border-primary opacity-100 ring-2 ring-primary ring-offset-1'
+                        : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-400'
+                        }`}
+                    >
+                      <img
+                        src={img.src}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/assets/default-vendor.png';
+                        }}
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Status & SKU */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Basic Info</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">Status</span>
-                <Badge variant={product.status === '1' ? 'default' : 'secondary'}>
-                  {product.status === '1' ? 'Active' : 'Inactive'}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Hash size={16} className="text-gray-500" />
-                <div>
-                  <p className="text-xs text-gray-500">SKU</p>
-                  <p className="text-sm font-semibold">{product.sku}</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -407,61 +612,67 @@ export default function ProductDetails() {
                 <p className="text-2xl font-bold">{formatNumber(product.stock)}</p>
                 <p className="text-xs text-gray-500">units</p>
               </div>
-              
+
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-gray-500" />
-                  <label className="text-xs text-gray-500">Category ID</label>
+                  <label className="text-xs text-gray-500">Category</label>
                 </div>
                 <p className="text-sm font-semibold">
-                  {product.category_id || 'N/A'}
+                  {getCategoryName(product.category_id)}
                 </p>
-                <p className="text-xs text-gray-500">
-                  → Subcategory ID: {product.subcategory_id || 'N/A'}
-                </p>
+                <div className="text-xs text-gray-500 mt-1 flex flex-col gap-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-400">→</span>
+                    <span className="font-medium text-gray-600">Subcategory:</span>
+                    <span className="text-primary-light font-semibold">
+                      {getSubcategoryName(product.subcategory_id)}
+                    </span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Descriptions */}
-          {(product.short_description_english || product.long_description_english || 
+          {(product.short_description_english || product.long_description_english ||
             product.short_description_bangla || product.long_description_bangla) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-bold">Product Descriptions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {product.short_description_english && (
-                  <div>
-                    <label className="text-xs text-gray-500">Short Description (English)</label>
-                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
-                  </div>
-                )}
-                {product.short_description_bangla && (
-                  <div>
-                    <label className="text-xs text-gray-500">Short Description (Bangla)</label>
-                    <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
-                  </div>
-                )}
-                {product.long_description_english && (
-                  <div>
-                    <label className="text-xs text-gray-500">Long Description (English)</label>
-                    <div className="prose prose-sm max-w-none mt-1">
-                      <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Product Descriptions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {product.short_description_english && (
+                    <div>
+                      <label className="text-xs text-gray-500">Short Description (English)</label>
+                      <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_english }} />
                     </div>
-                  </div>
-                )}
-                {product.long_description_bangla && (
-                  <div>
-                    <label className="text-xs text-gray-500">Long Description (Bangla)</label>
-                    <div className="prose prose-sm max-w-none mt-1">
-                      <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                  )}
+                  {product.short_description_bangla && (
+                    <div>
+                      <label className="text-xs text-gray-500">Short Description (Bangla)</label>
+                      <p className="text-sm text-gray-700 mt-1" dangerouslySetInnerHTML={{ __html: product.short_description_bangla }} />
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                  )}
+                  {product.long_description_english && (
+                    <div>
+                      <label className="text-xs text-gray-500">Long Description (English)</label>
+                      <div className="prose prose-sm max-w-none mt-1">
+                        <div dangerouslySetInnerHTML={{ __html: product.long_description_english }} />
+                      </div>
+                    </div>
+                  )}
+                  {product.long_description_bangla && (
+                    <div>
+                      <label className="text-xs text-gray-500">Long Description (Bangla)</label>
+                      <div className="prose prose-sm max-w-none mt-1">
+                        <div dangerouslySetInnerHTML={{ __html: product.long_description_bangla }} />
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
           {/* Video Link */}
           {product.video_link && (
@@ -527,8 +738,9 @@ export default function ProductDetails() {
 
       {/* Lightbox Modal */}
       <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-        <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-0">
+        <DialogContent className="max-w-6xl w-full h-[95vh] p-0 bg-black/95 border-0 shadow-2xl overflow-hidden flex flex-col justify-center">
           <div className="relative w-full h-full flex items-center justify-center">
+
             {/* Close button */}
             <button
               onClick={closeLightbox}
@@ -538,79 +750,77 @@ export default function ProductDetails() {
             </button>
 
             {/* Image counter */}
-            <div className="absolute top-4 left-4 z-50 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold">
-              {currentImageIndex + 1} / {galleryImages.length + 1}
+            <div className="absolute top-4 left-4 z-50 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-semibold tracking-wide">
+              {currentImageIndex + 1} / {allImages.length}
             </div>
 
             {/* Previous button */}
-            <button
-              onClick={goToPreviousImage}
-              className="absolute left-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
-            >
-              <ChevronLeft size={32} />
-            </button>
+            {allImages.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPreviousImage();
+                }}
+                className="absolute left-2 sm:left-4 z-50 p-2 sm:p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+              >
+                <ChevronLeft size={32} />
+              </button>
+            )}
 
             {/* Next button */}
-            <button
-              onClick={goToNextImage}
-              className="absolute right-4 z-50 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
-            >
-              <ChevronRight size={32} />
-            </button>
+            {allImages.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNextImage();
+                }}
+                className="absolute right-2 sm:right-4 z-50 p-2 sm:p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-200 hover:scale-110"
+              >
+                <ChevronRight size={32} />
+              </button>
+            )}
 
             {/* Main image */}
-            <div className="w-full h-full flex items-center justify-center p-16">
-              <img
-                key={currentImageIndex}
-                src={
-                  currentImageIndex === 0
-                    ? getProductImageUrl(product.product_image)
-                    : getGalleryImageUrl(galleryImages[currentImageIndex - 1]?.gal_img)
-                }
-                alt={product.product_title_english}
-                className="max-w-full max-h-full object-contain"
-                onError={(e) => {
-                  console.error('Failed to load image');
-                  e.currentTarget.src = '/assets/default-vendor.png';
-                }}
-              />
+            <div className="w-full h-full flex items-center justify-center p-4 sm:p-16 pb-28">
+              {allImages.length > 0 && (
+                <img
+                  key={currentImageIndex}
+                  src={allImages[currentImageIndex]?.src}
+                  alt={`${product?.product_title_english || 'Product'} - View ${currentImageIndex + 1}`}
+                  className="max-w-full max-h-full object-contain select-none drop-shadow-lg"
+                  onError={(e) => {
+                    console.error('Failed to load image in lightbox');
+                    e.currentTarget.src = '/assets/default-vendor.png';
+                  }}
+                />
+              )}
             </div>
 
             {/* Thumbnail strip at bottom */}
-            {galleryImages.length > 0 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-black/50 backdrop-blur-sm p-2 rounded-lg overflow-x-auto max-w-[80%]">
-                {/* Main image thumbnail */}
-                <button
-                  onClick={() => setCurrentImageIndex(0)}
-                  className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                    currentImageIndex === 0 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  <img
-                    src={getProductImageUrl(product.product_image)}
-                    alt="Main"
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-                
-                {/* Gallery thumbnails */}
-                {galleryImages.map((galImg, index) => (
+            {allImages.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-black/50 backdrop-blur-sm p-2 rounded-xl overflow-x-auto max-w-[90%] sm:max-w-[80%] scrollbar-hide">
+                {allImages.map((img, index) => (
                   <button
-                    key={galImg.id || index}
-                    onClick={() => setCurrentImageIndex(index + 1)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                      currentImageIndex === index + 1 ? 'border-white scale-110' : 'border-gray-400 opacity-60 hover:opacity-100'
-                    }`}
+                    key={`lightbox-thumb-${img.id}`}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
+                      ? 'border-white scale-105 ring-2 ring-white/30'
+                      : 'border-transparent opacity-50 hover:opacity-100 hover:border-gray-400'
+                      }`}
                   >
                     <img
-                      src={getGalleryImageUrl(galImg.gal_img)}
-                      alt={`Gallery ${index + 1}`}
+                      src={img.src}
+                      alt={`Thumbnail ${index + 1}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/assets/default-vendor.png';
+                      }}
                     />
                   </button>
                 ))}
               </div>
             )}
+
           </div>
         </DialogContent>
       </Dialog>
