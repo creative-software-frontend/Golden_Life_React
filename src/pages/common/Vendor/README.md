@@ -1,12 +1,16 @@
-# 🔐 Vendor Authentication - Complete Documentation
+# 🔐 Vendor Authentication & Product Management - Complete Documentation
 
 ## 📋 Overview
 
 Complete authentication system for Vendor Dashboard including Login, Forgot Password, Reset Password, and Logout functionality.
 
+Plus comprehensive Product Management with advanced filtering (Status, Stock), sorting, grid/table views, and bulk actions.
+
 ---
 
 ## 🎯 Features
+
+### A. **Authentication Features**
 
 ### 1. **Login System**
 - Email/password authentication
@@ -38,10 +42,52 @@ Complete authentication system for Vendor Dashboard including Login, Forgot Pass
 - Responsive design
 - Loading states
 
+### B. **Product Management Features**
+
+### 1. **Product List with Advanced Filters**
+✅ **Status Filter:**
+- **All Status** - Show all products
+- **Active** - Show only active products (status = 1)
+- **Inactive** - Show only inactive products (status = 0)
+
+✅ **Stock Filter:**
+- **All Stock** - Show all products
+- **Low Stock (< 10)** - Show products with low inventory
+- **Out of Stock** - Show products with zero stock
+
+✅ **Sort Options:**
+- **Newest First** - Sort by date (descending)
+- **Oldest First** - Sort by date (ascending)
+- **Price: Low to High** - Sort by price (ascending)
+- **Price: High to Low** - Sort by price (descending)
+- **Stock: Low to High** - Sort by stock (ascending)
+- **Stock: High to Low** - Sort by stock (descending)
+
+### 2. **Search Functionality**
+- Search by product name (English/Bangla)
+- Search by SKU
+
+### 3. **View Modes**
+- **Table View** - Detailed tabular format
+- **Grid View** - Card-based layout
+
+### 4. **Product Actions**
+- View product details
+- Edit product information
+- Quick status toggle (Active/Inactive)
+- Delete products
+- Bulk actions (delete multiple products)
+
+### 5. **Pagination**
+- Configurable page size (10, 25, 50, 100, All)
+- Navigate between pages
+- Display total item count
+
 ---
 
 ## 📁 Files Created
 
+### Authentication Files:
 ```
 src/pages/common/Vendor/
 ├── ForgotPassword.tsx                    # Main container component
@@ -58,6 +104,28 @@ src/hooks/
 src/layout/VendorLayout/
 ├── Sidebar.tsx                           # Updated with logout functionality
 └── Navbar.tsx                            # Updated with logout in profile dropdown
+```
+
+### Product Management Files:
+```
+src/pages/Vendor/ProductManagement/
+├── index.tsx                             # Main product management page
+├── components/
+│   ├── ProductFilters.tsx                # Search, filters, and view mode toggle
+│   ├── ProductTable.tsx                  # Table view component
+│   ├── ProductGrid.tsx                   # Grid view component
+│   ├── ProductStatusBadge.tsx            # Status badge component
+│   ├── ProductActions.tsx                # View/Edit/Delete actions
+│   ├── BulkActionsBar.tsx                # Bulk selection toolbar
+│   ├── Pagination.tsx                    # Pagination controls
+│   └── index.ts                          # Component exports
+├── hooks/
+│   ├── useProducts.ts                    # Product data and filtering logic
+│   └── useCategories.ts                  # Category data fetching
+├── utils/
+│   └── categoryHelpers.ts                # Category name lookup utilities
+├── constants.ts                          # Filter options and constants
+└── types.ts                              # TypeScript type definitions
 ```
 
 ---
@@ -303,6 +371,7 @@ Each component manages its own state:
 
 ## 🧪 Testing Checklist
 
+### Authentication Testing
 - [ ] Send OTP with valid mobile number
 - [ ] Send OTP with invalid mobile number
 - [ ] OTP verification with correct OTP
@@ -315,6 +384,45 @@ Each component manages its own state:
 - [ ] Back button navigation
 - [ ] Network error handling
 - [ ] Loading states during API calls
+
+### Product Status Filter Testing
+- [ ] **All Status Filter**
+  - [ ] Select "All Status" - shows all products
+  - [ ] Verify active and inactive products both visible
+  
+- [ ] **Active Status Filter**
+  - [ ] Select "Active" - shows only active products (status = 1)
+  - [ ] Verify no inactive products shown
+  - [ ] Check product count matches filtered results
+  
+- [ ] **Inactive Status Filter**
+  - [ ] Select "Inactive" - shows only inactive products (status = 0)
+  - [ ] Verify no active products shown
+  - [ ] Check product count matches filtered results
+  
+- [ ] **Combined Filters**
+  - [ ] Status + Stock filter together
+  - [ ] Status + Search filter together
+  - [ ] Status + Sort filter together
+  - [ ] All filters combined
+  
+- [ ] **Filter Transitions**
+  - [ ] Switch from Active → Inactive → All smoothly
+  - [ ] Pagination resets on filter change
+  - [ ] Filter state persists on page refresh (if implemented)
+  
+- [ ] **Edge Cases**
+  - [ ] No products match filter (show empty state)
+  - [ ] Only 1 product matches filter
+  - [ ] All products are active/inactive
+  - [ ] Filter with 0 products in inventory
+  
+- [ ] **UI/UX**
+  - [ ] Status badge displays correctly in table
+  - [ ] Active = Green badge
+  - [ ] Inactive = Grey badge
+  - [ ] Filter dropdown is responsive
+  - [ ] Mobile view works correctly
 
 ---
 
@@ -415,6 +523,188 @@ const Navbar = () => {
 
 ---
 
+## 🎯 Product Status Filter - Implementation Details
+
+### Overview
+The Product Management page includes a comprehensive filtering system with status-based filtering as a key feature.
+
+### Status Filter Options
+
+```typescript
+// From constants.ts
+export const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'All Status' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+];
+```
+
+### Type Definitions
+
+```typescript
+// types.ts
+export type StatusFilter = 'all' | 'active' | 'inactive';
+
+export interface ProductFilters {
+  search: string;
+  status: StatusFilter;
+  stock: StockFilter;
+  sort: SortOption;
+}
+```
+
+### Component Implementation
+
+#### 1. ProductFilters.tsx - Status Filter UI
+
+```tsx
+<Select
+  value={filters.status}
+  onValueChange={(value: any) => onFiltersChange({ ...filters, status: value })}
+>
+  <SelectTrigger className="w-full sm:w-[160px] h-10 rounded-xl">
+    <SelectValue placeholder="Status" />
+  </SelectTrigger>
+  <SelectContent>
+    {STATUS_OPTIONS.map((option) => (
+      <SelectItem key={option.value} value={option.value}>
+        {option.label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+```
+
+#### 2. useProducts.ts - Filter Logic
+
+```typescript
+// Apply filters and sorting
+const applyFilters = useCallback((filters: ProductFilters) => {
+  let result = [...products];
+  
+  // Status filter - IMPORTANT: Only filter if NOT 'all'
+  if (filters.status === 'active') {
+    result = result.filter(product => product.status === 1);
+  } else if (filters.status === 'inactive') {
+    result = result.filter(product => product.status === 0);
+  }
+  // If 'all', show all statuses
+  
+  // Apply other filters (stock, search, sort)...
+  
+  setFilteredProducts(result);
+}, [products]);
+```
+
+### State Management Flow
+
+```
+index.tsx (Main Component)
+    ↓
+filters state: { status: 'all' | 'active' | 'inactive' }
+    ↓
+ProductFilters component
+    ↓ (onFiltersChange callback)
+    ↓
+applyFilters function in useProducts hook
+    ↓
+Filter products array based on status
+    ↓
+Update filteredProducts state
+    ↓
+ProductTable/ProductGrid receives filtered products
+```
+
+### Product Status Display
+
+#### ProductStatusBadge.tsx
+```tsx
+export const ProductStatusBadge: React.FC<ProductStatusBadgeProps> = ({ status }) => {
+  return (
+    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
+      status === 1 
+        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+        : 'bg-slate-100 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400'
+    }`}>
+      {status === 1 ? 'Active' : 'Inactive'}
+    </span>
+  );
+};
+```
+
+### Usage Example
+
+```tsx
+import { useState } from 'react';
+import { ProductFilters } from './components/ProductFilters';
+import { ProductTable } from './components/ProductTable';
+import { useProducts } from './hooks/useProducts';
+
+function ProductManagement() {
+  const { products, applyFilters } = useProducts();
+  const [filters, setFilters] = useState({
+    search: '',
+    status: 'all',      // Status filter state
+    stock: 'all',
+    sort: 'date_desc',
+  });
+
+  // Handle filter changes
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+    applyFilters(newFilters);
+  };
+
+  return (
+    <div>
+      {/* Filter Bar with Status Dropdown */}
+      <ProductFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+      />
+      
+      {/* Product Table with filtered results */}
+      <ProductTable products={products} />
+    </div>
+  );
+}
+```
+
+### Filter Behavior
+
+| Status Filter Value | Products Shown | Condition |
+|---------------------|----------------|-----------|
+| `'all'` | All products | No filter applied |
+| `'active'` | Active products only | `product.status === 1` |
+| `'inactive'` | Inactive products only | `product.status === 0` |
+
+### Combining Multiple Filters
+
+The status filter works in combination with other filters:
+
+```typescript
+// Multiple filters can be active simultaneously
+filters = {
+  status: 'active',           // Show only active products
+  stock: 'low_stock',         // With low inventory (< 10)
+  sort: 'price_asc',          // Sorted by price (low to high)
+  search: 'shirt'             // Matching "shirt" in name/SKU
+}
+```
+
+### Debug Logging
+
+The implementation includes comprehensive debug logging:
+
+```typescript
+console.log('🔍 [applyFilters] After ACTIVE filter:', result.length, 'products');
+console.log('✅ [applyFilters] Status filter is "all" - showing all statuses');
+```
+
+This helps track filter application and troubleshoot issues.
+
+---
+
 ## 📝 Notes
 
 1. **API Endpoint Flexibility**: The `/api/password/verify-otp` endpoint is optional. If not available in your backend, the component will proceed directly to the password reset form.
@@ -484,5 +774,11 @@ For issues or questions, check the component code comments for detailed inline d
 ---
 
 **Implementation Date**: March 31, 2026  
-**Version**: 1.0.0  
+**Version**: 1.1.0 (Added Product Management with Status Filter)  
 **Status**: ✅ Complete and Ready for Testing
+
+### Version History
+- **v1.0.0** - Initial release with Authentication system
+- **v1.1.0** - Added Product Management with Status/Stock filters, sorting, and bulk actions
+
+---

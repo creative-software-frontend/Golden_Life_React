@@ -215,13 +215,30 @@ export function useProducts() {
     }
 
     // Status filter - IMPORTANT: Only filter if NOT 'all'
+    console.log('🔵 [Status Filter] Current status filter value:', filters.status);
     if (filters.status === 'active') {
       const beforeCount = result.length;
-      result = result.filter(product => product.status === 1);
+      console.log('🔵 [Status Filter] Filtering for ACTIVE products...');
+      console.log('🔵 [Status Filter] Products before filter:', beforeCount);
+      
+      result = result.filter(product => {
+        const isActive = product.status === 1 || product.status === "1";
+        console.log(`🔵 [Status Filter] Product ID ${product.id}: status="${product.status}" (${typeof product.status}), isActive=${isActive}`);
+        return isActive;
+      });
+      
       console.log('🔎 [applyFilters] After ACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else if (filters.status === 'inactive') {
       const beforeCount = result.length;
-      result = result.filter(product => product.status === 0);
+      console.log('🔵 [Status Filter] Filtering for INACTIVE products...');
+      console.log('🔵 [Status Filter] Products before filter:', beforeCount);
+      
+      result = result.filter(product => {
+        const isInactive = product.status === 0 || product.status === "0";
+        console.log(`🔵 [Status Filter] Product ID ${product.id}: status="${product.status}" (${typeof product.status}), isInactive=${isInactive}`);
+        return isInactive;
+      });
+      
       console.log('🔎 [applyFilters] After INACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else {
       console.log('✅ [applyFilters] Status filter is "all" - showing all statuses');
