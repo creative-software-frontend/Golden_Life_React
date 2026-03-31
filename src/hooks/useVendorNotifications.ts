@@ -28,17 +28,30 @@ export const useVendorNotifications = (baseURL: string, token: string | null) =>
   const [syncing, setSyncing] = useState(false);
 
   const fetchNotifications = useCallback(async (silent = false) => {
-    if (!token) return;
+    if (!token) {
+      console.warn('🔴 No token available for notifications');
+      return;
+    }
     if (!silent) setSyncing(true);
 
     try {
+      console.log('🔵 Fetching notifications from:', `${baseURL}/api/notifications`);
+      console.log('🔵 Token present:', !!token);
+
       const response = await fetch(`${baseURL}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) return;
+      console.log('🔵 Response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('🔴 Notification fetch failed with status:', response.status);
+        return;
+      }
 
       const data: NotificationsResponse = await response.json();
+      console.log('🔵 Response data:', data);
+      
       if (data.status) {
         const sorted = [...(data.notifications || [])].sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -48,9 +61,12 @@ export const useVendorNotifications = (baseURL: string, token: string | null) =>
         // Use whichever key the backend returns
         const realCount = data.unread_count ?? data.count ?? 0;
         setUnreadCount(realCount);
+        console.log('🟢 Notifications loaded:', sorted.length, 'Unread:', realCount);
+      } else {
+        console.warn('🟡 API returned status: false');
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      console.error('🔴 Failed to fetch notifications:', error);
     } finally {
       if (!silent) setSyncing(false);
     }
@@ -68,18 +84,24 @@ export const useVendorNotifications = (baseURL: string, token: string | null) =>
     } else {
       // Only count when closed (saves bandwidth)
       try {
+        console.log('🔵 Polling unread count from:', `${baseURL}/api/notifications/unread`);
         const response = await fetch(`${baseURL}/api/notifications/unread`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
+        console.log('🔵 Unread count response status:', response.status);
+        
         if (!response.ok) return;
 
         const data = await response.json();
+        console.log('🔵 Unread count data:', data);
+        
         if (data.status) {
           const realCount = data.unread_count ?? data.count ?? 0;
           setUnreadCount(realCount);
         }
       } catch (error) {
-        console.error('Poll unread count failed:', error);
+        console.error('🔴 Poll unread count failed:', error);
       }
     }
   }, [baseURL, token, isOpen, fetchNotifications]);
@@ -115,19 +137,24 @@ export const useVendorNotifications = (baseURL: string, token: string | null) =>
     );
 
     try {
+      console.log('🔵 Marking as read:', id);
       const response = await fetch(`${baseURL}/api/notifications/read?id=${encodeURIComponent(id)}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log('🔵 Mark as read response status:', response.status);
+      
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
+      console.log('🔵 Mark as read result:', result);
+      
       if (!result.status) throw new Error('Backend failed');
 
       // Immediate sync after marking read
       setTimeout(() => fetchNotifications(true), 100);
     } catch (error) {
-      console.error('Mark as read failed:', error);
+      console.error('🔴 Mark as read failed:', error);
       fetchNotifications(true);
     }
   };
@@ -140,19 +167,24 @@ export const useVendorNotifications = (baseURL: string, token: string | null) =>
     setNotifications(prev => prev.map(notif => ({ ...notif, read_at: now })));
 
     try {
+      console.log('🔵 Marking all as read');
       const response = await fetch(`${baseURL}/api/notifications/read-all`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log('🔵 Mark all as read response status:', response.status);
+      
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
+      console.log('🔵 Mark all as read result:', result);
+      
       if (!result.status) throw new Error('Backend failed');
 
       // Immediate sync after marking all read
       setTimeout(() => fetchNotifications(true), 200);
     } catch (error) {
-      console.error('Mark all failed:', error);
+      console.error('🔴 Mark all failed:', error);
       fetchNotifications(true);
     }
   };
