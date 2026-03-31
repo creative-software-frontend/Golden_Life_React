@@ -67,13 +67,17 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
     if (sellerPrice && sellerPrice > 0) {
       const seller = Number(sellerPrice);
 
-      const regularVal = seller + (seller * 0.30);
-      const offerVal = regularVal + (regularVal * 0.20);
+      const sellingVal = Math.round(seller + (seller * 0.30)); // 1.3x cost = Selling Price
+      const mrpVal = Math.round(sellingVal + (sellingVal * 0.20)); // 1.2x selling = MRP
 
-      setValue('regular_price', parseFloat(regularVal.toFixed(2)), { shouldValidate: true });
-      setValue('offer_price', parseFloat(offerVal.toFixed(2)), { shouldValidate: true });
+      // Key mappings based on user's manual label changes:
+      // regular_price key labels "Offer Price (Selling)" -> 130
+      // offer_price key labels "Regular Price (MRP)" -> 156
+      setValue('regular_price', sellingVal, { shouldValidate: true });
+      setValue('offer_price', mrpVal, { shouldValidate: true });
     }
   }, [sellerPrice, setValue]);
+
 
   // Calculate profit margin and discount
   const profitMargin = calculateProfitMargin(sellerPrice, offerPrice);
@@ -455,69 +459,7 @@ export function AddProductForm({ onSubmit, isLoading }: AddProductFormProps) {
         </CardContent>
       </Card>
 
-      {/* E-Book Options */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-bold">E-Book Options</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* E-book Toggle Switch */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <div>
-                <Label htmlFor="ebook-toggle" className="font-semibold cursor-pointer">
-                  This is an E-Book
-                </Label>
-                <p className="text-xs text-gray-500">
-                  Enable this if the product is a digital e-book
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="ebook-toggle"
-              checked={isEbook}
-              onCheckedChange={(checked) => {
-                setIsEbook(checked);
-                setValue('ebook', checked ? '1' : '0');
-                if (!checked) {
-                  setValue('video_link', '');
-                }
-              }}
-              className="data-[state=checked]:bg-blue-600"
-            />
-          </div>
 
-          {/* Conditional Video Link Field */}
-          {isEbook && (
-            <div className="p-4 border border-blue-200 rounded-lg bg-blue-50/50 space-y-2">
-              <div className="flex items-center gap-2 mb-2">
-                <Youtube className="w-4 h-4 text-blue-600" />
-                <Link2 className="w-4 h-4 text-blue-600" />
-                <Label htmlFor="video_link" className="font-semibold text-blue-900">
-                  Video Link / Download URL
-                </Label>
-              </div>
-              <Input
-                id="video_link"
-                {...register('video_link')}
-                placeholder="https://youtube.com/watch?v=... or https://drive.google.com/..."
-                className="border-blue-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-              <p className="text-xs text-blue-700">
-                Add YouTube video link or Google Drive download URL for the e-book
-              </p>
-              {errors.video_link && (
-                <p className="mt-1 text-xs text-red-500">{errors.video_link.message}</p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Media Upload */}
       <div className="grid lg:grid-cols-2 gap-6">
