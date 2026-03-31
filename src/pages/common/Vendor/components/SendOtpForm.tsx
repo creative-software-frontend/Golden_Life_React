@@ -45,13 +45,22 @@ export const SendOtpForm: React.FC<SendOtpFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔵 [SendOtpForm] Form submitted');
+    console.log('🔵 [SendOtpForm] Credential value:', credential);
+    console.log('🔵 [SendOtpForm] Login method:', loginMethod);
+    
     if (!validateCredential(credential)) {
+      console.log('❌ [SendOtpForm] Validation failed');
       return;
     }
 
+    console.log('✅ [SendOtpForm] Validation passed, calling onSendOtp...');
+
     try {
       await onSendOtp(credential);
+      console.log('✅ [SendOtpForm] onSendOtp completed successfully');
     } catch (error) {
+      console.error('❌ [SendOtpForm] onSendOtp error:', error);
       // Error is handled by parent component
     }
   };

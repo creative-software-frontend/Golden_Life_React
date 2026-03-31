@@ -4,10 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, Store, Loader2, ArrowLeft, 
-  CheckCircle2, AlertCircle, Smartphone
+  CheckCircle2, AlertCircle
 } from "lucide-react";
 import Logo from "../Logo";
-import { LoginTabs } from "./components/LoginTabs";
 import { SendOtpForm } from "./components/SendOtpForm";
 import { OtpModal } from "./components/OtpModal";
 import { useVendorOtp } from "./hooks/useVendorOtp";
@@ -30,7 +29,6 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   // OTP login states
-  const [loginMethod, setLoginMethod] = useState<'email' | 'mobile'>('mobile');
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
@@ -126,26 +124,47 @@ const LoginForm = () => {
 
   // Handle Send OTP
   const handleSendOtp = async (credential: string) => {
+    console.log('🔵 [LoginForm] === SEND OTP STARTED ===');
+    console.log('🔵 [LoginForm] Send OTP called with:', credential);
+    console.log('🔵 [LoginForm] Current showOtpModal state:', showOtpModal);
+    
     setIsOtpLoading(true);
     setOtpError(null);
 
     try {
-      const response = await sendOtp(credential, loginMethod);
+      const response = await sendOtp(credential, 'mobile');
+      console.log('🟢 [LoginForm] OTP Response:', response);
+      console.log('🟢 [LoginForm] Response success:', response.success);
+      console.log('🟢 [LoginForm] Response user_id:', response.user_id);
       
       if (response.success) {
+        console.log('✅ [LoginForm] Response is successful, opening modal...');
+        console.log('✅ [LoginForm] Setting showOtpModal to true');
+        
         // Open OTP verification modal
         setShowOtpModal(true);
-        setSuccessMessage(`OTP sent to your ${loginMethod}!`);
+        setSuccessMessage(`OTP sent to your mobile!`);
+        console.log('✅ [LoginForm] OTP sent successfully, modal opened');
+        console.log('✅ [LoginForm] New showOtpModal state:', showOtpModal);
         
         // Auto-hide success message after 3 seconds
         setTimeout(() => {
           setSuccessMessage("");
         }, 3000);
+      } else {
+        console.error('❌ [LoginForm] OTP response not successful:', response);
+        setOtpError(response.message || 'Failed to send OTP');
       }
     } catch (error: any) {
-      setOtpError(error.message);
+      console.error('❌ [LoginForm] Send OTP Error:', error);
+      console.error('[LoginForm] Error details:', {
+        message: error.message,
+        response: error.response?.data
+      });
+      setOtpError(error.message || 'Failed to send OTP');
     } finally {
       setIsOtpLoading(false);
+      console.log('🔵 [LoginForm] === SEND OTP COMPLETED ===');
     }
   };
 
@@ -241,14 +260,14 @@ const LoginForm = () => {
               viewport={{ once: true, margin: "-50px" }}
               className="mb-8 sm:mb-10"
             >
-              <Link to="/" className="inline-flex items-center gap-2 sm:gap-3">
+              <div className="inline-flex items-center gap-2 sm:gap-3">
                 <div className="w-10 h-10 sm:w-14 sm:h-14 bg-orange-100 rounded-xl flex items-center justify-center shadow-sm transition-all">
                   <Store className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 transition-all" strokeWidth={2.5} />
                 </div>
                 <div className="scale-100 sm:scale-125 origin-left transition-all">
                   <Logo />
                 </div>
-              </Link>
+              </div>
             </motion.div>
 
             {/* Header */}
@@ -263,10 +282,7 @@ const LoginForm = () => {
               <p className="text-gray-500 text-sm sm:text-base">Please enter your details to access your dashboard</p>
             </motion.div>
 
-            {/* Login Method Tabs */}
-            <LoginTabs selectedMethod={loginMethod} onMethodChange={setLoginMethod} />
-            
-            {/* Form */}
+            {/* Traditional Login Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
 
               {/* API Feedback Alert */}
@@ -378,43 +394,43 @@ const LoginForm = () => {
                   )}
                 </button>
               </motion.div>
-
-              {/* Divider */}
-              <motion.div
-                variants={scrollVariant}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-                className="relative py-4"
-              >
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
-                </div>
-              </motion.div>
-
-              {/* OTP Login Section */}
-              <motion.div
-                variants={scrollVariant}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-                className="pt-2"
-              >
-                <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-                  Login with OTP
-                </h3>
-                
-                <SendOtpForm
-                  loginMethod={loginMethod}
-                  onSendOtp={handleSendOtp}
-                  isLoading={isSendingOtp}
-                  error={otpSendError}
-                />
-              </motion.div>
             </form>
+
+            {/* Divider */}
+            <motion.div
+              variants={scrollVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="relative py-4"
+            >
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
+              </div>
+            </motion.div>
+
+            {/* OTP Login Section - Separate Form */}
+            <motion.div
+              variants={scrollVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="pt-2"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+                Login with OTP
+              </h3>
+              
+              <SendOtpForm
+                loginMethod="mobile"
+                onSendOtp={handleSendOtp}
+                isLoading={isSendingOtp}
+                error={otpSendError}
+              />
+            </motion.div>
 
             {/* Footer */}
             <motion.p 
@@ -460,7 +476,7 @@ const LoginForm = () => {
         onResend={handleResendOtp}
         isLoading={isOtpLoading}
         error={otpError}
-        loginMethod={loginMethod}
+        loginMethod="mobile"
       />
     </>
   );

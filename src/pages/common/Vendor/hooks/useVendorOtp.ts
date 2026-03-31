@@ -41,6 +41,8 @@ export const useVendorOtp = () => {
       const endpoint = `${baseURL}/api/vendor/login/send-otp`;
       const queryParams = type === 'mobile' ? `?mobile=${encodeURIComponent(credential)}` : `?email=${encodeURIComponent(credential)}`;
       
+      console.log('📍 [useVendorOtp] Request URL:', endpoint + queryParams);
+      
       const response = await axios.post(endpoint + queryParams, {}, {
         headers: { 
           'Content-Type': 'application/json',
@@ -48,7 +50,12 @@ export const useVendorOtp = () => {
         },
       });
 
-      console.log('🟢 [useVendorOtp] OTP sent successfully:', response.data);
+      console.log('🟢 [useVendorOtp] Full Response:', {
+        status: response.status,
+        data: response.data,
+        success: response.data.success,
+        user_id: response.data.user_id
+      });
       
       if (response.data.success && response.data.user_id) {
         setUserId(response.data.user_id);
@@ -57,6 +64,13 @@ export const useVendorOtp = () => {
       return response.data;
     } catch (err: any) {
       console.error('❌ [useVendorOtp] Failed to send OTP:', err);
+      console.error('[useVendorOtp] Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        url: err.config?.url
+      });
+      
       const errorMessage = err.response?.data?.message || err.message || 'Failed to send OTP';
       setError(errorMessage);
       throw new Error(errorMessage);

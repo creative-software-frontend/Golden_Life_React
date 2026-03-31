@@ -506,12 +506,14 @@ export default function ProductDetails() {
 
           {/* Action Buttons */}
           <div className="flex gap-4 pt-4">
-            <Button
-              onClick={() => navigate(`/vendor/dashboard/products/edit/${id}`)}
-              className="flex-1 sm:flex-none px-6 py-3 bg-primary-light text-white font-bold rounded-xl transition-all duration-300"
-            >
-              Edit This Product
-            </Button>
+            {product.status === '0' && (
+              <Button
+                onClick={() => navigate(`/vendor/dashboard/products/edit/${id}`)}
+                className="flex-1 sm:flex-none px-6 py-3 bg-primary-light text-white font-bold rounded-xl transition-all duration-300"
+              >
+                Edit This Product
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => navigate('/vendor/dashboard/products')}

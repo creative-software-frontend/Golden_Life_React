@@ -26,6 +26,14 @@ export const OtpModal: React.FC<OtpModalProps> = ({
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // Debug log when modal receives isOpen prop
+  useEffect(() => {
+    console.log('🔵 [OtpModal] isOpen prop changed:', isOpen);
+    if (isOpen) {
+      console.log('✅ [OtpModal] Modal should be visible now');
+    }
+  }, [isOpen]);
+
   // Auto-focus first input when modal opens
   useEffect(() => {
     if (isOpen) {

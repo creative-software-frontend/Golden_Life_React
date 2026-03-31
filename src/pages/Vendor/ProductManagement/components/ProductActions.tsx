@@ -36,13 +36,15 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
           <span className="font-medium">View Details</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-border" />
-        <DropdownMenuItem 
-          onClick={() => onEdit(product)} 
-          className="cursor-pointer py-2.5 gap-2.5 hover:bg-secondary/10 focus:bg-secondary/10"
-        >
-          <Pencil className="h-4 w-4 text-emerald-600" />
-          <span className="font-medium">Edit Product</span>
-        </DropdownMenuItem>
+        {product.status === '0' && (
+          <DropdownMenuItem 
+            onClick={() => onEdit(product)} 
+            className="cursor-pointer py-2.5 gap-2.5 hover:bg-secondary/10 focus:bg-secondary/10"
+          >
+            <Pencil className="h-4 w-4 text-emerald-600" />
+            <span className="font-medium">Edit Product</span>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
