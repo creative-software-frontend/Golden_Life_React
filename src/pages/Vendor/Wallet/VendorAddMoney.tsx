@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft, Wallet, Smartphone, ShieldCheck,
@@ -150,11 +151,15 @@ export default function VendorAddMoney() {
 
         // 1. Local basic validation check
         if (!amount || Number(amount) <= 0) {
-            setError(t('error_invalid_amount', "Please enter an amount greater than 0."));
+            const msg = t('error_invalid_amount', "Please enter an amount greater than 0.");
+            setError(msg);
+            toast.error(msg);
             return;
         }
         if (!accountNumber || !trxId || !paymentMethod) {
-            setError(t('error_missing_fields', "Please fill in all required fields."));
+            const msg = t('error_missing_fields', "Please fill in all required fields.");
+            setError(msg);
+            toast.error(msg);
             return;
         }
 
@@ -187,7 +192,9 @@ export default function VendorAddMoney() {
 
             // Backend might return status as a string "true", "success", or a boolean true
             if (data?.status === 'success' || data?.status === "true" || data?.success === true) {
-                setSuccess(data.message || t('success_request_submitted', "Request submitted successfully!"));
+                const msg = data.message || t('success_request_submitted', "Request submitted successfully!");
+                setSuccess(msg);
+                toast.success(msg);
 
                 // Clear Form
                 setAmount('');
@@ -201,11 +208,15 @@ export default function VendorAddMoney() {
 
                 setTimeout(() => setSuccess(null), 5000);
             } else {
-                setError(data?.message || "Failed to submit request.");
+                const msg = data?.message || "Failed to submit request.";
+                setError(msg);
+                toast.error(msg);
             }
         } catch (err: any) {
             console.error("Top-up Error:", err);
-            setError(err.response?.data?.message || t('error_server', "Internal server error."));
+            const msg = err.response?.data?.message || t('error_server', "Internal server error.");
+            setError(msg);
+            toast.error(msg);
         } finally {
             setIsSubmitting(false);
         }
@@ -330,10 +341,7 @@ export default function VendorAddMoney() {
                                             setAmount(val);
                                         }}
                                         placeholder="0.00"
-                                        className={cn(
-                                            "w-full pl-12 pr-6 py-5 text-4xl font-bold bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-secondary outline-none transition-all",
-                                            (Number(amount) > currentBalance) && "border-destructive focus:border-destructive text-destructive"
-                                        )}
+                                        className="w-full pl-12 pr-6 py-5 text-4xl font-bold bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-secondary outline-none transition-all"
                                     />
                                 </div>
 
@@ -344,7 +352,6 @@ export default function VendorAddMoney() {
                                         <button
                                             key={p}
                                             type="button"
-                                            disabled={p > currentBalance}
                                             onClick={() => setAmount(p.toString())}
                                             className={cn(
                                                 "px-4 py-2 rounded-xl border text-sm font-bold transition-all",
