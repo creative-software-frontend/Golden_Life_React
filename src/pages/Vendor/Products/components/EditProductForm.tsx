@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { productSchemaWithValidation, ProductFormData } from '../validation/product.validation';
@@ -24,26 +24,16 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
   const [existingGalleryImages, setExistingGalleryImages] = useState<string[]>(
-    initialData?.existing_images?.slice(1) || []
+    (initialData?.existing_images?.slice(1) || []).filter((img): img is string => !!img)
   );
   const [removedGalleryImages, setRemovedGalleryImages] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'short-en' | 'short-bn' | 'long-en' | 'long-bn'>('short-en');
   const [isEbook, setIsEbook] = useState(initialData?.ebook === '1');
+  const hasSynced = useRef(false);
 
-  console.log('🔵 [EDIT FORM] EditProductForm rendered');
-  console.log('📊 [EDIT FORM] Initial data received:', initialData);
-  console.log('🖼️ [EDIT FORM] Existing gallery images:', existingGalleryImages.length);
+  console.log('🔵 [EDIT FORM] EditProductForm rendered, hasSynced:', hasSynced.current);
 
-  // Update state when initialData changes
-  useEffect(() => {
-    if (initialData?.existing_images) {
-      const galleryImgs = initialData.existing_images.slice(1);
-      setExistingGalleryImages(galleryImgs);
-    }
-    if (initialData?.ebook) {
-      setIsEbook(initialData.ebook === '1');
-    }
-  }, [initialData]);
+
 
   const {
     register,
@@ -51,8 +41,8 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     control,
     formState: { errors, dirtyFields },
     setValue,
-    getValues,
     watch,
+    reset,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchemaWithValidation) as any,
     defaultValues: {
@@ -76,6 +66,39 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
       removed_images: [],
     },
   });
+
+  // 🔄 SYNC: Move this AFTER useForm to avoid "reset before initialization" error
+  useEffect(() => {
+    // Only sync if initialData is present AND we haven't synced yet
+    if (!initialData || Object.keys(initialData).length === 0 || hasSynced.current) return;
+    
+    console.log('🔄 [EDIT FORM] First-time sync into form using reset()');
+    reset(initialData);
+
+    // Set Ebook toggle
+    if (initialData.ebook) {
+      setIsEbook(initialData.ebook === '1');
+    }
+
+    // Safely Parse Gallery Images for the UI Grid
+    const rawImages = initialData.existing_images;
+    if (rawImages && Array.isArray(rawImages)) {
+      // Index 0 is main image, 1+ are gallery
+      if (rawImages.length > 1) {
+        // Filter out nulls and type cast to string[]
+        const gallery = rawImages.slice(1).filter((img): img is string => !!img);
+        setExistingGalleryImages(gallery);
+      }
+    } else if (typeof rawImages === 'string') {
+      try {
+        const parsed = rawImages.startsWith('[') ? JSON.parse(rawImages) : rawImages.split(',');
+        const array = (Array.isArray(parsed) ? parsed : [parsed]).filter(Boolean);
+        setExistingGalleryImages(array.slice(1));
+      } catch (e) { console.error(e); }
+    }
+
+    hasSynced.current = true; // 👈 Mark as synced so we don't overwrite manual edits
+  }, [initialData, reset]);
 
   // Watch price fields for calculations
   const sellerPrice = watch('seller_price');
@@ -158,34 +181,81 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     await onSubmit(submitData);
   };
 
-  // Reset form to initial values
+  // Update state when initialData changes
+  // useEffect(() => {
+  //   if (initialData?.ebook) {
+  //     setIsEbook(initialData.ebook === '1');
+  //   }
+
+  //   const rawImages = initialData?.existing_images;
+
+  //   if (!rawImages) {
+  //     setExistingGalleryImages([]);
+  //     return;
+  //   }
+
+  //   let parsedImages: string[] = [];
+
+  //   // 1. If it's already an array:
+  //   if (Array.isArray(rawImages)) {
+  //     parsedImages = rawImages;
+  //   }
+  //   // 2. If it's a string from the database:
+  //   else if (typeof rawImages === 'string') {
+  //     // Check if it's a JSON array string like '["img1.jpg", "img2.jpg"]'
+  //     if (rawImages.startsWith('[')) {
+  //       try {
+  //         parsedImages = JSON.parse(rawImages);
+  //       } catch (e) {
+  //         console.error("Failed to parse images JSON string", e);
+  //       }
+  //     } else {
+  //       // It's probably a comma-separated string like "img1.jpg,img2.jpg"
+  //       parsedImages = rawImages.split(',').map(img => img.trim());
+  //     }
+  //   }
+
+  //   // Now safely slice it. (Assuming index 0 is the main image, so gallery starts at index 1)
+  //   if (parsedImages.length > 1) {
+  //     setExistingGalleryImages(parsedImages.slice(1));
+  //   } else {
+  //     setExistingGalleryImages([]); // Only 1 image (or 0) means no gallery images
+  //   }
+
+  // }, [initialData]);
+  // 👈 FIX: Use react-hook-form's reset() instead of individual setValues
   const handleReset = () => {
     setMainImage(null);
     setGalleryImages([]);
-    setExistingGalleryImages(initialData?.existing_images?.slice(1) || []);
+    const gallery = (initialData?.existing_images?.slice(1) || []).filter((img): img is string => !!img);
+    setExistingGalleryImages(gallery);
     setRemovedGalleryImages([]);
     setActiveTab('short-en');
     setIsEbook(initialData?.ebook === '1');
 
-    setValue('product_title_english', initialData?.product_title_english || '');
-    setValue('product_title_bangla', initialData?.product_title_bangla || '');
-    setValue('category_id', initialData?.category_id || 0);
-    setValue('subcategory_id', initialData?.subcategory_id || 0);
-    setValue('short_description_english', initialData?.short_description_english || '');
-    setValue('short_description_bangla', initialData?.short_description_bangla || '');
-    setValue('long_description_english', initialData?.long_description_english || '');
-    setValue('long_description_bangla', initialData?.long_description_bangla || '');
-    setValue('seller_price', initialData?.seller_price || 0);
-    setValue('regular_price', initialData?.regular_price || 0);
-    setValue('offer_price', initialData?.offer_price || 0);
-    setValue('sku', initialData?.sku || '');
-    setValue('stock', initialData?.stock || 0);
-    setValue('video_link', initialData?.video_link || '');
-    setValue('ebook', initialData?.ebook || '0');
-    setValue('images', []);
-    setValue('existing_images', initialData?.existing_images || []);
-    setValue('removed_images', []);
+    reset({
+      product_title_english: initialData?.product_title_english || '',
+      product_title_bangla: initialData?.product_title_bangla || '',
+      category_id: initialData?.category_id || 0,
+      subcategory_id: initialData?.subcategory_id || 0,
+      short_description_english: initialData?.short_description_english || '',
+      short_description_bangla: initialData?.short_description_bangla || '',
+      long_description_english: initialData?.long_description_english || '',
+      long_description_bangla: initialData?.long_description_bangla || '',
+      seller_price: initialData?.seller_price || 0,
+      regular_price: initialData?.regular_price || 0,
+      offer_price: initialData?.offer_price || 0,
+      sku: initialData?.sku || '',
+      stock: initialData?.stock || 0,
+      video_link: initialData?.video_link || '',
+      ebook: initialData?.ebook || '0',
+      images: [],
+      existing_images: initialData?.existing_images || [],
+      removed_images: [],
+    });
   };
+
+  // ... (Your JSX Return Statement goes here)
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
@@ -508,6 +578,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
         </Card>
 
         {/* Gallery Images Upload */}
+        {/* Gallery Images Upload */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
@@ -525,7 +596,10 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                   multiple
                   onChange={(e) => {
                     const files = Array.from(e.target.files || []);
-                    if (files.length > 0) handleGalleryImagesChange([...galleryImages, ...files]);
+                    if (files.length > 0) {
+                      // FIX 1: Use setGalleryImages to ensure local state updates and triggers a re-render
+                      setGalleryImages((prev) => [...(prev || []), ...files]);
+                    }
                   }}
                   className="cursor-pointer"
                 />
@@ -534,31 +608,37 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                 </p>
               </div>
 
-              {(galleryImages.length > 0 || existingGalleryImages.length > 0) && (
-                <div className="grid grid-cols-4 gap-2">
-                  {existingGalleryImages.map((imgUrl, index) => (
-                    <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+              {/* FIX 2: Safely check lengths with optional chaining */}
+              {/* This will now safely trigger because the array is formatted properly */}
+              {/* Unified Gallery Grid (Marge) */}
+              {(existingGalleryImages.length > 0 || galleryImages.length > 0) && (
+                <div className="grid grid-cols-4 gap-3 mt-4">
+                  {/* Existing Images */}
+                  {existingGalleryImages.map((imgName, index) => (
+                    <div key={`existing-${index}`} className="group relative aspect-square rounded-lg overflow-hidden border-2 border-gray-100 hover:border-primary-light transition-all shadow-sm">
                       <img
-                        src={`https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgUrl}`}
-                        alt={`Gallery ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        src={imgName.startsWith('http') ? imgName : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgName}`}
+                        alt={`Existing Gallery ${index + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <button
                         type="button"
                         onClick={() => handleExistingGalleryImageRemove(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                       >
                         <X size={12} />
                       </button>
+                      <div className="absolute bottom-0 left-0 right-0 bg-primary-dark/70 text-white text-[8px] font-bold text-center p-0.5 backdrop-blur-sm">Existing</div>
                     </div>
                   ))}
 
+                  {/* New Images */}
                   {galleryImages.map((file, index) => (
-                    <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                    <div key={`new-${index}`} className="group relative aspect-square rounded-lg overflow-hidden border-2 border-green-100 hover:border-green-500 transition-all shadow-sm">
                       <img
                         src={URL.createObjectURL(file)}
-                        alt={`New gallery ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        alt={`New ${index + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <button
                         type="button"
@@ -566,14 +646,16 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                           const newGallery = galleryImages.filter((_, i) => i !== index);
                           setGalleryImages(newGallery);
                         }}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                       >
                         <X size={12} />
                       </button>
+                      <div className="absolute bottom-0 left-0 right-0 bg-green-500/80 text-white text-[8px] font-bold text-center p-0.5 backdrop-blur-sm">New</div>
                     </div>
                   ))}
                 </div>
               )}
+
             </div>
           </CardContent>
         </Card>
@@ -606,6 +688,6 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
           )}
         </Button>
       </div>
-    </form>
+    </form >
   );
 }

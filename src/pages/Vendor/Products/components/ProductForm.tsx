@@ -113,6 +113,7 @@ export function ProductForm({
 
   // Handle gallery images change
   const handleGalleryImagesChange = (files: File[]) => {
+    console.log('📸 [PRODUCT FORM] Gallery images changed:', files.length, 'files');
     setGalleryImages(files);
   };
 
@@ -601,8 +602,8 @@ export function ProductForm({
               </div>
 
               {/* Gallery Grid */}
-              {(galleryImages.length > 0 || existingGalleryImages.length > 0) && (
-                <div className="grid grid-cols-4 gap-2">
+              {(galleryImages?.length > 0 || (existingGalleryImages && existingGalleryImages.length > 0)) && (
+                <div className="grid grid-cols-4 gap-2 mt-4">
                   {/* Existing Gallery Images */}
                   {existingGalleryImages.map((imgUrl, index) => (
                     <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">

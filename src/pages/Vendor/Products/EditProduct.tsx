@@ -42,16 +42,16 @@ export default function EditProduct() {
       try {
         setIsLoading(true);
         setFetchError(null);
-        
+
         console.log('1. Fetching product with ID:', id);
-        
+
         const token = getAuthToken();
         console.log('2. Auth token present:', token ? 'Yes' : 'No');
-        
+
         if (!token) {
           throw new Error('Authentication required. Please login again.');
         }
-        
+
         console.log('3. Making API call to:', `${baseURL}/api/vendor/product/details`);
         const response = await axios.get(`${baseURL}/api/vendor/product/details`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -62,25 +62,39 @@ export default function EditProduct() {
         console.log('5. API Response data:', response.data);
 
         let product = null;
-        let gallery = [];
-        
+        let gallery: any = [];
+
+        // 1. Find product object
         if (response.data?.data?.product) {
-          console.log('6. Found product in response.data.data.product');
           product = response.data.data.product;
-          gallery = response.data.data.gallery || [];
+          gallery = response.data.data.gallery || response.data.data.gallery_images || [];
         } else if (response.data?.product) {
-          console.log('6. Found product in response.data.product');
           product = response.data.product;
+          gallery = response.data.gallery || response.data.gallery_images || [];
         } else if (response.data?.data) {
-          console.log('6. Found product in response.data.data');
           product = response.data.data;
-        } else {
-          console.log('6. Unknown response structure');
-          throw new Error('Product data not found in response');
+          gallery = response.data.data.gallery || response.data.gallery || response.data.gallery_images || [];
         }
-        
-        console.log('7. Extracted product:', product);
-        console.log('8. Gallery images:', gallery.length);
+
+        if (!product) throw new Error('Product data not found in response');
+
+        // 2. Search for gallery images in common locations
+        // If gallery is still empty, check if it's inside the product object
+        if ((!gallery || gallery.length === 0)) {
+          gallery = product.gallery || product.gallery_images || product.product_gallery || [];
+        }
+
+        // 3. Handle JSON strings for gallery
+        if (typeof gallery === 'string' && (gallery.startsWith('[') || gallery.includes(','))) {
+          try {
+            gallery = gallery.startsWith('[') ? JSON.parse(gallery) : gallery.split(',').map((s: string) => s.trim());
+          } catch (e) { console.error(e); }
+        }
+
+        // 4. Final check and flattening
+        if (!Array.isArray(gallery)) gallery = [];
+
+        console.log('✅ [EDIT PAGE] ID:', product.id, 'Gallery:', gallery.length);
 
         const formData: ProductFormData = {
           product_title_english: product.product_title_english || '',
@@ -100,19 +114,23 @@ export default function EditProduct() {
           ebook: product.ebook ?? '0',
           images: [],
           existing_images: [
-            product.product_image,
-            ...gallery.map((g: any) => g.gal_img)
-          ].filter(Boolean),
+            product.product_image || '', // Use empty string to satisfy Zod
+            ...gallery.map((g: any) => {
+              if (!g) return null;
+              if (typeof g === 'string') return g;
+              return g.gal_img || g.image || g.image_name || g.url || null;
+            })
+          ].filter((img, idx) => idx === 0 || (img && typeof img === 'string')) as string[],
           removed_images: []
         };
-        
+
         console.log('9. Form data prepared successfully');
         setProductData(formData);
-        
+
       } catch (err: any) {
         console.error('10. Fetch product error:', err);
         console.error('11. Error response:', err.response?.data);
-        
+
         let errorMessage = 'Failed to load product for editing';
         if (err.response?.status === 404) {
           errorMessage = 'Product not found.';
@@ -136,7 +154,7 @@ export default function EditProduct() {
     console.log('[EDIT PAGE] UPDATE BUTTON CLICKED');
     console.log('===================');
     console.log('📊 Data received from form:', data);
-    
+
     try {
       if (!id) {
         console.error('❌ No product ID found');
@@ -147,10 +165,10 @@ export default function EditProduct() {
       const formData = new FormData();
 
       console.log('🔧 Building FormData:');
-      
+
       // Exclude all image-related keys
       const excludedKeys = ['images', 'gallery_images', 'existing_gallery_images', 'removed_gallery_images'];
-      
+
       Object.keys(data).forEach((key) => {
         if (!excludedKeys.includes(key)) {
           const value = data[key];
@@ -175,10 +193,12 @@ export default function EditProduct() {
         }
       }
 
-      // Handle existing gallery images (keeping)
+      // Handle existing gallery images (keeping) - Using array format for robustness
       if (data.existing_gallery_images && data.existing_gallery_images.length > 0) {
         console.log(`  📷 Keeping ${data.existing_gallery_images.length} existing gallery images`);
-        formData.append('existing_gallery_images', JSON.stringify(data.existing_gallery_images));
+        data.existing_gallery_images.forEach((img: string) => {
+          formData.append('existing_gallery_images[]', img);
+        });
       }
 
       // Handle removed gallery images
@@ -235,7 +255,7 @@ export default function EditProduct() {
           <ArrowLeft size={16} className="mr-2" />
           Back to Products
         </Button>
-        
+
         <div className="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">

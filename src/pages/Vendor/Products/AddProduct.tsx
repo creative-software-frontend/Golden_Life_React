@@ -92,12 +92,16 @@ export default function AddProduct() {
         }
       });
 
+      // Handle main product image
       if (data.images && data.images.length > 0) {
         formData.append('product_image', data.images[0]);
-        if (data.images.length > 1) {
-          for (let i = 1; i < data.images.length; i++) {
-            formData.append('gal_img[]', data.images[i]);
-          }
+      }
+
+      // Handle new gallery images - matches ProductForm.tsx structure
+      if (data.gallery_images && data.gallery_images.length > 0) {
+        console.log(`📸 Adding ${data.gallery_images.length} gallery images to FormData`);
+        for (let i = 0; i < data.gallery_images.length; i++) {
+          formData.append('gal_img[]', data.gallery_images[i]);
         }
       }
 
