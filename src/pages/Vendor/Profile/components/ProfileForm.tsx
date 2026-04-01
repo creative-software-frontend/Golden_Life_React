@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, ProfileFormData } from '../validation';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Camera } from 'lucide-react';
 
 interface ProfileFormProps {
   user: any;
@@ -53,6 +53,10 @@ export function ProfileForm({
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       onImageChange(file);
+      
+      // Dispatch custom event for navbar/profile refresh (same as header camera icon)
+      window.dispatchEvent(new CustomEvent('vendor-profile-image-upload', { detail: { file } }));
+      console.log('📸 [ProfileForm] Image selected, event dispatched');
     }
   };
 

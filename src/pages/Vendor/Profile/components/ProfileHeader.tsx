@@ -1,4 +1,4 @@
-import { Camera, MapPin, Mail, Upload, Trash2, Pen, Edit2 } from 'lucide-react';
+import { MapPin, Mail, Trash2, Pen, Edit2, Loader2 } from 'lucide-react';
 import { getFallbackImage } from '@/utils/imageHelpers';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
@@ -27,7 +27,6 @@ export function ProfileHeader({
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
   
   const getVendorToken = () => {
@@ -140,6 +139,20 @@ export function ProfileHeader({
   const hasBanner = !!banner;
   const bannerUrl = banner ? `${baseURL}/uploads/vendor/banner/${banner}` : undefined;
   
+  // ✅ Scroll to edit form function
+  const handleEditClick = () => {
+    if (onEditToggle) {
+      onEditToggle(); // Enable edit mode
+      // Smooth scroll to edit form
+      setTimeout(() => {
+        const editForm = document.getElementById('edit-profile-form');
+        if (editForm) {
+          editForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  };
+  
   return (
     <div className="relative mb-6">
       {/* Cover Banner */}
@@ -200,13 +213,12 @@ export function ProfileHeader({
         </div>
       )}
 
-      {/* Profile Info Section - ALL IN WHITE AREA BELOW COVER */}
+      {/* Profile Info Section */}
       <div className="relative px-6 pb-6 -mt-12 md:-mt-16">
-        {/* ✅ ADDED TOP MARGIN (mt-4) for spacing above content */}
         <div className="mt-4">
           <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
             
-            {/* Avatar with camera icon */}
+            {/* Avatar - Camera icon removed, only image */}
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
                 <img
@@ -216,21 +228,6 @@ export function ProfileHeader({
                   onError={() => setImageError(true)}
                 />
               </div>
-              
-              <label className="absolute bottom-0 right-0 cursor-pointer bg-primary-light hover:bg-primary-dark p-1.5 rounded-full border-2 border-white transition-all z-10">
-                <Camera className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  className="hidden" 
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      window.dispatchEvent(new CustomEvent('vendor-profile-image-upload', { detail: { file } }));
-                    }
-                  }}
-                />
-              </label>
             </div>
             
             {/* NAME, SELLER ID, EMAIL, ADDRESS */}
@@ -260,15 +257,14 @@ export function ProfileHeader({
             
             {/* Action Buttons */}
             <div className="flex gap-2 ml-auto">
-              {onEditToggle && (
-                <button
-                  onClick={onEditToggle}
-                  className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
-                >
-                  <Edit2 size={16} />
-                  Edit Profile
-                </button>
-              )}
+              {/* ✅ Edit Profile Button - replaces camera icon */}
+              <button
+                onClick={handleEditClick}
+                className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
+              >
+                <Edit2 size={16} />
+                Edit Profile
+              </button>
               <button className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 shadow-md hover:shadow-lg">
                 Share Profile
               </button>

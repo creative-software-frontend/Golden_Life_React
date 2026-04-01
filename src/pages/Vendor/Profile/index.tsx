@@ -82,7 +82,7 @@ export default function VendorProfile() {
       </div>
     );
   }
-  
+
   console.log('✅ [VendorProfile] Data validated:', {
     userName: user.name,
     businessName: vendor.business_name || (vendor as any).businee_name,
@@ -107,25 +107,25 @@ export default function VendorProfile() {
   // Helper function to get full image URL with better debugging
   const getImageUrl = (imagePath: string | undefined): string => {
     console.log('🖼️ [getImageUrl] Called with:', imagePath);
-    
+
     if (!imagePath) {
       console.log('[getImageUrl] No image path provided, returning empty');
       return '';
     }
-    
+
     // If already a full URL, return as-is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       console.log('[getImageUrl] Already full URL:', imagePath);
       return imagePath;
     }
-    
+
     // If it's a relative path starting with /, prepend API base URL
     if (imagePath.startsWith('/')) {
       const fullUrl = `${baseURL}${imagePath}`;
       console.log('[getImageUrl] Relative path constructed:', fullUrl);
       return fullUrl;
     }
-    
+
     // Otherwise, assume it's just a filename and construct full URL
     // Pattern: https://api.goldenlife.my/uploads/vendor/image/{filename}
     const fullUrl = `${baseURL}/uploads/vendor/image/${imagePath}`;
@@ -136,7 +136,7 @@ export default function VendorProfile() {
   const handleSubmit = async (formData: any) => {
     try {
       const dataToSend = new FormData();
-      
+
       // Append all form fields
       Object.keys(formData).forEach(key => {
         if (formData[key]) {
@@ -173,7 +173,7 @@ export default function VendorProfile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light/10 via-primary-dark/10 to-white py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header Section */}
         <ProfileHeader
           name={user.name}
@@ -184,7 +184,7 @@ export default function VendorProfile() {
         />
 
         {/* Stats Cards */}
-        <StatsCard 
+        <StatsCard
           balance={user.balance || 0}
           totalProducts={5} // You can get this from API
           totalOrders={12} // You can get this from API
@@ -195,8 +195,10 @@ export default function VendorProfile() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Profile Info / Form */}
           <div className="lg:col-span-2 space-y-6">
+
+
             {isEditMode ? (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <div id="edit-profile-form" className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 scroll-mt-20">
                 <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-primary-light/20">
                   <h2 className="text-2xl font-black text-gray-900">Edit Profile</h2>
                   <button
@@ -206,7 +208,7 @@ export default function VendorProfile() {
                     <span className="text-sm font-bold text-gray-600">Exit Edit</span>
                   </button>
                 </div>
-                
+
                 <ProfileForm
                   user={user}
                   vendor={vendor}
@@ -239,7 +241,7 @@ export default function VendorProfile() {
             {!isEditMode && (
               <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 sticky top-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Actions</h3>
-                
+
                 <div className="space-y-3">
                   <button
                     onClick={() => navigate('/vendor/dashboard/change-password')}
@@ -247,7 +249,7 @@ export default function VendorProfile() {
                   >
                     Change Password
                   </button>
-                  
+
                   <button className="w-full px-6 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300">
                     Help & Support
                   </button>
@@ -261,14 +263,13 @@ export default function VendorProfile() {
                       ✓ Verified
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-gray-600">Mobile Verified</span>
-                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${
-                      user.mobile_verify 
-                        ? 'bg-emerald-100 text-emerald-700' 
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${user.mobile_verify
+                        ? 'bg-emerald-100 text-emerald-700'
                         : 'bg-amber-100 text-amber-700'
-                    }`}>
+                      }`}>
                       {user.mobile_verify ? '✓ Verified' : '⚠ Not Verified'}
                     </span>
                   </div>
@@ -276,7 +277,7 @@ export default function VendorProfile() {
               </div>
             )}
 
-            
+
 
           </div>
         </div>
