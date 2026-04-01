@@ -180,6 +180,7 @@ export default function VendorProfile() {
           email={user.email}
           sellerId={vendor.seller_id}
           imageUrl={getImageUrl(vendor.image || vendor.profile_image || user.image || user.profile_image)}
+          onEditToggle={() => setIsEditMode(true)}
         />
 
         {/* Stats Cards */}
@@ -234,20 +235,12 @@ export default function VendorProfile() {
 
           {/* Right Column - Actions & Social */}
           <div className="space-y-6">
-            {/* Edit Button Card */}
+            {/* Profile Actions Card */}
             {!isEditMode && (
               <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 sticky top-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Actions</h3>
                 
                 <div className="space-y-3">
-                  <button
-                    onClick={() => setIsEditMode(true)}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary-light/30 hover:shadow-primary-dark/30"
-                  >
-                    <Edit2 size={18} />
-                    Edit Profile
-                  </button>
-                  
                   <button
                     onClick={() => navigate('/vendor/dashboard/change-password')}
                     className="w-full px-6 py-3.5 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300"

@@ -1,4 +1,4 @@
-import { Camera, MapPin, Mail, Upload, Trash2, Pen } from 'lucide-react';
+import { Camera, MapPin, Mail, Upload, Trash2, Pen, Edit2 } from 'lucide-react';
 import { getFallbackImage } from '@/utils/imageHelpers';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
@@ -11,6 +11,7 @@ interface ProfileHeaderProps {
   imageUrl?: string;
   coverGradient?: string;
   vendorId?: number;
+  onEditToggle?: () => void;
 }
 
 export function ProfileHeader({ 
@@ -18,7 +19,8 @@ export function ProfileHeader({
   email, 
   sellerId, 
   imageUrl,
-  coverGradient = 'from-primary-light/20 via-primary-dark/20 to-primary-light/10'
+  coverGradient = 'from-primary-light/20 via-primary-dark/20 to-primary-light/10',
+  onEditToggle
 }: ProfileHeaderProps) {
   const [imageError, setImageError] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
@@ -258,10 +260,19 @@ export function ProfileHeader({
             
             {/* Action Buttons */}
             <div className="flex gap-2 ml-auto">
-              <button className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300">
+              {onEditToggle && (
+                <button
+                  onClick={onEditToggle}
+                  className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
+                >
+                  <Edit2 size={16} />
+                  Edit Profile
+                </button>
+              )}
+              <button className="px-4 py-2 bg-white border-2 border-primary-light text-primary-light font-bold rounded-xl hover:bg-primary-light hover:text-white transition-all duration-300 shadow-md hover:shadow-lg">
                 Share Profile
               </button>
-              <button className="px-4 py-2 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300">
+              <button className="px-4 py-2 bg-primary-light hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary-light/30 hover:shadow-primary-dark/30">
                 View Shop
               </button>
             </div>
