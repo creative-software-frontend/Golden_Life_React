@@ -1,4 +1,4 @@
-import { Camera, MapPin, Mail, Upload, Trash2 } from 'lucide-react';
+import { Camera, MapPin, Mail, Upload, Trash2, Pen } from 'lucide-react';
 import { getFallbackImage } from '@/utils/imageHelpers';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
@@ -35,7 +35,7 @@ export function ProfileHeader({
   };
   
   // Debug logging
-  console.log('🖼️ [ProfileHeader] Props:', {
+  console.log(' [ProfileHeader] Props:', {
     name,
     email,
     sellerId,
@@ -219,61 +219,17 @@ export function ProfileHeader({
         {/* Dark Overlay - appears on hover */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         
-        {/* Upload/Delete Buttons Container - Fixed hover issue */}
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-          {/* Upload Button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
+        {/* Always visible pen icon for cover photo upload */}
+        <label className="absolute bottom-3 right-3 cursor-pointer bg-black/60 hover:bg-black/80 p-2 rounded-full transition-all z-10">
+          <Pen className="w-4 h-4 text-white" />
+          <input 
+            type="file" 
+            accept="image/*" 
+            className="hidden" 
+            onChange={handleFileSelect}
             disabled={uploading}
-            className="p-2.5 bg-white/90 hover:bg-white text-primary-light rounded-xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
-            title="Change cover photo"
-          >
-            {uploading ? (
-              <Camera size={18} className="animate-spin" />
-            ) : (
-              <Upload size={18} />
-            )}
-          </button>
-          
-          {/* Delete Button - Only show when banner exists */}
-          {hasBanner && (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={deleting}
-              className="p-2.5 bg-red-500/90 hover:bg-red-600 text-white rounded-xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
-              title="Remove cover photo"
-            >
-              {deleting ? (
-                <Trash2 size={18} className="animate-spin" />
-              ) : (
-                <Trash2 size={18} />
-              )}
-            </button>
-          )}
-        </div>
-        
-        {/* "Add Cover Photo" Button - Only when no banner */}
-        {!hasBanner && (
-          <div className="absolute inset-0 flex items-end justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/90 hover:bg-white text-primary-light font-bold rounded-xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
-            >
-              {uploading ? (
-                <>
-                  <Camera size={18} className="animate-spin" />
-                  <span>Uploading...</span>
-                </>
-              ) : (
-                <>
-                  <Upload size={18} />
-                  <span>Add Cover Photo</span>
-                </>
-              )}
-            </button>
-          </div>
-        )}
+          />
+        </label>
         
         {/* Hidden File Input */}
         <input
@@ -333,9 +289,9 @@ export function ProfileHeader({
       {/* Profile Info Section */}
       <div className="relative px-6 pb-6 -mt-20">
         <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
-          {/* Avatar */}
-          <div className="relative group">
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
+          {/* Avatar with always visible camera icon */}
+          <div className="relative">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
               <img
                 src={displayImageUrl}
                 alt={displayName}
@@ -344,10 +300,22 @@ export function ProfileHeader({
               />
             </div>
             
-            {/* Edit Badge */}
-            <div className="absolute -bottom-2 -right-2 bg-primary-light text-white p-2.5 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-primary-dark">
-              <Camera size={18} />
-            </div>
+            {/* Always visible camera icon for profile image upload */}
+            <label className="absolute bottom-0 right-0 cursor-pointer bg-primary-light hover:bg-primary-dark p-1.5 rounded-full border-2 border-white transition-all z-10">
+              <Camera className="w-3 h-3 md:w-4 md:h-4 text-white" />
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Dispatch custom event for profile image upload
+                    window.dispatchEvent(new CustomEvent('vendor-profile-image-upload', { detail: { file } }));
+                  }
+                }}
+              />
+            </label>
           </div>
           
           {/* Banner Info Tooltip */}
