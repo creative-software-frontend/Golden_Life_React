@@ -38,7 +38,8 @@ export const productSchema = z.object({
     .or(z.literal('')),
   ebook: z.string().default('0'), // Default value '0' for regular products
   images: z.array(z.instanceof(File)).optional(),
-  existing_images: z.array(z.string()).optional(),
+  existing_images: z.array(z.string().nullable()).optional(),
+  gallery_images: z.array(z.any()).optional(), // Added for temporary storage in form
   removed_images: z.array(z.string()).optional(),
 });
 

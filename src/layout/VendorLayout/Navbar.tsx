@@ -63,13 +63,18 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
 
     // --- Fetch Wallet Balance ---
     useEffect(() => {
+        let isFirstFetch = true;
+
         const fetchBalance = async () => {
-            setIsLoading(true);
+            if (isFirstFetch) {
+                setIsLoading(true);
+            }
+            
             try {
                 const token = getVendorToken();
 
                 if (!token) {
-                    setIsLoading(false);
+                    if (isFirstFetch) setIsLoading(false);
                     return;
                 }
 
@@ -87,11 +92,20 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                 console.error("Failed to fetch wallet balance:", error);
                 setWalletBalance('0.00');
             } finally {
-                setIsLoading(false);
+                if (isFirstFetch) {
+                    setIsLoading(false);
+                    isFirstFetch = false;
+                }
             }
         };
 
         fetchBalance();
+
+        // Set up interval for auto-update every 5 seconds
+        const intervalId = setInterval(fetchBalance, 5000);
+
+        // Clean up interval on component unmount
+        return () => clearInterval(intervalId);
     }, [baseURL]);
 
     // --- Close Menu on Click Outside ---

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import {
     ArrowLeft, Wallet, Landmark, Smartphone, Minus,
@@ -185,11 +186,15 @@ export default function VendorWithdraw() {
 
         // 1. Amount Validation
         if (!amount || Number(amount) <= 0) {
-            setErrorMessage("Please enter a valid amount.");
+            const msg = "Please enter a valid amount.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
         if (Number(amount) > currentBalance) {
-            setErrorMessage("Insufficient funds.");
+            const msg = "Insufficient funds.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
 
@@ -199,12 +204,16 @@ export default function VendorWithdraw() {
             const mfsRegex = isRocket ? /^01\d{9,10}$/ : /^01\d{9}$/;
 
             if (!mfsRegex.test(mfsNumber)) {
-                setErrorMessage(`Please enter a valid ${isRocket ? '11 or 12' : '11'}-digit ${paymentMethod.toUpperCase()} number.`);
+                const msg = `Please enter a valid ${isRocket ? '11 or 12' : '11'}-digit ${paymentMethod.toUpperCase()} number.`;
+                setErrorMessage(msg);
+                toast.error(msg);
                 return;
             }
         } else if (paymentMethod === 'bank') {
             if (!bankDetails.bankName || !bankDetails.branchName || !bankDetails.accountName || !bankDetails.accountNumber) {
-                setErrorMessage("Please fill in all required bank details.");
+                const msg = "Please fill in all required bank details.";
+                setErrorMessage(msg);
+                toast.error(msg);
                 return;
             }
         }
@@ -214,6 +223,7 @@ export default function VendorWithdraw() {
 
     const handleWithdrawSuccess = async (msg: string) => {
         setSuccessMessage(msg);
+        toast.success(msg);
         setAmount('');
         setMfsNumber('');
         setBankDetails({ bankName: '', branchName: '', accountName: '', accountNumber: '' });
@@ -240,8 +250,14 @@ export default function VendorWithdraw() {
             <SetPinModal
                 isOpen={isPinModalOpen}
                 onClose={() => setIsPinModalOpen(false)}
-                onSuccess={(msg) => setSuccessMessage(msg)}
-                onError={(msg) => setErrorMessage(msg)}
+                onSuccess={(msg) => {
+                    setSuccessMessage(msg);
+                    toast.success(msg);
+                }}
+                onError={(msg) => {
+                    setErrorMessage(msg);
+                    toast.error(msg);
+                }}
                 baseURL={baseURL}
                 token={getAuthToken()}
             />
@@ -250,7 +266,10 @@ export default function VendorWithdraw() {
                 isOpen={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}
                 onSuccess={handleWithdrawSuccess}
-                onError={(msg) => setErrorMessage(msg)}
+                onError={(msg) => {
+                    setErrorMessage(msg);
+                    toast.error(msg);
+                }}
                 amount={amount}
                 accountNumber={getFinalAccountDetails()}
                 paymentMethod={paymentMethod}
@@ -463,7 +482,6 @@ export default function VendorWithdraw() {
                                         key={preset}
                                         type="button"
                                         onClick={() => setAmount(preset.toString())}
-                                        disabled={isLoadingBalance || preset > currentBalance}
                                         className={cn(
                                             "px-5 py-2 rounded-xl font-bold text-xs transition-all border",
                                             Number(amount) === preset

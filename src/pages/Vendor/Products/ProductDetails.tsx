@@ -490,7 +490,7 @@ export default function ProductDetails() {
                           openLightbox(index);
                         }}
                         className={`relative group flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentIndex === index
-                          ? 'border-primary opacity-100 ring-2 ring-primary ring-offset-1'
+                          ? 'border-primary opacity-100 ring-1 ring-primary ring-offset-1'
                           : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-400'
                           }`}
                       >
@@ -512,7 +512,7 @@ export default function ProductDetails() {
                       </button>
                     ))}
                   </div>
-                )}gi
+                )}
                 {/* Hover overlay instruction */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center pointer-events-none z-0">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg font-semibold text-sm shadow-lg pointer-events-auto">
@@ -529,7 +529,7 @@ export default function ProductDetails() {
                       key={`thumb-${img.id}`}
                       onClick={() => setCurrentIndex(index)}
                       className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentIndex === index
-                        ? 'border-primary opacity-100 ring-2 ring-primary ring-offset-1'
+                        ? 'border-primary opacity-100'
                         : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-400'
                         }`}
                     >
@@ -572,7 +572,7 @@ export default function ProductDetails() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-bold flex items-center gap-2">
-                <DollarSign size={20} />
+
                 Pricing
               </CardTitle>
             </CardHeader>
@@ -804,7 +804,7 @@ export default function ProductDetails() {
                     key={`lightbox-thumb-${img.id}`}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
-                      ? 'border-white scale-105 ring-2 ring-white/30'
+                      ? 'border-white scale-105 ring-1 ring-white/30'
                       : 'border-transparent opacity-50 hover:opacity-100 hover:border-gray-400'
                       }`}
                   >
