@@ -86,6 +86,7 @@ const VendorHome: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState<any[]>([]);
     const [vendorData, setVendorData] = useState<any>(null);
+    const [userData, setUserData] = useState<any>(null);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -109,8 +110,12 @@ const VendorHome: React.FC = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
+            // ✅ Set both vendor and user data
             if (response.data?.vendor) {
                 setVendorData(response.data.vendor);
+            }
+            if (response.data?.user) {
+                setUserData(response.data.user);
             }
         } catch (error) {
             console.error('Error fetching vendor profile:', error);
@@ -118,39 +123,40 @@ const VendorHome: React.FC = () => {
     };
 
     const fetchOrders = async () => {
-  setLoading(true);
-  try {
-    const token = getAuthToken();
-    if (!token) {
-      console.error('No authentication token found');
-      setLoading(false);
-      return;
-    }
+        setLoading(true);
+        try {
+            const token = getAuthToken();
+            if (!token) {
+                console.error('No authentication token found');
+                setLoading(false);
+                return;
+            }
 
-    const response = await axios.get(`${baseURL}/api/vendor/orders/history`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+            const response = await axios.get(`${baseURL}/api/vendor/orders/history`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-    console.log('Orders API Response:', response.data);
+            console.log('Orders API Response:', response.data);
 
-    //  Fix: Handle both 'success' (boolean) and 'status' (string) responses
-    const isSuccess = response.data?.success === true || response.data?.status === 'success';
+            // Handle both 'success' (boolean) and 'status' (string) responses
+            const isSuccess = response.data?.success === true || response.data?.status === 'success';
 
-    if (isSuccess) {
-      const ordersData = response.data?.orders || [];
-      console.log(` Loaded ${ordersData.length} orders`);
-      setOrders(ordersData);
-    } else {
-      console.warn('API returned non-success status:', response.data);
-      setOrders([]);
-    }
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    setOrders([]);
-  } finally {
-    setLoading(false);
-  }
-};
+            if (isSuccess) {
+                const ordersData = response.data?.orders || [];
+                console.log(`Loaded ${ordersData.length} orders`);
+                setOrders(ordersData);
+            } else {
+                console.warn('API returned non-success status:', response.data);
+                setOrders([]);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            setOrders([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchVendorProfile();
         fetchOrders();
@@ -197,7 +203,8 @@ const VendorHome: React.FC = () => {
     const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
     const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
 
-    const businessName = vendorData?.businee_name || vendorData?.business_name || 'Vendor';
+    // const businessName = vendorData?.businee_name || userData?.name || 'Vendor';
+    const businessName = userData?.name || vendorData?.businee_name ||  'Vendor';
     const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
     const recentOrders = filteredOrders.slice(0, 4);
 
@@ -369,8 +376,8 @@ const VendorHome: React.FC = () => {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                     }`}
                             >
                                 {tab}
