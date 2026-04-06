@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Package, 
-    CheckCircle2, 
+import {
+    Package,
+    CheckCircle2,
     Clock,
     AlertCircle,
     TrendingUp,
@@ -43,7 +43,7 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
                     <p className="font-semibold text-sm text-foreground">${parseFloat(order.total).toFixed(2)}</p>
                 </div>
             ))}
-            <button 
+            <button
                 onClick={() => window.location.href = '/vendor/dashboard/orders'}
                 className="w-full text-center text-xs text-primary hover:underline mt-2 pt-2 border-t border-border"
             >
@@ -64,7 +64,7 @@ const SalesChart = () => {
             <div className="flex justify-between items-end h-40 gap-1">
                 {salesData.map((sale, idx) => (
                     <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                        <div 
+                        <div
                             className="w-full bg-primary/70 hover:bg-primary transition-all duration-300 rounded-t"
                             style={{ height: `${(sale / maxSale) * 100}%`, minHeight: '4px' }}
                         />
@@ -86,7 +86,8 @@ const VendorHome: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState<any[]>([]);
     const [vendorData, setVendorData] = useState<any>(null);
-    
+    const [userData, setUserData] = useState<any>(null);
+
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     const getAuthToken = () => {
@@ -104,13 +105,17 @@ const VendorHome: React.FC = () => {
         try {
             const token = getAuthToken();
             if (!token) return;
-            
+
             const response = await axios.get(`${baseURL}/api/vendor/profile`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
+            // ✅ Set both vendor and user data
             if (response.data?.vendor) {
                 setVendorData(response.data.vendor);
+            }
+            if (response.data?.user) {
+                setUserData(response.data.user);
             }
         } catch (error) {
             console.error('Error fetching vendor profile:', error);
@@ -121,7 +126,6 @@ const VendorHome: React.FC = () => {
         setLoading(true);
         try {
             const token = getAuthToken();
-            
             if (!token) {
                 console.error('No authentication token found');
                 setLoading(false);
@@ -132,9 +136,17 @@ const VendorHome: React.FC = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            if (response.data?.success) {
-                setOrders(response.data.orders || []);
+            console.log('Orders API Response:', response.data);
+
+            // Handle both 'success' (boolean) and 'status' (string) responses
+            const isSuccess = response.data?.success === true || response.data?.status === 'success';
+
+            if (isSuccess) {
+                const ordersData = response.data?.orders || [];
+                console.log(`Loaded ${ordersData.length} orders`);
+                setOrders(ordersData);
             } else {
+                console.warn('API returned non-success status:', response.data);
                 setOrders([]);
             }
         } catch (error) {
@@ -153,8 +165,8 @@ const VendorHome: React.FC = () => {
     const getFilteredOrders = () => {
         const now = new Date();
         let startDate: Date;
-        
-        switch(activeTab) {
+
+        switch (activeTab) {
             case 'Today':
                 startDate = new Date(now.setHours(0, 0, 0, 0));
                 break;
@@ -170,7 +182,7 @@ const VendorHome: React.FC = () => {
             default:
                 startDate = new Date(0);
         }
-        
+
         return orders.filter(order => {
             const orderDate = new Date(order.created_at);
             return orderDate >= startDate;
@@ -178,20 +190,21 @@ const VendorHome: React.FC = () => {
     };
 
     const filteredOrders = getFilteredOrders();
-    
+
     // Calculate metrics
     const totalOrders = filteredOrders.length;
     const deliveredOrders = filteredOrders.filter(o => o.status === "Delivered").length;
     const pendingOrders = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").length;
     const cancelledOrders = filteredOrders.filter(o => o.status === "Cancelled").length;
-    
+
     const totalAmount = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
     const deliveredAmount = filteredOrders.filter(o => o.status === "Delivered").reduce((sum, o) => sum + parseFloat(o.total), 0);
     const pendingAmount = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").reduce((sum, o) => sum + parseFloat(o.total), 0);
     const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
     const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
 
-    const businessName = vendorData?.businee_name || vendorData?.business_name || 'Vendor';
+    // const businessName = vendorData?.businee_name || userData?.name || 'Vendor';
+    const businessName = userData?.name || vendorData?.businee_name ||  'Vendor';
     const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
     const recentOrders = filteredOrders.slice(0, 4);
 
@@ -205,7 +218,7 @@ const VendorHome: React.FC = () => {
 
     return (
         <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto">
-            
+
             {/* Welcome Section */}
             <div className="mb-8">
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
@@ -218,10 +231,10 @@ const VendorHome: React.FC = () => {
 
             {/* Two Column Layout */}
             <div className="grid lg:grid-cols-3 gap-6">
-                
+
                 {/* ========== LEFT COLUMN (takes 2/3 width) ========== */}
                 <div className="lg:col-span-2 space-y-6">
-                    
+
                     {/* Top Stats Cards (3 in a row) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
@@ -265,8 +278,8 @@ const VendorHome: React.FC = () => {
                                     <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
                                     <div className="flex text-yellow-500 mt-2">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star 
-                                                key={i} 
+                                            <Star
+                                                key={i}
                                                 className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
                                             />
                                         ))}
@@ -301,26 +314,26 @@ const VendorHome: React.FC = () => {
 
                 {/* ========== RIGHT COLUMN (takes 1/3 width) ========== */}
                 <div className="space-y-6">
-                    
+
                     {/* Quick Actions */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Actions</h3>
                         <div className="space-y-3">
-                            <QuickActionButton 
-                                icon={Plus} 
-                                label="Add New Product" 
+                            <QuickActionButton
+                                icon={Plus}
+                                label="Add New Product"
                                 onClick={() => navigate('/vendor/dashboard/products/add')}
                                 variant="primary"
                             />
-                            <QuickActionButton 
-                                icon={FileText} 
-                                label="Generate Report" 
+                            <QuickActionButton
+                                icon={FileText}
+                                label="Generate Report"
                                 onClick={() => console.log('Generate Report')}
                                 variant="outline"
                             />
-                            <QuickActionButton 
-                                icon={Headphones} 
-                                label="Contact Support" 
+                            <QuickActionButton
+                                icon={Headphones}
+                                label="Contact Support"
                                 onClick={() => console.log('Contact Support')}
                                 variant="outline"
                             />
@@ -362,18 +375,17 @@ const VendorHome: React.FC = () => {
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                                    activeTab === tab
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                }`}
+                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    }`}
                             >
                                 {tab}
                             </button>
                         ))}
                     </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Total Parcel Card */}
                     <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
