@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, Check, ShieldCheck } from 'lucide-react';
+import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, ShieldCheck } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
 import EditProfileModal from '../EditProfileModal/EditProfileModal';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
+
 
 export interface StudentData {
     id: number;
@@ -81,26 +82,6 @@ export default function BasicInfoTab() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl animate-pulse" />
 
                 <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10">
-                    <div className="relative group">
-                        <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl overflow-hidden border-4 border-white shadow-xl relative bg-slate-50">
-                            {student?.image ? (
-                                <img
-                                    src={`${baseURL}/uploads/student/image/${student.image}?t=${Date.now()}`}
-                                    alt={student.name}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                    <UserIcon size={40} />
-                                </div>
-                            )}
-                        </div>
-                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg border-2 border-white">
-                            <Check size={14} />
-                        </div>
-                    </div>
-
                     <div className="text-center sm:text-left space-y-1">
                         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{student?.name || 'Loading...'}</h2>
                         <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-2">
@@ -188,7 +169,6 @@ function LoadingSkeleton() {
         <div className="w-full max-w-5xl mx-auto space-y-8 pb-10">
             <div className="flex justify-between items-center bg-white p-8 rounded-3xl border border-slate-100 animate-pulse">
                 <div className="flex items-center gap-6">
-                    <div className="w-24 h-24 bg-slate-100 rounded-3xl" />
                     <div className="space-y-3">
                         <div className="h-8 bg-slate-100 rounded-lg w-48" />
                         <div className="h-4 bg-slate-50 rounded-lg w-32" />

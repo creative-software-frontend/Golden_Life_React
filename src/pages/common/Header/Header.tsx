@@ -8,15 +8,14 @@ import { ImageSearchButton } from '@/components/search';
 
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
 import { useTranslation } from 'react-i18next';
 import LoginOptionsModal from '@/components/LoginoptionsModal';
-import axios from 'axios';
-import { toast } from 'react-toastify';
 import NotificationBell from '@/components/ui/NotificationBell';
+import { useAppStore } from '@/store/useAppStore';
+import { getAuthToken } from '@/store/utils';
 
 const Header: React.FC = () => {
-    // 1. ADDED walletUpdateTrigger HERE
     const { isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore();
 
     const navigate = useNavigate();
@@ -47,103 +46,20 @@ const Header: React.FC = () => {
     // Split refs for Desktop and Mobile so clicking outside works properly
     const desktopSearchRef = useRef<HTMLDivElement>(null);
     const mobileSearchRef = useRef<HTMLDivElement>(null);
-    const [walletBalance, setWalletBalance] = React.useState<string | null>(null);
+    const studentProfile = useAppStore(s => s.studentProfile);
+    const walletBalanceValue = useAppStore(s => s.walletBalance);
+    const isWalletLoading = useAppStore(s => s.isWalletLoading);
+    const isProfileLoading = useAppStore(s => s.isProfileLoading);
+    const fetchWallet = useAppStore(s => s.fetchWallet);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [studentProfile, setStudentProfile] = React.useState({ name: '', image: '' });
-    // Consolidating into one loading state
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
-    const getAuthToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            const parsedSession = JSON.parse(session);
-            if (new Date().getTime() > parsedSession.expiry) {
-                sessionStorage.removeItem("student_session");
-                return null;
-            }
-            return parsedSession.token;
-        } catch (e) { return null; }
-    };
-    React.useEffect(() => {
-        const fetchStudentProfile = async () => {
-            const token = getAuthToken();
-
-            if (!token) {
-                setStudentProfile({
-                    name: "Guest",
-                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
-                });
-                return;
-            }
-
-            try {
-                const response = await axios.get(`${baseURL}/api/student/profile`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                // CHANGE: Check for 'status === success' and the 'student' key
-                if (response.data?.status === "success" && response.data?.student) {
-                    const student = response.data.student;
-                    const userName = student.name || "Student";
-
-                    // Construct the avatar URL or use the student's actual image if available
-                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF8A00&color=fff&bold=true`;
-
-                    setStudentProfile({
-                        name: userName,
-                        // If the API image is just a filename, you might need to prepend a base URL
-                        image: student.image ? `${baseURL}/uploads/profiles/${student.image}` : avatarUrl
-                    });
-                }
-            } catch (error) {
-                console.error("Profile Fetch Failed:", error);
-                setStudentProfile({
-                    name: "Guest",
-                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
-                });
-            }
-        };
-
-        if (baseURL) fetchStudentProfile();
-    }, [baseURL]);
-
-    React.useEffect(() => {
-        const fetchWalletBalance = async () => {
-            // Set loading to true at the start of every fetch
-            setIsLoading(true);
-
-            try {
-                const token = getAuthToken();
-                const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && { Authorization: `Bearer ${token}` })
-                    }
-                });
-
-                if (response.data?.success && response.data?.data) {
-                    const rawBalance = response.data.data.balance;
-                    setWalletBalance(parseFloat(rawBalance).toFixed(2));
-                } else {
-                    setWalletBalance("0.00");
-                }
-            } catch (error) {
-                console.error("Wallet Balance Fetch Failed:", error);
-                setWalletBalance("0.00");
-            } finally {
-                // This ensures the skeleton stops pulsing regardless of success or error
-                setIsLoading(false);
-            }
-        };
-
-        fetchWalletBalance();
-
-        // 2. ADDED walletUpdateTrigger TO THE DEPENDENCY ARRAY
-    }, [baseURL, walletUpdateTrigger]);
+    useEffect(() => {
+        fetchWallet();
+    }, [walletUpdateTrigger]);
 
     // Handle clicks outside the search dropdown
     useEffect(() => {
@@ -280,6 +196,13 @@ const Header: React.FC = () => {
 
     // Optional: Add the click-outside useEffect here if you want it to close when clicking away
 
+    // --- avatar URL logic (using global store profile) ---
+    const cacheBreaker = Date.now();
+    const serverImageUrl = studentProfile?.image
+        ? (studentProfile.image.startsWith('http') ? studentProfile.image : `${baseURL}/uploads/student/image/${studentProfile.image}?t=${cacheBreaker}`)
+        : null;
+    const avatarUrl = serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+
     return (
         <div className="w-full bg-white shadow-md border-b border-gray-200 z-40 sticky top-0">
 
@@ -297,13 +220,20 @@ const Header: React.FC = () => {
                             onClick={() => setIsProfileOpen(!isProfileOpen)}
                             className="group flex items-center gap-3 pl-4 pr-3 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300"
                         >
-                            {/* 1st: Icon Container */}
+                            {/* 1st: Profile Avatar */}
                             <div className="relative shrink-0">
-                                <div className="flex items-center justify-center h-10 w-10 bg-gradient-to-br from-white to-slate-100 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
-                                    <UserIcon className="h-5 w-5 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                                <div className="h-10 w-10 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300 overflow-hidden bg-slate-100">
+                                    <img
+                                        src={avatarUrl}
+                                        alt={studentProfile?.name || 'Profile'}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'S')}&background=FF8A00&color=fff&bold=true`;
+                                        }}
+                                    />
                                 </div>
 
-                                {/* Floating Badge */}
+                                {/* Online Badge */}
                                 <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
                                     <GraduationCap size={12} className="text-white" />
                                 </div>
@@ -311,9 +241,13 @@ const Header: React.FC = () => {
 
                             {/* 2nd: Text Info (Name & Tier) */}
                             <div className="flex flex-col items-start justify-center text-left hidden md:flex">
-                                <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
-                                    {studentProfile?.name || "Student"}
-                                </span>
+                                    {isProfileLoading && !studentProfile ? (
+                                        <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-md" />
+                                    ) : (
+                                        <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                            {studentProfile?.name || "Student"}
+                                        </span>
+                                    )}
 
                                 <div className="flex items-center gap-1.5 mt-1.5">
                                     <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
@@ -350,16 +284,16 @@ const Header: React.FC = () => {
                     <div className="relative group z-40">
                         {/* Wallet Button trigger */}
                         <div className="flex items-center gap-2.5 bg-white border border-slate-100 px-3 py-2 rounded-2xl shadow-sm hover:shadow-md hover:border-green-100 transition-all cursor-pointer">
-                            <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
-                                {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                            <div className={`flex items-center justify-center h-9 w-9 rounded-xl transition-all duration-300 ${isWalletLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367] group-hover:bg-[#5ca367] group-hover:text-white"}`}>
+                                {!isWalletLoading && <Wallet className="h-4.5 w-4.5" />}
                             </div>
                             <div className="flex flex-col pr-1">
                                 <span className="text-[10px] font-black text-slate-400 uppercase leading-none tracking-tight">My Balance</span>
                                 <div className="mt-1.5 h-3.5 flex items-center">
-                                    {isLoading ? (
+                                    {isWalletLoading ? (
                                         <div className="h-4 w-16 bg-slate-100 animate-pulse rounded-md" />
                                     ) : (
-                                        <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                                        <span className="text-[15px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalanceValue}</span>
                                     )}
                                 </div>
                             </div>
@@ -455,7 +389,7 @@ const Header: React.FC = () => {
                 <div className="flex items-center gap-5 shrink-0">
 
                     {/* Notification Bell */}
-                    <NotificationBell baseURL={baseURL} token={getAuthToken()} />
+                    <NotificationBell token={getAuthToken()} />
 
                     {/* Modern Language Toggle */}
                     <div className="flex items-center bg-white rounded-lg border border-gray-200 px-2 py-1.5 shadow-sm">
@@ -498,12 +432,15 @@ const Header: React.FC = () => {
                             <button onClick={() => handleChangeLanguage('bn')} className={`px-2.5 py-1 rounded-md ${i18n.language === 'bn' ? 'bg-white shadow-sm text-primary-default' : 'text-gray-400'}`}>BN</button>
                         </div>
 
-                        {/* Mobile Profile Image - Always Visible */}
+                        {/* Mobile Profile Image - Reactive like ProfileSidebar */}
                         <Link to="/dashboard/profile/settings" className="flex items-center p-0.5 bg-slate-50 rounded-full border border-gray-100">
                             <img
-                                src={studentProfile.image || "https://ui-avatars.com/api/?name=User"}
+                                src={avatarUrl}
                                 alt="Profile"
                                 className="h-8 w-8 rounded-full object-cover border border-white shadow-sm bg-slate-200"
+                                onError={(e) => {
+                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'S')}&background=FF8A00&color=fff&bold=true`;
+                                }}
                             />
                         </Link>
 
@@ -513,16 +450,16 @@ const Header: React.FC = () => {
                                 onClick={() => setIsMobileWalletOpen(!isMobileWalletOpen)}
                                 className="flex items-center gap-1.5 bg-white border border-slate-200 px-2 py-1.5 rounded-xl shadow-sm active:scale-95 transition-all"
                             >
-                                <div className={`flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-300 ${isLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367]"}`}>
-                                    {!isLoading && <Wallet className="h-3.5 w-3.5" />}
+                                <div className={`flex items-center justify-center h-7 w-7 rounded-lg transition-all duration-300 ${isWalletLoading ? "bg-slate-100 animate-pulse" : "bg-green-50 text-[#5ca367]"}`}>
+                                    {!isWalletLoading && <Wallet className="h-3.5 w-3.5" />}
                                 </div>
                                 <div className="flex flex-col items-start pr-0.5">
                                     <span className="text-[8px] font-black text-slate-400 uppercase leading-none tracking-tight">Balance</span>
                                     <div className="mt-1 h-2.5 flex items-center">
-                                        {isLoading ? (
+                                        {isWalletLoading ? (
                                             <div className="h-2.5 w-10 bg-slate-100 animate-pulse rounded-sm" />
                                         ) : (
-                                            <span className="text-[11px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalance}</span>
+                                            <span className="text-[11px] font-black text-slate-900 tracking-tight leading-none">৳{walletBalanceValue}</span>
                                         )}
                                     </div>
                                 </div>

@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Mail, Lock, Eye, EyeOff, ArrowRight, Store, Loader2, ArrowLeft, 
+import {
+  Mail, Lock, Eye, EyeOff, ArrowRight, Store, Loader2, ArrowLeft,
   CheckCircle2, AlertCircle
 } from "lucide-react";
 import Logo from "../Logo";
@@ -15,8 +15,8 @@ import ForgotPassword from "./ForgotPassword";
 // Scroll Animation Variants
 const scrollVariant = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.5 }
   }
@@ -24,19 +24,19 @@ const scrollVariant = {
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  
+
   // Traditional login states
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // OTP login states
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
-  
+
   // Forgot Password states
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  
+
   // API Feedback States
   const [apiError, setApiError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -57,7 +57,7 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic frontend validation
     if (!formData.email || !formData.password) {
       setApiError("Please fill in both email and password.");
@@ -95,7 +95,7 @@ const LoginForm = () => {
       }
 
       // --- SUCCESS FLOW ---
-      
+
       if (data.token) {
         // 1. Save to SessionStorage instead of LocalStorage for better security
         sessionStorage.setItem("vendor_token", data.token);
@@ -111,12 +111,10 @@ const LoginForm = () => {
 
       // 3. Show the Success Toast
       setSuccessMessage("Login successful! Redirecting to dashboard...");
-      
-      // 4. Redirect to Dashboard after 1.5 seconds so they can read the message
-      setTimeout(() => {
-        setSuccessMessage("");
-        navigate("/vendor/dashboard");
-      }, 1500);
+
+      // 4. Redirect to Dashboard immediately
+      setSuccessMessage("");
+      navigate("/vendor/dashboard");
 
     } catch (error: any) {
       console.error("Login Error:", error);
@@ -131,7 +129,7 @@ const LoginForm = () => {
     console.log('🔵 [LoginForm] === SEND OTP STARTED ===');
     console.log('🔵 [LoginForm] Send OTP called with:', credential);
     console.log('🔵 [LoginForm] Current showOtpModal state:', showOtpModal);
-    
+
     setIsOtpLoading(true);
     setOtpError(null);
 
@@ -140,21 +138,16 @@ const LoginForm = () => {
       console.log('🟢 [LoginForm] OTP Response:', response);
       console.log('🟢 [LoginForm] Response success:', response.success);
       console.log('🟢 [LoginForm] Response user_id:', response.user_id);
-      
+
       if (response.success) {
         console.log('✅ [LoginForm] Response is successful, opening modal...');
         console.log('✅ [LoginForm] Setting showOtpModal to true');
-        
+
         // Open OTP verification modal
         setShowOtpModal(true);
+        // Auto-hide success message - removed timeout
         setSuccessMessage(`OTP sent to your mobile!`);
         console.log('✅ [LoginForm] OTP sent successfully, modal opened');
-        console.log('✅ [LoginForm] New showOtpModal state:', showOtpModal);
-        
-        // Auto-hide success message after 3 seconds
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 3000);
       } else {
         console.error('❌ [LoginForm] OTP response not successful:', response);
         setOtpError(response.message || 'Failed to send OTP');
@@ -179,16 +172,14 @@ const LoginForm = () => {
 
     try {
       const response = await verifyOtp(otpCode);
-      
+
       if (response.success && response.token) {
         setShowOtpModal(false);
         setSuccessMessage("Verification successful! Redirecting to dashboard...");
-        
-        // Redirect after 1.5 seconds
-        setTimeout(() => {
-          setSuccessMessage("");
-          navigate("/vendor/dashboard");
-        }, 1500);
+
+        // Redirect immediately
+        setSuccessMessage("");
+        navigate("/vendor/dashboard");
       }
     } catch (error: any) {
       setOtpError(error.message);
@@ -207,9 +198,7 @@ const LoginForm = () => {
       // You would need to store the credential to resend
       // For now, we'll just show a success message
       setSuccessMessage("OTP resent successfully!");
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
+
     } finally {
       setIsOtpLoading(false);
     }
@@ -240,19 +229,19 @@ const LoginForm = () => {
 
       {/* OUTER WRAPPER: Native CSS injected to completely hide scrollbars across ALL browsers */}
       <div className="h-screen w-full overflow-y-auto relative bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        
+
         {/* INNER WRAPPER: Ensures content is centered but safely expands */}
         <div className="min-h-full flex flex-col justify-center px-6 pt-28 pb-8 sm:p-12 lg:p-24 relative">
-          
+
           {/* Back Button */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
             className="absolute top-8 left-6 sm:left-12"
           >
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition-colors font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -261,9 +250,9 @@ const LoginForm = () => {
           </motion.div>
 
           <div className="w-full max-w-md mx-auto">
-            
+
             {/* Logo */}
-            <motion.div 
+            <motion.div
               variants={scrollVariant}
               initial="hidden"
               whileInView="visible"
@@ -281,7 +270,7 @@ const LoginForm = () => {
             </motion.div>
 
             {/* Header */}
-            <motion.div 
+            <motion.div
               variants={scrollVariant}
               initial="hidden"
               whileInView="visible"
@@ -304,7 +293,7 @@ const LoginForm = () => {
               )}
 
               {/* Email */}
-              <motion.div 
+              <motion.div
                 variants={scrollVariant}
                 initial="hidden"
                 whileInView="visible"
@@ -328,7 +317,7 @@ const LoginForm = () => {
               </motion.div>
 
               {/* Password */}
-              <motion.div 
+              <motion.div
                 variants={scrollVariant}
                 initial="hidden"
                 whileInView="visible"
@@ -336,7 +325,7 @@ const LoginForm = () => {
               >
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-sm font-medium text-gray-700">Password</label>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setIsForgotPasswordOpen(true)}
                     className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors"
@@ -366,7 +355,7 @@ const LoginForm = () => {
               </motion.div>
 
               {/* Remember Me */}
-              <motion.div 
+              <motion.div
                 variants={scrollVariant}
                 initial="hidden"
                 whileInView="visible"
@@ -374,9 +363,9 @@ const LoginForm = () => {
                 className="flex items-center justify-between"
               >
                 <label className="flex items-center gap-2 cursor-pointer group">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer" 
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
                   />
                   <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Remember me</span>
                 </label>
@@ -434,7 +423,7 @@ const LoginForm = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
                 Login with OTP
               </h3>
-              
+
               <SendOtpForm
                 loginMethod="mobile"
                 onSendOtp={handleSendOtp}
@@ -444,7 +433,7 @@ const LoginForm = () => {
             </motion.div>
 
             {/* Footer */}
-            <motion.p 
+            <motion.p
               variants={scrollVariant}
               initial="hidden"
               whileInView="visible"
@@ -458,7 +447,7 @@ const LoginForm = () => {
             </motion.p>
 
             {/* Trust Badge */}
-            <motion.div 
+            <motion.div
               variants={scrollVariant}
               initial="hidden"
               whileInView="visible"

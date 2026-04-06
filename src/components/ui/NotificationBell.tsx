@@ -586,42 +586,28 @@
 // export default NotificationBell;
 
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Package, CheckCheck, Wallet, Users, Info, BellOff } from 'lucide-react';
+import { useAppStore } from '@/store/useAppStore';
 
 interface NotificationBellProps {
-  baseURL: string;
   token: string;
 }
 
-interface NotificationData {
-  title: string;
-  message: string;
-  [key: string]: any;
-}
-
-interface NotificationItem {
-  id: string;
-  read_at: string | null;
-  created_at: string;
-  data: NotificationData;
-  type?: string;
-}
-
-interface NotificationsResponse {
-  status: boolean;
-  unread_count?: number;
-  count?: number;
-  notifications: NotificationItem[];
-}
-
-const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
+const NotificationBell = ({ token }: NotificationBellProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [syncing, setSyncing] = useState(false);
-
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Store data
+  const notifications = useAppStore(s => s.notifications);
+  const unreadCount = useAppStore(s => s.unreadCount);
+  const isNotificationLoading = useAppStore(s => s.isNotificationLoading);
+  
+  // Store actions
+  const fetchNotifications = useAppStore(s => s.fetchNotifications);
+  const pollUnreadCount = useAppStore(s => s.pollUnreadCount);
+  const markAsRead = useAppStore(s => s.markAsRead);
+  const markAllAsRead = useAppStore(s => s.markAllAsRead);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -634,139 +620,37 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchNotifications = useCallback(async (silent = false) => {
-    if (!token) return;
-    if (!silent) setSyncing(true);
-
-    try {
-      const response = await fetch(`${baseURL}/api/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) return;
-
-      const data: NotificationsResponse = await response.json();
-      if (data.status) {
-        const sorted = [...(data.notifications || [])].sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setNotifications(sorted);
-
-        // Use whichever key the backend returns
-        const realCount = data.unread_count ?? data.count ?? 0;
-        setUnreadCount(realCount);
-      }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
-    } finally {
-      if (!silent) setSyncing(false);
-    }
-  }, [baseURL, token]);
-
-  // Background polling: 
-  // - When CLOSED → only fast unread count (lightweight)
-  // - When OPEN → full notifications refresh (so list is always fresh)
-  const backgroundPoll = useCallback(async () => {
-    if (!token) return;
-
-    if (isOpen) {
-      // Full refresh when dropdown is open → this is exactly what you asked for
+  // Sync notifications on mount and when opening
+  useEffect(() => {
+    if (token) {
       fetchNotifications(true);
-    } else {
-      // Only count when closed (saves bandwidth)
-      try {
-        const response = await fetch(`${baseURL}/api/notifications/unread`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!response.ok) return;
+    }
+  }, [token, fetchNotifications]);
 
-        const data = await response.json();
-        if (data.status) {
-          const realCount = data.unread_count ?? data.count ?? 0;
-          setUnreadCount(realCount);
+  useEffect(() => {
+    if (isOpen && token) {
+      fetchNotifications(true);
+    }
+  }, [isOpen, token, fetchNotifications]);
+
+  // Polling logic (Centralized in component but sharing store state)
+  useEffect(() => {
+    if (!token) return;
+    
+    // Poll unread count every 12 seconds when closed, 4 seconds when open
+    const intervalMs = isOpen ? 4000 : 12000;
+    const interval = setInterval(() => {
+        if (isOpen) {
+            fetchNotifications(true);
+        } else {
+            pollUnreadCount();
         }
-      } catch (error) {
-        console.error('Poll unread count failed:', error);
-      }
-    }
-  }, [baseURL, token, isOpen, fetchNotifications]);
-
-  // Initial load (silent)
-  useEffect(() => {
-    fetchNotifications(true);
-  }, [fetchNotifications]);
-
-  // Polling interval – changes automatically when you open/close the bell
-  useEffect(() => {
-    const intervalMs = isOpen ? 3000 : 12000;
-    const interval = setInterval(backgroundPoll, intervalMs);
+    }, intervalMs);
+    
     return () => clearInterval(interval);
-  }, [backgroundPoll]);
+  }, [token, isOpen, fetchNotifications, pollUnreadCount]);
 
-  // 🔥 THIS IS THE KEY FIX YOU REQUESTED:
-  // Whenever you click the bell and isOpen becomes true → immediately fetch fresh notifications
-  // (so the list you see is never stale)
-  useEffect(() => {
-    if (isOpen) {
-      fetchNotifications(true);
-    }
-  }, [isOpen, fetchNotifications]);
-
-  const markAsRead = async (id: string) => {
-    const wasUnread = notifications.some(n => n.id === id && !n.read_at);
-    if (!wasUnread) return;
-
-    // Instant visual update
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id ? { ...notif, read_at: new Date().toISOString() } : notif
-      )
-    );
-
-    try {
-      const response = await fetch(`${baseURL}/api/notifications/read?id=${encodeURIComponent(id)}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const result = await response.json();
-      if (!result.status) throw new Error('Backend failed');
-
-      // Immediate sync after marking read
-      setTimeout(() => fetchNotifications(true), 100);
-    } catch (error) {
-      console.error('Mark as read failed:', error);
-      fetchNotifications(true);
-    }
-  };
-
-  const markAllAsRead = async () => {
-    if (unreadCount === 0) return;
-
-    // Instant visual update
-    const now = new Date().toISOString();
-    setNotifications(prev => prev.map(notif => ({ ...notif, read_at: now })));
-
-    try {
-      const response = await fetch(`${baseURL}/api/notifications/read-all`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const result = await response.json();
-      if (!result.status) throw new Error('Backend failed');
-
-      // Immediate sync after marking all read
-      setTimeout(() => fetchNotifications(true), 200);
-    } catch (error) {
-      console.error('Mark all failed:', error);
-      fetchNotifications(true);
-    }
-  };
-
-  const getIcon = (notif: NotificationItem) => {
+  const getIcon = (notif: any) => {
     const base = 'w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110';
     const title = notif.data.title?.toLowerCase() || '';
     const type = notif.type?.toLowerCase() || '';
@@ -786,18 +670,17 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
     });
   };
 
-  const isUnread = (notif: NotificationItem) => !notif.read_at;
+  const isUnread = (notif: any) => !notif.read_at;
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${
-          isOpen
+        className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${isOpen
             ? 'bg-emerald-100 text-emerald-600 shadow-inner'
             : 'bg-white text-slate-500 hover:text-emerald-600 hover:bg-slate-50 shadow-sm border border-slate-200'
-        }`}
-        disabled={syncing}
+          }`}
+        disabled={isNotificationLoading}
       >
         <Bell className="h-5 w-5" strokeWidth={2.5} />
 
@@ -810,7 +693,7 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
           </span>
         )}
 
-        {syncing && (
+        {isNotificationLoading && (
           <span className="absolute inset-0 flex items-center justify-center bg-white/30 rounded-full">
             <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           </span>
@@ -833,7 +716,7 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                disabled={syncing}
+                disabled={isNotificationLoading}
                 className="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
                 <CheckCheck className="w-4 h-4 text-slate-400" />
@@ -859,12 +742,11 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
                   return (
                     <div
                       key={notif.id}
-                      onClick={() => unread && !syncing && markAsRead(notif.id)}
-                      className={`group relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                        unread
+                      onClick={() => unread && !isNotificationLoading && markAsRead(notif.id)}
+                      className={`group relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${unread
                           ? 'bg-emerald-50/70 hover:bg-emerald-100 border-l-4 border-emerald-500'
                           : 'bg-white hover:bg-slate-50 border-l-4 border-transparent opacity-80'
-                      } ${syncing ? 'opacity-60 pointer-events-none' : ''}`}
+                        } ${isNotificationLoading ? 'opacity-60 pointer-events-none' : ''}`}
                     >
                       <div className="p-2 sm:p-2.5 rounded-full shrink-0 bg-white shadow-sm border border-slate-200">
                         {getIcon(notif)}
@@ -872,16 +754,14 @@ const NotificationBell = ({ baseURL, token }: NotificationBellProps) => {
 
                       <div className="flex-1 space-y-1">
                         <p
-                          className={`text-sm ${
-                            unread ? 'font-semibold text-slate-900' : 'font-normal text-slate-700'
-                          }`}
+                          className={`text-sm ${unread ? 'font-semibold text-slate-900' : 'font-normal text-slate-700'
+                            }`}
                         >
                           {notif.data.title}
                         </p>
                         <p
-                          className={`text-[13px] leading-relaxed line-clamp-2 ${
-                            unread ? 'text-slate-700' : 'text-slate-500'
-                          }`}
+                          className={`text-[13px] leading-relaxed line-clamp-2 ${unread ? 'text-slate-700' : 'text-slate-500'
+                            }`}
                         >
                           {notif.data.message}
                         </p>

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { useAppStore } from "@/store/useAppStore";
 
 interface Category {
     id: number;
@@ -33,51 +34,15 @@ const itemVariants = {
 
 export default function Categories() {
     const { t, i18n } = useTranslation('global');
-    const [categories, setCategories] = useState<Category[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [hoveredId, setHoveredId] = useState<number | null>(null); // Track which card is hovered
+    const { categories, fetchCategories, isLoading } = useAppStore();
 
-    const getAuthToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            const parsedSession = JSON.parse(session);
-            return parsedSession.token;
-        } catch (e) { return null; }
-    };
-
+    // 2. Simply trigger the fetch on mount
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-                const token = getAuthToken();
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && { Authorization: `Bearer ${token}` })
-                    }
-                };
-
-                const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
-                const rawData = response.data?.data?.categories || [];
-
-                const mappedCategories = rawData.map((item: any) => ({
-                    id: item.id,
-                    name_en: item.category_name || "Category",
-                    name_bn: item.category_name_bangla || item.category_name || "Category",
-                    icon: `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`,
-                    slug: item.category_slug
-                }));
-
-                setCategories(mappedCategories);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     if (loading) {
         return (

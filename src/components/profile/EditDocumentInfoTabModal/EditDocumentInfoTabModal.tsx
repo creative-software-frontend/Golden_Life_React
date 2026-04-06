@@ -6,7 +6,6 @@ import {
   Loader2,
   FileText,
   Upload,
-  Check,
   ChevronRight,
   Info,
   Camera,
@@ -34,10 +33,14 @@ export default function EditDocumentInfoTabModal({
 }: EditDocumentInfoTabModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [nidNumber, setNidNumber] = useState('');
+
   const [frontPage, setFrontPage] = useState<File | null>(null);
   const [backPage, setBackPage] = useState<File | null>(null);
-  const [frontPreview, setFrontPreview] = useState<string | null>(null);
-  const [backPreview, setBackPreview] = useState<string | null>(null);
+
+  const [previews, setPreviews] = useState({
+    nid_front: null as string | null,
+    nid_back: null as string | null,
+  });
 
   const frontInputRef = useRef<HTMLInputElement>(null);
   const backInputRef = useRef<HTMLInputElement>(null);
@@ -47,10 +50,15 @@ export default function EditDocumentInfoTabModal({
   useEffect(() => {
     if (data && isOpen) {
       setNidNumber(data.nid_number || '');
-      const frontUrl = data.nid_front_page ? `${effectiveBaseURL}/uploads/student/nid_front_page/${data.nid_front_page}` : null;
-      const backUrl = data.nid_back_page ? `${effectiveBaseURL}/uploads/student/nid_back_page/${data.nid_back_page}` : null;
-      setFrontPreview(frontUrl);
-      setBackPreview(backUrl);
+
+      const frontUrl = data.nid_front_page
+        ? `${effectiveBaseURL}/uploads/student/nid_front_page/${data.nid_front_page}`
+        : null;
+      const backUrl = data.nid_back_page
+        ? `${effectiveBaseURL}/uploads/student/nid_back_page/${data.nid_back_page}`
+        : null;
+
+      setPreviews({ nid_front: frontUrl, nid_back: backUrl });
       setFrontPage(null);
       setBackPage(null);
     }
@@ -59,33 +67,37 @@ export default function EditDocumentInfoTabModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back') => {
     const file = e.target.files?.[0];
     if (file) {
+      const url = URL.createObjectURL(file);
       if (type === 'front') {
         setFrontPage(file);
-        setFrontPreview(URL.createObjectURL(file));
+        setPreviews(p => ({ ...p, nid_front: url }));
       } else {
         setBackPage(file);
-        setBackPreview(URL.createObjectURL(file));
+        setPreviews(p => ({ ...p, nid_back: url }));
       }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data?.student_id) {
+
+    const effectiveStudentId = data?.student_id || data?.id?.toString();
+    if (!effectiveStudentId) {
       toast.error("Student ID is missing. Cannot update.");
       return;
     }
+
     setIsSubmitting(true);
 
     const formDataToSend = new FormData();
-    formDataToSend.append('student_id', data.student_id);
+    formDataToSend.append('student_id', effectiveStudentId);
     formDataToSend.append('nid_number', nidNumber);
     if (frontPage) formDataToSend.append('nid_front_page', frontPage);
     if (backPage) formDataToSend.append('nid_back_page', backPage);
 
     try {
       const response = await axios.post(
-        `${effectiveBaseURL}/api/student/document-info?id=${data.student_id}`,
+        `${effectiveBaseURL}/api/student/document-info?id=${effectiveStudentId}`,
         formDataToSend,
         {
           headers: {
@@ -95,14 +107,16 @@ export default function EditDocumentInfoTabModal({
         }
       );
 
-      if (response.data?.success) {
-        toast.success("Documents updated successfully!");
+      if (response.data?.status === "success" || response.data?.success) {
+        toast.success(response.data.message || "Documents updated successfully!");
         onSuccess(response.data.data);
         onClose();
+      } else {
+        toast.error(response.data?.message || "Failed to update documents.");
       }
     } catch (error: any) {
-      console.error('❌ Update failed:', error);
-      toast.error(error.response?.data?.message || "Failed to update documents.");
+      console.error('Update Error:', error.response?.data);
+      toast.error(error.response?.data?.message || "An error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -111,7 +125,7 @@ export default function EditDocumentInfoTabModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => !isSubmitting && onClose()}
@@ -131,20 +145,17 @@ export default function EditDocumentInfoTabModal({
                   <FileText size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Identity Records</h3>
-                  <p className="text-xs text-slate-400 font-medium">Update your identification documents</p>
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tight">Identity Records</h3>
+                  <p className="text-xs text-slate-400 font-medium tracking-wide">Update your identification documents</p>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-2xl transition-all"
-              >
+              <button onClick={onClose} disabled={isSubmitting} className="p-3 bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-2xl transition-all">
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8 overflow-y-auto">
+              {/* Verification Notice */}
               <div className="p-5 rounded-3xl bg-blue-50/50 border border-blue-100 flex items-start gap-4">
                 <div className="p-2 bg-white rounded-lg text-blue-500 shadow-sm mt-0.5">
                   <Info size={16} />
@@ -158,7 +169,7 @@ export default function EditDocumentInfoTabModal({
               </div>
 
               {/* NID Number Field */}
-              <div className="space-y-1.5 px-1">
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">National ID Number</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 rounded-lg text-slate-400 group-focus-within:bg-emerald-600/10 group-focus-within:text-emerald-600 transition-all">
@@ -176,87 +187,86 @@ export default function EditDocumentInfoTabModal({
               </div>
 
               {/* Document Uploads */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4">
-                {/* Front Page */}
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Front Page</label>
-                  <div
-                    onClick={() => !isSubmitting && frontInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload shadow-inner"
-                  >
-                    {frontPreview ? (
-                      <>
-                        <img src={frontPreview} className="w-full h-full object-cover" alt="Front Preview" />
-                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-emerald-600 font-bold text-xs shadow-lg">
-                            <Camera size={14} />
-                            Change Photo
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <Upload size={24} />
-                        <div className="text-center">
-                          <p className="text-xs font-bold text-slate-700">Upload Front</p>
-                        </div>
-                      </div>
-                    )}
-                    <input type="file" ref={frontInputRef} className="hidden" onChange={(e) => handleFileChange(e, 'front')} accept="image/*" />
-                  </div>
+              <div className="space-y-6 pt-4 border-t border-slate-50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Camera size={16} className="text-emerald-500" />
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Identity Documents</h3>
                 </div>
 
-                {/* Back Page */}
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">NID Back Page</label>
-                  <div
-                    onClick={() => !isSubmitting && backInputRef.current?.click()}
-                    className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload shadow-inner"
-                  >
-                    {backPreview ? (
-                      <>
-                        <img src={backPreview} className="w-full h-full object-cover" alt="Back Preview" />
-                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl text-emerald-600 font-bold text-xs shadow-lg">
-                            <Camera size={14} />
-                            Change Photo
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* NID Front */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Front Page</p>
+                    <div
+                      className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
+                      onClick={() => !isSubmitting && frontInputRef.current?.click()}
+                    >
+                      {previews.nid_front ? (
+                        <>
+                          <img src={previews.nid_front} className="w-full h-full object-cover" alt="Front Preview" />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera size={20} className="text-white" />
                           </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Upload size={24} />
+                          <p className="text-[10px] font-bold uppercase tracking-widest">Upload Front</p>
                         </div>
-                      </>
-                    ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-400">
-                        <Upload size={24} />
-                        <div className="text-center">
-                          <p className="text-xs font-bold text-slate-700">Upload Back</p>
+                      )}
+                      <input ref={frontInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'front')} />
+                    </div>
+                  </div>
+
+                  {/* NID Back */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight ml-1">NID Back Page</p>
+                    <div
+                      className="relative aspect-[3/2] rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-600/30 transition-all cursor-pointer overflow-hidden group/upload"
+                      onClick={() => !isSubmitting && backInputRef.current?.click()}
+                    >
+                      {previews.nid_back ? (
+                        <>
+                          <img src={previews.nid_back} className="w-full h-full object-cover" alt="Back Preview" />
+                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                            <Camera size={20} className="text-white" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Upload size={24} />
+                          <p className="text-[10px] font-bold uppercase tracking-widest">Upload Back</p>
                         </div>
-                      </div>
-                    )}
-                    <input type="file" ref={backInputRef} className="hidden" onChange={(e) => handleFileChange(e, 'back')} accept="image/*" />
+                      )}
+                      <input ref={backInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'back')} />
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-2 sticky bottom-0 bg-white">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-14 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="animate-spin" size={20} />
-                      <span className="uppercase tracking-widest text-xs">Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="uppercase tracking-widest text-xs">Verify Documents</span>
-                      <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
               </div>
             </form>
+
+            {/* Sticky Footer Submit Button — same pattern as EditNomineeInfoTabModal */}
+            <div className="p-8 border-t border-slate-50 bg-slate-50/30">
+              <button
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e as any)}
+                className="w-full h-14 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    <span className="uppercase tracking-widest text-xs">Updating Records...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="uppercase tracking-widest text-xs">Save Documents</span>
+                    <div className="p-1 px-2 bg-white/20 rounded-lg group-hover/btn:bg-white/30 transition-colors">
+                      <ChevronRight size={18} />
+                    </div>
+                  </>
+                )}
+              </button>
+            </div>
           </motion.div>
         </div>
       )}

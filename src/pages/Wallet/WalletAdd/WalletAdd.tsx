@@ -5,35 +5,19 @@ import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft, Wallet, Smartphone, ShieldCheck,
     Loader2, AlertCircle, History, Plus, Clock, Building2,
-    HelpCircle, X,CheckCircle2
+    HelpCircle, X, CheckCircle2
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// --- Configuration ---
-const BANK_DETAILS = {
-    accountName: "Golden Life Academy",
-    accountNumber: "123-456-789-012",
-    bankName: "Dutch Bangla Bank PLC",
-    branch: "Dhanmondi Branch",
-};
-
-// --- Interfaces ---
-interface Transaction {
-    id: number;
-    type: string;
-    amount: string;
-    payment_method: string;
-    number: string;
-    Transaction_ID: string | null;
-    status: string;
-    created_at: string;
-}
+import { toast } from 'react-toastify';
+import { useAppStore } from '@/store/useAppStore';
+import { baseURL, getAuthToken } from '@/store/utils';
 
 export default function WalletAdd() {
     const navigate = useNavigate();
     // Updated translation hook based on your request
-    const { t, i18n } = useTranslation('global');
+    const { t } = useTranslation('global');
+
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     // --- State Management ---
@@ -43,12 +27,9 @@ export default function WalletAdd() {
     const [accountNumber, setAccountNumber] = useState<string>('');
     const [trxId, setTrxId] = useState<string>('');
     const [attachment, setAttachment] = useState<File | null>(null);
-    const [currentBalance, setCurrentBalance] = useState<string>('0.00');
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+
 
     // Status States
-    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -64,40 +45,27 @@ export default function WalletAdd() {
     ];
 
     // --- Helpers ---
-    const getAuthToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        return session ? JSON.parse(session).token : null;
-    };
-
-    const fetchBalance = async () => {
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/wallet-balance`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setCurrentBalance(Number(data?.data?.balance || 0).toFixed(2));
-        } catch (err) { console.error(err); }
-        finally { setIsLoadingBalance(false); }
-    };
-
-    const fetchHistory = async () => {
-        setIsLoadingHistory(true);
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/student/transactions`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data?.status === "success") {
-                setTransactions(data.transactions.filter((t: Transaction) => t.type === 'add'));
-            }
-        } catch (err) { console.error(err); }
-        finally { setIsLoadingHistory(false); }
-    };
+    const walletBalance = useAppStore(s => s.walletBalance);
+    const isWalletLoading = useAppStore(s => s.isWalletLoading);
+    const fetchWallet = useAppStore(s => s.fetchWallet);
+    const transactions = useAppStore(s => s.transactions);
+    const fetchHistory = useAppStore(s => s.fetchHistory);
 
     useEffect(() => {
-        fetchBalance();
-        fetchHistory();
+        fetchWallet(); // Ensure this is called on mount!
     }, []);
+
+    // Fetch history when switching to history tab
+    useEffect(() => {
+        if (activeTab === 'history') {
+            fetchHistory();
+        }
+    }, [activeTab]);
+
+    // --- Form State ---
+
+
+
 
     // --- Dynamic Input Validation ---
     const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,21 +113,14 @@ export default function WalletAdd() {
         return true;
     };
 
+    // --- Submission Logic ---
     const handleAddFunds = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 1. Local basic validation check
-        if (!amount || Number(amount) <= 0) {
-            setError(t('error_invalid_amount', "Please enter an amount greater than 0."));
-            return;
-        }
-        if (!accountNumber || !trxId || !paymentMethod) {
-            setError(t('error_missing_fields', "Please fill in all required fields."));
-            return;
-        }
+        if (!validateForm()) return; // Use the validation function
 
         setIsSubmitting(true);
-        setError(null); // Clear previous errors
+        setError(null);
 
         try {
             const token = getAuthToken();
@@ -169,7 +130,7 @@ export default function WalletAdd() {
             formData.append('type', 'add');
             formData.append('amount', amount);
             formData.append('number', accountNumber);
-            formData.append('Transaction_ID', trxId.toUpperCase()); // Most APIs prefer uppercase Trx IDs
+            formData.append('Transaction_ID', trxId.toUpperCase());
             formData.append('payment_method', paymentMethod);
 
             if (attachment) {
@@ -179,14 +140,14 @@ export default function WalletAdd() {
             const { data } = await axios.post(`${baseURL}/api/transactions`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-
+                    // 🚨 REMOVED 'Content-Type': 'application/json' so the browser can set multipart/form-data properly for the file upload.
                 }
             });
 
-            // Backend might return status as a string "true", "success", or a boolean true
             if (data?.status === 'success' || data?.status === "true" || data?.success === true) {
-                setSuccess(data.message || t('success_request_submitted', "Request submitted successfully!"));
+                const msg = data.message || t('success_request_submitted', "Request submitted successfully!");
+                setSuccess(msg);
+                toast.success(msg);
 
                 // Clear Form
                 setAmount('');
@@ -194,13 +155,21 @@ export default function WalletAdd() {
                 setTrxId('');
                 setAttachment(null);
 
-                // Refresh Data
-                if (typeof fetchBalance === 'function') fetchBalance();
-                if (typeof fetchHistory === 'function') fetchHistory();
+                // 4. Update the Zustand Store (Silent fetch for balance so the UI doesn't flash)
+                await fetchWallet(true); // This updates the balance everywhere
+                
+                // If on history tab, refresh history too
+                if (activeTab === 'history') {
+                    await fetchHistory();
+                }
 
-                setTimeout(() => setSuccess(null), 5000);
+
+
+
             } else {
-                setError(data?.message || "Failed to submit request.");
+                const msg = data?.message || "Failed to submit request.";
+                setError(msg);
+                toast.error(msg);
             }
         } catch (err: any) {
             console.error("Top-up Error:", err);
@@ -209,7 +178,6 @@ export default function WalletAdd() {
             setIsSubmitting(false);
         }
     };
-
     // --- Modal Configuration Helpers ---
     const getGatewayConfig = () => {
         switch (paymentMethod) {
@@ -300,11 +268,11 @@ export default function WalletAdd() {
                                     </p>
 
                                     {/* Integrated Loading Logic */}
-                                    {isLoadingBalance ? (
+                                    {isWalletLoading ? (
                                         <div className="h-8 w-32 bg-slate-200 animate-pulse rounded-lg mt-1"></div>
                                     ) : (
                                         <p className="text-2xl font-bold text-slate-900">
-                                            ৳ {currentBalance}
+                                            ৳ {walletBalance}
                                         </p>
                                     )}
                                 </div>
@@ -312,7 +280,7 @@ export default function WalletAdd() {
                         </div>
 
                         <form onSubmit={handleAddFunds} className="p-8 space-y-8">
-                             {success && <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 font-bold text-sm"><CheckCircle2 className="w-5 h-5" />{success}</div>}
+                            {success && <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 font-bold text-sm"><CheckCircle2 className="w-5 h-5" />{success}</div>}
                             {/* Amount Section */}
                             <div className="space-y-4">
                                 <label className="text-sm font-bold text-slate-700">Enter Amount</label>
@@ -329,27 +297,21 @@ export default function WalletAdd() {
                                             setAmount(val);
                                         }}
                                         placeholder="0.00"
-                                        className={cn(
-                                            "w-full pl-12 pr-6 py-5 text-4xl font-bold bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-secondary outline-none transition-all",
-                                            (Number(amount) > currentBalance) && "border-destructive focus:border-destructive text-destructive"
-                                        )}
+                                        className="w-full pl-12 pr-6 py-5 text-4xl font-bold bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-secondary outline-none transition-all"
                                     />
                                 </div>
-
-
 
                                 <div className="flex flex-wrap gap-2">
                                     {presetAmounts.map((p) => (
                                         <button
                                             key={p}
                                             type="button"
-                                            disabled={p > currentBalance}
                                             onClick={() => setAmount(p.toString())}
                                             className={cn(
                                                 "px-4 py-2 rounded-xl border text-sm font-bold transition-all",
                                                 Number(amount) === p
                                                     ? "bg-secondary text-white border-secondary"
-                                                    : "bg-white text-slate-600 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    : "bg-white text-slate-600 hover:border-slate-300"
                                             )}
                                         >
                                             + ৳{p}
@@ -461,7 +423,7 @@ export default function WalletAdd() {
                                     </div>
                                 )}
 
-                             
+
 
                                 {/* ─── Submit Button ─────────────────────────────────────────── */}
                                 <button
@@ -496,9 +458,9 @@ export default function WalletAdd() {
                     <div className="flex items-center justify-between px-12 py-6 bg-slate-50/50 border-b border-slate-100">
                         <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
                             {t('transaction_history', 'Transaction History')}
-                            {!isLoadingHistory && (
+                            {!isWalletLoading && (
                                 <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px]">
-                                    {transactions.length} {t('records_found', 'Records Found')}
+                                    {transactions.filter(t => t.type === 'add').length} {t('records_found', 'Records Found')}
                                 </span>
                             )}
                         </h3>
@@ -511,7 +473,7 @@ export default function WalletAdd() {
                         <div className="text-right">{t('table_col_time', 'Timestamp')}</div>
                     </div>
 
-                    {isLoadingHistory ? (
+                    {isWalletLoading ? (
                         <div className="p-4 md:p-8 space-y-3">
                             {Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="group p-5 md:px-10 md:py-6 border border-slate-100 rounded-[2rem] grid grid-cols-1 md:grid-cols-4 items-center gap-4 bg-white shadow-sm">
@@ -536,7 +498,7 @@ export default function WalletAdd() {
                                 </div>
                             ))}
                         </div>
-                    ) : transactions.length === 0 ? (
+                    ) : transactions.filter(t => t.type === 'add').length === 0 ? (
                         <div className="text-center py-32">
                             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <History className="w-12 h-12 text-slate-200" />
@@ -545,7 +507,7 @@ export default function WalletAdd() {
                         </div>
                     ) : (
                         <div className="p-4 md:p-8 space-y-3">
-                            {transactions.map((item) => (
+                            {transactions.filter(t => t.type === 'add').map((item) => (
                                 <div
                                     key={item.id}
                                     className="group p-5 md:px-10 md:py-6 border border-slate-100 rounded-[2rem] grid grid-cols-1 md:grid-cols-4 items-center gap-4 hover:border-secondary/30 hover:bg-slate-50/30 transition-all duration-300"

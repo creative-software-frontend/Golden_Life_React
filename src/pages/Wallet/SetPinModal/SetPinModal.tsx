@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
 import { KeyRound, X, Loader2, ShieldCheck } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useAppStore } from '@/store/useAppStore';
 
 interface SetPinModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: (message: string) => void;
     onError: (message: string) => void;
-    baseURL: string;
-    token: string | null;
 }
 
-export default function SetPinModal({ isOpen, onClose, onSuccess, onError, baseURL, token }: SetPinModalProps) {
+export default function SetPinModal({ isOpen, onClose, onSuccess, onError }: SetPinModalProps) {
+    const { setPin } = useAppStore();
     const [newPin, setNewPin] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -22,25 +22,23 @@ export default function SetPinModal({ isOpen, onClose, onSuccess, onError, baseU
         setIsSubmitting(true);
 
         try {
-            const formData = new FormData();
-            formData.append('pin_code', newPin);
+            const result = await setPin(newPin);
 
-            const response = await axios.post(`${baseURL}/api/set-pin`, formData, {
-                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
-            });
-
-            if (response.data?.status === 'success' || response.data?.status === true) {
-                onSuccess(response.data?.message || "4-digit PIN set successfully!");
+            if (result.success) {
+                toast.success(result.message);
+                onSuccess(result.message);
                 setNewPin('');
                 onClose();
             } else {
-                onError(String(response.data?.message || "Failed to set PIN."));
+                toast.error(result.message);
+                onError(result.message);
                 setNewPin('');
                 onClose();
             }
         } catch (error) {
-            const axiosError = error as AxiosError<{ message: string }>;
-            onError(String(axiosError.response?.data?.message || "Error setting PIN."));
+            const msg = "Error setting PIN.";
+            toast.error(msg);
+            onError(msg);
             onClose();
         } finally {
             setIsSubmitting(false);

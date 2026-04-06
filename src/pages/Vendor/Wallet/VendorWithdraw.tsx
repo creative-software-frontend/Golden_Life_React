@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import SetPinModal from '@/pages/Wallet/SetPinModal/SetPinModal';
-import ConfirmWithdrawModal from '@/pages/Wallet/ConfirmTransferModal/ConfirmTransferModal';
+import ConfirmWithdrawModal from '@/pages/Wallet/ConfirmWithdrawModal/ConfirmWithdrawModal';
 
 
 interface Transaction {

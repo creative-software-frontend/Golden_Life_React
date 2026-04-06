@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
 import { X, Loader2, ShieldCheck, Lock, ArrowRight } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useAppStore } from '@/store/useAppStore';
 
 interface ConfirmWithdrawModalProps {
     isOpen: boolean;
@@ -11,13 +12,12 @@ interface ConfirmWithdrawModalProps {
     accountNumber: string;
     paymentMethod: string;
     attachment: File | null;
-    baseURL: string;
-    token: string | null;
 }
 
 export default function ConfirmWithdrawModal({ 
-    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token 
+    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment
 }: ConfirmWithdrawModalProps) {
+    const { withdrawFunds } = useAppStore();
     
     const [pinCode, setPinCode] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,20 +43,20 @@ export default function ConfirmWithdrawModal({
             
             if (attachment) formData.append('attachment', attachment);
 
-            const response = await axios.post(`${baseURL}/api/transactions`, formData, {
-                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
-            });
+            const result = await withdrawFunds(formData);
 
-            if (response.data?.status === 'success' || response.data?.status === true) {
-                onSuccess(response.data?.message || "Withdrawal successful!");
+            if (result.success) {
+                toast.success(result.message);
+                onSuccess(result.message);
                 handleClose(); 
             } else {
-                onError(String(response.data?.message || "Transaction failed."));
+                toast.error(result.message);
+                onError(result.message);
                 setIsSubmitting(false);
             }
         } catch (error) {
-            const axiosError = error as AxiosError<any>;
-            const errorMsg = axiosError.response?.data?.message || "Error processing withdrawal.";
+            const errorMsg = "Error processing withdrawal.";
+            toast.error(errorMsg);
             onError(errorMsg);
             setIsSubmitting(false);
         }

@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { X, Plus, Minus, Trash2, ShoppingBag, AlertCircle, Pencil, Check } from "lucide-react";
-import useModalStore from "@/store/Store";
+
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import CheckoutModal from "../CheckoutModal/CheckoutModal";
 import CheckoutBookModal from "../CheckoutModal/CheckoutBookModal";
+import useModalStore from "@/store/modalStore";
 
 export default function Cart() {
   const { t } = useTranslation('global');

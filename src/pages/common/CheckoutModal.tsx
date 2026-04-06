@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
-import useModalStore from "@/store/Store"
+import useModalStore from '@/store/modalStore'
 import { Icon } from "./Icon"
 import { Button } from "./Button"
 import { Select } from "./Select"

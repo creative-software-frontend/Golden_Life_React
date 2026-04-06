@@ -18,7 +18,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Sheet, SheetContent } from "@/components/ui/sheet" // Import Sheet for Mobile Drawer
 import { Separator } from "@/components/ui/separator"
 import Footer from "@/pages/common/Footer/Footer"
-import useModalStore from "@/store/Store"
+import useModalStore from "@/store/modalStore";
+
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
 import CourseHeader from "@/pages/common/CourseHeader/CourseHeader"
@@ -152,7 +153,7 @@ export default function CourseLayout() {
 
                 <SidebarContentComponent />
 
-                <SidebarFooter  size="lg"  className=" border-t border-slate-100 mt-4 bg-transparent">
+                <SidebarFooter size="lg" className=" border-t border-slate-100 mt-4 bg-transparent">
                     {/* Parent Wrapper: Mimicking the SidebarMenuButton logic for a borderless split design */}
                     <div className="h-auto min-h-[68px] w-full p-2.5 pr-2 flex items-stretch justify-between bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300 overflow-hidden">
 

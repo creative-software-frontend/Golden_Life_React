@@ -23,7 +23,7 @@ import CourseInstructor from "../Courseinstructor/CourseInstructor"
 import CoursePlan from "../CoursePlan/CoursePlan"
 import CourseDetails from "../CourseDetails/CourseDetails"
 import CourseFeatures from "../CourseFeature/CourseFeature"
-import useModalStore from "@/store/Store"
+import useModalStore from '@/store/modalStore'
 import { useTranslation } from "react-i18next"
 import CourseCarousel from "@/pages/Home/AllCourses/CourseCaroudel"
 import CourseGrid from "./CourseGrid"

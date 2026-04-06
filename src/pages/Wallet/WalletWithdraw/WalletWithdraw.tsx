@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useAppStore } from '@/store/useAppStore';
 import {
     ArrowLeft, Wallet, Landmark, Smartphone, Minus,
     UploadCloud, CheckCircle2, AlertCircle, Loader2, KeyRound, ShieldCheck, Building2, User, Clock, ArrowUpRight, X, HelpCircle
@@ -8,6 +8,8 @@ import {
 import { cn } from "@/lib/utils";
 import SetPinModal from '../SetPinModal/SetPinModal';
 import ConfirmWithdrawModal from '../ConfirmWithdrawModal/ConfirmWithdrawModal';
+import { toast } from 'react-toastify';
+import useModalStore from '@/store/modalStore';
 
 interface Transaction {
     id: number | string;
@@ -18,6 +20,9 @@ interface Transaction {
     created_at: string;
     trx_id?: string;
     account_number?: string;
+    invoice_number?: string;
+    payment_method?: string;
+    number?: string;
 }
 
 // Add your dynamic merchant number here
@@ -81,13 +86,11 @@ const BANK_DETAILS = {
 
 export default function WalletWithdraw() {
     const navigate = useNavigate();
+    const { triggerWalletUpdate } = useModalStore();
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     // --- Tab & History States ---
     const [activeTab, setActiveTab] = useState<'withdraw' | 'history'>('withdraw');
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-
     // --- Modal States ---
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -108,62 +111,32 @@ export default function WalletWithdraw() {
         accountNumber: ''
     });
 
-    // --- UI & Data State ---
-    const [currentBalance, setCurrentBalance] = useState(0);
-    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const presetAmounts: number[] = [500, 1000, 2000, 5000];
+
+    // --- Helpers ---
+    const walletBalanceValue = useAppStore(s => s.walletBalance);
+    const transactions = useAppStore(s => s.transactions);
+    const isWalletLoading = useAppStore(s => s.isWalletLoading);
+    const fetchWallet = useAppStore(s => s.fetchWallet);
+    const fetchHistory = useAppStore(s => s.fetchHistory);
 
     const getAuthToken = (): string | null => {
         const session = sessionStorage.getItem("student_session");
         return session ? JSON.parse(session).token : null;
     };
 
-    // --- API Calls ---
-    const fetchBalance = async () => {
-        setIsLoadingBalance(true);
-        try {
-            const token = getAuthToken();
-            if (!token) return;
-            const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const fetchedBalance = response.data?.data?.balance || response.data?.balance || 0;
-            setCurrentBalance(Number(fetchedBalance));
-        } catch (error) {
-            console.error("Failed to fetch balance:", error);
-        } finally {
-            setIsLoadingBalance(false);
-        }
-    };
-
-    const fetchHistory = async () => {
-        setIsLoadingHistory(true);
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/student/transactions`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data?.status === "success" || data?.transactions) {
-                const history = data.transactions || data.data || [];
-                setTransactions(history.filter((t: Transaction) => t.type === 'withdraw'));
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsLoadingHistory(false);
-        }
-    };
-
-    useEffect(() => { fetchBalance(); }, [baseURL]);
+    useEffect(() => {
+        fetchWallet();
+    }, [fetchWallet]);
 
     useEffect(() => {
         if (activeTab === 'history') {
             fetchHistory();
         }
-    }, [activeTab]);
+    }, [activeTab, fetchHistory]);
 
     // --- Helpers ---
     const getGatewayConfig = (method: string) => {
@@ -184,11 +157,15 @@ export default function WalletWithdraw() {
 
         // 1. Amount Validation
         if (!amount || Number(amount) <= 0) {
-            setErrorMessage("Please enter a valid amount.");
+            const msg = "Please enter a valid amount.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
-        if (Number(amount) > currentBalance) {
-            setErrorMessage("Insufficient funds.");
+        if (Number(amount) > Number(walletBalanceValue)) {
+            const msg = "Insufficient funds.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
 
@@ -213,12 +190,14 @@ export default function WalletWithdraw() {
 
     const handleWithdrawSuccess = async (msg: string) => {
         setSuccessMessage(msg);
+        toast.success(msg);
         setAmount('');
         setMfsNumber('');
         setBankDetails({ bankName: '', branchName: '', accountName: '', accountNumber: '' });
         setAttachment(null);
-        await fetchBalance();
-        if (activeTab === 'history') fetchHistory();
+        await fetchWallet(true); // Silent refresh
+        if (activeTab === 'history') fetchHistory(true);
+        triggerWalletUpdate(); // Global Sync
     };
 
     const getFinalAccountDetails = () => {
@@ -241,8 +220,6 @@ export default function WalletWithdraw() {
                 onClose={() => setIsPinModalOpen(false)}
                 onSuccess={(msg) => setSuccessMessage(msg)}
                 onError={(msg) => setErrorMessage(msg)}
-                baseURL={baseURL}
-                token={getAuthToken()}
             />
 
             <ConfirmWithdrawModal
@@ -254,7 +231,6 @@ export default function WalletWithdraw() {
                 accountNumber={getFinalAccountDetails()}
                 paymentMethod={paymentMethod}
                 attachment={attachment}
-                baseURL={baseURL}
                 token={getAuthToken()}
             />
             {/* --- Instruction Modal --- */}
@@ -417,10 +393,10 @@ export default function WalletWithdraw() {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
-                            {isLoadingBalance ? (
+                            {isWalletLoading ? (
                                 <div className="h-9 w-32 bg-slate-200 animate-pulse rounded-lg"></div>
                             ) : (
-                                <p className="text-3xl md:text-4xl font-bold text-slate-900">৳ {currentBalance.toFixed(2)}</p>
+                                <p className="text-3xl md:text-4xl font-bold text-slate-900">৳ {Number(walletBalanceValue).toFixed(2)}</p>
                             )}
                         </div>
                     </div>
@@ -461,7 +437,7 @@ export default function WalletWithdraw() {
                                         key={preset}
                                         type="button"
                                         onClick={() => setAmount(preset.toString())}
-                                        disabled={isLoadingBalance || preset > currentBalance}
+                                        disabled={isWalletLoading || preset > Number(walletBalanceValue)}
                                         className={cn(
                                             "px-5 py-2 rounded-xl font-bold text-xs transition-all border",
                                             Number(amount) === preset
@@ -623,7 +599,7 @@ export default function WalletWithdraw() {
                 {/* --- History Tab Content --- */}
                 {activeTab === 'history' && (
                     <div className="animate-in fade-in slide-in-from-left-4 duration-300 w-full">
-                        {isLoadingHistory ? (
+                        {isWalletLoading ? (
                             <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                                 <Loader2 className="w-8 h-8 animate-spin mb-4" />
                                 <p className="text-sm font-medium">Loading history...</p>

@@ -3,7 +3,8 @@
 import React from 'react';
 import { ShoppingCart, Zap, Info, Eye } from 'lucide-react'; // Added Info for details
 import { Link } from 'react-router-dom';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
+
 
 interface ProductCardProps {
     product?: any;

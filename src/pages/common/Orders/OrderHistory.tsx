@@ -76,7 +76,7 @@ const OrderHistory = () => {
   // FIX: Passing both `id` and `orderNo` in state in case the Details API needs the DB id instead of the string.
   const goToDetails = (e: React.MouseEvent, orderId: number, orderNo: string) => {
     e.stopPropagation();
-    navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } }); 
+    navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } });
   };
 
   const getAuthToken = () => {
@@ -101,31 +101,20 @@ const OrderHistory = () => {
         setLoading(false);
         return;
       }
+
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [ordersRes, productsRes] = await Promise.all([
-          axios.get(`${baseURL}/api/student/orders`, { headers }),
-          axios.get(`${baseURL}/api/products`, { headers }).catch(() => null)
-        ]);
 
+        // We now only fetch the orders directly
+        const ordersRes = await axios.get(`${baseURL}/api/student/orders`, { headers });
+
+        // Handle the data structure returned by your API
         const rawOrders = Array.isArray(ordersRes.data.orders) ? ordersRes.data.orders : [];
-        const allProductsList = productsRes?.data?.data?.products || productsRes?.data?.products || [];
 
-        // Enrich orders with product ebook/video info
-        const enrichedOrders = rawOrders.map((order: Order) => ({
-          ...order,
-          products: order.products?.map((orderP: Product) => {
-            const pId = String(orderP.product_id ?? orderP.id);
-            const details = allProductsList.find((p: any) => String(p.id) === pId);
-            return {
-              ...orderP,
-              ebook: details?.ebook ? String(details.ebook).trim() : "0",
-              video_link: details?.video_link?.trim() || ""
-            };
-          })
-        }));
+        // If the API already includes the product details you need, 
+        // you can set them directly without the extra mapping logic.
+        setOrders(rawOrders);
 
-        setOrders(enrichedOrders);
       } catch (error) {
         console.error("Error fetching orders:", error);
         setOrders([]);
@@ -133,9 +122,9 @@ const OrderHistory = () => {
         setLoading(false);
       }
     };
+
     fetchOrders();
   }, [baseURL]);
-
   const toggleOrder = (id: number) => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
@@ -199,11 +188,10 @@ const OrderHistory = () => {
           {orders.map((order) => (
             <div
               key={order.id}
-              className={`transition-all duration-300 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-sm border ${
-                expandedOrderId === order.id
+              className={`transition-all duration-300 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-sm border ${expandedOrderId === order.id
                   ? 'bg-white/90 border-emerald-200 shadow-xl shadow-emerald-100/30'
                   : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
-              }`}
+                }`}
             >
               <div
                 onClick={() => toggleOrder(order.id)}
@@ -211,9 +199,8 @@ const OrderHistory = () => {
               >
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                   <div
-                    className={`h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center transition-colors ${
-                      expandedOrderId === order.id ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
-                    }`}
+                    className={`h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center transition-colors ${expandedOrderId === order.id ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                      }`}
                   >
                     <Package size={18} />
                   </div>
@@ -231,13 +218,13 @@ const OrderHistory = () => {
 
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5 text-xs text-slate-500">
                       <span className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-50 rounded-md border border-slate-100">
-                        <Calendar size={12} className="text-slate-400" /> 
+                        <Calendar size={12} className="text-slate-400" />
                         {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </span>
                       {(() => {
                         const s = order.status.toLowerCase();
                         let colorClass = "bg-slate-100 text-slate-700 border-slate-200"; // default
-                        
+
                         if (s.includes('delivered')) colorClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
                         else if (s.includes('pending') || s.includes('placed')) colorClass = "bg-amber-50 text-amber-700 border-amber-100";
                         else if (s.includes('process') || s.includes('packag')) colorClass = "bg-indigo-50 text-indigo-700 border-indigo-100";
@@ -343,9 +330,9 @@ const OrderHistory = () => {
                             <div className="md:col-span-3 lg:col-span-2 md:text-right flex flex-col items-end">
                               <span className="md:hidden text-[10px] text-slate-500 block mb-0.5 font-bold uppercase">Subtotal</span>
                               <span className="font-black text-slate-900 text-sm sm:text-base">৳{Number(item.subtotal).toFixed(2)}</span>
-                              
+
                               {/* New Access Button for E-books */}
-                              {item.ebook === "1" && item.video_link ? (
+                              {/* {item.ebook === "1" && item.video_link ? (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -358,7 +345,7 @@ const OrderHistory = () => {
                                 </button>
                               ) : item.ebook === "1" ? (
                                 <span className="text-[10px] text-amber-600 font-bold mt-1 uppercase tracking-tighter italic">Digitizing...</span>
-                              ) : null}
+                              ) : null} */}
                             </div>
                           </div>
                         </div>

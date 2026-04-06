@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import useModalStore from '@/store/Store';
+
 import axios from 'axios';
 
 // Sub-components
@@ -7,6 +7,7 @@ import CheckSummaryBookView from './CheckSummaryBookView';
 import AddressListView from './AddressListView';
 import AddAddressForm from './AddAddressFormView';
 import { Address, ViewState, PaymentMethod } from './CheckoutModal';
+import useModalStore from '@/store/modalStore';
 
 const CheckoutBookModal = () => {
     const { isCheckoutBookModalOpen, closeBuyNow, buyNowProduct } = useModalStore();
@@ -54,7 +55,7 @@ const CheckoutBookModal = () => {
             setDeliveryFee(charge !== undefined && charge !== null ? Number(charge) : 60);
         } catch (error: any) {
             console.error("Fetch Fee API Failed:", error.response?.data || error.message);
-            setDeliveryFee(60); 
+            setDeliveryFee(60);
         }
     };
 

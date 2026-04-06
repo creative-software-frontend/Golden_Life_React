@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Phone, User as UserIcon, X, Hash, Image as ImageIcon, ChevronRight, Check, Camera, Loader2 } from 'lucide-react';
 import { StudentData } from '../BasicInfoTab/BasicInfoTab';
-import useModalStore from '@/store/Store';
+
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useAppStore } from '@/store/useAppStore';
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -24,33 +25,26 @@ interface FormDataState {
 
 export default function EditProfileModal({ isOpen, onClose, student, baseURL }: EditProfileModalProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const triggerProfileUpdate = useModalStore(s => s.triggerProfileUpdate);
-    const setProfileBlobPreview = useModalStore(s => s.setProfileBlobPreview);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    const [formData, setFormData] = useState<FormDataState>({
-        name: '',
-        email: '',
-        mobile: '',
-        affiliate_id: '',
-        refer_code: '',
+    const initialFormData = React.useMemo(() => ({
+        name: student?.name || '',
+        email: student?.email || '',
+        mobile: student?.mobile || '',
+        affiliate_id: student?.affiliate_id || '',
+        refer_code: student?.refer_code || '',
         image: null
-    });
+    }), [student]);
+
+    const [formData, setFormData] = useState<FormDataState>(initialFormData);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        if (student && isOpen) {
-            setFormData({
-                name: student.name || '',
-                email: student.email || '',
-                mobile: student.mobile || '',
-                affiliate_id: student.affiliate_id || '',
-                refer_code: student.refer_code || '',
-                image: null
-            });
-            // Show existing image as preview if available
-            setPreviewUrl(student.image ? `${baseURL}/uploads/student/image/${student.image}` : null);
+        if (isOpen) {
+            setFormData(initialFormData);
+            setPreviewUrl(student?.image ? `${baseURL}/uploads/student/image/${student.image}` : null);
         }
-    }, [student, isOpen, baseURL]);
+    }, [isOpen, initialFormData, student, baseURL]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -102,15 +96,8 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
             if (response.data?.status === "success" || response.data?.success) {
                 toast.success(response.data.message || "Basic profile updated successfully!");
 
-                // Set global blob preview for instant refresh ONLY if it's a new image
-                if (formData.image && previewUrl) {
-                    setProfileBlobPreview(previewUrl);
-                } else {
-                    setProfileBlobPreview(null);
-                }
-
-                // Trigger global refresh to force all components to re-fetch and cache-bust
-                triggerProfileUpdate();
+                // Trigger global refresh to sync all components (Header, Sidebar)
+                await fetchProfile(true); 
                 onClose();
             } else {
                 toast.error(response.data?.message || "Failed to update profile photo.");

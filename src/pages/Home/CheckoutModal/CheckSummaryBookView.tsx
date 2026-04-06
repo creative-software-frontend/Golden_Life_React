@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package } from 'lucide-react';
-import { Address, PaymentMethod } from './CheckoutModal'; 
-import useModalStore from '@/store/Store';
+import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package, Trash2 } from 'lucide-react';
+import { Address, PaymentMethod } from './CheckoutModal';
+import useModalStore from '@/store/modalStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -42,18 +42,18 @@ const CheckSummaryBookView = ({
     deliveryFee
 }: Props) => {
     const { closeBuyNow, triggerWalletUpdate, buyNowProduct } = useModalStore();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState(false);
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-    
+
     // --- WALLET BALANCE STATE ---
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [isFetchingBalance, setIsFetchingBalance] = useState(true);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-    
+
     // Fetch Initial Wallet Balance
     useEffect(() => {
         const fetchWalletBalance = async () => {
@@ -102,7 +102,7 @@ const CheckSummaryBookView = ({
     const safeDeliveryFee = Number(deliveryFee) || 0;
     const total = currentSubTotal + safeDeliveryFee;
     const remainingBalance = walletBalance - total;
-    
+
     const isInsufficientBalance = !isFetchingBalance && paymentMethod === 'Wallet' && walletBalance < total;
 
     // --- HANDLERS ---
@@ -159,7 +159,7 @@ const CheckSummaryBookView = ({
                     triggerWalletUpdate?.();
                 }
 
-                onConfirm(); 
+                onConfirm();
                 closeBuyNow();
 
                 if (orderNo) {
@@ -232,40 +232,59 @@ const CheckSummaryBookView = ({
                 </div>
 
                 {/* 2. Product List Section (Single Item) */}
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-                    <div className="flex items-center gap-2 border-b border-gray-100 pb-3 mb-1">
-                        <Package className="w-4 h-4 text-gray-400" />
-                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Direct Purchase Item</h3>
-                    </div>
-                    <div className="flex justify-between items-center gap-3">
-                        <div className="w-12 h-12 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center group">
-                            <img 
-                                src={imageUrl?.startsWith('http') ? imageUrl : `${import.meta.env.VITE_API_BASE_URL}/uploads/ecommarce/product_image/${imageUrl}`} 
-                                alt={buyNowProduct.product_title_english || buyNowProduct.name || "Product"} 
-                                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex gap-4 relative">
 
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-bold text-gray-800 truncate">
-                                {buyNowProduct.product_title_english || buyNowProduct.name || "Unknown Item"}
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                                <p className="text-[11px] font-medium text-gray-400">
-                                    Qty: {qty} × ৳{activePrice.toFixed(2)} (Member)
-                                </p>
-                                <span className="w-1 h-1 rounded-full bg-gray-200" />
-                                <p className="text-[11px] font-bold text-emerald-600">
-                                    Customer: ৳{origPrice.toFixed(2)}
+                    {/* Left: Product Image */}
+                    <div className="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden shrink-0 flex items-center justify-center p-1">
+                        <img
+                            src={imageUrl?.startsWith('http') ? imageUrl : `${import.meta.env.VITE_API_BASE_URL}/uploads/ecommarce/product_image/${imageUrl}`}
+                            alt={buyNowProduct.product_title_english || buyNowProduct.name || "Product"}
+                            className="w-full h-full object-contain mix-blend-multiply"
+                        />
+                    </div>
+
+                    {/* Right: Product Details & Pricing */}
+                    <div className="flex-1 flex flex-col justify-between">
+
+                        {/* Top: Title & Trash Icon */}
+                        <div className="flex justify-between items-start gap-2">
+                            <div>
+                                <h3 className="text-[16px] font-bold text-slate-900 leading-tight">
+                                    {buyNowProduct.product_title_english || buyNowProduct.name || "Unknown Item"}
+                                </h3>
+                                <p className="text-[13px] font-medium text-slate-400 mt-1">
+                                    Quantity: <span className="text-slate-500">{qty}</span>
                                 </p>
                             </div>
+
+                            <button className="text-slate-300 hover:text-red-500 transition-colors p-1 -mt-1 -mr-1">
+                                <Trash2 className="w-5 h-5" />
+                            </button>
                         </div>
-                        
-                        <div className="flex flex-col items-end shrink-0">
-                            <span className="text-[14px] font-black text-gray-900">
-                                ৳{currentSubTotal.toFixed(2)}
-                            </span>
+
+                        {/* Bottom: Pricing Rows */}
+                        <div className="mt-4 space-y-1.5">
+                            {/* Member Price Row */}
+                            <div className="flex justify-between items-center">
+                                <span className="text-[12px] font-bold text-slate-400 tracking-wider uppercase">
+                                    Member
+                                </span>
+                                <span className="text-[15px] font-black text-slate-900">
+                                    ৳{currentSubTotal.toFixed(2)}
+                                </span>
+                            </div>
+
+                            {/* Customer Price Row */}
+                            <div className="flex justify-between items-center">
+                                <span className="text-[12px] font-bold text-emerald-600 tracking-wider uppercase">
+                                    Customer
+                                </span>
+                                <span className="text-[13px] font-bold text-emerald-600">
+                                    ৳{(origPrice * qty).toFixed(2)}
+                                </span>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -285,7 +304,7 @@ const CheckSummaryBookView = ({
                         <span>Total Customer Price:</span>
                         <span className="text-gray-900">৳{originalTotal.toFixed(2)}</span>
                     </div>
-                    
+
                     <div className="flex justify-between text-[13px] font-bold text-gray-500">
                         <span>Delivery Fee:</span>
                         <span className="text-gray-900">৳{safeDeliveryFee.toFixed(2)}</span>
@@ -302,7 +321,7 @@ const CheckSummaryBookView = ({
                         <span className="text-[15px] font-black text-gray-900 uppercase tracking-tight">Final Total</span>
                         <span className="text-2xl font-black text-[#5C9C72] tracking-tight">৳{total.toFixed(2)}</span>
                     </div>
-                    
+
                     <div className="pt-3 mt-3 border-t border-dashed border-gray-200 flex flex-col gap-2">
                         <div className="flex justify-between items-center">
                             <span className="text-xs font-bold text-gray-500 uppercase">Your Account Balance:</span>
@@ -316,7 +335,7 @@ const CheckSummaryBookView = ({
 
             {/* --- FIXED FOOTER --- */}
             <div className="p-4 border-t border-gray-200 bg-white space-y-4 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.08)] z-20">
-                
+
                 <div>
                     <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2.5 px-1">Choose Payment Method</h4>
                     <div className="flex flex-wrap gap-2">
@@ -328,10 +347,10 @@ const CheckSummaryBookView = ({
                                     onClick={() => setPaymentMethod(method)}
                                     disabled={isDisabled}
                                     className={`flex-1 min-w-[85px] py-3.5 px-2 rounded-xl text-[14px] font-black transition-all border-2 flex items-center justify-center whitespace-nowrap ${isDisabled
-                                            ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed opacity-60"
-                                            : paymentMethod === method
-                                                ? "bg-[#5C9C72] text-white border-[#5C9C72] shadow-md scale-[1.02]"
-                                                : "bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                                        ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed opacity-60"
+                                        : paymentMethod === method
+                                            ? "bg-[#5C9C72] text-white border-[#5C9C72] shadow-md scale-[1.02]"
+                                            : "bg-white text-gray-500 border-gray-100 hover:border-gray-200 hover:bg-gray-50"
                                         }`}
                                 >
                                     {method}
@@ -375,11 +394,10 @@ const CheckSummaryBookView = ({
                     <button
                         onClick={handleConfirm}
                         disabled={isPlacingOrder || isInsufficientBalance}
-                        className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${
-                            (isPlacingOrder || isInsufficientBalance)
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
-                                : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
-                        }`}
+                        className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${(isPlacingOrder || isInsufficientBalance)
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
+                            : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
+                            }`}
                     >
                         {isPlacingOrder ? <Loader2 className="animate-spin w-6 h-6" /> : `Confirm Purchase — ৳${total.toFixed(2)}`}
                     </button>

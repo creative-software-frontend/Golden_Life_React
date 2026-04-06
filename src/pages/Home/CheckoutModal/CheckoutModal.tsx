@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 

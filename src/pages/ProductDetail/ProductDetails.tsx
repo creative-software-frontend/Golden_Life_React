@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
 
 // --- INTERFACES ---
 interface GalleryItem {
@@ -270,10 +270,7 @@ export default function ProductDetails() {
                                 </div>
                                 <span className="text-sm text-gray-500 hover:text-orange-600 cursor-pointer underline decoration-dotted underline-offset-4">(275 Reviews)</span>
                                 <div className="h-4 w-[1px] bg-gray-300 hidden sm:block"></div>
-                                <div className="flex items-center gap-1.5 text-sm">
-                                    <span className="text-gray-500">SKU:</span>
-                                    <span className="font-semibold text-gray-900">{product.sku}</span>
-                                </div>
+
                             </div>
 
                             <div className="mb-8">

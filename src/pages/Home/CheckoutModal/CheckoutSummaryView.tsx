@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, MapPin, ArrowLeft, AlertCircle, Loader2, Receipt, Package, Trash2 } from 'lucide-react'; // Added Trash2
 import { Address, PaymentMethod } from './CheckoutModal';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -311,50 +311,65 @@ const CheckoutSummaryView = ({
                                 const imageUrl = item.image || item.thumbnail || item.product_image;
 
                                 return (
-                                    <div key={item.id || idx} className="flex justify-between items-center gap-3">
-                                        <div className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 mb-3">
-
+                                    <div
+                                        key={item.id || idx}
+                                        className="group relative flex justify-between items-start gap-4 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-100 transition-all duration-300 mb-3"
+                                    >
+                                        {/* Left Section: Image and Info */}
+                                        <div className="flex items-start gap-4 flex-1 min-w-0">
                                             {/* Image Section */}
-                                            <div className="w-14 h-14 bg-gray-50 border border-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center group">
+                                            <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center mt-0.5">
                                                 <img
                                                     src={imageUrl || "/placeholder.svg"}
-                                                    alt={item.product_title_english || item.name || "Product"}
-                                                    className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                                                    alt={item.name || "Product"}
+                                                    className="w-full h-full object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                                                 />
                                             </div>
 
                                             {/* Details Section */}
-                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                            <div className="flex-1 min-w-0 flex flex-col h-full">
                                                 {/* Title */}
-                                                <p className="text-[14px] font-bold text-gray-800 truncate mb-1">
-                                                    {item.name || item.product_title_english || item.product_name || "Unknown Item"}
+                                                <p className="text-[15px] font-bold text-gray-900 truncate leading-tight mb-1">
+                                                    {item.name || item.product_title_english || "Unknown Item"}
                                                 </p>
 
-                                                {/* 1st Row: Qty & Member Price */}
-                                                <p className="text-[12px] font-medium text-gray-500 mb-0.5">
-                                                    Qty: <span className="font-semibold text-gray-700">{qty}</span> × ৳{activePrice.toFixed(2)} <span className="text-gray-400 font-normal">(Member)</span>
+                                                {/* Qty Info */}
+                                                <p className="text-[12px] font-medium text-gray-400 mb-3">
+                                                    Quantity: <span className="text-gray-700 font-semibold">{qty}</span>
                                                 </p>
 
-                                                {/* 2nd Row: Customer Price */}
-                                                <p className="text-[12px] font-bold text-emerald-600">
-                                                    Customer: ৳{origPrice.toFixed(2)}
-                                                </p>
+                                                {/* Labels Stack */}
+                                                <div className="mt-auto space-y-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Member</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Customer</span>
+                                                    </div>
+                                                </div>
                                             </div>
-
                                         </div>
 
-                                        {/* NEW: Updated Price Column with Delete Button */}
-                                        <div className="flex flex-col items-end shrink-0">
-                                            <span className="text-[14px] font-black text-gray-900">
-                                                ৳{itemTotal.toFixed(2)}
-                                            </span>
+                                        {/* Right Section: Actions and Price */}
+                                        <div className="flex flex-col items-end justify-between shrink-0 self-stretch min-w-[100px]">
+                                            {/* Delete Button */}
                                             <button
                                                 onClick={() => handleRemoveItem(item.id)}
-                                                className="mt-1 text-gray-300 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors"
+                                                className="text-gray-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all duration-200 -mr-2 -mt-2"
                                                 title="Remove item"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-4.5 h-4.5" />
                                             </button>
+
+                                            {/* Price Stack (Aligned with Labels) */}
+                                            <div className="flex flex-col items-end space-y-0.5 mt-auto">
+                                                <span className="text-[14px] font-black text-gray-900 ">
+                                                    ৳{itemTotal.toFixed(2)}
+                                                </span>
+                                                <span className="text-[12px] font-bold text-emerald-600  ">
+                                                    ৳{origPrice.toFixed(2)}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -476,8 +491,8 @@ const CheckoutSummaryView = ({
                         onClick={handleConfirm}
                         disabled={isPlacingOrder || isInsufficientBalance || cartItems.length === 0}
                         className={`w-full h-14 rounded-2xl text-[14px] font-black uppercase transition-all flex items-center justify-center gap-2 ${(isPlacingOrder || isInsufficientBalance || cartItems.length === 0)
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
-                                : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed border-none"
+                            : "bg-[#5C9C72] hover:bg-[#4a855d] shadow-xl shadow-green-100 text-white active:scale-[0.97]"
                             }`}
                     >
                         {isPlacingOrder ? <Loader2 className="animate-spin w-6 h-6" /> : `Confirm Order — ৳${total.toFixed(2)}`}

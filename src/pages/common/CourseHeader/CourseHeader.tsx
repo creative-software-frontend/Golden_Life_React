@@ -6,8 +6,9 @@ import { Dialog, Transition } from '@headlessui/react';
 import { CameraIcon, UserIcon, Search, Menu, X, Bell } from 'lucide-react';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import useModalStore from '@/store/Store';
+
 import { useTranslation } from 'react-i18next';
+import useModalStore from '@/store/modalStore';
 
 interface CourseHeaderProps {
     onMenuClick?: () => void;

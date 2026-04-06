@@ -7,6 +7,9 @@ import global_Bn from './translator/Bn/global.json';
 import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 
+// 1. Import the Provider from react-redux
+
+
 i18next.init({
   interpolation: { escapeValue: false },
   lng: 'en',
@@ -24,9 +27,12 @@ const rootElement = document.getElementById('root');
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
+      {/* 3. Wrap everything inside the Redux Provider */}
+
       <I18nextProvider i18n={i18next}>
         <App />
       </I18nextProvider>
+
     </StrictMode>
   );
 } else {

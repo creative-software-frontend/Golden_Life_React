@@ -29,13 +29,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import Footer from "@/pages/common/Footer/Footer"
 import Header from "@/pages/common/Header/Header"
-import useModalStore from "@/store/Store"
+
 import Cart from "@/pages/Home/Cart/Cart"
 import LiveChat from "@/pages/Home/LiveChat/Livechat"
 import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 import { getNavData } from "@/data/navData"
-
+import useModalStore from '@/store/modalStore';
 import {
     Baby,
     Camera,
@@ -70,9 +70,11 @@ import {
     Tags,
     User as UserIcon,
     Wallet,
-    X
+    X,
+    RotateCw
 } from 'lucide-react';
 import NotificationBell from "@/components/ui/NotificationBell"
+import { useAppStore } from "@/store/useAppStore"
 
 // Helper function to assign icons based on category name
 const getCategoryIcon = (categoryName: string) => {
@@ -110,140 +112,71 @@ const getAuthToken = () => {
     }
 };
 
+
 export default function UserLayout() {
-    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal } = useModalStore();
+    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore(); // Added walletUpdateTrigger
     const [activeCategory, setActiveCategory] = React.useState("shopping");
     const [isMobileWalletOpen, setIsMobileWalletOpen] = React.useState(false)
     const { t, i18n } = useTranslation("global")
     const navigate = useNavigate();
-    const location = useLocation(); // <-- ADD THIS LINE
-    const [studentProfile, setStudentProfile] = React.useState({ name: '', image: '' });
+    const location = useLocation();
+
+    const {
+        categories, fetchCategories, studentProfile, fetchProfile,
+        walletBalance, fetchWallet, isCategoryLoading, isWalletLoading, logout
+    } = useAppStore();
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     // --- CATEGORY API STATE ---
-    const [categories, setCategories] = React.useState<any[]>([]);
-    const [isLoadingCategories, setIsLoadingCategories] = React.useState(true);
-    const [walletBalance, setWalletBalance] = React.useState<string | null>(null);
-    const [isLoading, setIsLoading] = React.useState(true);
 
+    const [isRefreshing, setIsRefreshing] = React.useState(false); // New state for refresh animation
+
+    const handleManualRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await Promise.all([
+                fetchWallet(true),
+                fetchProfile(true)
+            ]);
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
+    // Avatar Logic (Sync with Header/Sidebar)
+    const cacheBreaker = React.useMemo(() => Date.now(), [studentProfile]);
+    const avatarUrl = React.useMemo(() => {
+        const serverImageUrl = studentProfile?.image
+            ? (studentProfile.image.startsWith('http') ? studentProfile.image : `${baseURL}/uploads/student/image/${studentProfile.image}?t=${cacheBreaker}`)
+            : null;
+        return serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+    }, [studentProfile, baseURL, cacheBreaker]);
+
+
+    // 2. Fetch on mount and when walletUpdateTrigger changes
     React.useEffect(() => {
-        const fetchWalletBalance = async () => {
-            setIsLoading(true);
-            try {
-                const token = getAuthToken();
-                const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && { Authorization: `Bearer ${token}` })
-                    }
-                });
-                if (response.data?.success && response.data?.data) {
-                    setWalletBalance(parseFloat(response.data.data.balance).toFixed(2));
-                }
-            } catch (error) {
-                console.error("Wallet Fetch Error:", error);
-                setWalletBalance("0.00");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchWalletBalance();
-    }, [baseURL]);
+        fetchCategories();
+        fetchProfile();
+        fetchWallet();
+
+        const interval = setInterval(() => {
+            fetchProfile(true); // Silent update (no loading states)
+            fetchWallet(true);
+        }, 12000);
+
+        return () => clearInterval(interval);
+    }, [fetchCategories, fetchProfile, fetchWallet]);
 
 
     // 2. Define the handleLogout function
 
-    // 2. Fetch Categories from API
-    React.useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const token = getAuthToken();
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && { Authorization: `Bearer ${token}` })
-                    }
-                };
 
-                const response = await axios.get(`${baseURL}/api/getProductCategory`, config);
 
-                let rawData = [];
 
-                if (response.data?.data?.categories && Array.isArray(response.data.data.categories)) {
-                    rawData = response.data.data.categories;
-                } else if (response.data?.data && Array.isArray(response.data.data)) {
-                    rawData = response.data.data;
-                }
 
-                const mappedCategories = rawData.map((item: any) => {
-                    const imageUrl = `${baseURL}/uploads/ecommarce/category_image/${item.category_image}`;
 
-                    return {
-                        id: item.id,
-                        name_en: item.category_name_english || item.category_name || "Category",
-                        name_bn: item.category_name_bangla || item.category_name || "Category",
-                        icon: imageUrl,
-                        slug: item.category_slug
-                    };
-                });
 
-                setCategories(mappedCategories);
-
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            } finally {
-                setIsLoadingCategories(false);
-            }
-        };
-
-        fetchCategories();
-    }, [baseURL]);
-    React.useEffect(() => {
-        const fetchStudentProfile = async () => {
-            const token = getAuthToken();
-
-            if (!token) {
-                setStudentProfile({
-                    name: "Guest",
-                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
-                });
-                return;
-            }
-
-            try {
-                const response = await axios.get(`${baseURL}/api/student/profile`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                // CHANGE: Check for 'status === success' and the 'student' key
-                if (response.data?.status === "success" && response.data?.student) {
-                    const student = response.data.student;
-                    const userName = student.name || "Student";
-
-                    // Construct the avatar URL or use the student's actual image if available
-                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF8A00&color=fff&bold=true`;
-
-                    setStudentProfile({
-                        name: userName,
-                        // If the API image is just a filename, you might need to prepend a base URL
-                        image: student.image ? `${baseURL}/uploads/profiles/${student.image}` : avatarUrl
-                    });
-                }
-            } catch (error) {
-                console.error("Profile Fetch Failed:", error);
-                setStudentProfile({
-                    name: "Guest",
-                    image: "https://ui-avatars.com/api/?name=Guest&background=cbd5e1&color=fff"
-                });
-            }
-        };
-
-        if (baseURL) fetchStudentProfile();
-    }, [baseURL]);
     // --- LANGUAGE HANDLER ---
     const handleChangeLanguage = (language: string) => {
         i18n.changeLanguage(language);
@@ -257,7 +190,7 @@ export default function UserLayout() {
     const [isMobileProfileOpen, setIsMobileProfileOpen] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const mobileSearchRef = React.useRef<HTMLDivElement>(null);
-    const containerRef = React.useRef(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const handleLogout = () => {
         // Clear the specific session key used by your app
         sessionStorage.removeItem("student_session");
@@ -384,106 +317,91 @@ export default function UserLayout() {
 
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarMenu>
-                            {isLoadingCategories ? (
-                                <div className="flex flex-col gap-2 px-1 md:px-3 py-4">
-                                    {Array.from({ length: 8 }).map((_, i) => (
-                                        <div key={i} className="flex items-center gap-3 w-full h-[48px] px-2 rounded-lg">
-                                            <Skeleton className="h-[22px] w-[22px] rounded-md bg-[#5ca367]/10" />
-                                            <Skeleton className="h-4 w-2/3 rounded-md bg-slate-200" />
-                                        </div>
-                                    ))}
-                                </div>
+                        <SidebarMenu className="px-1 md:px-3 py-4 flex flex-col gap-1">
+                            {isCategoryLoading ? (
+                                /* --- LOADING SKELETONS --- */
+                                Array.from({ length: 8 }).map((_, i) => (
+                                    <div key={i} className="flex items-center gap-3 w-full h-[48px] px-2 rounded-lg">
+                                        <Skeleton className="h-[22px] w-[22px] rounded-md bg-[#5ca367]/10" />
+                                        <Skeleton className="h-4 w-2/3 rounded-md bg-slate-200" />
+                                    </div>
+                                ))
                             ) : categories.length > 0 ? (
-                                /* 1. WRAPPER SPACING: 
-                                   Using px-6 (24px) creates a substantial gutter on both sides for mobile. 
-                                */
-                                <div className="flex flex-col gap-1 px-1 md:px-3 py-4">
-                                    {/* Reduced gap for a tighter, cleaner list view */}
-                                    {categories.map((category) => {
-                                        const categoryName = i18n.language === 'bn' ? category.name_bn : category.name_en;
-                                        const categoryPath = `/dashboard/category/${category.id}`;
-                                        const isActive = location.pathname === categoryPath;
+                                /* --- CATEGORY LIST --- */
+                                categories.map((category) => {
+                                    const categoryName = i18n.language === 'bn' ? category.name_bn : category.name_en;
+                                    const categoryPath = `/dashboard/category/${category.id}`;
+                                    const isActive = location.pathname === categoryPath;
 
-                                        return (
-                                            <SidebarMenuItem key={category.id} className="list-none relative group mx-0">
+                                    return (
+                                        <SidebarMenuItem key={category.id} className="list-none relative group mx-0">
+                                            {/* INDICATOR LINE */}
+                                            <div className={cn(
+                                                "absolute left-[-12px] top-[30%] h-[40%] w-1 rounded-r-full bg-[#5ca367] transition-all duration-300 z-20",
+                                                isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 group-hover:opacity-100 group-hover:scale-y-100"
+                                            )} />
 
-                                                {/* 1. INDICATOR LINE: 
-                    Remains the primary visual cue for the active item 
-                */}
-                                                <div className={cn(
-                                                    "absolute left-[-12px] top-[30%] h-[40%] w-1 rounded-r-full bg-[#5ca367] transition-all duration-300 z-20",
-                                                    isActive ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 group-hover:opacity-100 group-hover:scale-y-100"
-                                                )} />
-
-                                                <SidebarMenuButton
-                                                    asChild
-                                                    className={cn(
-                                                        "group relative w-full h-[48px] px-2 rounded-lg transition-all duration-300 ease-out border-none bg-transparent shadow-none",
-                                                        /* --- 1. THE COLORFUL HOVER (Gradient + Shadow) --- */
-                                                        "hover:bg-gradient-to-r hover:from-[#5ca367]/20 hover:to-transparent",
-                                                        "hover:border-[#5ca367]/10 hover:shadow-lg hover:shadow-[#5ca367]/10",
-                                                        isActive ? "translate-x-1" : "hover:translate-x-1"
-                                                    )}
-                                                >
-                                                    <Link to={categoryPath} className="flex items-center justify-between w-full">
-
-                                                        {/* LEFT CONTENT: Icon + Text */}
-                                                        <div className="flex items-center gap-3">
-                                                            {/* Icon container background removed */}
-                                                            <div className="p-1 transition-all duration-300 flex items-center justify-center bg-transparent">
-                                                                <img
-                                                                    src={category.icon}
-                                                                    alt={categoryName}
-                                                                    className={cn(
-                                                                        "h-[17px] w-[17px] object-contain transition-transform duration-300",
-                                                                        isActive ? "scale-110" : "group-hover:scale-110"
-                                                                    )}
-                                                                    onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/22?text=C'}
-                                                                />
-                                                            </div>
-                                                            <span className={cn(
-                                                                "text-[14px] font-medium tracking-tight transition-colors duration-300",
-                                                                /* Text color is the main indicator of the active state */
-                                                                isActive ? "text-[#5ca367] font-bold" : "text-slate-600 group-hover:text-slate-900"
-                                                            )}>
-                                                                {categoryName}
-                                                            </span>
+                                            <SidebarMenuButton
+                                                asChild
+                                                className={cn(
+                                                    "group relative w-full h-[48px] px-2 rounded-lg transition-all duration-300 ease-out border-none bg-transparent shadow-none",
+                                                    "hover:bg-gradient-to-r hover:from-[#5ca367]/20 hover:to-transparent",
+                                                    "hover:border-[#5ca367]/10 hover:shadow-lg hover:shadow-[#5ca367]/10",
+                                                    isActive ? "translate-x-1" : "hover:translate-x-1"
+                                                )}
+                                            >
+                                                <Link to={categoryPath} className="flex items-center justify-between w-full">
+                                                    {/* LEFT CONTENT: Icon + Text */}
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-1 transition-all duration-300 flex items-center justify-center bg-transparent">
+                                                            <img
+                                                                src={category.icon}
+                                                                alt={categoryName}
+                                                                className={cn(
+                                                                    "h-[17px] w-[17px] object-contain transition-transform duration-300",
+                                                                    isActive ? "scale-110" : "group-hover:scale-110"
+                                                                )}
+                                                                onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/22?text=C'}
+                                                            />
                                                         </div>
-
-                                                        {/* RIGHT CONTENT: Arrow (Visible only on hover or active) */}
-                                                        <div className={cn(
-                                                            "flex items-center justify-center transition-all duration-500 ease-in-out",
-                                                            /* 1. POSITIONING: Pushes the arrow slightly right on hover */
-                                                            isActive ? "opacity-100 translate-x-0" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5"
+                                                        <span className={cn(
+                                                            "text-[14px] font-medium tracking-tight transition-colors duration-300",
+                                                            isActive ? "text-[#5ca367] font-bold" : "text-slate-600 group-hover:text-slate-900"
                                                         )}>
-                                                            {/* 2. THE ICON CONTAINER: Adds a colorful background glow */}
-                                                            <div className={cn(
-                                                                "flex items-center justify-center p-1.5 rounded-full transition-all duration-300",
-                                                                isActive ? "bg-[#5ca367]/20" : "group-hover:bg-slate-100"
-                                                            )}>
-                                                                <ChevronRight
-                                                                    /* 3. SIZE & THICKNESS: Increased to h-5 and strokeWidth 3 for that 'big' feel */
-                                                                    className={cn(
-                                                                        "h-4 w-4 transition-transform duration-300",
-                                                                        isActive ? "text-[#5ca367] scale-110" : "text-slate-400"
-                                                                    )}
-                                                                    strokeWidth={3}
-                                                                />
-                                                            </div>
+                                                            {categoryName}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* RIGHT CONTENT: Arrow */}
+                                                    <div className={cn(
+                                                        "flex items-center justify-center transition-all duration-500 ease-in-out",
+                                                        isActive ? "opacity-100 translate-x-0" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5"
+                                                    )}>
+                                                        <div className={cn(
+                                                            "flex items-center justify-center p-1.5 rounded-full transition-all duration-300",
+                                                            isActive ? "bg-[#5ca367]/20" : "group-hover:bg-slate-100"
+                                                        )}>
+                                                            <ChevronRight
+                                                                className={cn(
+                                                                    "h-4 w-4 transition-transform duration-300",
+                                                                    isActive ? "text-[#5ca367] scale-110" : "text-slate-400"
+                                                                )}
+                                                                strokeWidth={3}
+                                                            />
                                                         </div>
-                                                    </Link>
-                                                </SidebarMenuButton>
-                                            </SidebarMenuItem>
-                                        );
-                                    })}
-                                </div>
+                                                    </div>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    );
+                                })
                             ) : (
+                                /* --- EMPTY STATE --- */
                                 <div className="p-10 text-center text-sm font-medium text-slate-400 italic">
-                                    No categories found
+                                    {isCategoryLoading ? "Loading..." : "No categories found"}
                                 </div>
                             )}
-                        </SidebarMenu>     </SidebarGroup>
+                        </SidebarMenu>    </SidebarGroup>
                 </SidebarContent>
 
                 <SidebarFooter>
@@ -640,9 +558,16 @@ export default function UserLayout() {
                                         setIsMobileProfileOpen(!isMobileProfileOpen);
                                         setIsMobileWalletOpen(false); // FIXED: Closes wallet if open
                                     }}
-                                    className="flex items-center justify-center bg-slate-50 rounded-full border border-gray-200 hover:bg-slate-100 transition-all active:scale-95 h-9 w-9 shadow-sm"
+                                    className="flex items-center justify-center bg-slate-50 rounded-full border border-gray-200 hover:bg-slate-100 transition-all active:scale-95 h-10 w-10 shadow-sm overflow-hidden"
                                 >
-                                    <UserIcon className="h-5 w-5 text-slate-500" />
+                                    <img
+                                        src={avatarUrl}
+                                        alt="Profile"
+                                        className="h-full w-full object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'S')}&background=FF8A00&color=fff&bold=true`;
+                                        }}
+                                    />
                                 </button>
 
                                 {/* Mobile Profile Dropdown Options */}
@@ -656,7 +581,7 @@ export default function UserLayout() {
                                                 {/* Beautiful Dropdown Header (Shows Full Name) */}
                                                 <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                                                     <p className="text-[13px] font-bold text-slate-800 truncate">
-                                                        {studentProfile.name || "Loading..."}
+                                                        {studentProfile?.name || "Student"}
                                                     </p>
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
                                                         Golden Tier
@@ -666,8 +591,8 @@ export default function UserLayout() {
 
                                                 {/* Premium Order History Item (Matching design reference) */}
                                                 <div className="p-2">
-                                                    <Link 
-                                                        to="/dashboard/order" 
+                                                    <Link
+                                                        to="/dashboard/order"
                                                         onClick={() => setIsMobileProfileOpen(false)}
                                                         className="flex items-center gap-4 p-3 rounded-[20px] bg-emerald-50/50 border border-emerald-100/50 hover:bg-emerald-100/60 transition-all group/order"
                                                     >
@@ -693,9 +618,9 @@ export default function UserLayout() {
                                                         <LogOut size={18} />
                                                         <span className="text-[13px] font-bold">Sign Out</span>
                                                     </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     </>
                                 )}
                             </div>
@@ -718,16 +643,28 @@ export default function UserLayout() {
                                 <div className="flex items-center gap-3">
                                     <div className={cn(
                                         "flex items-center justify-center h-9 w-9 rounded-xl transition-all",
-                                        isLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
+                                        isWalletLoading ? "bg-slate-100 animate-pulse" : "bg-[#5ca367] text-white shadow-md shadow-green-100"
                                     )}>
-                                        {!isLoading && <Wallet className="h-4.5 w-4.5" />}
+                                        {!isWalletLoading && <Wallet className="h-4.5 w-4.5" />}
                                     </div>
                                     <div className="flex flex-col text-left">
                                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">My Balance</span>
-                                        {isLoading ? (
+                                        {isWalletLoading ? (
                                             <div className="h-3 w-20 bg-slate-100 animate-pulse rounded-full mt-1" />
                                         ) : (
-                                            <span className="text-[15px] font-black text-slate-900 leading-none mt-0.5">৳{walletBalance}</span>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-[15px] font-black text-slate-900 leading-none">৳{walletBalance}</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevent opening dropdown
+                                                        handleManualRefresh();
+                                                    }}
+                                                    className="p-1 hover:bg-slate-100 rounded-full transition-all"
+                                                    title="Refresh Balance"
+                                                >
+                                                    <RotateCw className={cn("h-3 w-3 text-slate-400", isRefreshing && "animate-spin text-secondary")} />
+                                                </button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -773,7 +710,7 @@ export default function UserLayout() {
                         {/* 2. Mobile/Tablet Notification Bell */}
                         <div className="shrink-0 z-50">
                             {/* Pass your actual baseURL and token here */}
-                            <NotificationBell baseURL={baseURL} token={getAuthToken()} />
+                            <NotificationBell token={getAuthToken()} />
                         </div>
 
                     </div>
@@ -817,7 +754,7 @@ export default function UserLayout() {
                                                 key={p.id}
                                                 to={`/dashboard?q=${encodeURIComponent(getProductTitle(p))}`}
                                                 className="flex items-center p-4 hover:bg-slate-50 border-b border-slate-50 last:border-0 gap-4"
-                                                onClick={handleSelectSuggestion}
+                                                onClick={() => handleSelectSuggestion(getProductTitle(p))}
                                             >
                                                 <img src={p.product_image ? `${baseURL}/uploads/ecommarce/product_image/${p.product_image}` : '/placeholder.jpg'} className="w-12 h-12 rounded-xl object-cover" alt="" />
                                                 <div className="flex flex-col min-w-0">

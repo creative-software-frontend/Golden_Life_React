@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight, MapPin, Wallet, X, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import useModalStore from "@/store/Store";
+import useModalStore from '@/store/modalStore';
 import { useTranslation } from "react-i18next";
 
 export default function CheckoutModal() {

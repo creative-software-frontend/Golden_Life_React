@@ -30,7 +30,11 @@ interface ModalStore {
 
     // --- ADDED: Shared student profile data ---
     studentProfile: StudentProfileData | null;
-    setStudentProfile: (data: StudentProfileData) => void;
+    setStudentProfile: (data: StudentProfileData | null) => void;
+
+    // --- ADDED: Wallet Balance ---
+    walletBalance: string | null;
+    setWalletBalance: (balance: string | null) => void;
 
     // --- ADDED: Blob preview URL from FileReader after a successful image upload ---
     profileBlobPreview: string | null;
@@ -96,6 +100,10 @@ const useModalStore = create<ModalStore>((set) => ({
     // --- ADDED: Initial student profile state ---
     studentProfile: null,
     setStudentProfile: (data) => set({ studentProfile: data }),
+
+    // --- ADDED: Initial wallet balance ---
+    walletBalance: null,
+    setWalletBalance: (balance) => set({ walletBalance: balance }),
 
     // --- ADDED: Initial blob preview state ---
     profileBlobPreview: null,

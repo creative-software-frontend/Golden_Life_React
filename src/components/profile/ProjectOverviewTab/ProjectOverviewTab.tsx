@@ -20,7 +20,8 @@ import {
     Activity,
     Users
 } from 'lucide-react';
-import useModalStore from '@/store/Store';
+import useModalStore from '@/store/modalStore';
+
 
 interface FullProfileData {
     student: {

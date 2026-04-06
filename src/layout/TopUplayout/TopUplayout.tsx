@@ -41,7 +41,8 @@ import {
 } from "@/components/ui/sidebar";
 import Footer from "@/pages/common/Footer/Footer";
 import Header from "@/pages/common/Header/Header";
-import useModalStore from "@/store/Store";
+import useModalStore from "@/store/modalStore";
+
 import Cart from "@/pages/Home/Cart/Cart";
 import LiveChat from "@/pages/Home/LiveChat/Livechat";
 import { useTranslation } from "react-i18next";
@@ -56,7 +57,7 @@ export default function TopupLayout() {
     // 2. Define the handleLogout function
     const handleLogout = () => {
         // Clear the session data
-       sessionStorage.removeItem("student_session");
+        sessionStorage.removeItem("student_session");
 
         // Optional: Clear other app data like cart or preferences if necessary
         // localStorage.removeItem("cart"); 

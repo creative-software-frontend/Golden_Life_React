@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
-import { 
-    ArrowLeft, Wallet, Send, User, 
+import {
+    ArrowLeft, Wallet, Send, User,
     CheckCircle2, AlertCircle, KeyRound, ArrowRight, Search, Loader2, Mail, Phone, Clock, Plus, Minus, History
 } from 'lucide-react';
 
 // Import our newly separated modals
 import SetPinModal from '../SetPinModal/SetPinModal';
 import ConfirmTransferModal from '../ConfirmTransferModal/ConfirmTransferModal';
+import { toast } from 'react-toastify';
+import useModalStore from '@/store/modalStore';
 
 // --- Interface for the Verified User ---
 interface VerifiedUserData {
@@ -25,12 +27,12 @@ interface VerifiedUserData {
 interface Transaction {
     id: string | number;
     amount: string;
-    type: string; 
+    type: string;
     method?: string;
     payment_method?: string;
     account?: string;
     number?: string;
-    status?: string; 
+    status?: string;
     date?: string;
     time?: string;
     created_at?: string;
@@ -38,6 +40,7 @@ interface Transaction {
 
 export default function WalletSend() {
     const navigate = useNavigate();
+    const { triggerWalletUpdate } = useModalStore();
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     // --- Tabs State ---
@@ -46,8 +49,8 @@ export default function WalletSend() {
     // --- Transfer Form State ---
     const [amount, setAmount] = useState<string>('');
     const [affiliateId, setAffiliateId] = useState<string>('');
-    const [receiverType, setReceiverType] = useState<string>(''); 
-    
+    const [receiverType, setReceiverType] = useState<string>('');
+
     // --- Verification State ---
     const [isVerifying, setIsVerifying] = useState<boolean>(false);
     const [verifiedUser, setVerifiedUser] = useState<VerifiedUserData | null>(null);
@@ -92,7 +95,7 @@ export default function WalletSend() {
     };
 
     // --- Fetch Transaction History ---
-   const fetchHistory = async () => {
+    const fetchHistory = async () => {
         setIsLoadingHistory(true);
         try {
             const token = getAuthToken();
@@ -136,8 +139,8 @@ export default function WalletSend() {
             if (response.data?.status === 'success' || response.data?.status === true) {
                 const userData = response.data?.data;
                 const foundName = userData?.name || "Verified User";
-                const foundType = userData?.type || userData?.role || "student"; 
-                
+                const foundType = userData?.type || userData?.role || "student";
+
                 setVerifiedUser({
                     type: foundType,
                     name: foundName,
@@ -146,8 +149,8 @@ export default function WalletSend() {
                     mobile: userData?.mobile || "",
                     image: userData?.image || ""
                 });
-                
-                setReceiverType(foundType); 
+
+                setReceiverType(foundType);
             } else {
                 setVerifyError(response.data?.message || "User not found.");
             }
@@ -155,13 +158,13 @@ export default function WalletSend() {
             const axiosError = error as AxiosError<any>;
             const backendMessage = axiosError.response?.data?.message;
             const backendErrors = axiosError.response?.data?.errors;
-            
+
             let finalError = "Unable to verify user. Please check the ID.";
-            
+
             if (backendErrors && backendErrors.key) {
-                 finalError = backendErrors.key[0];
+                finalError = backendErrors.key[0];
             } else if (backendMessage) {
-                 finalError = backendMessage;
+                finalError = backendMessage;
             }
 
             setVerifyError(finalError);
@@ -181,13 +184,16 @@ export default function WalletSend() {
     const handleSuccess = (message: string) => {
         setErrorMessage('');
         setSuccessMessage(message);
+        toast.success(message);
     };
 
     const handleTransferSuccess = async (message: string) => {
         setErrorMessage('');
         setSuccessMessage(message);
-        await fetchBalance(); 
+        toast.success(message);
+        await fetchBalance();
         await fetchHistory(); // Refresh history after transfer
+        triggerWalletUpdate(); // Global Sync
         setAmount('');
         setAffiliateId('');
         setVerifiedUser(null);
@@ -196,23 +202,30 @@ export default function WalletSend() {
     const handleError = (message: string) => {
         setSuccessMessage('');
         setErrorMessage(message);
+        toast.error(message);
     };
 
     const triggerPinConfirmation = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (Number(amount) <= 0) {
-            setErrorMessage("Amount must be greater than 0.");
+            const msg = "Amount must be greater than 0.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
 
         if (Number(amount) > currentBalance) {
-            setErrorMessage("Insufficient funds!");
+            const msg = "Insufficient funds!";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
 
         if (!verifiedUser) {
-            setErrorMessage("Please verify the receiver first.");
+            const msg = "Please verify the receiver first.";
+            setErrorMessage(msg);
+            toast.error(msg);
             return;
         }
 
@@ -222,7 +235,7 @@ export default function WalletSend() {
     // --- Helper Components ---
     const getStatusBadge = (status: string) => {
         const normalizedStatus = status?.toUpperCase() || 'COMPLETED';
-        switch(normalizedStatus) {
+        switch (normalizedStatus) {
             case 'PENDING':
                 return <span className="bg-orange-400 text-white px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-wider">PENDING</span>;
             case 'COMPLETED':
@@ -252,10 +265,10 @@ export default function WalletSend() {
 
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            
+
             {/* --- Modals --- */}
-            <SetPinModal 
-                isOpen={showSetPinModal} 
+            <SetPinModal
+                isOpen={showSetPinModal}
                 onClose={() => setShowSetPinModal(false)}
                 onSuccess={handleSuccess}
                 onError={handleError}
@@ -263,7 +276,7 @@ export default function WalletSend() {
                 token={getAuthToken()}
             />
 
-            <ConfirmTransferModal 
+            <ConfirmTransferModal
                 isOpen={showConfirmModal}
                 onClose={() => setShowConfirmModal(false)}
                 onSuccess={(msg) => handleTransferSuccess(msg)}
@@ -278,8 +291,8 @@ export default function WalletSend() {
             {/* --- Main Page Header --- */}
             <div className="flex items-center justify-between mb-6 md:mb-8">
                 <div className="flex items-center gap-3 md:gap-4">
-                    <button 
-                        onClick={() => navigate(-1)} 
+                    <button
+                        onClick={() => navigate(-1)}
                         className="p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-background border border-border shadow-sm hover:bg-muted hover:border-border/80 text-muted-foreground hover:text-foreground transition-all"
                     >
                         <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
@@ -291,8 +304,8 @@ export default function WalletSend() {
                         </p>
                     </div>
                 </div>
-                <button 
-                    onClick={() => setShowSetPinModal(true)} 
+                <button
+                    onClick={() => setShowSetPinModal(true)}
                     className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-4 md:py-2.5 bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/20 rounded-lg md:rounded-xl text-[11px] md:text-xs font-bold transition-all shadow-sm whitespace-nowrap"
                 >
                     <KeyRound className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2.5} /> Set PIN
@@ -317,7 +330,7 @@ export default function WalletSend() {
 
             {/* --- Main Content Card --- */}
             <div className="bg-background rounded-[24px] md:rounded-[32px] border border-border/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all">
-                
+
                 {activeTab === 'send' && (
                     <div className="animate-in fade-in duration-300">
                         {/* Modern Balance Header */}
@@ -342,7 +355,7 @@ export default function WalletSend() {
 
                         {/* Form Section */}
                         <form onSubmit={triggerPinConfirmation} className="p-5 md:p-8 space-y-6 md:space-y-8">
-                            
+
                             {/* Status Messages */}
                             {successMessage && (
                                 <div className="flex items-center gap-3 p-3 md:p-4 bg-secondary/10 text-secondary rounded-xl md:rounded-2xl border border-secondary/20 animate-in fade-in zoom-in-95">
@@ -368,16 +381,16 @@ export default function WalletSend() {
                                         <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-muted-foreground">
                                             <User className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} />
                                         </span>
-                                        <input 
-                                            type="text" 
-                                            value={affiliateId} 
-                                            onChange={(e) => setAffiliateId(e.target.value)} 
-                                            placeholder="e.g. 123456" 
-                                            className="w-full pl-11 pr-4 py-3 md:pl-14 md:pr-5 md:py-4 text-sm md:text-base font-bold text-foreground bg-muted/50 border-2 border-transparent rounded-xl md:rounded-2xl focus:bg-background focus:border-secondary focus:ring-4 focus:ring-secondary/10 outline-none transition-all placeholder:text-muted-foreground/40" 
-                                            required 
+                                        <input
+                                            type="text"
+                                            value={affiliateId}
+                                            onChange={(e) => setAffiliateId(e.target.value)}
+                                            placeholder="e.g. 123456"
+                                            className="w-full pl-11 pr-4 py-3 md:pl-14 md:pr-5 md:py-4 text-sm md:text-base font-bold text-foreground bg-muted/50 border-2 border-transparent rounded-xl md:rounded-2xl focus:bg-background focus:border-secondary focus:ring-4 focus:ring-secondary/10 outline-none transition-all placeholder:text-muted-foreground/40"
+                                            required
                                         />
                                     </div>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={handleVerifyUser}
                                         disabled={!affiliateId || isVerifying}
@@ -391,7 +404,7 @@ export default function WalletSend() {
                                 {/* Verified User Details Card */}
                                 {verifiedUser && (
                                     <div className="mt-4 p-4 md:p-5 bg-secondary/5 border-2 border-secondary/20 rounded-[20px] flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-5 animate-in fade-in zoom-in-95 relative overflow-hidden">
-                                        
+
                                         {/* Absolute "Verified" Badge */}
                                         <div className="absolute top-0 right-0 bg-secondary text-secondary-foreground text-[9px] md:text-[10px] font-black uppercase px-3 py-1.5 rounded-bl-xl flex items-center gap-1.5 shadow-sm">
                                             <CheckCircle2 size={12} strokeWidth={3} /> Verified
@@ -399,18 +412,18 @@ export default function WalletSend() {
 
                                         <div className="relative shrink-0 pt-2 sm:pt-0">
                                             {!imageFailed && verifiedUser.image ? (
-                                                <img 
-                                                    src={verifiedUser.image} 
-                                                    alt={verifiedUser.name} 
+                                                <img
+                                                    src={verifiedUser.image}
+                                                    alt={verifiedUser.name}
                                                     className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-4 border-background shadow-md bg-muted"
-                                                    onError={() => setImageFailed(true)} 
+                                                    onError={() => setImageFailed(true)}
                                                 />
                                             ) : (
                                                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-background shadow-md bg-secondary/10 flex items-center justify-center text-secondary font-black text-2xl md:text-3xl uppercase">
                                                     {verifiedUser.name ? verifiedUser.name.charAt(0) : <User size={24} />}
                                                 </div>
                                             )}
-                                            
+
                                             {/* Green Online Dot */}
                                             <div className="absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 bg-emerald-500 border-[3px] border-background rounded-full shadow-sm"></div>
                                         </div>
@@ -421,7 +434,7 @@ export default function WalletSend() {
                                             <p className="text-[11px] md:text-xs font-bold text-secondary uppercase tracking-widest mt-1 mb-2.5">
                                                 {verifiedUser.type} Profile
                                             </p>
-                                            
+
                                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-xs md:text-sm font-medium text-muted-foreground">
                                                 {verifiedUser.mobile && (
                                                     <span className="flex items-center gap-1.5 bg-background px-3 py-1.5 rounded-lg border border-border shadow-sm">
@@ -447,29 +460,29 @@ export default function WalletSend() {
                                 </div>
                                 <div className="relative group">
                                     <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-2xl md:text-3xl font-black text-muted-foreground group-focus-within:text-foreground transition-colors">৳</span>
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         min="1"
-                                        value={amount} 
-                                        onChange={(e) => setAmount(e.target.value)} 
-                                        placeholder="0.00" 
-                                        className={`w-full pl-11 pr-4 py-3.5 md:pl-14 md:pr-6 md:py-5 text-3xl md:text-4xl font-black bg-muted/50 border-2 rounded-[20px] md:rounded-3xl focus:bg-background transition-all outline-none placeholder:text-muted-foreground/30 ${Number(amount) > currentBalance && !isLoadingBalance ? 'border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10 text-destructive' : 'border-transparent focus:border-secondary focus:ring-4 focus:ring-secondary/10 text-foreground'}`} 
-                                        required 
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        placeholder="0.00"
+                                        className={`w-full pl-11 pr-4 py-3.5 md:pl-14 md:pr-6 md:py-5 text-3xl md:text-4xl font-black bg-muted/50 border-2 rounded-[20px] md:rounded-3xl focus:bg-background transition-all outline-none placeholder:text-muted-foreground/30 ${Number(amount) > currentBalance && !isLoadingBalance ? 'border-destructive/50 focus:border-destructive focus:ring-4 focus:ring-destructive/10 text-destructive' : 'border-transparent focus:border-secondary focus:ring-4 focus:ring-secondary/10 text-foreground'}`}
+                                        required
                                     />
                                 </div>
-                                
+
                                 <div className="flex flex-wrap gap-2 md:gap-2.5 pt-2 md:pt-3">
                                     {presetAmounts.map((preset) => {
                                         const isSelected = Number(amount) === preset;
                                         return (
-                                            <button 
-                                                key={preset} 
-                                                type="button" 
-                                                onClick={() => setAmount(preset.toString())} 
-                                                disabled={isLoadingBalance || preset > currentBalance} 
+                                            <button
+                                                key={preset}
+                                                type="button"
+                                                onClick={() => setAmount(preset.toString())}
+                                                disabled={isLoadingBalance || preset > currentBalance}
                                                 className={`px-4 py-2 md:px-5 md:py-2.5 rounded-xl md:rounded-[14px] font-bold text-xs md:text-sm transition-all border-2 
-                                                    ${isSelected 
-                                                        ? 'bg-secondary text-secondary-foreground border-secondary shadow-md shadow-secondary/20' 
+                                                    ${isSelected
+                                                        ? 'bg-secondary text-secondary-foreground border-secondary shadow-md shadow-secondary/20'
                                                         : 'bg-background border-border text-muted-foreground hover:border-muted-foreground/30 hover:bg-muted/50'
                                                     } 
                                                     disabled:opacity-40 disabled:hover:bg-background disabled:hover:border-border disabled:cursor-not-allowed`}
@@ -483,13 +496,13 @@ export default function WalletSend() {
 
                             {/* Submit Button Container */}
                             <div className="pt-4 md:pt-6">
-                                <button 
-                                    type="submit" 
-                                    disabled={!amount || Number(amount) <= 0 || !verifiedUser || isLoadingBalance || Number(amount) > currentBalance} 
+                                <button
+                                    type="submit"
+                                    disabled={!amount || Number(amount) <= 0 || !verifiedUser || isLoadingBalance || Number(amount) > currentBalance}
                                     className="w-full group flex items-center justify-center gap-2 md:gap-2.5 py-4 md:py-[18px] bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl md:rounded-2xl font-black text-base md:text-lg tracking-wide shadow-xl shadow-secondary/25 hover:shadow-secondary/40 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none"
                                 >
-                                    <Send className="w-5 h-5 md:w-[22px] md:h-[22px] group-hover:translate-x-1 transition-transform" strokeWidth={2.5} /> 
-                                    Proceed to Verify 
+                                    <Send className="w-5 h-5 md:w-[22px] md:h-[22px] group-hover:translate-x-1 transition-transform" strokeWidth={2.5} />
+                                    Proceed to Verify
                                 </button>
                             </div>
                         </form>
@@ -497,96 +510,96 @@ export default function WalletSend() {
                 )}
 
                 {/* --- History View --- */}
-            {activeTab === 'history' && (
-    <div className="p-4 md:p-8 animate-in fade-in duration-300 w-full">
-        {/* Header Area */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 md:mb-8">
-            <div className="flex items-center gap-3 md:gap-4">
-                <h2 className="text-sm md:text-base font-black text-slate-500 uppercase tracking-widest">Transaction History</h2>
-                <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider shrink-0">
-                    {transactions.length} Records
-                </span>
-            </div>
-        </div>
-
-        {/* Transaction List */}
-        <div className="w-full">
-            {/* Desktop Headers */}
-            <div className="hidden md:grid grid-cols-4 gap-4 pb-4 border-b border-border/50 text-xs font-bold text-muted-foreground uppercase tracking-widest px-4">
-                <div>Details</div>
-                <div>Method</div>
-                <div>Status</div>
-                <div className="text-right">Timestamp</div>
-            </div>
-
-            {/* Rows */}
-            <div className="space-y-3 md:space-y-0 mt-4 md:mt-0">
-                {isLoadingHistory ? (
-                    <div className="py-10 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
-                    </div>
-                ) : transactions.length === 0 ? (
-                    <div className="py-10 text-center text-muted-foreground font-medium bg-muted/10 rounded-2xl border border-dashed border-border/50 m-2 md:m-0">
-                        No transactions found.
-                    </div>
-                ) : (
-                    transactions.map((tx) => {
-                        const isPositive = tx.type === 'deposit' || tx.type === 'transfer_in' || tx.type === 'receive';
-                        
-                        return (
-                            <div key={tx.id} className="grid grid-cols-2 md:grid-cols-4 items-center gap-y-4 gap-x-2 md:gap-4 p-4 md:py-6 md:px-4 border border-border/50 md:border-0 md:border-b md:border-border/50 rounded-[20px] md:rounded-none bg-muted/20 md:bg-transparent hover:bg-muted/40 transition-colors">
-                                
-                                {/* 1. Details (Top Left Mobile) */}
-                                <div className="order-1 flex items-center gap-3 md:gap-4">
-                                    <div className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-[14px] md:rounded-xl border shrink-0 ${isPositive ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
-                                        {isPositive ? <Plus className="w-4 h-4 md:w-[18px] md:h-[18px]" strokeWidth={3} /> : <Minus className="w-4 h-4 md:w-[18px] md:h-[18px]" strokeWidth={3} />}
-                                    </div>
-                                    <div>
-                                        <p className="text-[15px] md:text-base font-bold text-foreground truncate">
-                                            {isPositive ? '+' : '-'} ৳{Number(tx.amount).toFixed(2)}
-                                        </p>
-                                        <p className="text-[10px] md:text-xs font-semibold text-muted-foreground uppercase mt-0.5">
-                                            {(tx.type || 'transaction').replace('_', ' ')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* 3. Status (Top Right Mobile via order-2) */}
-                                <div className="order-2 md:order-3 flex items-center justify-end md:justify-start w-full">
-                                    {getStatusBadge(tx.status || 'COMPLETED')}
-                                </div>
-
-                                {/* 2. Method (Bottom Left Mobile via order-3) */}
-                                <div className="order-3 md:order-2 flex flex-col items-start w-full">
-                                    <div className="flex flex-col items-start gap-1">
-                                        <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider">
-                                            {tx.payment_method || tx.method || 'Wallet'}
-                                        </span>
-                                        <span className="text-[10px] md:text-xs font-medium text-muted-foreground truncate max-w-full">
-                                            {tx.number || tx.account || 'N/A'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* 4. Timestamp (Bottom Right Mobile via order-4) */}
-                                <div className="order-4 flex flex-col items-end text-right w-full">
-                                    <div className="flex items-center justify-end gap-1 md:gap-1.5 text-muted-foreground">
-                                        <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                                        <span className="text-[11px] md:text-sm font-semibold">{formatDate(tx)}</span>
-                                    </div>
-                                    <div className="text-[10px] md:text-xs font-medium text-muted-foreground mt-0.5">
-                                        {formatTime(tx)}
-                                    </div>
-                                </div>
-                                
+                {activeTab === 'history' && (
+                    <div className="p-4 md:p-8 animate-in fade-in duration-300 w-full">
+                        {/* Header Area */}
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 md:mb-8">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <h2 className="text-sm md:text-base font-black text-slate-500 uppercase tracking-widest">Transaction History</h2>
+                                <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider shrink-0">
+                                    {transactions.length} Records
+                                </span>
                             </div>
-                        );
-                    })
+                        </div>
+
+                        {/* Transaction List */}
+                        <div className="w-full">
+                            {/* Desktop Headers */}
+                            <div className="hidden md:grid grid-cols-4 gap-4 pb-4 border-b border-border/50 text-xs font-bold text-muted-foreground uppercase tracking-widest px-4">
+                                <div>Details</div>
+                                <div>Method</div>
+                                <div>Status</div>
+                                <div className="text-right">Timestamp</div>
+                            </div>
+
+                            {/* Rows */}
+                            <div className="space-y-3 md:space-y-0 mt-4 md:mt-0">
+                                {isLoadingHistory ? (
+                                    <div className="py-10 flex items-center justify-center">
+                                        <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+                                    </div>
+                                ) : transactions.length === 0 ? (
+                                    <div className="py-10 text-center text-muted-foreground font-medium bg-muted/10 rounded-2xl border border-dashed border-border/50 m-2 md:m-0">
+                                        No transactions found.
+                                    </div>
+                                ) : (
+                                    transactions.map((tx) => {
+                                        const isPositive = tx.type === 'deposit' || tx.type === 'transfer_in' || tx.type === 'receive';
+
+                                        return (
+                                            <div key={tx.id} className="grid grid-cols-2 md:grid-cols-4 items-center gap-y-4 gap-x-2 md:gap-4 p-4 md:py-6 md:px-4 border border-border/50 md:border-0 md:border-b md:border-border/50 rounded-[20px] md:rounded-none bg-muted/20 md:bg-transparent hover:bg-muted/40 transition-colors">
+
+                                                {/* 1. Details (Top Left Mobile) */}
+                                                <div className="order-1 flex items-center gap-3 md:gap-4">
+                                                    <div className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-[14px] md:rounded-xl border shrink-0 ${isPositive ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
+                                                        {isPositive ? <Plus className="w-4 h-4 md:w-[18px] md:h-[18px]" strokeWidth={3} /> : <Minus className="w-4 h-4 md:w-[18px] md:h-[18px]" strokeWidth={3} />}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[15px] md:text-base font-bold text-foreground truncate">
+                                                            {isPositive ? '+' : '-'} ৳{Number(tx.amount).toFixed(2)}
+                                                        </p>
+                                                        <p className="text-[10px] md:text-xs font-semibold text-muted-foreground uppercase mt-0.5">
+                                                            {(tx.type || 'transaction').replace('_', ' ')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* 3. Status (Top Right Mobile via order-2) */}
+                                                <div className="order-2 md:order-3 flex items-center justify-end md:justify-start w-full">
+                                                    {getStatusBadge(tx.status || 'COMPLETED')}
+                                                </div>
+
+                                                {/* 2. Method (Bottom Left Mobile via order-3) */}
+                                                <div className="order-3 md:order-2 flex flex-col items-start w-full">
+                                                    <div className="flex flex-col items-start gap-1">
+                                                        <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider">
+                                                            {tx.payment_method || tx.method || 'Wallet'}
+                                                        </span>
+                                                        <span className="text-[10px] md:text-xs font-medium text-muted-foreground truncate max-w-full">
+                                                            {tx.number || tx.account || 'N/A'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* 4. Timestamp (Bottom Right Mobile via order-4) */}
+                                                <div className="order-4 flex flex-col items-end text-right w-full">
+                                                    <div className="flex items-center justify-end gap-1 md:gap-1.5 text-muted-foreground">
+                                                        <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                                        <span className="text-[11px] md:text-sm font-semibold">{formatDate(tx)}</span>
+                                                    </div>
+                                                    <div className="text-[10px] md:text-xs font-medium text-muted-foreground mt-0.5">
+                                                        {formatTime(tx)}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
-            </div>
-        </div>
-    </div>
-)}
             </div>
         </div>
     );

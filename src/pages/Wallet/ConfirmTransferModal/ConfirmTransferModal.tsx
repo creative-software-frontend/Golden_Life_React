@@ -1,89 +1,73 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { Lock, X, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-interface ConfirmWithdrawModalProps {
+interface ConfirmTransferModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: (message: string) => void;
     onError: (message: string) => void;
     amount: string;
-    accountNumber: string;
-    paymentMethod: string;
-    attachment: File | null;
+    receiverType: string;
+    affiliateId: string;
     baseURL: string;
     token: string | null;
-    role?: string;
 }
 
-export default function ConfirmWithdrawModal({ 
-    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment, baseURL, token, role 
-}: ConfirmWithdrawModalProps) {
+export default function ConfirmTransferModal({ 
+    isOpen, onClose, onSuccess, onError, amount, receiverType, affiliateId, baseURL, token
+}: ConfirmTransferModalProps) {
     
     const [pinCode, setPinCode] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     if (!isOpen) return null;
 
-    const handleWithdraw = async (e: React.FormEvent) => {
+    const handleTransfer = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (pinCode.length !== 4) return;   // ← Enforce exactly 4 digits
+        if (pinCode.length !== 4) return;
 
         setIsSubmitting(true);
 
         try {
             const formData = new FormData();
-            formData.append('type', 'withdraw');
+            formData.append('type', 'send'); // Most likely 'send' or 'transfer'
             formData.append('amount', amount);
-            formData.append('number', accountNumber);
-            formData.append('payment_method', paymentMethod);
-            
-            formData.append('password', pinCode); 
+            formData.append('receiver_type', receiverType);
+            formData.append('affiliate_id', affiliateId);
             formData.append('pin_code', pinCode); 
             
-            if (role) {
-                formData.append('role', role);
-            }
-
-            if (attachment) {
-                formData.append('attachment', attachment);
-            }
-
             const response = await axios.post(`${baseURL}/api/transactions`, formData, {
                 headers: { ...(token && { Authorization: `Bearer ${token}` }) }
             });
 
             if (response.data?.status === 'success' || response.data?.status === true) {
-                onSuccess(response.data?.message || "Withdrawal completed successfully!");
+                const msg = response.data?.message || "Transfer completed successfully!";
+                toast.success(msg);
+                onSuccess(msg);
                 setPinCode('');
                 onClose();
             } else {
-                onError(String(response.data?.message || "Withdrawal failed. Please check your details."));
+                const msg = String(response.data?.message || "Transfer failed. Please check your details.");
+                toast.error(msg);
+                onError(msg);
                 setIsSubmitting(false);
             }
-        } catch (error) {
-            const axiosError = error as AxiosError<any>;
-            const responseData = axiosError.response?.data;
-            
-            let finalErrorMessage = "Failed to process withdrawal. Please try again.";
+        } catch (error: any) {
+            const responseData = error.response?.data;
+            let finalErrorMessage = "Failed to process transfer. Please try again.";
 
             if (responseData) {
-                if (typeof responseData.message === 'string') {
-                    finalErrorMessage = responseData.message;
-                }
-                
-                if (responseData.errors && typeof responseData.errors === 'object') {
+                finalErrorMessage = responseData.message || finalErrorMessage;
+                if (responseData.errors) {
                     const firstErrorKey = Object.keys(responseData.errors)[0];
                     const firstErrorVal = responseData.errors[firstErrorKey];
-                    
-                    if (Array.isArray(firstErrorVal) && typeof firstErrorVal[0] === 'string') {
-                        finalErrorMessage = firstErrorVal[0];
-                    } else if (typeof firstErrorVal === 'string') {
-                        finalErrorMessage = firstErrorVal;
-                    }
+                    finalErrorMessage = Array.isArray(firstErrorVal) ? firstErrorVal[0] : finalErrorMessage;
                 }
             }
 
+            toast.error(finalErrorMessage);
             onError(String(finalErrorMessage));
             setIsSubmitting(false); 
         } finally {
@@ -101,7 +85,7 @@ export default function ConfirmWithdrawModal({
             <div className="bg-background rounded-[24px] p-6 w-full max-w-sm shadow-2xl border border-border">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-black text-foreground flex items-center gap-2">
-                        <Lock className="text-secondary" /> Verify Withdrawal
+                        <Lock className="text-secondary" /> Verify Transfer
                     </h3>
                     <button onClick={handleClose} className="text-muted-foreground hover:bg-muted p-1.5 rounded-full transition-colors">
                         <X size={20}/>
@@ -111,13 +95,13 @@ export default function ConfirmWithdrawModal({
                 {/* Summary Card */}
                 <div className="bg-muted rounded-xl p-4 mb-4 border border-border text-center">
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
-                        Withdrawing to <ArrowRight size={12} strokeWidth={3} /> <span className="text-foreground">{paymentMethod}</span>
+                        Sending to <ArrowRight size={12} strokeWidth={3} /> <span className="text-foreground">{receiverType}</span>
                     </p>
-                    <p className="text-lg font-black text-foreground break-all">{accountNumber}</p>
+                    <p className="text-lg font-black text-foreground break-all">{affiliateId}</p>
                     <div className="mt-2 text-3xl font-black text-secondary">৳{amount}</div>
                 </div>
 
-                <form onSubmit={handleWithdraw} className="space-y-4">
+                <form onSubmit={handleTransfer} className="space-y-4">
                     <div>
                         <label className="text-xs font-bold text-muted-foreground uppercase">
                             Enter Your 4-Digit PIN
@@ -133,7 +117,6 @@ export default function ConfirmWithdrawModal({
                             required 
                         />
 
-                        {/* Live Length Indicator */}
                         <div className="flex justify-center items-center gap-2 mt-2 text-[11px] font-bold text-muted-foreground">
                             <span>{pinCode.length} / 4 digits</span>
                             {pinCode.length > 0 && pinCode.length !== 4 && (
@@ -154,7 +137,7 @@ export default function ConfirmWithdrawModal({
                             <Loader2 className="animate-spin mx-auto" />
                         ) : (
                             <>
-                                <ShieldCheck size={20}/> Confirm & Withdraw
+                                <ShieldCheck size={20}/> Confirm & Send
                             </>
                         )}
                     </button>
