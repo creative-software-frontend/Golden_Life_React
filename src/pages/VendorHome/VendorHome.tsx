@@ -229,6 +229,109 @@ const VendorHome: React.FC = () => {
                 </p>
             </div>
 
+            {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
+            <div className="mt-8 mb-8 bg-card rounded-xl p-6 shadow-sm border">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
+                    <div className="flex gap-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Total Parcel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Total Parcel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Package className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{totalOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{totalAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Delivered Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Delivered</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <CheckCircle2 className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{deliveredOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{deliveredAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pending Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{pendingOrders}</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{pendingAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cancel Card */}
+                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
+                        <div className="flex justify-between items-start mb-4">
+                            <p className="text-sm font-medium text-muted-foreground">Cancel</p>
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <AlertCircle className="w-4 h-4 text-primary" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <span className="text-2xl font-bold text-foreground">{cancelledOrders} ({cancelPercentage}%)</span>
+                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-lg font-semibold text-primary">{cancelledAmount.toFixed(2)} BDT</span>
+                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Two Column Layout */}
             <div className="grid lg:grid-cols-3 gap-6">
 
@@ -366,108 +469,7 @@ const VendorHome: React.FC = () => {
                 </div>
             </div>
 
-            {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
-            <div className="mt-8 bg-card rounded-xl p-6 shadow-sm border">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
-                    <div className="flex gap-2">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Total Parcel Card */}
-                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
-                        <div className="flex justify-between items-start mb-4">
-                            <p className="text-sm font-medium text-muted-foreground">Total Parcel</p>
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <Package className="w-4 h-4 text-primary" />
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <span className="text-2xl font-bold text-foreground">{totalOrders}</span>
-                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{totalAmount.toFixed(2)} BDT</span>
-                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Delivered Card */}
-                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
-                        <div className="flex justify-between items-start mb-4">
-                            <p className="text-sm font-medium text-muted-foreground">Delivered</p>
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <CheckCircle2 className="w-4 h-4 text-primary" />
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <span className="text-2xl font-bold text-foreground">{deliveredOrders}</span>
-                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{deliveredAmount.toFixed(2)} BDT</span>
-                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Pending Card */}
-                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
-                        <div className="flex justify-between items-start mb-4">
-                            <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <Clock className="w-4 h-4 text-primary" />
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <span className="text-2xl font-bold text-foreground">{pendingOrders}</span>
-                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{pendingAmount.toFixed(2)} BDT</span>
-                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Cancel Card */}
-                    <div className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all duration-200">
-                        <div className="flex justify-between items-start mb-4">
-                            <p className="text-sm font-medium text-muted-foreground">Cancel</p>
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <AlertCircle className="w-4 h-4 text-primary" />
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <span className="text-2xl font-bold text-foreground">{cancelledOrders} ({cancelPercentage}%)</span>
-                                <p className="text-xs text-muted-foreground mt-1">Orders</p>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{cancelledAmount.toFixed(2)} BDT</span>
-                                <p className="text-xs text-muted-foreground mt-1">Amount</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     );
 };
