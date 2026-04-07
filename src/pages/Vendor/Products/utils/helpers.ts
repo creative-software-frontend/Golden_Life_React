@@ -56,7 +56,7 @@ export const createImagePreview = (file: File): Promise<string> => {
 };
 
 /**
- * Format price with currency symbol
+ * Format price with BDT currency
  */
 export const formatPrice = (price: number, currency: string = '৳'): string => {
   return `${currency} ${price.toFixed(2)}`;

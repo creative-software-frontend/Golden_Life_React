@@ -5,7 +5,7 @@ import {
     Clock,
     AlertCircle,
     TrendingUp,
-    DollarSign,
+    Wallet,
     ShoppingCart,
     Star,
     Plus,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { formatBDT } from '@/utils/currencyFormatter';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -40,7 +41,7 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
                         <p className="font-medium text-sm text-foreground">{order.order_no}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{order.status}</p>
                     </div>
-                    <p className="font-semibold text-sm text-foreground">${parseFloat(order.total).toFixed(2)}</p>
+                    <p className="font-semibold text-sm text-foreground">{formatBDT(order.total, { compact: true })}</p>
                 </div>
             ))}
             <button
@@ -73,8 +74,8 @@ const SalesChart = () => {
                 ))}
             </div>
             <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-                <span>Lowest: $218</span>
-                <span>Highest: $450</span>
+                <span>Lowest: {formatBDT(218, { compact: true, showDecimals: false })}</span>
+                <span>Highest: {formatBDT(450, { compact: true, showDecimals: false })}</span>
             </div>
         </div>
     );
@@ -344,14 +345,14 @@ const VendorHome: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">$0.00</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">{formatBDT(0)}</p>
                                     <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
                                         <TrendingUp className="w-4 h-4" />
                                         Coming soon
                                     </p>
                                 </div>
                                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                                    <DollarSign className="w-6 h-6 text-primary" />
+                                    <Wallet className="w-6 h-6 text-primary" />
                                 </div>
                             </div>
                         </div>
@@ -407,7 +408,7 @@ const VendorHome: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>Daily Sales ($)</span>
+                                <span>Daily Sales (BDT)</span>
                                 <span className="text-primary font-semibold">Coming soon</span>
                             </div>
                             <SalesChart />

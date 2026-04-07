@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Eye, EyeOff } from 'lucide-react';
 import Logo from '../Logo';
 
 type LoginMethod = 'mobile' | 'email';
@@ -26,7 +27,14 @@ const Login: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Limit mobile number to 11 digits and only allow numbers
+    let finalValue = value;
+    if (name === 'mobile') {
+      finalValue = value.replace(/\D/g, '').slice(0, 11);
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: finalValue }));
     if (errors[name as keyof typeof errors]) setErrors(prev => ({ ...prev, [name]: '' }));
     if (apiError) setApiError('');
   };
@@ -172,7 +180,15 @@ const Login: React.FC = () => {
             {loginMethod === 'mobile' ? (
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                <input name="mobile" type="tel" placeholder="01XXXXXXXXX" value={formData.mobile} onChange={handleChange} className={`w-full px-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`} />
+                <input 
+                  name="mobile" 
+                  type="tel" 
+                  placeholder="01XXXXXXXXX" 
+                  maxLength={11}
+                  value={formData.mobile} 
+                  onChange={handleChange} 
+                  className={`w-full px-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`} 
+                />
                 {errors.mobile && <p className="text-sm text-red-500">{errors.mobile}</p>}
               </div>
             ) : (
@@ -183,7 +199,23 @@ const Login: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password</label>
-                  <input name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={formData.password} onChange={handleChange} className={`w-full px-4 py-3.5 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`} />
+                  <div className="relative">
+                    <input 
+                      name="password" 
+                      type={showPassword ? 'text' : 'password'} 
+                      placeholder="••••••••" 
+                      value={formData.password} 
+                      onChange={handleChange} 
+                      className={`w-full px-4 py-3.5 pr-12 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`} 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

@@ -2,6 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Avatar } from "@/components/ui/avatar"
+import { formatBDT } from '@/utils/currencyFormatter';
 // import { ChevronLeft } from 'lucide-react'
 // import Image from "next/image"
 
@@ -100,7 +101,7 @@ export default function History() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-red-500 font-semibold">${transaction.amount}</p>
+                                    <p className="text-red-500 font-semibold">{formatBDT(transaction.amount, { compact: true })}</p>
                                     <p className="text-gray-600 text-sm">{transaction.timestamp}</p>
                                 </div>
                             </div>
@@ -129,7 +130,7 @@ export default function History() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-red-500 font-semibold">${transaction.amount}</p>
+                                    <p className="text-red-500 font-semibold">{formatBDT(transaction.amount, { compact: true })}</p>
                                     <p className="text-gray-600 text-sm">{transaction.timestamp}</p>
                                 </div>
                             </div>
@@ -158,7 +159,7 @@ export default function History() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-red-500 font-semibold">${transaction.amount}</p>
+                                    <p className="text-red-500 font-semibold">{formatBDT(transaction.amount, { compact: true })}</p>
                                     <p className="text-gray-600 text-sm">{transaction.timestamp}</p>
                                 </div>
                             </div>

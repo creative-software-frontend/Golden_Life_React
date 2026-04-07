@@ -249,8 +249,15 @@ const ForgotPassword: React.FC = () => {
                         id="mobile"
                         type="tel"
                         placeholder="01XXXXXXXXX"
+                        maxLength={11}
                         value={mobile}
-                        onChange={(e) => { setMobile(e.target.value); setMobileError(''); }}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 11) {
+                            setMobile(value);
+                            setMobileError('');
+                          }
+                        }}
                         className={`w-full pl-10 pr-4 py-3.5 border ${mobileError ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
                         disabled={isLoading}
                       />
