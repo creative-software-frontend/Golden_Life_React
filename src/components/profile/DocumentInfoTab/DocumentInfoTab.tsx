@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
     FileText,
     ShieldCheck,
@@ -10,15 +9,18 @@ import {
     Eye
 } from 'lucide-react';
 import EditDocumentInfoTabModal from '../EditDocumentInfoTabModal/EditDocumentInfoTabModal';
-import { DocumentData } from '../types/types';
 import { InfoCard } from '../InfoCard/InfoCard';
+import { useAppStore } from '@/store/useAppStore';
+import { getAuthToken } from '@/store/utils';
 
 export default function DocumentInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [documentData, setDocumentData] = useState<DocumentData | null>(null);
-    const [loading, setLoading] = useState(false);
+    const documentData = useAppStore(s => s.documentInfo);
+    const loading = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const token = getAuthToken();
 
     // Helper to get correct path for documents
     const getDocUrl = (fileName: string, type: 'nid_front_page' | 'nid_back_page') => {
@@ -26,56 +28,15 @@ export default function DocumentInfoTab() {
         return `${baseURL}/uploads/student/${type}/${fileName}`;
     };
 
-    const getActiveToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            return JSON.parse(session).token;
-        } catch (e) { return null; }
-    };
-
-    const token = getActiveToken();
-
-    const fetchDocumentInfo = async (signal?: AbortSignal) => {
-        if (!token || !baseURL) return;
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseURL}/api/student/document-info`, {
-                signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.data?.success) {
-                setDocumentData(response.data.data);
-            }
-        } catch (error: any) {
-            if (error.name !== 'CanceledError') {
-                console.error('❌ Document info fetch failed:', error);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        const controller = new AbortController();
-        fetchDocumentInfo(controller.signal);
-        return () => controller.abort();
-    }, [token, baseURL]);
+        fetchProfile();
+    }, [fetchProfile]);
 
-    const handleLocalUpdate = (updatedData: DocumentData) => {
-        setDocumentData(updatedData);
-        fetchDocumentInfo();
+    const handleLocalUpdate = () => {
+        fetchProfile(true);
     };
 
-    // Better empty/loading check
-    const isDataEmpty = !documentData || Object.keys(documentData).length <= 2;
-
-    if (loading || isDataEmpty) {
+    if (loading && !documentData) {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
@@ -89,6 +50,8 @@ export default function DocumentInfoTab() {
             </div>
         );
     }
+
+    if (!documentData) return null;
 
     return (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">

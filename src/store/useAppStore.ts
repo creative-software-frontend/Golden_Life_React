@@ -3,9 +3,12 @@ import { createCategorySlice, CategorySlice } from './slices/categorySlice';
 import { createProfileSlice, ProfileSlice } from './slices/profileSlice';
 import { createWalletSlice, WalletSlice } from './slices/walletSlice';
 import { createNotificationSlice, NotificationSlice } from './slices/notificationSlice';
+import { createNavbarSlice, NavbarSlice } from './slices/navbarSlice';
+import { createOrderSlice, OrderSlice } from './slices/orderSlice';
+import { createProductSlice, ProductSlice } from './slices/productSlice';
 
 // 1. Define the master AppState that combines all slices
-export type AppState = CategorySlice & ProfileSlice & WalletSlice & NotificationSlice & {
+export type AppState = CategorySlice & ProfileSlice & WalletSlice & NotificationSlice & NavbarSlice & OrderSlice & ProductSlice & {
     isCategoryLoading: boolean;
     isProfileLoading: boolean;
     isWalletLoading: boolean;
@@ -34,4 +37,7 @@ export const useAppStore = create<AppState>()((set, get, api) => ({
     ...createProfileSlice(set, get, api),
     ...createWalletSlice(set, get, api),
     ...createNotificationSlice(set, get, api),
+    ...createNavbarSlice(set, get, api),
+    ...createOrderSlice(set, get, api),
+    ...createProductSlice(set, get, api),
 }));

@@ -13,6 +13,10 @@ export interface Transaction {
     number: string;
     Transaction_ID: string | null;
     invoice_number?: string;
+    method?: string;
+    account?: string;
+    date?: string;
+    time?: string;
 }
 
 export interface WalletSlice {
@@ -22,6 +26,8 @@ export interface WalletSlice {
     fetchHistory: (silent?: boolean) => Promise<void>;
     withdrawFunds: (formData: FormData) => Promise<{ success: boolean; message: string }>;
     setPin: (pinCode: string) => Promise<{ success: boolean; message: string }>;
+    searchReceiver: (key: string) => Promise<{ success: boolean; data?: any; message?: string }>;
+    sendFunds: (formData: FormData) => Promise<{ success: boolean; message: string }>;
 }
 
 export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set, get) => ({
@@ -132,6 +138,55 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
             return { 
                 success: false, 
                 message: error.response?.data?.message || "Error setting PIN." 
+            };
+        }
+    },
+    
+    searchReceiver: async (key: string) => {
+        const token = getAuthToken();
+        try {
+            const formData = new FormData();
+            formData.append('key', key);
+
+            const { data } = await axios.post(`${baseURL}/api/search-receiver`, formData, {
+                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
+            });
+
+            if (data?.status === 'success' || data?.status === true) {
+                return { success: true, data: data.data };
+            } else {
+                return { success: false, message: data.message || "User not found." };
+            }
+        } catch (error: any) {
+            console.error("Search Receiver Error:", error);
+            return { 
+                success: false, 
+                message: error.response?.data?.message || "Unable to verify user." 
+            };
+        }
+    },
+
+    sendFunds: async (formData: FormData) => {
+        const token = getAuthToken();
+        if (!token) return { success: false, message: "Authentication required" };
+
+        try {
+            const { data } = await axios.post(`${baseURL}/api/transactions`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (data?.status === 'success' || data?.status === true || data?.success === true) {
+                const { fetchWallet, fetchHistory } = get();
+                await Promise.all([fetchWallet(true), fetchHistory(true)]);
+                return { success: true, message: data.message || "Transfer completed successfully!" };
+            } else {
+                return { success: false, message: data.message || "Transfer failed." };
+            }
+        } catch (error: any) {
+            console.error("Send Funds Error:", error);
+            return { 
+                success: false, 
+                message: error.response?.data?.message || "Failed to process transfer." 
             };
         }
     }

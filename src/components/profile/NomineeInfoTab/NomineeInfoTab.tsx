@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
     User,
     ShieldCheck,
@@ -12,16 +11,18 @@ import {
     Eye
 } from 'lucide-react';
 import EditNomineeInfoTabModal from '../EditNomineeInfoTabModal/EditNomineeInfoTabModal';
-import { NomineeData } from '../types/types';
-
+import { useAppStore } from '@/store/useAppStore';
+import { getAuthToken } from '@/store/utils';
 import { InfoCard } from '../InfoCard/InfoCard';
 
 export default function NomineeInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [nomineeData, setNomineeData] = useState<NomineeData | null>(null);
-    const [loading, setLoading] = useState(false);
+    const nomineeData = useAppStore(s => s.nomineeInfo);
+    const loading = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const token = getAuthToken();
 
     // Helper to get correct path for nominee documents
     const getNomineeDocUrl = (fileName: string, type: 'nominee_image' | 'nominee_nid_front_page' | 'nominee_nid_back_page') => {
@@ -29,55 +30,15 @@ export default function NomineeInfoTab() {
         return `${baseURL}/uploads/student/${type}/${fileName}`;
     };
 
-    const getActiveToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            return JSON.parse(session).token;
-        } catch (e) { return null; }
-    };
-
-    const token = getActiveToken();
-
-    const fetchNomineeInfo = async (signal?: AbortSignal) => {
-        if (!token || !baseURL) return;
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseURL}/api/student/nominee-info`, {
-                signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.data?.success) {
-                setNomineeData(response.data.data);
-            }
-        } catch (error: any) {
-            if (error.name !== 'CanceledError') {
-                console.error('❌ Nominee info fetch failed:', error);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        const controller = new AbortController();
-        fetchNomineeInfo(controller.signal);
-        return () => controller.abort();
-    }, [token, baseURL]);
+        fetchProfile();
+    }, [fetchProfile]);
 
-    const handleLocalUpdate = (updatedData: NomineeData) => {
-        setNomineeData(updatedData);
-        fetchNomineeInfo();
+    const handleLocalUpdate = () => {
+        fetchProfile(true);
     };
 
-    const isDataEmpty = !nomineeData || Object.keys(nomineeData).length <= 2;
-
-    if (loading || isDataEmpty) {
+    if (loading && !nomineeData) {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
@@ -91,6 +52,8 @@ export default function NomineeInfoTab() {
             </div>
         );
     }
+
+    if (!nomineeData) return null;
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -193,3 +156,4 @@ export default function NomineeInfoTab() {
         </div>
     );
 }
+

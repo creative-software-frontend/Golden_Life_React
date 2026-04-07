@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios, { AxiosError } from 'axios';
 import {
     ArrowLeft, Wallet, Send, User,
     CheckCircle2, AlertCircle, KeyRound, ArrowRight, Search, Loader2, Mail, Phone, Clock, Plus, Minus, History
 } from 'lucide-react';
 
 // Import our newly separated modals
+import { useAppStore } from '@/store/useAppStore';
+import { Transaction } from '@/store/slices/walletSlice';
 import SetPinModal from '../SetPinModal/SetPinModal';
 import ConfirmTransferModal from '../ConfirmTransferModal/ConfirmTransferModal';
 import { toast } from 'react-toastify';
-import useModalStore from '@/store/modalStore';
 
 // --- Interface for the Verified User ---
 interface VerifiedUserData {
@@ -22,26 +22,16 @@ interface VerifiedUserData {
     image: string;
 }
 
-// --- Interface for Transaction History ---
-// Updated to handle both mock data and the new API structure
-interface Transaction {
-    id: string | number;
-    amount: string;
-    type: string;
-    method?: string;
-    payment_method?: string;
-    account?: string;
-    number?: string;
-    status?: string;
-    date?: string;
-    time?: string;
-    created_at?: string;
-}
-
 export default function WalletSend() {
     const navigate = useNavigate();
-    const { triggerWalletUpdate } = useModalStore();
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const { 
+        walletBalance: storeWalletBalance,
+        transactions: storeTransactions,
+        isWalletLoading: isLoadingBalance,
+        fetchWallet,
+        fetchHistory,
+        searchReceiver
+    } = useAppStore();
 
     // --- Tabs State ---
     const [activeTab, setActiveTab] = useState<'send' | 'history'>('send');
@@ -58,63 +48,20 @@ export default function WalletSend() {
     const [imageFailed, setImageFailed] = useState<boolean>(false);
 
     // --- UI & Modals State ---
-    const [currentBalance, setCurrentBalance] = useState<number>(0);
-    const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(true);
     const [successMessage, setSuccessMessage] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [showSetPinModal, setShowSetPinModal] = useState<boolean>(false);
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
-    // --- History Data ---
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
-
+    const currentBalance = parseFloat(storeWalletBalance) || 0;
     const presetAmounts: number[] = [100, 500, 1000, 2000];
 
-    const getAuthToken = (): string | null => {
-        const session = sessionStorage.getItem("student_session");
-        return session ? JSON.parse(session).token : null;
-    };
-
-    // --- 1. Fetch Current Balance ---
-    const fetchBalance = async () => {
-        setIsLoadingBalance(true);
-        try {
-            const token = getAuthToken();
-            if (!token) return;
-            const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const fetchedBalance = response.data?.data?.balance || response.data?.balance || 0;
-            setCurrentBalance(Number(fetchedBalance));
-        } catch (error) {
-            console.error("Failed to fetch wallet balance:", error);
-        } finally {
-            setIsLoadingBalance(false);
-        }
-    };
-
-    // --- Fetch Transaction History ---
-    const fetchHistory = async () => {
-        setIsLoadingHistory(true);
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/student/transactions`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data?.status === "success") {
-                setTransactions(data.transactions.filter((t: Transaction) => t.type === 'send'));
-            }
-        } catch (err) { console.error(err); }
-        finally { setIsLoadingHistory(false); }
-    };
-
     useEffect(() => {
-        fetchBalance();
+        fetchWallet();
         fetchHistory();
-    }, [baseURL]);
+    }, [fetchWallet, fetchHistory]);
 
-    // --- 2. Verify User API Call ---
+    // --- 2. Verify User Using Store ---
     const handleVerifyUser = async () => {
         if (!affiliateId) {
             setVerifyError("Please enter an Affiliate ID first.");
@@ -128,46 +75,25 @@ export default function WalletSend() {
         setImageFailed(false);
 
         try {
-            const token = getAuthToken();
-            const formData = new FormData();
-            formData.append('key', affiliateId);
-
-            const response = await axios.post(`${baseURL}/api/search-receiver`, formData, {
-                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
-            });
-
-            if (response.data?.status === 'success' || response.data?.status === true) {
-                const userData = response.data?.data;
-                const foundName = userData?.name || "Verified User";
+            const result = await searchReceiver(affiliateId);
+            if (result.success && result.data) {
+                const userData = result.data;
                 const foundType = userData?.type || userData?.role || "student";
 
                 setVerifiedUser({
                     type: foundType,
-                    name: foundName,
+                    name: userData?.name || "Verified User",
                     email: userData?.email || "",
                     display_id: userData?.display_id || "",
                     mobile: userData?.mobile || "",
                     image: userData?.image || ""
                 });
-
                 setReceiverType(foundType);
             } else {
-                setVerifyError(response.data?.message || "User not found.");
+                setVerifyError(result.message || "User not found.");
             }
-        } catch (error) {
-            const axiosError = error as AxiosError<any>;
-            const backendMessage = axiosError.response?.data?.message;
-            const backendErrors = axiosError.response?.data?.errors;
-
-            let finalError = "Unable to verify user. Please check the ID.";
-
-            if (backendErrors && backendErrors.key) {
-                finalError = backendErrors.key[0];
-            } else if (backendMessage) {
-                finalError = backendMessage;
-            }
-
-            setVerifyError(finalError);
+        } catch (error: any) {
+            setVerifyError(error.message || "Unable to verify user.");
         } finally {
             setIsVerifying(false);
         }
@@ -180,6 +106,13 @@ export default function WalletSend() {
         setImageFailed(false);
     }, [affiliateId]);
 
+    // Derived Transactions
+    const transactions = React.useMemo(() => {
+        return storeTransactions.filter((t: Transaction) => t.type === 'send' || t.type === 'transfer_out');
+    }, [storeTransactions]);
+
+    const isLoadingHistory = isLoadingBalance; // Simplified loading tie-in
+
     // --- 3. Modal Handlers ---
     const handleSuccess = (message: string) => {
         setErrorMessage('');
@@ -190,10 +123,6 @@ export default function WalletSend() {
     const handleTransferSuccess = async (message: string) => {
         setErrorMessage('');
         setSuccessMessage(message);
-        toast.success(message);
-        await fetchBalance();
-        await fetchHistory(); // Refresh history after transfer
-        triggerWalletUpdate(); // Global Sync
         setAmount('');
         setAffiliateId('');
         setVerifiedUser(null);
@@ -272,8 +201,6 @@ export default function WalletSend() {
                 onClose={() => setShowSetPinModal(false)}
                 onSuccess={handleSuccess}
                 onError={handleError}
-                baseURL={baseURL}
-                token={getAuthToken()}
             />
 
             <ConfirmTransferModal
@@ -284,8 +211,6 @@ export default function WalletSend() {
                 amount={amount}
                 receiverType={receiverType}
                 affiliateId={affiliateId}
-                baseURL={baseURL}
-                token={getAuthToken()}
             />
 
             {/* --- Main Page Header --- */}

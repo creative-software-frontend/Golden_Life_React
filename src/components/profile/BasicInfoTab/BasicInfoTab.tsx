@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Edit2, Mail, Phone, User as UserIcon, Hash, Fingerprint, Activity, ShieldCheck } from 'lucide-react';
 import DataRow from '@/components/ui/DataRow';
 import EditProfileModal from '../EditProfileModal/EditProfileModal';
 import useModalStore from '@/store/modalStore';
+import { useAppStore } from '@/store/useAppStore';
+import { baseURL } from '@/store/utils';
 
 
 export interface StudentData {
@@ -23,57 +24,20 @@ export interface StudentData {
 }
 
 export default function BasicInfoTab() {
-    const [student, setStudent] = useState<StudentData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const student = useAppStore(s => s.studentProfile);
+    const loading = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const profileUpdateTrigger = useModalStore(s => s.profileUpdateTrigger);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-    const getAuthToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            return JSON.parse(session).token;
-        } catch (e) { return null; }
-    };
-
-    const fetchDashboardData = async () => {
-        const token = getAuthToken();
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const response = await axios.get(`${baseURL}/api/student/dashboard`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.data?.success) {
-                const fetchedStudent = response.data.data.student;
-                setStudent({
-                    ...fetchedStudent,
-                    refer_code: fetchedStudent.refer_code ?? null
-                });
-            }
-        } catch (error) {
-            console.error('❌ Dashboard fetch failed:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchDashboardData();
-    }, [profileUpdateTrigger]);
+        fetchProfile();
+    }, [fetchProfile, profileUpdateTrigger]);
 
-    if (loading) return <LoadingSkeleton />;
+    if (loading && !student) return <LoadingSkeleton />;
 
     const displayReferCode = student?.refer_code || 'Not generated yet';
+
 
     return (
         <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">

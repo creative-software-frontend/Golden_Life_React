@@ -36,9 +36,28 @@ export interface Order {
     payment_method: string;
     transaction_number: string;
   };
+  student_address?: {
+    id: number;
+    user_id: string;
+    name: string;
+    phone: string;
+    address: string;
+  };
+  student?: {
+    id: number;
+    name: string;
+    email: string;
+    mobile: string;
+    image: string;
+    personal_info?: {
+      id: number;
+      student_id: string;
+      location: string;
+    };
+  };
 }
 
-export type OrderStatus = 'Order Placed' | 'Pending' | 'Processing' | 'Packaging' | 'Ready to Ship' | 'Delivered' | 'Cancelled';
+export type OrderStatus = 'Order Placed' | 'Pending' | 'Processing' | 'Packaging' | 'Sent To Courier' | 'Ready To Courier' | 'On The Way' | 'Delivered' | 'Returned' | 'Ready to Ship' | 'Cancelled';
 
 export interface OrdersApiResponse {
   status: boolean;

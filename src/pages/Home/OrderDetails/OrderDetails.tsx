@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import {
   Package, Truck, MapPin, CreditCard, CheckCircle2,
   User, Phone, ArrowLeft, Printer, Contact, Mail, Calendar, Download
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useAppStore } from '@/store/useAppStore';
+import { OrderProduct } from '@/store/slices/orderSlice';
 
 /* ─── Print-only Invoice Component ───────────────────────────── */
 const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems, baseURL }: any) => {
@@ -189,58 +190,7 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
   );
 };
 
-// ─── Types ────────────────────────────────────────────────
-interface Product {
-  id: number;
-  product_id?: string | number;
-  product_name: string;
-  product_image: string;
-  quantity: string;
-  subtotal: string;
-  ebook?: string;
-  video_link?: string;
-}
-
-interface Payment {
-  payment_method: string;
-  transaction_number: string;
-}
-
-interface OrderDetailsData {
-  id: number;
-  order_no: string;
-  user_name: string;
-  user_phone: string;
-  user_address: string;
-  delivery_charge: string;
-  total: string;
-  created_at: string;
-  status: string;
-  payment: Payment | null;
-  products: Product[];
-}
-
-interface BuyerAddress {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  is_default: string;
-}
-
-interface StudentProfile {
-  student: {
-    name: string;
-    email: string;
-    mobile: string;
-    affiliate_id: string;
-  };
-  personal_info: {
-    district: string;
-    location: string;
-    division: string;
-  };
-}
+// Interfaces removed - using store Order type
 
 // ─── Component ─────────────────────────────────────────────
 const OrderDetails = () => {
@@ -251,99 +201,37 @@ const OrderDetails = () => {
 
   const orderNoFromQuery = searchParams.get('order');
   const { id, orderNo: orderNoFromState } = location.state || {};
-
   const effectiveOrderNo = orderNoFromQuery || orderNoFromState || id?.toString?.() || '';
 
-  const [order, setOrder] = useState<OrderDetailsData | null>(null);
-  const [shippingInfo, setShippingInfo] = useState<BuyerAddress | null>(null);
-  const [buyerProfile, setBuyerProfile] = useState<StudentProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    currentOrder: order,
+    isOrderDetailsLoading: loading,
+    fetchOrderDetails,
+    studentProfile,
+    personalInfo
+  } = useAppStore();
+
   const [error, setError] = useState("");
-
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-  const getAuthToken = () => {
-    const session = sessionStorage.getItem("student_session");
-    if (!session) return null;
-    try {
-      const parsed = JSON.parse(session);
-      if (new Date().getTime() > parsed.expiry) return null;
-      return parsed.token;
-    } catch {
-      return null;
-    }
-  };
 
   useEffect(() => {
     if (!effectiveOrderNo) {
       setError(t("orderDetails.errorNotFound") || "No order number provided.");
-      setLoading(false);
       return;
     }
+    fetchOrderDetails(effectiveOrderNo);
+  }, [effectiveOrderNo, fetchOrderDetails, t]);
 
-    const fetchDetails = async () => {
-      const token = getAuthToken();
-      if (!token) {
-        setError(t("orderDetails.errorAuth") || "Please log in to view order details.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [ordersRes, addrRes, profileRes] = await Promise.all([
-          axios.get(`${baseURL}/api/student/orders`, { headers }),
-          axios.get(`${baseURL}/api/student/addresses`, { headers }).catch(() => null),
-          axios.get(`${baseURL}/api/student/profile`, { headers }).catch(() => null)
-        ]);
-
-        if (ordersRes.data?.status === "success" && ordersRes.data?.orders) {
-          const matchedOrder = ordersRes.data.orders.find(
-            (o: OrderDetailsData) => o.order_no === effectiveOrderNo
-          );
-
-          if (matchedOrder) {
-            const productsRes = await axios.get(`${baseURL}/api/products`, { headers }).catch(() => null);
-            // Handle multiple potential response structures
-            const allProductsList = productsRes?.data?.data?.products || productsRes?.data?.products || [];
-
-            const enrichedProducts = matchedOrder.products.map((orderP: Product) => {
-              const pId = String(orderP.product_id ?? orderP.id);
-              const details = allProductsList.find((p: any) => String(p.id) === pId);
-              return {
-                ...orderP,
-                ebook: details?.ebook ? String(details.ebook).trim() : "0",
-                video_link: details?.video_link?.trim() || ""
-              };
-            });
-
-            setOrder({ ...matchedOrder, products: enrichedProducts });
-          } else {
-            setError(t("orderDetails.errorNotFound") || "Order not found.");
-          }
-        } else {
-          setError(t("orderDetails.errorNotFound") || "Failed to load orders.");
-        }
-
-        if (addrRes?.data?.status === "success" && addrRes.data.addresses) {
-          const defaultAddr = addrRes.data.addresses.find((a: BuyerAddress) => a.is_default === "1");
-          if (defaultAddr) setShippingInfo(defaultAddr);
-        }
-
-        if (profileRes?.data?.status === "success" && profileRes.data.student) {
-          setBuyerProfile(profileRes.data);
-        }
-      } catch (err: any) {
-        console.error("Order fetch error:", err);
-        setError(err.response?.data?.message || "Failed to load order details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetails();
-  }, [effectiveOrderNo, baseURL, t]);
+  // Shipping info can be derived from the currentOrder or store addresses
+  const shippingInfo = order?.student_address || null;
+  
+  // Buyer profile - prefer order's student data if available (from backend response)
+  // Fallback to logged-in studentProfile and personalInfo from store
+  const buyerProfile = order?.student 
+    ? { student: order.student, personal_info: order.student.personal_info }
+    : studentProfile 
+      ? { student: studentProfile, personal_info: personalInfo }
+      : null;
 
   if (loading) {
     return (
@@ -371,7 +259,7 @@ const OrderDetails = () => {
   }
 
   const subtotal = Number(order.total) - Number(order.delivery_charge);
-  const totalItems = order.products?.reduce((sum, p) => sum + Number(p.quantity || 0), 0) || 0;
+  const totalItems = order.products?.reduce((sum: number, p: OrderProduct) => sum + Number(p.quantity || 0), 0) || 0;
 
   const statuses = [
     "Order Placed", "Processing", "Packaging", "Sent To Courier",
@@ -531,7 +419,7 @@ const OrderDetails = () => {
               </div>
 
               <div className="p-4 sm:p-6 space-y-4">
-                {order.products?.map((item) => (
+                {order.products?.map((item: OrderProduct) => (
                   <div
                     key={item.id}
                     className="flex flex-col sm:flex-row gap-4 bg-slate-50/60 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all"

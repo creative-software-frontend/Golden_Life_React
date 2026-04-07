@@ -6,7 +6,6 @@ import {
     Loader2,
     TrendingUp,
     Wallet,
-    BadgeDollarSign,
     Facebook,
     Youtube,
     Linkedin,
@@ -21,27 +20,6 @@ import {
     Users
 } from 'lucide-react';
 import useModalStore from '@/store/modalStore';
-
-
-interface FullProfileData {
-    student: {
-        id: number;
-        name: string;
-        email: string;
-        affiliate_id: string;
-        mobile: string;
-        image: string;
-        refer_code: string;
-        status: string;
-        created_at: string;
-        updated_at: string;
-        user_id: string;
-    };
-    personal_info: any;
-    document_info: any;
-    nominee_info: any;
-    additional_info: any;
-}
 
 interface DashboardStats {
     boucher_balance: number | string;
@@ -82,11 +60,19 @@ const InfoCard = ({ icon: Icon, label, value }: any) => (
     </div>
 );
 
+import { useAppStore } from '@/store/useAppStore';
+
 export default function ProjectOverviewTab() {
-    const [profile, setProfile] = useState<FullProfileData | null>(null);
-    const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [walletBalance, setWalletBalance] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const student = useAppStore(s => s.studentProfile);
+    const personal_info = useAppStore(s => s.personalInfo);
+    const nominee_info = useAppStore(s => s.nomineeInfo);
+    const additional_info = useAppStore(s => s.additionalInfo);
+    const walletBalance = useAppStore(s => s.walletBalance);
+    const loadingProfile = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
+
+    const [stats, setStats] = useState<DashboardStats>({ boucher_balance: 0, earning_balance: 0, recharge_balance: 0 });
+    const [loadingStats, setLoadingStats] = useState(true);
 
     const profileUpdateTrigger = useModalStore((s) => s.profileUpdateTrigger);
     const profileBlobPreview = useModalStore((s) => s.profileBlobPreview);
@@ -94,25 +80,19 @@ export default function ProjectOverviewTab() {
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
     useEffect(() => {
-        const fetchData = async () => {
+        fetchProfile();
+
+        const fetchStats = async () => {
             const session = sessionStorage.getItem("student_session");
             if (!session) {
-                setLoading(false);
+                setLoadingStats(false);
                 return;
             }
             const token = JSON.parse(session).token;
             const headers = { Authorization: `Bearer ${token}` };
 
             try {
-                const [profileRes, dashRes, walletRes] = await Promise.all([
-                    axios.get(`${baseURL}/api/student/profile`, { headers }).catch(() => null),
-                    axios.get(`${baseURL}/api/student/dashboard`, { headers }).catch(() => null),
-                    axios.get(`${baseURL}/api/wallet-balance`, { headers }).catch(() => null)
-                ]);
-
-                if (profileRes?.data?.status === "success") {
-                    setProfile(profileRes.data);
-                }
+                const dashRes = await axios.get(`${baseURL}/api/student/dashboard`, { headers });
                 if (dashRes?.data?.success) {
                     setStats({
                         boucher_balance: dashRes.data.data.boucher_balance || 0,
@@ -120,20 +100,17 @@ export default function ProjectOverviewTab() {
                         recharge_balance: dashRes.data.data.recharge_balance || 0
                     });
                 }
-                if (walletRes?.data?.success) {
-                    setWalletBalance(walletRes.data.data.balance);
-                }
             } catch (err) {
-                console.error("ProjectOverview: Fetch failed", err);
+                console.error("ProjectOverview: Stats Fetch failed", err);
             } finally {
-                setLoading(false);
+                setLoadingStats(false);
             }
         };
 
-        fetchData();
-    }, [baseURL, profileUpdateTrigger]);
+        fetchStats();
+    }, [baseURL, profileUpdateTrigger, fetchProfile]);
 
-    if (loading || !profile) {
+    if ((loadingProfile && !student) || loadingStats) {
         return (
             <div className="p-20 flex flex-col items-center justify-center bg-white rounded-[3rem] border border-dashed border-slate-200">
                 <Loader2 className="animate-spin text-primary mb-4" size={40} />
@@ -142,12 +119,12 @@ export default function ProjectOverviewTab() {
         );
     }
 
-    const { student, personal_info, nominee_info, additional_info } = profile;
+    if (!student) return null;
 
-    const serverImageUrl = student?.image
-        ? `${baseURL}/uploads/student/image/${student.image}?t=${profileUpdateTrigger}_${Date.now()}`
+    const profileImg = student?.image
+        ? (student.image.startsWith('http') ? student.image : `${baseURL}/uploads/student/image/${student.image}?t=${profileUpdateTrigger}_${Date.now()}`)
         : null;
-    const avatarUrl = profileBlobPreview ?? serverImageUrl ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
+    const avatarUrl = profileBlobPreview ?? profileImg ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.name || 'Student')}&background=FF8A00&color=fff&bold=true`;
 
     return (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700 pb-10">

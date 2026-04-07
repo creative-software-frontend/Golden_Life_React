@@ -2,7 +2,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react"; // For a cleaner "Explore" icon
+import { ArrowRight } from "lucide-react"; 
+import { baseURL } from "@/store/utils";
 
 interface ProductCardProps {
   product: any; // Using 'any' to match your API response object
@@ -27,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, bgColorClass }) => {
     : product.product_title_english;
 
   // 2. Correct Image Pathing from your API structure
-  const imageUrl = `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`;
+  const imageUrl = `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`;
 
   return (
     <Link to={`/dashboard/product/${product.id}`} className="block h-full">
@@ -48,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, bgColorClass }) => {
             src={imageUrl} 
             alt={title}
             className="w-full h-full object-contain transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500"
-            onError={(e) => (e.currentTarget.src = "https://api.goldenlife.my/uploads/ecommarce/product_image/placeholder.png")}
+            onError={(e) => (e.currentTarget.src = `${baseURL}/uploads/ecommarce/product_image/placeholder.png`)}
             loading="lazy"
           />
         </div>

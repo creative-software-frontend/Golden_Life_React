@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, User, Phone, MapPin, Printer, Check, CreditCard, Receipt } from 'lucide-react';
+import { ArrowLeft, Package, User, Phone, MapPin, Printer, Check, CreditCard, Receipt, Mail } from 'lucide-react';
 import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
-import { log } from 'node:console';
+
 
 // Helper function to format address
 const formatAddress = (address: string | undefined) => {
@@ -182,7 +182,6 @@ export default function OrderDetails() {
   const [fullAddressText, setFullAddressText] = useState<string | null>(null);
 
   // New state for transactions
-  const [transactions, setTransactions] = useState<any[]>([]);
   const [orderTransaction, setOrderTransaction] = useState<any | null>(null);
 
   // Added 8 full statuses
@@ -276,7 +275,7 @@ export default function OrderDetails() {
 
         if (data.status === true && data.transactions) {
           console.log(data.transactions);
-          setTransactions(data.transactions);
+          // setTransactions(data.transactions);
 
           // Fetch Transactions
           if (order) {
@@ -468,16 +467,34 @@ export default function OrderDetails() {
             <CardHeader><CardTitle className="text-lg font-bold">BUYER PROFILE</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-gray-600"><User className="w-4 h-4" /><span className="text-sm font-medium">Customer Name</span></div>
-                <p className="text-base font-semibold text-gray-900 pl-6">{order.user_name}</p>
+                <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] mb-1">Name</div>
+                <p className="text-[17px] font-black text-slate-900">{order.user_name}</p>
               </div>
+
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-gray-600"><Phone className="w-4 h-4" /><span className="text-sm font-medium">Contact Number</span></div>
-                <p className="text-base font-semibold text-gray-900 pl-6">{order.user_phone}</p>
+                <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] mb-2">Contact</div>
+                <div className="space-y-2">
+                  {order.student?.email && (
+                    <div className="flex items-center gap-2.5 text-slate-700">
+                      <Mail className="w-4 h-4 text-slate-400" />
+                      <span className="text-[15px] font-bold">{order.student.email}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2.5 text-slate-700">
+                    <Phone className="w-4 h-4 text-slate-400" />
+                    <span className="text-[15px] font-bold">{order.user_phone}</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1">
-                <div className="flex items-start gap-2 text-gray-600"><MapPin className="w-4 h-4 mt-1" /><span className="text-sm font-medium">Delivery Address</span></div>
-                <p className="text-base text-gray-900 pl-6">{fullAddressText || "Loading address..."}</p>
+
+              <div className="space-y-1 pt-1">
+                <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.1em] mb-2">Location</div>
+                <div className="flex items-start gap-2.5 text-slate-700">
+                  <MapPin className="w-4 h-4 mt-0.5 text-slate-400 shrink-0" />
+                  <p className="text-[15px] font-bold leading-relaxed">
+                    {order.student?.personal_info?.location || order.student_address?.address || fullAddressText || 'Not provided'}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
