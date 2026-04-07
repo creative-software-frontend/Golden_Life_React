@@ -14,6 +14,7 @@ import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus, OrderFilters } from './types/order.types';
 import { OrderTable } from './components/OrderTable';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
+import PrintReceipt from '@/components/PrintReceipt/PrintReceipt';
 
 export default function Orders() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function Orders() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<{ orderNo: string; status: OrderStatus } | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
 
   const loadOrders = useCallback(async () => {
     try {
@@ -131,6 +133,14 @@ export default function Orders() {
     delete (window as any).__selectedOrderId;
   };
 
+  const handlePrintOrder = (order: Order) => {
+    setPrintingOrder(order);
+  };
+
+  const handleClosePrint = () => {
+    setPrintingOrder(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -226,6 +236,7 @@ export default function Orders() {
               orders={filteredOrders}
               onViewDetails={handleViewDetails}
               onUpdateStatus={handleUpdateStatus}
+              onPrint={handlePrintOrder}
             />
           )}
         </CardContent>
@@ -243,6 +254,35 @@ export default function Orders() {
           onUpdate={handleStatusUpdate}
           orderNo={selectedOrder.orderNo}
         />
+      )}
+
+      {/* Print Receipt Modal */}
+      {printingOrder && (
+        <div className="fixed inset-0 z-[9999] bg-white overflow-auto">
+          <PrintReceipt
+            order={{
+              id: printingOrder.id,
+              order_no: printingOrder.order_no,
+              created_at: printingOrder.created_at,
+              status: printingOrder.status,
+              total: printingOrder.total,
+              delivery_charge: printingOrder.delivery_charge,
+              products: printingOrder.products?.map((p: any) => ({
+                product_name: p.product_name,
+                quantity: p.quantity,
+                subtotal: p.subtotal,
+                price: p.price,
+              })),
+              payment: printingOrder.payment,
+              customer: {
+                name: printingOrder.user_name,
+                phone: printingOrder.user_phone,
+                address: printingOrder.user_address,
+              },
+            }}
+            onClose={handleClosePrint}
+          />
+        </div>
       )}
     </div>
   );

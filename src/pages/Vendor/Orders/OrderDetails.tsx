@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,8 @@ import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
-
+import QRCode from 'qrcode';
+import JsBarcode from 'jsbarcode';
 
 // Helper function to format address
 const formatAddress = (address: string | undefined) => {
@@ -23,6 +24,56 @@ const formatAddress = (address: string | undefined) => {
 const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { order: Order; formatDate: (d: string) => string; fullAddressText?: string | null; orderTransaction?: any }) => {
   const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
   const baseURL = 'https://api.goldenlife.my';
+  const invoiceNumber = order.order_no;
+  const orderDate = formatDate(order.created_at);
+  const printDateTime = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // QR Code and Barcode refs
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
+
+  // Generate QR Code
+  useEffect(() => {
+    if (qrCanvasRef.current) {
+      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
+        width: 100,
+        margin: 1,
+        color: { dark: '#1e293b', light: '#ffffff' },
+        errorCorrectionLevel: 'M',
+      }, (error) => {
+        if (error) console.error('QR Code generation error:', error);
+      });
+    }
+  }, [trackingUrl]);
+
+  // Generate Barcode
+  useEffect(() => {
+    if (barcodeRef.current) {
+      try {
+        JsBarcode(barcodeRef.current, invoiceNumber, {
+          format: 'CODE128',
+          width: 2,
+          height: 60,
+          displayValue: true,
+          fontSize: 12,
+          font: 'monospace',
+          textMargin: 4,
+          margin: 5,
+          background: '#ffffff',
+          lineColor: '#1e293b',
+        });
+      } catch (error) {
+        console.error('Barcode generation error:', error);
+      }
+    }
+  }, [invoiceNumber]);
 
   return (
     <>
@@ -75,98 +126,123 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
         background: '#fff',
         boxSizing: 'border-box'
       }}>
-      {/* ─── Header ─── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
-        <div>
-          <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
-        </div>
+        {/* ─── Header ─── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
+          <div>
+            <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
+          </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-          <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-          <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
-            Date: {formatDate(order.created_at)} &nbsp;|&nbsp; Status: {order.status}
-          </p>
-        </div>
-      </div>
+          <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
+            <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
+              Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
+            </p>
+          </div>
 
-      {/* ─── Billing Address Only ─── */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
-        <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Address</p>
-        <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
-        <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{fullAddressText || formatAddress(order.user_address)}</p>
-        <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-      </div>
+          {/* QR Code & Barcode Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
 
-      {/* ─── Product Table ─── */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '13px' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid #eee' }}>
-            <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
-            <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Qty</th>
-            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Unit Price</th>
-            <th style={{ padding: '10px 0 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.products?.map((product: any) => (
-            <tr key={product.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-              <td style={{ padding: '12px 14px 12px 0', verticalAlign: 'middle' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <img
-                    src={product.product_image?.startsWith('http') ? product.product_image : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`}
-                    alt={product.product_name}
-                    style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
-                  />
-                  <span style={{ fontWeight: 700, color: '#111' }}>{product.product_name}</span>
-                </div>
-              </td>
-              <td style={{ padding: '12px 14px', textAlign: 'center', color: '#555' }}>{product.quantity}</td>
-              <td style={{ padding: '12px 14px', textAlign: 'right', color: '#555' }}>৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</td>
-              <td style={{ padding: '12px 0 12px 14px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{parseFloat(product.subtotal).toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* ─── Totals ─── */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-        <div style={{ width: '280px', fontSize: '13px' }}>
-          {[
-            { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
-            { label: 'Delivery Fee', value: `৳${parseFloat(order.delivery_charge).toFixed(2)}` },
-            { label: 'Total Amount Paid', value: `৳${parseFloat(order.total).toFixed(2)}`, bold: true },
-            { label: 'Total Due', value: '৳0', bold: true },
-          ].map(({ label, value, bold }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
-              <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
-              <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── Payment Method (Left Aligned) ─── */}
-      <div style={{ padding: '12px', background: '#f0f7ff', border: '1px solid #dbeafe', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <CreditCard size={16} color="#2563eb" />
-        <div>
-          <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '14px' }}>{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-          <div style={{ fontSize: '12px', color: '#3b82f6' }}>
-            TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}
+            <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
+            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
           </div>
         </div>
-      </div>
 
-      {/* ─── Footer ─── */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6, marginTop: '24px' }}>
-        <p style={{ margin: '0 0 15px 0' }}>
-          Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
-        </p>
-        <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
-          Thank you for shopping!
-        </p>
-      </div>
+        {/* ─── Billing + Shipping Info ─── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
+          {/* Billing Info (Buyer Profile) */}
+          <div>
+            <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Information</p>
+            <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
+            <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
+              {order.student?.personal_info?.location || order.student_address?.address || fullAddressText || formatAddress(order.user_address)}
+            </p>
+            {order.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.student.email}</p>}
+            <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
+          </div>
+
+          {/* Additional Info if needed */}
+          <div>
+             <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Status</p>
+             <p style={{ fontSize: '13px', color: '#444', margin: '0 0 4px' }}>Status: <span style={{ fontWeight: 700, color: '#111' }}>{order.status}</span></p>
+             <p style={{ fontSize: '13px', color: '#444' }}>Payment: <span style={{ fontWeight: 700, color: '#111' }}>{order.payment?.payment_method || '—'}</span></p>
+          </div>
+        </div>
+
+        {/* ─── Product Table ─── */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '13px' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid #eee' }}>
+              <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
+              <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Qty</th>
+              <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Unit Price</th>
+              <th style={{ padding: '10px 0 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {order.products?.map((product: any) => (
+              <tr key={product.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '12px 14px 12px 0', verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img
+                      src={product.product_image?.startsWith('http') ? product.product_image : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`}
+                      alt={product.product_name}
+                      style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
+                    />
+                    <span style={{ fontWeight: 700, color: '#111' }}>{product.product_name}</span>
+                  </div>
+                </td>
+                <td style={{ padding: '12px 14px', textAlign: 'center', color: '#555' }}>{product.quantity}</td>
+                <td style={{ padding: '12px 14px', textAlign: 'right', color: '#555' }}>৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</td>
+                <td style={{ padding: '12px 0 12px 14px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{parseFloat(product.subtotal).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* ─── Totals ─── */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+          <div style={{ width: '280px', fontSize: '13px' }}>
+            {[
+              { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
+              { label: 'Delivery Fee', value: `৳${parseFloat(order.delivery_charge).toFixed(2)}` },
+              { label: 'Total Amount Paid', value: `৳${parseFloat(order.total).toFixed(2)}`, bold: true },
+              { label: 'Total Due', value: '৳0', bold: true },
+            ].map(({ label, value, bold }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
+                <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
+                <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Payment Method (Left Aligned) ─── */}
+        <div style={{ padding: '12px', background: '#f0f7ff', border: '1px solid #dbeafe', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CreditCard size={16} color="#2563eb" />
+          <div>
+            <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '14px' }}>{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
+            <div style={{ fontSize: '12px', color: '#3b82f6' }}>
+              TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Footer ─── */}
+        <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6, marginTop: '24px' }}>
+          <p style={{ margin: '0 0 15px 0' }}>
+            Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
+          </p>
+          <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
+            Thank you for shopping!
+          </p>
+          <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
+            Printed on: {printDateTime}
+          </p>
+        </div>
       </div>
     </>
   );
@@ -346,14 +422,6 @@ export default function OrderDetails() {
 
   return (
     <div className="max-w-[1400px] mx-auto p-6 space-y-6">
-      <style>{`
-        @media print {
-          @page { margin: 12mm; size: auto; }
-          .screen-only, header, nav, footer, .fixed, .backdrop-blur { display: none !important; }
-          .print-only { display: block !important; }
-          body { background: white !important; }
-        }
-      `}</style>
 
       <PrintInvoice order={order} formatDate={formatDate} fullAddressText={fullAddressText} orderTransaction={orderTransaction} />
 
@@ -507,12 +575,22 @@ export default function OrderDetails() {
                 <div className="flex justify-between text-gray-600"><span>Delivery Fee</span><span className="font-medium">৳{parseFloat(order.delivery_charge).toFixed(2)}</span></div>
                 <div className="border-t pt-3 space-y-3">
                   <div className="flex justify-between font-bold text-lg"><span>Total</span><span className="text-primary-light">৳{parseFloat(order.total).toFixed(2)}</span></div>
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex items-center gap-3 text-sm">
-                    <CreditCard size={16} className="text-blue-600" />
-                    <div>
-                      <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-                      <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <CreditCard size={16} className="text-blue-600" />
+                      <div>
+                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
+                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                      </div>
                     </div>
+                    <Button
+                      onClick={() => window.print()}
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                    >
+                      <Printer size={14} />
+                      PRINT RECEIPT
+                    </Button>
                   </div>
                 </div>
               </div>

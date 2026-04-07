@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import QRCode from 'qrcode';
+import JsBarcode from 'jsbarcode';
 import {
   Package, Truck, MapPin, CreditCard, CheckCircle2,
   User, Phone, ArrowLeft, Printer, Contact, Mail, Calendar, Download
@@ -10,9 +13,62 @@ import { OrderProduct } from '@/store/slices/orderSlice';
 
 /* ─── Print-only Invoice Component ───────────────────────────── */
 const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems, baseURL }: any) => {
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+
   const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric'
   });
+
+  const printDateTime = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const invoiceNumber = order.order_no;
+  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
+
+  // Generate QR Code
+  useEffect(() => {
+    if (qrCanvasRef.current) {
+      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
+        width: 100,
+        margin: 1,
+        color: {
+          dark: '#1e293b',
+          light: '#ffffff',
+        },
+        errorCorrectionLevel: 'M',
+      }, (error) => {
+        if (error) console.error('QR Code generation error:', error);
+      });
+    }
+  }, [trackingUrl]);
+
+  // Generate Barcode
+  useEffect(() => {
+    if (barcodeRef.current) {
+      try {
+        JsBarcode(barcodeRef.current, invoiceNumber, {
+          format: 'CODE128',
+          width: 2,
+          height: 60,
+          displayValue: true,
+          fontSize: 12,
+          font: 'monospace',
+          textMargin: 4,
+          margin: 5,
+          background: '#ffffff',
+          lineColor: '#1e293b',
+        });
+      } catch (error) {
+        console.error('Barcode generation error:', error);
+      }
+    }
+  }, [invoiceNumber]);
 
   return (
     <>
@@ -60,15 +116,34 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
         padding: '0'          /* Margins are now handled by @page in CSS */
       }}>
         {/* ─── Header ─── */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
           <div>
             <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
 
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
             <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
             <p style={{ fontSize: '11px', color: '#777', marginTop: '4px', marginBottom: 0 }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
+          </div>
+
+          {/* QR Code & Barcode Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            {/* QR Code */}
+            <canvas
+              ref={qrCanvasRef}
+              width={100}
+              height={100}
+              style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+            />
+            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
+
+            {/* Barcode */}
+            <svg
+              ref={barcodeRef}
+              style={{ maxWidth: '200px', height: '80px' }}
+            />
+            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
           </div>
         </div>
 
@@ -180,8 +255,11 @@ const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems,
           <p style={{ margin: '0 0 15px 0' }}>
             Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
           </p>
-          <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
+          <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: '0 0 10px 0' }}>
             Thank you for shopping!
+          </p>
+          <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
+            Printed on: {printDateTime}
           </p>
         </div>
       </div>
@@ -224,12 +302,12 @@ const OrderDetails = () => {
 
   // Shipping info can be derived from the currentOrder or store addresses
   const shippingInfo = order?.student_address || null;
-  
+
   // Buyer profile - prefer order's student data if available (from backend response)
   // Fallback to logged-in studentProfile and personalInfo from store
-  const buyerProfile = order?.student 
+  const buyerProfile = order?.student
     ? { student: order.student, personal_info: order.student.personal_info }
-    : studentProfile 
+    : studentProfile
       ? { student: studentProfile, personal_info: personalInfo }
       : null;
 

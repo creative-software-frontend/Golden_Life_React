@@ -10,8 +10,10 @@ import {
   ShoppingBag,
   ExternalLink,
   ArrowRight,
+  Printer,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import PrintReceipt from '@/components/PrintReceipt/PrintReceipt';
 
 // --- Types ---
 interface Product {
@@ -65,27 +67,39 @@ const OrderSkeleton = () => (
 );
 
 const OrderHistory = () => {
-    const navigate = useNavigate();
-    const { 
-        orders, 
-        isOrdersLoading: loading, 
-        fetchOrders 
-    } = useAppStore();
-    
-    const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const {
+    orders,
+    isOrdersLoading: loading,
+    fetchOrders,
+    studentProfile,
+    personalInfo
+  } = useAppStore();
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
+  const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
 
-    const goToDetails = (e: React.MouseEvent, orderId: number, orderNo: string) => {
-        e.stopPropagation();
-        navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } });
-    };
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
+  const goToDetails = (e: React.MouseEvent, orderId: number, orderNo: string) => {
+    e.stopPropagation();
+    navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } });
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
   const toggleOrder = (id: number) => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
+  };
+
+  const handlePrintOrder = (e: React.MouseEvent, order: Order) => {
+    e.stopPropagation();
+    setPrintingOrder(order);
+  };
+
+  const handleClosePrint = () => {
+    setPrintingOrder(null);
   };
 
   // ==================== SKELETON LOADING ====================
@@ -148,8 +162,8 @@ const OrderHistory = () => {
             <div
               key={order.id}
               className={`transition-all duration-300 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-sm border ${expandedOrderId === order.id
-                  ? 'bg-white/90 border-emerald-200 shadow-xl shadow-emerald-100/30'
-                  : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
+                ? 'bg-white/90 border-emerald-200 shadow-xl shadow-emerald-100/30'
+                : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
                 }`}
             >
               <div
@@ -246,6 +260,16 @@ const OrderHistory = () => {
                       </p>
                       <p className="text-xs font-semibold text-indigo-900/80">View Full Invoice & Tracker</p>
                     </div>
+
+                    <button
+                      onClick={(e) => handlePrintOrder(e, order)}
+                      className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 shadow-sm hover:bg-emerald-50 cursor-pointer transition-all flex flex-col justify-center group/btn no-print"
+                    >
+                      <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                        Print Receipt <Printer size={11} className="transition-transform group-hover/btn:scale-110" />
+                      </p>
+                      <p className="text-xs font-semibold text-emerald-900/80">Print or Download PDF</p>
+                    </button>
                   </div>
 
                   <div>
@@ -317,6 +341,36 @@ const OrderHistory = () => {
           ))}
         </div>
       </div>
+
+      {/* Print Receipt Modal */}
+      {printingOrder && (
+        <div className="fixed inset-0 z-[9999] bg-white overflow-auto">
+          <PrintReceipt
+            order={{
+              id: printingOrder.id,
+              order_no: printingOrder.order_no,
+              created_at: printingOrder.created_at,
+              status: printingOrder.status,
+              total: printingOrder.total,
+              delivery_charge: printingOrder.delivery_charge,
+              products: printingOrder.products,
+              payment: printingOrder.payment,
+              customer: {
+                name: studentProfile?.name || 'Customer',
+                email: studentProfile?.email,
+                phone: studentProfile?.mobile,
+                address: personalInfo?.location || personalInfo?.district || 'N/A'
+              },
+              shipping_address: {
+                name: studentProfile?.name || 'Customer',
+                phone: studentProfile?.mobile || 'N/A',
+                address: personalInfo?.location || personalInfo?.district || 'N/A'
+              }
+            }}
+            onClose={handleClosePrint}
+          />
+        </div>
+      )}
     </div>
   );
 };

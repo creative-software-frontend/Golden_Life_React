@@ -5,7 +5,7 @@ import {
     Clock,
     AlertCircle,
     TrendingUp,
-    DollarSign,
+    Wallet,
     ShoppingCart,
     Star,
     Plus,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { formatBDT } from '@/utils/currencyFormatter';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -40,7 +41,7 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
                         <p className="font-medium text-sm text-foreground">{order.order_no}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{order.status}</p>
                     </div>
-                    <p className="font-semibold text-sm text-foreground">${parseFloat(order.total).toFixed(2)}</p>
+                    <p className="font-semibold text-sm text-foreground">{formatBDT(order.total, { compact: true })}</p>
                 </div>
             ))}
             <button
@@ -73,8 +74,8 @@ const SalesChart = () => {
                 ))}
             </div>
             <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-                <span>Lowest: $218</span>
-                <span>Highest: $450</span>
+                <span>Lowest: {formatBDT(218, { compact: true, showDecimals: false })}</span>
+                <span>Highest: {formatBDT(450, { compact: true, showDecimals: false })}</span>
             </div>
         </div>
     );
@@ -229,145 +230,8 @@ const VendorHome: React.FC = () => {
                 </p>
             </div>
 
-            {/* Two Column Layout */}
-            <div className="grid lg:grid-cols-3 gap-6">
-
-                {/* ========== LEFT COLUMN (takes 2/3 width) ========== */}
-                <div className="lg:col-span-2 space-y-6">
-
-                    {/* Top Stats Cards (3 in a row) */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">$0.00</p>
-                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
-                                        <TrendingUp className="w-4 h-4" />
-                                        Coming soon
-                                    </p>
-                                </div>
-                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                                    <DollarSign className="w-6 h-6 text-primary" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">
-                                        {filteredOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length}
-                                    </p>
-                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
-                                        <TrendingUp className="w-4 h-4" />
-                                        Active orders
-                                    </p>
-                                </div>
-                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                                    <ShoppingCart className="w-6 h-6 text-primary" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
-                                    <div className="flex text-yellow-500 mt-2">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-                                    <Star className="w-6 h-6 text-primary" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Sales Chart */}
-                    <div className="bg-card rounded-xl p-5 shadow-sm border">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-lg text-foreground">Sales Performance (Last 30 Days)</h3>
-                            <div className="flex gap-1">
-                                <button className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary">Week</button>
-                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Month</button>
-                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Year</button>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>Daily Sales ($)</span>
-                                <span className="text-primary font-semibold">Coming soon</span>
-                            </div>
-                            <SalesChart />
-                        </div>
-                    </div>
-                </div>
-
-                {/* ========== RIGHT COLUMN (takes 1/3 width) ========== */}
-                <div className="space-y-6">
-
-                    {/* Quick Actions */}
-                    <div className="bg-card rounded-xl p-5 shadow-sm border">
-                        <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Actions</h3>
-                        <div className="space-y-3">
-                            <QuickActionButton
-                                icon={Plus}
-                                label="Add New Product"
-                                onClick={() => navigate('/vendor/dashboard/products/add')}
-                                variant="primary"
-                            />
-                            <QuickActionButton
-                                icon={FileText}
-                                label="Generate Report"
-                                onClick={() => console.log('Generate Report')}
-                                variant="outline"
-                            />
-                            <QuickActionButton
-                                icon={Headphones}
-                                label="Contact Support"
-                                onClick={() => console.log('Contact Support')}
-                                variant="outline"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Inventory Status */}
-                    <div className="bg-card rounded-xl p-5 shadow-sm border">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-lg text-foreground">Inventory Status</h3>
-                            <AlertCircle className="w-5 h-5 text-red-500" />
-                        </div>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                                <div>
-                                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">Low Stock Alert</p>
-                                    <p className="text-xs text-red-500 dark:text-red-500">Coming soon</p>
-                                </div>
-                                <p className="text-xl font-bold text-red-600 dark:text-red-400">-</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Recent Orders */}
-                    <div className="bg-card rounded-xl p-5 shadow-sm border">
-                        <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Orders</h3>
-                        <span className="text-xs text-muted-foreground">{filteredOrders.length} orders</span>
-                        <RecentOrdersStack orders={recentOrders} />
-                    </div>
-                </div>
-            </div>
-
             {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
-            <div className="mt-8 bg-card rounded-xl p-6 shadow-sm border">
+            <div className="mt-8 mb-8 bg-card rounded-xl p-6 shadow-sm border">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
                     <div className="flex gap-2">
@@ -468,6 +332,145 @@ const VendorHome: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Two Column Layout */}
+            <div className="grid lg:grid-cols-3 gap-6">
+
+                {/* ========== LEFT COLUMN (takes 2/3 width) ========== */}
+                <div className="lg:col-span-2 space-y-6">
+
+                    {/* Top Stats Cards (3 in a row) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">{formatBDT(0)}</p>
+                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
+                                        <TrendingUp className="w-4 h-4" />
+                                        Coming soon
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <Wallet className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">
+                                        {filteredOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length}
+                                    </p>
+                                    <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
+                                        <TrendingUp className="w-4 h-4" />
+                                        Active orders
+                                    </p>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <ShoppingCart className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-card rounded-xl p-5 shadow-sm border hover:shadow-md transition-all duration-200 group">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
+                                    <div className="flex text-yellow-500 mt-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star
+                                                key={i}
+                                                className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <Star className="w-6 h-6 text-primary" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sales Chart */}
+                    <div className="bg-card rounded-xl p-5 shadow-sm border">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-semibold text-lg text-foreground">Sales Performance (Last 30 Days)</h3>
+                            <div className="flex gap-1">
+                                <button className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary">Week</button>
+                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Month</button>
+                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Year</button>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Daily Sales (BDT)</span>
+                                <span className="text-primary font-semibold">Coming soon</span>
+                            </div>
+                            <SalesChart />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ========== RIGHT COLUMN (takes 1/3 width) ========== */}
+                <div className="space-y-6">
+
+                    {/* Quick Actions */}
+                    <div className="bg-card rounded-xl p-5 shadow-sm border">
+                        <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Actions</h3>
+                        <div className="space-y-3">
+                            <QuickActionButton
+                                icon={Plus}
+                                label="Add New Product"
+                                onClick={() => navigate('/vendor/dashboard/products/add')}
+                                variant="primary"
+                            />
+                            <QuickActionButton
+                                icon={FileText}
+                                label="Generate Report"
+                                onClick={() => console.log('Generate Report')}
+                                variant="outline"
+                            />
+                            <QuickActionButton
+                                icon={Headphones}
+                                label="Contact Support"
+                                onClick={() => console.log('Contact Support')}
+                                variant="outline"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Inventory Status */}
+                    <div className="bg-card rounded-xl p-5 shadow-sm border">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-semibold text-lg text-foreground">Inventory Status</h3>
+                            <AlertCircle className="w-5 h-5 text-red-500" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                <div>
+                                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">Low Stock Alert</p>
+                                    <p className="text-xs text-red-500 dark:text-red-500">Coming soon</p>
+                                </div>
+                                <p className="text-xl font-bold text-red-600 dark:text-red-400">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Orders */}
+                    <div className="bg-card rounded-xl p-5 shadow-sm border">
+                        <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Orders</h3>
+                        <span className="text-xs text-muted-foreground">{filteredOrders.length} orders</span>
+                        <RecentOrdersStack orders={recentOrders} />
+                    </div>
+                </div>
+            </div>
+
+            
         </div>
     );
 };

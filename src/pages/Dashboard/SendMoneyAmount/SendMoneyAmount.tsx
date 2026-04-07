@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, ArrowRight, User2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { formatBDT } from '@/utils/currencyFormatter';
 
 const QUICK_AMOUNTS = [100, 200, 300, 400];
 
@@ -44,9 +45,9 @@ export default function SendMoneyAmount() {
             <div className="p-4">
                 <h2 className="text-gray-600 mb-6">Amount</h2>
                 <div className="text-center mb-4">
-                    <p className="text-5xl font-light mb-4">${amount}</p>
+                    <p className="text-5xl font-light mb-4">{formatBDT(amount, { compact: true })}</p>
                     <p className="text-gray-600">
-                        Available Balance: ${availableBalance}
+                        Available Balance: {formatBDT(availableBalance, { compact: true })}
                     </p>
                 </div>
 

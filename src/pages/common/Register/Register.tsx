@@ -42,8 +42,10 @@ const Register: React.FC = () => {
     const { name, value, type, checked } = e.target;
 
     let finalValue = value;
-    if (name === 'mobile' && value.length > 11) {
-      finalValue = value.slice(0, 11);
+    
+    // Limit mobile number to 11 digits and only allow numbers
+    if (name === 'mobile') {
+      finalValue = value.replace(/\D/g, '').slice(0, 11);
     }
 
     setFormData(prev => ({
