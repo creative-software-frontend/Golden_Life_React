@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
 import { log } from 'node:console';
+import QRCode from 'qrcode';
+import JsBarcode from 'jsbarcode';
 
 // Helper function to format address
 const formatAddress = (address: string | undefined) => {
@@ -23,6 +25,56 @@ const formatAddress = (address: string | undefined) => {
 const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { order: Order; formatDate: (d: string) => string; fullAddressText?: string | null; orderTransaction?: any }) => {
   const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
   const baseURL = 'https://api.goldenlife.my';
+  const invoiceNumber = order.order_no;
+  const orderDate = formatDate(order.created_at);
+  const printDateTime = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  // QR Code and Barcode refs
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const barcodeRef = useRef<SVGSVGElement>(null);
+  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
+
+  // Generate QR Code
+  useEffect(() => {
+    if (qrCanvasRef.current) {
+      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
+        width: 100,
+        margin: 1,
+        color: { dark: '#1e293b', light: '#ffffff' },
+        errorCorrectionLevel: 'M',
+      }, (error) => {
+        if (error) console.error('QR Code generation error:', error);
+      });
+    }
+  }, [trackingUrl]);
+
+  // Generate Barcode
+  useEffect(() => {
+    if (barcodeRef.current) {
+      try {
+        JsBarcode(barcodeRef.current, invoiceNumber, {
+          format: 'CODE128',
+          width: 2,
+          height: 60,
+          displayValue: true,
+          fontSize: 12,
+          font: 'monospace',
+          textMargin: 4,
+          margin: 5,
+          background: '#ffffff',
+          lineColor: '#1e293b',
+        });
+      } catch (error) {
+        console.error('Barcode generation error:', error);
+      }
+    }
+  }, [invoiceNumber]);
 
   return (
     <>
@@ -76,17 +128,26 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
         boxSizing: 'border-box'
       }}>
       {/* ─── Header ─── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
         <div>
           <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
         </div>
 
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
           <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
           <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
           <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
-            Date: {formatDate(order.created_at)} &nbsp;|&nbsp; Status: {order.status}
+            Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
           </p>
+        </div>
+
+        {/* QR Code & Barcode Section */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+          <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
+          
+          <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
+          <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
         </div>
       </div>
 
@@ -165,6 +226,9 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
         </p>
         <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
           Thank you for shopping!
+        </p>
+        <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
+          Printed on: {printDateTime}
         </p>
       </div>
       </div>
@@ -490,12 +554,22 @@ export default function OrderDetails() {
                 <div className="flex justify-between text-gray-600"><span>Delivery Fee</span><span className="font-medium">৳{parseFloat(order.delivery_charge).toFixed(2)}</span></div>
                 <div className="border-t pt-3 space-y-3">
                   <div className="flex justify-between font-bold text-lg"><span>Total</span><span className="text-primary-light">৳{parseFloat(order.total).toFixed(2)}</span></div>
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex items-center gap-3 text-sm">
-                    <CreditCard size={16} className="text-blue-600" />
-                    <div>
-                      <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-                      <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-3">
+                      <CreditCard size={16} className="text-blue-600" />
+                      <div>
+                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
+                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                      </div>
                     </div>
+                    <Button 
+                      onClick={() => window.print()} 
+                      size="sm"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                    >
+                      <Printer size={14} />
+                      PRINT RECEIPT
+                    </Button>
                   </div>
                 </div>
               </div>
