@@ -1,6 +1,6 @@
 // src/pages/common/Vendor/VendorLogin.tsx
 
-import LoginForm from "./LoginForm";
+import VendorLoginNew from "./VendorLoginNew";
 import LoginRightSideContent from "./LoginRightSideContent";
 
 const VendorLogin = () => {
@@ -8,7 +8,7 @@ const VendorLogin = () => {
     <div className="min-h-screen w-full flex bg-white">
       {/* Left Side - Scrollable Form */}
       <div className="w-full lg:w-1/2 h-screen overflow-y-auto relative">
-        <LoginForm />
+        <VendorLoginNew />
       </div>
 
       {/* Right Side - Fixed Content */}
