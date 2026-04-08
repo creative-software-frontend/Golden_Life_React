@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 
 interface ForgotPasswordModalProps {
-  onSendOtpSuccess: (mobile: string) => void;
+  onSendOtpSuccess: (mobile: string, userId?: number) => void;
   onClose: () => void;
 }
 
@@ -59,7 +59,8 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
 
       if (response.data?.success) {
         toast.success('OTP sent successfully! Please check your mobile.');
-        onSendOtpSuccess(mobile);
+        // Pass mobile and user_id (if available) to parent
+        onSendOtpSuccess(mobile, response.data.user_id || undefined);
       } else {
         throw new Error(response.data?.message || 'Failed to send OTP');
       }

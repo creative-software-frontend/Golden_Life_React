@@ -15,8 +15,11 @@ type Step = 'mobile' | 'otp' | 'reset';
 const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
   const [step, setStep] = useState<Step>('mobile');
   const [mobile, setMobile] = useState('');
+  const [userId, setUserId] = useState<number | null>(null);
   const [otp, setOtp] = useState(''); 
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -30,14 +33,34 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
     onClose();
   };
 
-  const handleSendOtpSuccess = (userMobile: string) => {
+  const handleSendOtpSuccess = (userMobile: string, newUserId?: number) => {
     setMobile(userMobile);
+    if (newUserId) {
+      setUserId(newUserId);
+    }
     setStep('otp');
   };
 
-  const handleOtpVerifySuccess = (verifiedOtp: string) => {
-    setOtp(verifiedOtp);
-    setStep('reset');
+  const handleOtpVerify = async (verifiedUserId: number, verifiedOtp: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // You can add API call here if needed
+      setOtp(verifiedOtp);
+      setStep('reset');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpResend = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Add resend OTP logic here
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResetPasswordSuccess = () => {
@@ -86,12 +109,23 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
                   />
                 )}
 
-                {step === 'otp' && (
+                {step === 'otp' && userId && (
                   <OtpVerificationModal
                     mobile={mobile}
-                    onVerifySuccess={handleOtpVerifySuccess}
-                    onBack={() => setStep('mobile')}
+                    userId={userId}
+                    onVerify={handleOtpVerify}
+                    onResend={handleOtpResend}
+                    isLoading={isLoading}
+                    error={error}
+                    onClose={() => setStep('mobile')}
+                    onSuccess={() => {}}
                   />
+                )}
+
+                {step === 'otp' && !userId && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Loading OTP verification...</p>
+                  </div>
                 )}
 
                 {step === 'reset' && (

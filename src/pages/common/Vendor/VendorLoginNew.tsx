@@ -6,6 +6,7 @@ import Logo from '../Logo';
 import { useVendorOtp } from './hooks/useVendorOtp';
 import MobileOTPTab from './components/MobileOTPTab';
 import EmailPasswordTab from './components/EmailPasswordTab';
+import VendorForgotPasswordModal from './components/VendorForgotPasswordModal';
 
 type ActiveTab = 'mobile' | 'email';
 
@@ -15,6 +16,9 @@ const VendorLoginNew: React.FC = () => {
 
   // Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>('mobile');
+
+  // Forgot Password Modal State
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Loading & Error States
   const [isLoading, setIsLoading] = useState(false);
@@ -116,7 +120,11 @@ const VendorLoginNew: React.FC = () => {
 
   // Handle Forgot Password
   const handleForgotPassword = () => {
-    navigate('/vendor/forgot-password');
+    setShowForgotPassword(true);
+  };
+
+  const handleCloseForgotPassword = () => {
+    setShowForgotPassword(false);
   };
 
   return (
@@ -199,6 +207,12 @@ const VendorLoginNew: React.FC = () => {
           
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <VendorForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={handleCloseForgotPassword}
+      />
     </div>
   );
 };
