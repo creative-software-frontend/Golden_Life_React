@@ -1,7 +1,6 @@
 import { Order } from '../types/order.types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { Button } from '@/components/ui/button';
-import { Printer } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -15,10 +14,9 @@ interface OrderTableProps {
   orders: Order[];
   onViewDetails: (orderNo: string) => void;
   onUpdateStatus: (order: Order) => void;
-  onPrint?: (order: Order) => void;
 }
 
-export function OrderTable({ orders, onViewDetails, onUpdateStatus, onPrint }: OrderTableProps) {
+export function OrderTable({ orders, onViewDetails, onUpdateStatus }: OrderTableProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -86,17 +84,6 @@ export function OrderTable({ orders, onViewDetails, onUpdateStatus, onPrint }: O
                   >
                     View
                   </Button>
-                  {onPrint && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onPrint(order)}
-                      className="text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                    >
-                      <Printer size={14} />
-                      Print
-                    </Button>
-                  )}
                   <Button
                     size="sm"
                     onClick={() => onUpdateStatus(order)}

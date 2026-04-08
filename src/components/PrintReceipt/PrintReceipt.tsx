@@ -1,5 +1,5 @@
 import React from 'react';
-import QRBarcodeGenerator from '@/components/QRBarcode/QRBarcodeGenerator';
+// import QRBarcodeGenerator from '@/components/QRBarcode/QRBarcodeGenerator';
 import './printStyles.css';
 
 interface Product {
@@ -144,7 +144,7 @@ const PrintReceipt: React.FC<PrintReceiptProps> = ({
           </div>
 
           {/* Right Column - QR & Barcode */}
-          <div className="qr-column">
+          {/* <div className="qr-column">
             <QRBarcodeGenerator
               orderId={invoiceNumber}
               showQR={true}
@@ -153,7 +153,7 @@ const PrintReceipt: React.FC<PrintReceiptProps> = ({
               barcodeWidth={200}
               barcodeHeight={60}
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Divider */}

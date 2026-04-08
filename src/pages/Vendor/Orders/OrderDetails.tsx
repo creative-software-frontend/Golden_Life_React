@@ -1,15 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, User, Phone, MapPin, Printer, Check, CreditCard, Receipt } from 'lucide-react';
+import { ArrowLeft, Package, User, Phone, MapPin, Check, CreditCard, Receipt, Printer } from 'lucide-react';
 import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
-import QRCode from 'qrcode';
-import JsBarcode from 'jsbarcode';
+import PrintInvoice from '@/components/Invoice/PrintInvoice';
+import { usePrintInvoice, OrderForPrint } from '@/hooks/usePrintInvoice';
+
 
 // Helper function to format address
 const formatAddress = (address: string | undefined) => {
@@ -20,301 +21,7 @@ const formatAddress = (address: string | undefined) => {
   return address;
 };
 
-/* ─── Print-only Invoice Component ─── */
-const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { 
-  order: Order; 
-  formatDate: (d: string) => string; 
-  fullAddressText?: string | null; 
-  orderTransaction?: any;
-}) => {
-  const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
-  const invoiceNumber = order.order_no;
-  const orderDate = formatDate(order.created_at);
-  const printDateTime = new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
-  // QR Code and Barcode refs
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
-  const barcodeRef = useRef<SVGSVGElement>(null);
-  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
-
-  // Generate QR Code
-  useEffect(() => {
-    if (qrCanvasRef.current) {
-      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
-        width: 90,
-        margin: 1,
-        color: { dark: '#1e293b', light: '#ffffff' },
-        errorCorrectionLevel: 'M',
-      }, (error) => {
-        if (error) console.error('QR Code generation error:', error);
-      });
-    }
-  }, [trackingUrl]);
-
-  // Generate Barcode
-  useEffect(() => {
-    if (barcodeRef.current) {
-      try {
-        JsBarcode(barcodeRef.current, invoiceNumber, {
-          format: 'CODE128',
-          width: 1.8,
-          height: 50,
-          displayValue: true,
-          fontSize: 10,
-          font: 'monospace',
-          textMargin: 3,
-          margin: 5,
-          background: '#ffffff',
-          lineColor: '#1e293b',
-        });
-      } catch (error) {
-        console.error('Barcode generation error:', error);
-      }
-    }
-  }, [invoiceNumber]);
-
-  // Get user email - try multiple possible field names
-  const userEmail = (order as any).user_email || (order as any).email || (order as any).customer_email || '—';
-
-  return (
-    <>
-      <style>{`
-        @media screen {
-          .print-only { display: none !important; }
-        }
-        @media print {
-          body * { visibility: hidden; }
-          .print-only, .print-only * { visibility: visible; }
-          .print-only {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-            display: block !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          @page { margin: 12mm; size: A4; }
-        }
-      `}</style>
-
-      <div className="print-only" style={{
-        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        color: '#111827',
-        background: '#ffffff',
-        maxWidth: '800px',
-        margin: '0 auto',
-        padding: '20px',
-      }}>
-        
-        {/* ========== HEADER: Logo Left + Invoice Info Right ========== */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          borderBottom: '2px solid #f5b800',
-          paddingBottom: '16px',
-          marginBottom: '24px'
-        }}>
-          {/* Left: Logo + Company Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img 
-              src="/image/logo/logo.jpg" 
-              alt="Golden Life" 
-              style={{ height: '55px', width: '55px', objectFit: 'contain', borderRadius: '10px' }} 
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-            />
-            <div>
-              <h1 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#111827', letterSpacing: '-0.3px' }}>GOLDEN LIFE</h1>
-              <p style={{ fontSize: '9px', color: '#6b7280', margin: '2px 0 0 0' }}>No #1 Digital Business & Reseller Platform in Bangladesh</p>
-            </div>
-          </div>
-          
-          {/* Right: Invoice Number + Date + Status */}
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ 
-              background: '#f5b800', 
-              color: '#111827', 
-              padding: '6px 14px', 
-              borderRadius: '30px',
-              fontWeight: 800,
-              fontSize: '14px',
-              marginBottom: '8px',
-              display: 'inline-block'
-            }}>
-              INVOICE #{invoiceNumber}
-            </div>
-            <p style={{ fontSize: '10px', color: '#6b7280', margin: '4px 0 0 0' }}>
-              Date: {orderDate} | Status: <span style={{ fontWeight: 600, color: '#f5b800' }}>{order.status}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* ========== TWO COLUMN: Addresses (Left) + QR/Barcode (Right) ========== */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          gap: '40px', 
-          marginBottom: '28px' 
-        }}>
-          
-          {/* LEFT COLUMN - Addresses */}
-          <div style={{ flex: 2 }}>
-            {/* Billing Address */}
-            <div style={{ marginBottom: '20px' }}>
-              <h3 style={{ 
-                fontSize: '11px', 
-                fontWeight: 700, 
-                letterSpacing: '1px', 
-                color: '#9ca3af', 
-                textTransform: 'uppercase',
-                marginBottom: '8px'
-              }}>Billing Address</h3>
-              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111827' }}>{order.user_name}</p>
-              <p style={{ fontSize: '12px', color: '#4b5563', margin: '4px 0' }}>{fullAddressText || formatAddress(order.user_address)}</p>
-              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{order.user_phone}</p>
-              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{userEmail}</p>
-            </div>
-
-            {/* Shipping Address */}
-            <div>
-              <h3 style={{ 
-                fontSize: '11px', 
-                fontWeight: 700, 
-                letterSpacing: '1px', 
-                color: '#9ca3af', 
-                textTransform: 'uppercase',
-                marginBottom: '8px'
-              }}>Shipping Address</h3>
-              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111827' }}>{order.user_name}</p>
-              <p style={{ fontSize: '12px', color: '#4b5563', margin: '4px 0' }}>{fullAddressText || formatAddress(order.user_address)}</p>
-              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{order.user_phone}</p>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN - QR Code + Barcode */}
-          <div style={{ 
-            flex: 1, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            gap: '12px',
-            background: '#f9fafb',
-            padding: '16px 12px',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb'
-          }}>
-            <canvas ref={qrCanvasRef} width={90} height={90} style={{ borderRadius: '8px' }} />
-            <svg ref={barcodeRef} style={{ width: '100%', maxWidth: '200px', height: 'auto' }} />
-            <p style={{ fontSize: '9px', color: '#9ca3af', margin: '4px 0 0 0' }}>Scan to Track Order</p>
-          </div>
-        </div>
-
-        {/* ========== PRODUCTS TABLE (No Headers) ========== */}
-        <div style={{ marginBottom: '24px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <tbody>
-              {order.products?.map((product: any, idx: number) => {
-                const unitPrice = product.price ? parseFloat(product.price) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1'));
-                return (
-                  <tr key={product.id} style={{ borderBottom: idx === (order.products?.length || 0) - 1 ? 'none' : '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '12px 0', textAlign: 'left', fontWeight: 500, fontSize: '13px', color: '#111827' }}>
-                      {product.product_name}
-                    </td>
-                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', color: '#6b7280', width: '70px' }}>
-                      x{product.quantity}
-                    </td>
-                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', fontWeight: 600, color: '#4b5563', width: '100px' }}>
-                      ৳{unitPrice.toFixed(2)}
-                    </td>
-                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', fontWeight: 700, color: '#111827', width: '110px' }}>
-                      ৳{parseFloat(product.subtotal).toFixed(2)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ========== DIVIDER ========== */}
-        <div style={{ height: '1px', background: 'linear-gradient(to right, #e5e7eb, #d1d5db, #e5e7eb)', margin: '16px 0' }}></div>
-
-        {/* ========== TOTALS SECTION ========== */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-          <div style={{ width: '280px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}>
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>Subtotal</span>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>৳{subtotal.toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}>
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>Delivery Fee</span>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>৳{parseFloat(order.delivery_charge).toFixed(2)}</span>
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              padding: '12px 0 8px', 
-              borderTop: '2px solid #e5e7eb',
-              marginTop: '4px'
-            }}>
-              <span style={{ fontSize: '14px', fontWeight: 800, color: '#111827' }}>Total Amount</span>
-              <span style={{ fontSize: '16px', fontWeight: 800, color: '#f5b800' }}>৳{parseFloat(order.total).toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ========== PAYMENT METHOD SECTION ========== */}
-        <div style={{ 
-          background: '#fefce8', 
-          border: '1px solid #fef08a', 
-          borderRadius: '10px', 
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '24px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <CreditCard size={18} color="#ca8a04" />
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '13px', color: '#854d0e' }}>{orderTransaction?.payment_method || (order as any).payment?.payment_method || '—'}</div>
-              <div style={{ fontSize: '11px', color: '#a16207' }}>TXN: {orderTransaction?.Transaction_ID || (order as any).payment?.transaction_number || '—'}</div>
-            </div>
-          </div>
-          <Button 
-            onClick={() => window.print()} 
-            size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-          >
-            <Printer size={14} /> PRINT RECEIPT
-          </Button>
-        </div>
-
-        {/* ========== FOOTER ========== */}
-        <div style={{ 
-          borderTop: '1px solid #e5e7eb', 
-          paddingTop: '16px', 
-          textAlign: 'center',
-          fontSize: '10px',
-          color: '#9ca3af'
-        }}>
-          <p style={{ margin: '0 0 8px 0' }}>Thank you for shopping with Golden Life!</p>
-          <p style={{ margin: 0, fontStyle: 'italic' }}>Printed on: {printDateTime}</p>
-        </div>
-      </div>
-    </>
-  );
-};
 
 export default function OrderDetails() {
   const { order_no } = useParams<{ order_no: string }>();
@@ -325,6 +32,9 @@ export default function OrderDetails() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [fullAddressText, setFullAddressText] = useState<string | null>(null);
   const [orderTransaction, setOrderTransaction] = useState<any | null>(null);
+
+  // Print invoice hook
+  const { printInvoice } = usePrintInvoice();
 
   // Define OrderStatus array with proper type assertion
   const progressSteps: OrderStatus[] = [
@@ -479,8 +189,25 @@ export default function OrderDetails() {
 
   return (
     <div className="max-w-[1400px] mx-auto p-6 space-y-6">
-      {/* Print Invoice Component */}
-      <PrintInvoice order={order} formatDate={formatDate} fullAddressText={fullAddressText} orderTransaction={orderTransaction} />
+      {/* Print Invoice Component - Hidden on screen, visible when printing */}
+      {order && (
+        <PrintInvoice
+          order={{
+            order_no: order.order_no,
+            created_at: order.created_at,
+            status: order.status,
+            total: order.total,
+            delivery_charge: order.delivery_charge,
+            user_name: order.user_name,
+            user_phone: order.user_phone,
+            user_address: order.user_address,
+            products: order.products || [],
+            payment: (order as any).payment || null,
+          }}
+          fullAddressText={fullAddressText}
+        />
+      )}
+
 
       {/* Screen Only Content */}
       <div className="screen-only">
@@ -498,8 +225,28 @@ export default function OrderDetails() {
           <p className="text-gray-500 mt-1">{formatDate(order.created_at)}</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => window.print()} variant="outline" className="gap-2">
-            <Printer className="w-4 h-4" /> Print
+          <Button 
+            onClick={() => {
+              if (order) {
+                const orderForPrint: OrderForPrint = {
+                  order_no: order.order_no,
+                  created_at: order.created_at,
+                  status: order.status,
+                  total: order.total,
+                  delivery_charge: order.delivery_charge,
+                  user_name: order.user_name,
+                  user_phone: order.user_phone,
+                  user_address: order.user_address,
+                  products: order.products || [],
+                  payment: (order as any).payment || null,
+                };
+                printInvoice(orderForPrint);
+              }
+            }} 
+            variant="outline" 
+            className="gap-2"
+          >
+            <Printer className="w-4 h-4" /> PRINT RECEIPT
           </Button>
           <Button onClick={() => setIsStatusModalOpen(true)} className="bg-primary-light hover:bg-primary-light/90 text-white">
             Update Status
@@ -549,11 +296,11 @@ export default function OrderDetails() {
             <CardContent>
               {order.products && order.products.length > 0 ? (
                 <div className="space-y-4">
-                  {order.products.map((product) => (
+                  {order.products.map((product: any) => (
                     <div key={product.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-all duration-200">
                       <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border">
                         <img
-                          src={product.product_image.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
+                          src={product.product_image?.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
                           alt={product.product_name}
                           className="w-full h-full object-cover"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/80?text=No+Image'; }}
@@ -619,9 +366,7 @@ export default function OrderDetails() {
                         <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || (order as any).payment?.transaction_number || '—'}</div>
                       </div>
                     </div>
-                    <Button onClick={() => window.print()} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
-                      <Printer size={14} /> PRINT RECEIPT
-                    </Button>
+
                   </div>
                 </div>
               </div>
@@ -658,5 +403,5 @@ export default function OrderDetails() {
         orderNo={order.order_no}
       />
     </div>
-  );
+  ); 
 }

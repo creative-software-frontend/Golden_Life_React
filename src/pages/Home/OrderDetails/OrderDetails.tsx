@@ -1,270 +1,15 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import QRCode from 'qrcode';
-import JsBarcode from 'jsbarcode';
 import {
   Package, Truck, MapPin, CreditCard, CheckCircle2,
-  User, Phone, ArrowLeft, Printer, Contact, Mail, Calendar, Download
+  User, Phone, ArrowLeft, Contact, Mail, Calendar, Download, Printer
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import PrintInvoice from '@/components/Invoice/PrintInvoice';
+import { usePrintInvoice, OrderForPrint } from '@/hooks/usePrintInvoice';
 
-/* ─── Print-only Invoice Component ───────────────────────────── */
-const PrintInvoice = ({ order, shippingInfo, buyerProfile, subtotal, totalItems, baseURL }: any) => {
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
-  const barcodeRef = useRef<SVGSVGElement>(null);
-  
-  const orderDate = new Date(order.created_at).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric'
-  });
 
-  const printDateTime = new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  const invoiceNumber = order.order_no;
-  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
-
-  // Generate QR Code
-  useEffect(() => {
-    if (qrCanvasRef.current) {
-      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
-        width: 100,
-        margin: 1,
-        color: {
-          dark: '#1e293b',
-          light: '#ffffff',
-        },
-        errorCorrectionLevel: 'M',
-      }, (error) => {
-        if (error) console.error('QR Code generation error:', error);
-      });
-    }
-  }, [trackingUrl]);
-
-  // Generate Barcode
-  useEffect(() => {
-    if (barcodeRef.current) {
-      try {
-        JsBarcode(barcodeRef.current, invoiceNumber, {
-          format: 'CODE128',
-          width: 2,
-          height: 60,
-          displayValue: true,
-          fontSize: 12,
-          font: 'monospace',
-          textMargin: 4,
-          margin: 5,
-          background: '#ffffff',
-          lineColor: '#1e293b',
-        });
-      } catch (error) {
-        console.error('Barcode generation error:', error);
-      }
-    }
-  }, [invoiceNumber]);
-
-  return (
-    <>
-      {/* ─── PRINT SPECIFIC CSS ─── */}
-      <style>{`
-        @media screen {
-          .print-only { display: none !important; }
-        }
-        @media print {
-          /* Hide everything else on the page */
-          body * { visibility: hidden; }
-          
-          /* Make the invoice visible and allow it to grow */
-          .print-only, .print-only * { visibility: visible; }
-          .print-only {
-            position: absolute; 
-            left: 0; 
-            top: 0; 
-            width: 100%;
-            display: block !important;
-          }
-
-          /* Table print rules */
-          table { page-break-inside: auto; }
-          thead { display: table-header-group; /* Repeats header on new pages */ }
-          tr { page-break-inside: avoid; page-break-after: auto; /* Stops rows splitting in half */ }
-          
-          /* Keep totals blocks together but allow breaking if they are too large to avoid huge gaps */
-          .no-break { page-break-inside: auto; }
-          
-          @page { margin: 15mm; }
-        }
-      `}</style>
-
-      {/* ─── INVOICE WRAPPER ─── */}
-      <div className="print-only" style={{
-        fontFamily: 'Arial, sans-serif',
-        color: '#111',
-        background: '#fff',
-        position: 'relative', /* CHANGED: Replaced 'fixed' */
-        width: '100%',
-        height: 'auto',       /* CHANGED: Replaced '100%' */
-        overflow: 'visible',  /* CHANGED: Replaced 'hidden' */
-        boxSizing: 'border-box',
-        padding: '0'          /* Margins are now handled by @page in CSS */
-      }}>
-        {/* ─── Header ─── */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
-          <div>
-            <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
-          </div>
-
-          <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
-            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-            <p style={{ fontSize: '11px', color: '#777', marginTop: '4px', marginBottom: 0 }}>Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}</p>
-          </div>
-
-          {/* QR Code & Barcode Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-            {/* QR Code */}
-            <canvas
-              ref={qrCanvasRef}
-              width={100}
-              height={100}
-              style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-            />
-            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
-            
-            {/* Barcode */}
-            <svg
-              ref={barcodeRef}
-              style={{ maxWidth: '200px', height: '80px' }}
-            />
-            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
-          </div>
-        </div>
-
-        {/* ─── Billing + Shipping ─── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
-          {/* Billing */}
-          <div>
-            <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Address</p>
-            {buyerProfile ? (
-              <>
-                <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{buyerProfile.student?.name}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.personal_info?.location || buyerProfile.personal_info?.district || '—'}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.student?.email}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{buyerProfile.student?.mobile}</p>
-              </>
-            ) : (
-              <p style={{ fontSize: '13px', color: '#999', margin: 0 }}>Not provided</p>
-            )}
-          </div>
-          {/* Shipping */}
-          <div>
-            <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Address</p>
-            {shippingInfo ? (
-              <>
-                <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{shippingInfo.name}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{shippingInfo.address}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{shippingInfo.phone}</p>
-              </>
-            ) : (
-              <>
-                <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px' }}>{order.user_name}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.user_address}</p>
-                <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* ─── Product Table ─── */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px', fontSize: '12px' }}>
-          <thead>
-            <tr>
-              <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
-              <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Quantity</th>
-              <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Unit Price</th>
-              <th style={{ padding: '10px 14px 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '100px' }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.products?.map((item: any) => {
-              const qty = Number(item.quantity) || 1;
-              const itemTotal = Number(item.subtotal) || 0;
-              const unitPrice = qty > 0 ? (itemTotal / qty) : itemTotal;
-
-              return (
-                <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', borderTop: '1px solid #eee' }}>
-                  <td style={{ padding: '12px 12px 12px 0', verticalAlign: 'middle' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <img
-                        src={`${baseURL}/uploads/ecommarce/product_image/${item.product_image}`}
-                        alt={item.product_name}
-                        style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
-                      />
-                      <span style={{ fontWeight: 700, color: '#111' }}>{item.product_name}</span>
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center', color: '#555' }}>{qty}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', color: '#555' }}>৳{unitPrice.toFixed(2)}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{itemTotal.toFixed(2)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {/* ─── Totals and Payment (Grouped to prevent breaking across pages) ─── */}
-        <div className="no-break">
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-            <div style={{ width: '280px', fontSize: '13px' }}>
-              {[
-                { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
-                { label: 'Delivery Fee', value: `৳${Number(order.delivery_charge).toFixed(2)}` },
-                { label: 'Total Amount Paid', value: `৳${Number(order.total).toFixed(2)}`, bold: true },
-                { label: 'Total Due', value: '৳0', bold: true },
-              ].map(({ label, value, bold }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
-                  <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
-                  <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Payment Info */}
-          {order.payment && (
-            <div style={{ padding: '0', marginBottom: '32px', fontSize: '12px', color: '#555' }}>
-              <span style={{ fontWeight: 800, color: '#111' }}>PaymentType: </span>
-              {order.payment.payment_method}
-              {order.payment.transaction_number && (
-                <span> &nbsp;|&nbsp; TXN: {order.payment.transaction_number}</span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* ─── Footer Note ─── */}
-        <div className="no-break" style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6 }}>
-          <p style={{ margin: '0 0 15px 0' }}>
-            Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
-          </p>
-          <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: '0 0 10px 0' }}>
-            Thank you for shopping!
-          </p>
-          <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
-            Printed on: {printDateTime}
-          </p>
-        </div>
-      </div>
-    </>
-
-  );
-};
 
 // ─── Types ────────────────────────────────────────────────
 interface Product {
@@ -338,6 +83,9 @@ const OrderDetails = () => {
   const [error, setError] = useState("");
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+  // Print invoice hook
+  const { printInvoice } = usePrintInvoice();
 
   const getAuthToken = () => {
     const session = sessionStorage.getItem("student_session");
@@ -479,13 +227,22 @@ const OrderDetails = () => {
 
         {/* Print Invoice — hidden on screen, visible when printing */}
         <PrintInvoice
-          order={order}
-          shippingInfo={shippingInfo}
-          buyerProfile={buyerProfile}
-          subtotal={subtotal}
-          totalItems={totalItems}
-          baseURL={baseURL}
+          order={{
+            order_no: order.order_no,
+            created_at: order.created_at,
+            status: order.status,
+            total: order.total,
+            delivery_charge: order.delivery_charge,
+            user_name: order.user_name,
+            user_phone: order.user_phone,
+            user_address: order.user_address,
+            products: order.products,
+            payment: order.payment,
+          }}
+          fullAddressText={shippingInfo ? shippingInfo.address : null}
         />
+
+
 
         {/* ── Screen Header (no-print) ── */}
         <div className="screen-only bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -498,13 +255,26 @@ const OrderDetails = () => {
           </div>
           {/* Right: company info + print button */}
           <div className="flex items-center gap-4">
-
             <button
-              onClick={() => window.print()}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition shadow-sm"
+              onClick={() => {
+                const orderForPrint: OrderForPrint = {
+                  order_no: order.order_no,
+                  created_at: order.created_at,
+                  status: order.status,
+                  total: order.total,
+                  delivery_charge: order.delivery_charge,
+                  user_name: order.user_name,
+                  user_phone: order.user_phone,
+                  user_address: order.user_address,
+                  products: order.products,
+                  payment: order.payment,
+                };
+                printInvoice(orderForPrint);
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition shadow-sm"
             >
               <Printer size={15} />
-              Print
+              PRINT RECEIPT
             </button>
           </div>
         </div>

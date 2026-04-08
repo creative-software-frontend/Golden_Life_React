@@ -12,9 +12,8 @@ import {
   ExternalLink,
   Download,
   ArrowRight,
-  Printer,
 } from 'lucide-react';
-import PrintReceipt from '@/components/PrintReceipt/PrintReceipt';
+
 
 // --- Types ---
 interface Product {
@@ -72,7 +71,6 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
-  const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -132,14 +130,7 @@ const OrderHistory = () => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
 
-  const handlePrintOrder = (e: React.MouseEvent, order: Order) => {
-    e.stopPropagation();
-    setPrintingOrder(order);
-  };
 
-  const handleClosePrint = () => {
-    setPrintingOrder(null);
-  };
 
   // ==================== SKELETON LOADING ====================
   if (loading) {
@@ -299,16 +290,6 @@ const OrderHistory = () => {
                       </p>
                       <p className="text-xs font-semibold text-indigo-900/80">View Full Invoice & Tracker</p>
                     </div>
-
-                    <button
-                      onClick={(e) => handlePrintOrder(e, order)}
-                      className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 shadow-sm hover:bg-emerald-50 cursor-pointer transition-all flex flex-col justify-center group/btn no-print"
-                    >
-                      <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-                        Print Receipt <Printer size={11} className="transition-transform group-hover/btn:scale-110" />
-                      </p>
-                      <p className="text-xs font-semibold text-emerald-900/80">Print or Download PDF</p>
-                    </button>
                   </div>
 
                   <div>
@@ -381,24 +362,7 @@ const OrderHistory = () => {
         </div>
       </div>
 
-      {/* Print Receipt Modal */}
-      {printingOrder && (
-        <div className="fixed inset-0 z-[9999] bg-white overflow-auto">
-          <PrintReceipt
-            order={{
-              id: printingOrder.id,
-              order_no: printingOrder.order_no,
-              created_at: printingOrder.created_at,
-              status: printingOrder.status,
-              total: printingOrder.total,
-              delivery_charge: printingOrder.delivery_charge,
-              products: printingOrder.products,
-              payment: printingOrder.payment,
-            }}
-            onClose={handleClosePrint}
-          />
-        </div>
-      )}
+
     </div>
   );
 };
