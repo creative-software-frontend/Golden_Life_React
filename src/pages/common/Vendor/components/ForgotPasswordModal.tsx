@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Send, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle, Send } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
 interface ForgotPasswordModalProps {
-  onSendOtpSuccess: (mobile: string, userId: number) => void;
+  onSendOtpSuccess: (mobile: string) => void;
   onClose: () => void;
 }
 
@@ -16,86 +16,59 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-  // Clean and format mobile number - remove all non-digits
-  const cleanMobile = (value: string) => {
-    return value.replace(/\D/g, '');
+  const validateMobile = (mobile: string): boolean => {
+    const mobileRegex = /^01[3-9]\d{8}$/;
+    return mobileRegex.test(mobile);
   };
 
-  // Validate mobile number (11 digits for Bangladesh)
-  const validateMobile = (phoneNumber: string): boolean => {
-    const cleaned = phoneNumber.replace(/\D/g, '');
-    // Must be exactly 11 digits starting with 01
-    return /^01[3-9]\d{8}$/.test(cleaned);
-  };
-
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Clean mobile number - remove all non-digit characters
-    const cleanedMobile = cleanMobile(mobile);
-
-    // Validation
-    if (!cleanedMobile) {
+    if (!mobile) {
       setError('Please enter your mobile number');
       return;
     }
 
-    if (cleanedMobile.length !== 11) {
-      setError('Mobile number must be 11 digits');
-      return;
-    }
-
-    if (!validateMobile(cleanedMobile)) {
-      setError('Please enter a valid mobile number (e.g., 01865847806)');
+    if (!validateMobile(mobile)) {
+      setError('Please enter a valid Bangladeshi mobile number (e.g., 01XXXXXXXXX)');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      console.log('🔵 [ForgotPassword] Sending OTP to:', cleanedMobile);
-      
+      console.log('🔵 [Send OTP] Sending OTP to:', mobile);
+
+      // ✅ সঠিক ফরম্যাটে ডাটা পাঠানো
+      const formData = new FormData();
+      formData.append('mobile', mobile);
+
       const response = await axios.post(
         `${baseURL}/api/password/forgot`,
-        { mobile: cleanedMobile }, // Send only digits, no +88 prefix
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json'
           }
         }
       );
 
-      console.log('🟢 [ForgotPassword] API Response:', response.data);
+      console.log('🟢 [Send OTP] Response:', response.data);
 
       if (response.data?.success) {
         toast.success('OTP sent successfully! Please check your mobile.');
-        onSendOtpSuccess(cleanedMobile, response.data.user_id);
+        onSendOtpSuccess(mobile);
       } else {
         throw new Error(response.data?.message || 'Failed to send OTP');
       }
     } catch (err: any) {
-      console.error('🔴 [ForgotPassword] Error:', err);
-      console.error('🔴 [ForgotPassword] Error Response:', err.response?.data);
+      console.error('🔴 [Send OTP] Error:', err);
       
-      // Check for specific API validation errors
-      let errorMessage = 'Failed to send OTP. Please try again.';
-      
-      if (err.response?.data?.message) {
-        const apiMessage = err.response.data.message;
-        
-        // Handle mobile format validation error from API
-        if (apiMessage.includes('format') || apiMessage.includes('invalid')) {
-          errorMessage = 'Please enter a valid 11-digit mobile number (e.g., 01865847806)';
-        } else if (apiMessage.includes('not found') || apiMessage.includes('exists')) {
-          errorMessage = 'This mobile number is not registered';
-        } else {
-          errorMessage = apiMessage;
-        }
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          'Failed to send OTP. Please try again.';
       
       setError(errorMessage);
       toast.error(errorMessage);
@@ -111,53 +84,50 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
       exit={{ opacity: 0, y: -20 }}
     >
       <div className="space-y-4">
-        {/* Info Text */}
         <div className="text-center space-y-2">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+          </div>
           <p className="text-gray-600">
-            Enter your mobile number and we'll send you an OTP to verify your identity.
+            Enter your registered mobile number
+          </p>
+          <p className="text-sm text-gray-500">
+            We'll send you an OTP to reset your password
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSendOtp} className="space-y-4">
-          {/* Mobile Input */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Mobile Number
             </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="tel"
-                value={mobile}
-                onChange={(e) => {
-                  // Allow only digits, remove any non-digit characters
-                  const cleanedValue = e.target.value.replace(/\D/g, '');
-                  // Limit to 11 digits
-                  if (cleanedValue.length <= 11) {
-                    setMobile(cleanedValue);
-                    if (error) setError(null);
-                  }
-                }}
-                placeholder="018XXXXXXXX"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={11}
-                className={`w-full pl-10 pr-4 py-3 border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
-                disabled={isLoading}
-              />
-            </div>
-            {error && (
-              <div className="flex items-center gap-2 text-red-600 text-sm">
-                <AlertCircle className="w-4 h-4" />
-                <span>{error}</span>
-              </div>
-            )}
+            <input
+              type="tel"
+              value={mobile}
+              onChange={(e) => {
+                setMobile(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="01XXXXXXXXX"
+              className={`w-full px-4 py-3 border ${
+                error ? 'border-red-500' : 'border-gray-300'
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+              disabled={isLoading}
+            />
+            <p className="text-xs text-gray-500">
+              Enter 11 digit Bangladeshi mobile number
+            </p>
           </div>
 
-          {/* Submit Button */}
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              <AlertCircle className="w-4 h-4" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={isLoading}
@@ -185,16 +155,6 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
             )}
           </button>
         </form>
-
-        {/* Back to Login */}
-        <div className="text-center">
-          <button
-            onClick={onClose}
-            className="text-sm text-gray-600 hover:text-primary transition-colors"
-          >
-            ← Back to Login
-          </button>
-        </div>
       </div>
     </motion.div>
   );

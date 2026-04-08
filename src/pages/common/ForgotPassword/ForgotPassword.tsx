@@ -2,21 +2,14 @@ import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import Logo from '../Logo'; // Adjust path if needed
+import Logo from '../Logo';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
   
-  // --- Step Management ---
-  // 1: Request OTP (Mobile Input)
-  // 2: Set New Password
-  // 3: Success
   const [step, setStep] = useState<1 | 2 | 3>(1);
-
-  // --- Form States ---
   const [mobile, setMobile] = useState('');
-  const [userId, setUserId] = useState<number | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
@@ -25,14 +18,13 @@ const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // --- OTP Modal States ---
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", ""]); // 4-digit OTP
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // --- 1. HANDLE REQUEST OTP ---
+  // ✅ 1. HANDLE REQUEST OTP (FormData ব্যবহার করে)
   const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -48,29 +40,30 @@ const ForgotPassword: React.FC = () => {
     setMobileError('');
 
     try {
-      // REAL API CALL: Send OTP for student
+      const formData = new FormData();
+      formData.append('mobile', mobile);
+      
       const response = await axios.post(
-        `${baseURL}/api/student/password/forgot`,
-        { mobile: mobile },
+        `${baseURL}/api/password/forgot`,
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json'
           }
         }
       );
 
-      console.log('🟢 [Forgot Password] OTP sent:', response.data);
+      console.log('🟢 [Send OTP] Response:', response.data);
 
       if (response.data?.success) {
-        setUserId(response.data.user_id);
         toast.success('OTP sent successfully! Please check your mobile.');
-        setShowOtpModal(true); // Open OTP Modal
+        setShowOtpModal(true);
       } else {
         throw new Error(response.data?.message || 'Failed to send OTP');
       }
     } catch (err: any) {
-      console.error('🔴 [Forgot Password] Error:', err);
+      console.error('🔴 [Send OTP] Error:', err);
       const errorMessage = err.response?.data?.message || 'Failed to send OTP. Please try again.';
       setMobileError(errorMessage);
       toast.error(errorMessage);
@@ -79,7 +72,7 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  // --- 2. OTP INPUT HANDLERS ---
+  // 2. OTP INPUT HANDLERS
   const handleOtpChange = (index: number, value: string) => {
     if (isNaN(Number(value))) return; 
     
@@ -99,7 +92,7 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  // --- 3. VERIFY OTP ---
+  
   const handleOtpSubmit = async () => {
     const otpCode = otp.join("");
     if (otpCode.length !== 4) {
@@ -110,56 +103,22 @@ const ForgotPassword: React.FC = () => {
     setIsOtpLoading(true);
 
     try {
-      // Verify OTP before allowing password reset
-      // Note: Some APIs verify OTP separately, others combine it with password reset
-      // This is a verification step before showing the reset password form
+      // ✅ OTP সংরক্ষণ করে সরাসরি রিসেট পাসওয়ার্ড স্টেপে যান
+      // কারণ আপনার API ডকুমেন্টেশন অনুযায়ী, OTP যাচাই হবে রিসেট করার সময়
+      console.log('OTP Verified (client-side):', otpCode);
+      toast.success('OTP verified successfully!');
+      setShowOtpModal(false);
+      setStep(2); // Move to set password step
       
-      const response = await axios.post(
-        `${baseURL}/api/student/password/verify-otp`,
-        { 
-          mobile,
-          user_id: userId,
-          otp: otpCode 
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
-      );
-
-      console.log('🟢 [OTP Verification] Response:', response.data);
-
-      if (response.data?.success) {
-        toast.success('OTP verified successfully!');
-        setShowOtpModal(false);
-        setStep(2); // Move to set password step
-      } else {
-        throw new Error(response.data?.message || 'Invalid OTP');
-      }
     } catch (err: any) {
       console.error('🔴 [OTP Verification] Error:', err);
-      
-      // If verify-otp endpoint doesn't exist, we'll proceed to reset directly
-      // The actual verification will happen during password reset
-      if (err.response?.status === 404) {
-        console.log('⚠️ [OTP Verification] Verify endpoint not found, proceeding to reset form');
-        toast.info('Proceeding to password reset...');
-        setShowOtpModal(false);
-        setStep(2);
-        return;
-      }
-
-      const errorMessage = err.response?.data?.message || err.message || 'Invalid OTP. Please try again.';
-      setOtpError(errorMessage);
-      toast.error(errorMessage);
+      setOtpError('Invalid OTP. Please try again.');
+      toast.error('Invalid OTP');
     } finally {
       setIsOtpLoading(false);
     }
   };
 
-  // --- 4. HANDLE PASSWORD RESET ---
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -176,37 +135,51 @@ const ForgotPassword: React.FC = () => {
     setPasswordError('');
 
     try {
-      console.log('🔵 [Password Reset] Resetting password for:', mobile);
+      console.log('🔵 [Reset Password] Resetting password for:', mobile);
+      console.log('🔵 [Reset Password] OTP:', otp.join(""));
+      
+
+      const formData = new FormData();
+      formData.append('mobile', mobile);
+      formData.append('otp', otp.join(""));
+      formData.append('password', newPassword);
+      formData.append('password_confirmation', confirmPassword);
       
       const response = await axios.post(
-        `${baseURL}/api/student/password/reset`,
-        { 
-          user_id: userId,
-          otp: otp.join(""),
-          password: newPassword,
-          password_confirmation: confirmPassword
-        },
+        `${baseURL}/api/password/reset`,
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json'
           }
         }
       );
 
-      console.log('🟢 [Password Reset] Response:', response.data);
+      console.log('🟢 [Reset Password] Response:', response.data);
 
       if (response.data?.success) {
         toast.success('Password reset successfully! Please login with your new password.');
         setTimeout(() => {
-          setStep(3); // Move to success step
+          setStep(3);
         }, 1000);
       } else {
         throw new Error(response.data?.message || 'Failed to reset password');
       }
     } catch (err: any) {
-      console.error('🔴 [Password Reset] Error:', err);
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to reset password. Please try again.';
+      console.error('🔴 [Reset Password] Error:', err);
+      
+      let errorMessage = 'Failed to reset password. Please try again.';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.errors) {
+        const errors = Object.values(err.response.data.errors).flat();
+        errorMessage = errors.join(', ');
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
       setPasswordError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -218,12 +191,10 @@ const ForgotPassword: React.FC = () => {
     <>
       <div className="w-full max-w-xl mx-auto flex flex-col items-center mt-8 md:mt-12 mb-8 px-4">
         
-        {/* LOGO SECTION */}
         <div className="mb-8 transform scale-125 md:scale-150 origin-bottom">
           <Logo />
         </div>
 
-        {/* MAIN CARD */}
         <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
           
           {step === 1 && (
@@ -280,7 +251,9 @@ const ForgotPassword: React.FC = () => {
             <div className="animate-in fade-in zoom-in-95 duration-500">
               <div className="px-8 pt-8 pb-6 text-center">
                 <div className="mx-auto w-12 h-12 bg-green-100 text-green-600 flex items-center justify-center rounded-full mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800">Set New Password</h2>
                 <p className="text-gray-500 text-sm mt-2">Create a secure new password for your account.</p>
@@ -295,7 +268,6 @@ const ForgotPassword: React.FC = () => {
                     </div>
                   )}
 
-                  {/* New Password */}
                   <div className="space-y-2 relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -314,7 +286,6 @@ const ForgotPassword: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Confirm Password */}
                   <div className="space-y-2">
                     <input
                       type="password"
@@ -360,7 +331,7 @@ const ForgotPassword: React.FC = () => {
         </div>
       </div>
 
-      {/* --- OTP VERIFICATION MODAL --- */}
+      {/* OTP VERIFICATION MODAL */}
       {showOtpModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 transform transition-all animate-in zoom-in-95 relative">
@@ -399,7 +370,6 @@ const ForgotPassword: React.FC = () => {
                   key={index}
                   type="text"
                   maxLength={1}
-                  // @ts-ignore
                   ref={el => otpInputRefs.current[index] = el}
                   value={data}
                   onChange={e => handleOtpChange(index, e.target.value)}

@@ -102,7 +102,8 @@ const LoginForm = () => {
         sessionStorage.setItem("vendor_session", JSON.stringify({
           token: data.token,
           isVerified: true,
-          expiry: new Date().getTime() + 86400000 // Expires in 24 hours
+          // Expires in 24 hours
+          expiry: new Date().getTime() + 86400000 
         }));
 
         // 2. Save to Browser Cookies
@@ -183,7 +184,8 @@ const LoginForm = () => {
       }
     } catch (error: any) {
       setOtpError(error.message);
-      throw error; // Re-throw to let modal know it failed
+      // Re-throw to let modal know it failed
+      throw error; 
     } finally {
       setIsOtpLoading(false);
     }
