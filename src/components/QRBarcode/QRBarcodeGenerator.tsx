@@ -4,51 +4,41 @@ import JsBarcode from 'jsbarcode';
 
 interface QRBarcodeGeneratorProps {
   orderId: string;
-  baseUrl?: string;
   showQR?: boolean;
   showBarcode?: boolean;
   qrSize?: number;
   barcodeWidth?: number;
   barcodeHeight?: number;
+  trackingUrl?: string;
 }
 
-/**
- * QR Code & Barcode Generator Component
- * Generates both QR Code and Barcode for order tracking
- */
 const QRBarcodeGenerator: React.FC<QRBarcodeGeneratorProps> = ({
   orderId,
-  baseUrl = window.location.origin,
   showQR = true,
   showBarcode = true,
   qrSize = 100,
   barcodeWidth = 200,
   barcodeHeight = 60,
+  trackingUrl,
 }) => {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const barcodeRef = useRef<SVGSVGElement>(null);
 
-  // Generate tracking URL
-  const trackingUrl = `${baseUrl}/order-tracking/${orderId}`;
+  const finalTrackingUrl = trackingUrl || `${window.location.origin}/order-tracking/${orderId}`;
 
   // Generate QR Code
   useEffect(() => {
     if (showQR && qrCanvasRef.current) {
-      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
+      QRCode.toCanvas(qrCanvasRef.current, finalTrackingUrl, {
         width: qrSize,
         margin: 1,
-        color: {
-          dark: '#1e293b', // slate-800
-          light: '#ffffff',
-        },
-        errorCorrectionLevel: 'M', // Medium error correction
+        color: { dark: '#1e293b', light: '#ffffff' },
+        errorCorrectionLevel: 'M',
       }, (error) => {
-        if (error) {
-          console.error('QR Code generation error:', error);
-        }
+        if (error) console.error('QR Code generation error:', error);
       });
     }
-  }, [orderId, trackingUrl, showQR, qrSize]);
+  }, [finalTrackingUrl, qrSize, showQR]);
 
   // Generate Barcode
   useEffect(() => {
@@ -62,7 +52,7 @@ const QRBarcodeGenerator: React.FC<QRBarcodeGeneratorProps> = ({
           fontSize: 12,
           font: 'monospace',
           textMargin: 4,
-          margin: 5,
+          margin: 10,
           background: '#ffffff',
           lineColor: '#1e293b',
         });
@@ -70,39 +60,22 @@ const QRBarcodeGenerator: React.FC<QRBarcodeGeneratorProps> = ({
         console.error('Barcode generation error:', error);
       }
     }
-  }, [orderId, showBarcode, barcodeHeight]);
+  }, [orderId, barcodeHeight, showBarcode]);
 
-  if (!showQR && !showBarcode) {
-    return null;
-  }
+  if (!showQR && !showBarcode) return null;
 
   return (
-    <div className="flex flex-col items-center gap-4 print:gap-3">
+    <div className="flex flex-col items-center gap-3">
       {showQR && (
-        <div className="flex flex-col items-center gap-1">
-          <canvas
-            ref={qrCanvasRef}
-            width={qrSize}
-            height={qrSize}
-            className="rounded-lg shadow-sm border border-slate-200 print:shadow-none print:border"
-            aria-label={`QR Code for Order ${orderId}`}
-          />
-          <span className="text-[10px] text-slate-500 font-medium print:text-[8px]">Scan to Track</span>
-        </div>
+        <canvas 
+          ref={qrCanvasRef} 
+          width={qrSize} 
+          height={qrSize} 
+          style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+        />
       )}
-
       {showBarcode && (
-        <div className="flex flex-col items-center gap-1">
-          <svg
-            ref={barcodeRef}
-            className="print:w-full"
-            style={{ maxWidth: `${barcodeWidth}px`, height: `${barcodeHeight + 20}px` }}
-            aria-label={`Barcode for Order ${orderId}`}
-          />
-          <span className="text-[10px] text-slate-500 font-mono font-medium print:text-[8px]">
-            {orderId}
-          </span>
-        </div>
+        <svg ref={barcodeRef} style={{ width: barcodeWidth, height: barcodeHeight }} />
       )}
     </div>
   );

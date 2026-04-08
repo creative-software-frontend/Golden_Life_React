@@ -104,14 +104,47 @@ const PrintReceipt: React.FC<PrintReceiptProps> = ({
 
       {/* Receipt Content */}
       <div className="receipt-paper">
-        {/* Header */}
-        <div className="receipt-header">
-          <div className="company-info">
+        {/* Header - Company Info Centered */}
+        <div className="receipt-header-new">
+          <div className="company-info-centered">
             <h1 className="company-name">{companyName}</h1>
             <p className="company-tagline">{companyTagline}</p>
             <p className="company-address">{companyAddress}</p>
           </div>
-          <div className="qr-barcode-section">
+        </div>
+
+        {/* Invoice Info - Centered */}
+        <div className="invoice-info-centered">
+          <h2 className="invoice-title">Invoice #{invoiceNumber}</h2>
+          <p className="invoice-meta">
+            Date: {orderDate} | Status: {order.status}
+          </p>
+        </div>
+
+        {/* Two Column Layout: Addresses (Left) + QR/Barcode (Right) */}
+        <div className="receipt-two-column">
+          {/* Left Column - Addresses */}
+          <div className="address-column">
+            {/* Billing Address */}
+            <div className="billing-address">
+              <h3 className="address-heading">BILLING ADDRESS</h3>
+              <p className="address-name">{order.customer?.name || 'N/A'}</p>
+              {order.customer?.address && <p className="address-text">{order.customer.address}</p>}
+              {order.customer?.email && <p className="address-text">{order.customer.email}</p>}
+              {order.customer?.phone && <p className="address-text">{order.customer.phone}</p>}
+            </div>
+
+            {/* Shipping Address */}
+            <div className="shipping-address">
+              <h3 className="address-heading">SHIPPING ADDRESS</h3>
+              <p className="address-name">{order.shipping_address?.name || order.customer?.name || 'N/A'}</p>
+              {order.shipping_address?.address && <p className="address-text">{order.shipping_address.address}</p>}
+              {order.shipping_address?.phone && <p className="address-text">{order.shipping_address.phone}</p>}
+            </div>
+          </div>
+
+          {/* Right Column - QR & Barcode */}
+          <div className="qr-column">
             <QRBarcodeGenerator
               orderId={invoiceNumber}
               showQR={true}
@@ -123,70 +156,21 @@ const PrintReceipt: React.FC<PrintReceiptProps> = ({
           </div>
         </div>
 
-        {/* Invoice Info */}
-        <div className="invoice-info">
-          <div className="invoice-number">
-            <span className="label">INVOICE:</span>
-            <span className="value">#{invoiceNumber}</span>
-          </div>
-          <div className="invoice-details">
-            <span>Date: {orderDate}</span>
-            <span className="status-badge status-{order.status.toLowerCase().replace(/\s+/g, '-')}">
-              {order.status}
-            </span>
-          </div>
-        </div>
-
         {/* Divider */}
         <div className="divider"></div>
 
-        {/* Addresses */}
-        <div className="addresses-section">
-          <div className="address-box">
-            <h3 className="address-title">BILLING ADDRESS</h3>
-            <div className="address-content">
-              <p className="name">{order.customer?.name || 'N/A'}</p>
-              {order.customer?.address && <p className="address">{order.customer.address}</p>}
-              {order.customer?.email && <p className="email">{order.customer.email}</p>}
-              {order.customer?.phone && <p className="phone">{order.customer.phone}</p>}
-            </div>
-          </div>
-          <div className="address-box">
-            <h3 className="address-title">SHIPPING ADDRESS</h3>
-            <div className="address-content">
-              <p className="name">{order.shipping_address?.name || order.customer?.name || 'N/A'}</p>
-              {order.shipping_address?.address && <p className="address">{order.shipping_address.address}</p>}
-              {order.shipping_address?.phone && <p className="phone">{order.shipping_address.phone}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="divider"></div>
-
-        {/* Products Table */}
+        {/* Products Table - No Headers */}
         <div className="products-section">
-          <h3 className="section-title">PRODUCTS</h3>
-          <table className="products-table">
-            <thead>
-              <tr>
-                <th className="col-sl">SL</th>
-                <th className="col-product">PRODUCT NAME</th>
-                <th className="col-qty">QTY</th>
-                <th className="col-price">PRICE</th>
-                <th className="col-total">TOTAL</th>
-              </tr>
-            </thead>
+          <table className="product-table-no-header">
             <tbody>
               {order.products?.map((item, index) => {
                 const unitPrice = Number(item.subtotal) / Number(item.quantity);
                 return (
                   <tr key={index}>
-                    <td className="col-sl">{index + 1}</td>
-                    <td className="col-product">{item.product_name}</td>
-                    <td className="col-qty">{item.quantity}</td>
-                    <td className="col-price">৳{unitPrice.toFixed(2)}</td>
-                    <td className="col-total">৳{Number(item.subtotal).toFixed(2)}</td>
+                    <td className="product-name">{item.product_name}</td>
+                    <td className="product-qty">x{item.quantity}</td>
+                    <td className="product-price">৳{unitPrice.toFixed(2)}</td>
+                    <td className="product-total">৳{Number(item.subtotal).toFixed(2)}</td>
                   </tr>
                 );
               })}

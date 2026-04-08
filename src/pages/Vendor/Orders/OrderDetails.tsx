@@ -8,7 +8,6 @@ import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
-import { log } from 'node:console';
 import QRCode from 'qrcode';
 import JsBarcode from 'jsbarcode';
 
@@ -21,10 +20,14 @@ const formatAddress = (address: string | undefined) => {
   return address;
 };
 
-/* ─── Print-only Invoice ─────────────────────────────────────── */
-const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { order: Order; formatDate: (d: string) => string; fullAddressText?: string | null; orderTransaction?: any }) => {
+/* ─── Print-only Invoice Component ─── */
+const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { 
+  order: Order; 
+  formatDate: (d: string) => string; 
+  fullAddressText?: string | null; 
+  orderTransaction?: any;
+}) => {
   const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
-  const baseURL = 'https://api.goldenlife.my';
   const invoiceNumber = order.order_no;
   const orderDate = formatDate(order.created_at);
   const printDateTime = new Date().toLocaleString('en-US', {
@@ -44,7 +47,7 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
   useEffect(() => {
     if (qrCanvasRef.current) {
       QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
-        width: 100,
+        width: 90,
         margin: 1,
         color: { dark: '#1e293b', light: '#ffffff' },
         errorCorrectionLevel: 'M',
@@ -60,12 +63,12 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
       try {
         JsBarcode(barcodeRef.current, invoiceNumber, {
           format: 'CODE128',
-          width: 2,
-          height: 60,
+          width: 1.8,
+          height: 50,
           displayValue: true,
-          fontSize: 12,
+          fontSize: 10,
           font: 'monospace',
-          textMargin: 4,
+          textMargin: 3,
           margin: 5,
           background: '#ffffff',
           lineColor: '#1e293b',
@@ -76,6 +79,9 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
     }
   }, [invoiceNumber]);
 
+  // Get user email - try multiple possible field names
+  const userEmail = (order as any).user_email || (order as any).email || (order as any).customer_email || '—';
+
   return (
     <>
       <style>{`
@@ -83,11 +89,8 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
           .print-only { display: none !important; }
         }
         @media print {
-          /* Hide dashboard, show only invoice */
           body * { visibility: hidden; }
           .print-only, .print-only * { visibility: visible; }
-          
-          /* Force the invoice to break out of any scroll containers */
           .print-only {
             position: absolute !important;
             left: 0 !important;
@@ -96,141 +99,218 @@ const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: 
             height: auto !important;
             overflow: visible !important;
             display: block !important;
-            padding: 0 !important; /* Managed by @page */
+            padding: 0 !important;
             margin: 0 !important;
           }
-          
-          /* Ensure the table headers repeat on every new page */
-          .print-only table {
-            page-break-inside: auto;
-          }
-          .print-only tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-          .print-only thead {
-            display: table-header-group;
-          }
-          
-          /* Prevent summary blocks from breaking across pages if possible without huge gaps */
-          .no-break {
-            page-break-inside: auto;
-          }
-          
-          @page { margin: 15mm; }
+          @page { margin: 12mm; size: A4; }
         }
       `}</style>
 
       <div className="print-only" style={{
-        fontFamily: 'Arial, sans-serif',
-        color: '#111',
-        background: '#fff',
-        boxSizing: 'border-box'
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        color: '#111827',
+        background: '#ffffff',
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '20px',
       }}>
-      {/* ─── Header ─── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
-        <div>
-          <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
-        </div>
-
-        <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-          <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-          <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
-            Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
-          </p>
-        </div>
-
-        {/* QR Code & Barcode Section */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-          <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-          <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
-          
-          <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
-          <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
-        </div>
-      </div>
-
-      {/* ─── Billing Address Only ─── */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
-        <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Address</p>
-        <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
-        <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{fullAddressText || formatAddress(order.user_address)}</p>
-        <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-      </div>
-
-      {/* ─── Product Table ─── */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '13px' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid #eee' }}>
-            <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
-            <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Qty</th>
-            <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Unit Price</th>
-            <th style={{ padding: '10px 0 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.products?.map((product: any) => (
-            <tr key={product.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-              <td style={{ padding: '12px 14px 12px 0', verticalAlign: 'middle' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <img
-                    src={product.product_image?.startsWith('http') ? product.product_image : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`}
-                    alt={product.product_name}
-                    style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
-                  />
-                  <span style={{ fontWeight: 700, color: '#111' }}>{product.product_name}</span>
-                </div>
-              </td>
-              <td style={{ padding: '12px 14px', textAlign: 'center', color: '#555' }}>{product.quantity}</td>
-              <td style={{ padding: '12px 14px', textAlign: 'right', color: '#555' }}>৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</td>
-              <td style={{ padding: '12px 0 12px 14px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{parseFloat(product.subtotal).toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* ─── Totals ─── */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-        <div style={{ width: '280px', fontSize: '13px' }}>
-          {[
-            { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
-            { label: 'Delivery Fee', value: `৳${parseFloat(order.delivery_charge).toFixed(2)}` },
-            { label: 'Total Amount Paid', value: `৳${parseFloat(order.total).toFixed(2)}`, bold: true },
-            { label: 'Total Due', value: '৳0', bold: true },
-          ].map(({ label, value, bold }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
-              <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
-              <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
+        
+        {/* ========== HEADER: Logo Left + Invoice Info Right ========== */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          borderBottom: '2px solid #f5b800',
+          paddingBottom: '16px',
+          marginBottom: '24px'
+        }}>
+          {/* Left: Logo + Company Name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img 
+              src="/image/logo/logo.jpg" 
+              alt="Golden Life" 
+              style={{ height: '55px', width: '55px', objectFit: 'contain', borderRadius: '10px' }} 
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
+            <div>
+              <h1 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#111827', letterSpacing: '-0.3px' }}>GOLDEN LIFE</h1>
+              <p style={{ fontSize: '9px', color: '#6b7280', margin: '2px 0 0 0' }}>No #1 Digital Business & Reseller Platform in Bangladesh</p>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── Payment Method (Left Aligned) ─── */}
-      <div style={{ padding: '12px', background: '#f0f7ff', border: '1px solid #dbeafe', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <CreditCard size={16} color="#2563eb" />
-        <div>
-          <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '14px' }}>{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-          <div style={{ fontSize: '12px', color: '#3b82f6' }}>
-            TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}
+          </div>
+          
+          {/* Right: Invoice Number + Date + Status */}
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ 
+              background: '#f5b800', 
+              color: '#111827', 
+              padding: '6px 14px', 
+              borderRadius: '30px',
+              fontWeight: 800,
+              fontSize: '14px',
+              marginBottom: '8px',
+              display: 'inline-block'
+            }}>
+              INVOICE #{invoiceNumber}
+            </div>
+            <p style={{ fontSize: '10px', color: '#6b7280', margin: '4px 0 0 0' }}>
+              Date: {orderDate} | Status: <span style={{ fontWeight: 600, color: '#f5b800' }}>{order.status}</span>
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* ─── Footer ─── */}
-      <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6, marginTop: '24px' }}>
-        <p style={{ margin: '0 0 15px 0' }}>
-          Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
-        </p>
-        <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
-          Thank you for shopping!
-        </p>
-        <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
-          Printed on: {printDateTime}
-        </p>
-      </div>
+        {/* ========== TWO COLUMN: Addresses (Left) + QR/Barcode (Right) ========== */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          gap: '40px', 
+          marginBottom: '28px' 
+        }}>
+          
+          {/* LEFT COLUMN - Addresses */}
+          <div style={{ flex: 2 }}>
+            {/* Billing Address */}
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ 
+                fontSize: '11px', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                color: '#9ca3af', 
+                textTransform: 'uppercase',
+                marginBottom: '8px'
+              }}>Billing Address</h3>
+              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111827' }}>{order.user_name}</p>
+              <p style={{ fontSize: '12px', color: '#4b5563', margin: '4px 0' }}>{fullAddressText || formatAddress(order.user_address)}</p>
+              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{order.user_phone}</p>
+              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{userEmail}</p>
+            </div>
+
+            {/* Shipping Address */}
+            <div>
+              <h3 style={{ 
+                fontSize: '11px', 
+                fontWeight: 700, 
+                letterSpacing: '1px', 
+                color: '#9ca3af', 
+                textTransform: 'uppercase',
+                marginBottom: '8px'
+              }}>Shipping Address</h3>
+              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111827' }}>{order.user_name}</p>
+              <p style={{ fontSize: '12px', color: '#4b5563', margin: '4px 0' }}>{fullAddressText || formatAddress(order.user_address)}</p>
+              <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0' }}>{order.user_phone}</p>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN - QR Code + Barcode */}
+          <div style={{ 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: '12px',
+            background: '#f9fafb',
+            padding: '16px 12px',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb'
+          }}>
+            <canvas ref={qrCanvasRef} width={90} height={90} style={{ borderRadius: '8px' }} />
+            <svg ref={barcodeRef} style={{ width: '100%', maxWidth: '200px', height: 'auto' }} />
+            <p style={{ fontSize: '9px', color: '#9ca3af', margin: '4px 0 0 0' }}>Scan to Track Order</p>
+          </div>
+        </div>
+
+        {/* ========== PRODUCTS TABLE (No Headers) ========== */}
+        <div style={{ marginBottom: '24px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <tbody>
+              {order.products?.map((product: any, idx: number) => {
+                const unitPrice = product.price ? parseFloat(product.price) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1'));
+                return (
+                  <tr key={product.id} style={{ borderBottom: idx === (order.products?.length || 0) - 1 ? 'none' : '1px solid #f0f0f0' }}>
+                    <td style={{ padding: '12px 0', textAlign: 'left', fontWeight: 500, fontSize: '13px', color: '#111827' }}>
+                      {product.product_name}
+                    </td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', color: '#6b7280', width: '70px' }}>
+                      x{product.quantity}
+                    </td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', fontWeight: 600, color: '#4b5563', width: '100px' }}>
+                      ৳{unitPrice.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '12px 0', textAlign: 'right', fontSize: '13px', fontWeight: 700, color: '#111827', width: '110px' }}>
+                      ৳{parseFloat(product.subtotal).toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ========== DIVIDER ========== */}
+        <div style={{ height: '1px', background: 'linear-gradient(to right, #e5e7eb, #d1d5db, #e5e7eb)', margin: '16px 0' }}></div>
+
+        {/* ========== TOTALS SECTION ========== */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+          <div style={{ width: '280px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}>
+              <span style={{ fontSize: '12px', color: '#6b7280' }}>Subtotal</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>৳{subtotal.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0' }}>
+              <span style={{ fontSize: '12px', color: '#6b7280' }}>Delivery Fee</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>৳{parseFloat(order.delivery_charge).toFixed(2)}</span>
+            </div>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              padding: '12px 0 8px', 
+              borderTop: '2px solid #e5e7eb',
+              marginTop: '4px'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 800, color: '#111827' }}>Total Amount</span>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: '#f5b800' }}>৳{parseFloat(order.total).toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ========== PAYMENT METHOD SECTION ========== */}
+        <div style={{ 
+          background: '#fefce8', 
+          border: '1px solid #fef08a', 
+          borderRadius: '10px', 
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <CreditCard size={18} color="#ca8a04" />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '13px', color: '#854d0e' }}>{orderTransaction?.payment_method || (order as any).payment?.payment_method || '—'}</div>
+              <div style={{ fontSize: '11px', color: '#a16207' }}>TXN: {orderTransaction?.Transaction_ID || (order as any).payment?.transaction_number || '—'}</div>
+            </div>
+          </div>
+          <Button 
+            onClick={() => window.print()} 
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+          >
+            <Printer size={14} /> PRINT RECEIPT
+          </Button>
+        </div>
+
+        {/* ========== FOOTER ========== */}
+        <div style={{ 
+          borderTop: '1px solid #e5e7eb', 
+          paddingTop: '16px', 
+          textAlign: 'center',
+          fontSize: '10px',
+          color: '#9ca3af'
+        }}>
+          <p style={{ margin: '0 0 8px 0' }}>Thank you for shopping with Golden Life!</p>
+          <p style={{ margin: 0, fontStyle: 'italic' }}>Printed on: {printDateTime}</p>
+        </div>
       </div>
     </>
   );
@@ -244,18 +324,20 @@ export default function OrderDetails() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [fullAddressText, setFullAddressText] = useState<string | null>(null);
-
-  // New state for transactions
-  const [transactions, setTransactions] = useState<any[]>([]);
   const [orderTransaction, setOrderTransaction] = useState<any | null>(null);
 
-  // Added 8 full statuses
+  // Define OrderStatus array with proper type assertion
   const progressSteps: OrderStatus[] = [
-    "Order Placed", "Processing", "Packaging", "Sent To Courier",
-    "Ready To Courier", "On The Way", "Delivered", "Returned"
+    "Order Placed", 
+    "Processing", 
+    "Packaging", 
+    "Sent To Courier" as OrderStatus,
+    "Ready To Courier" as OrderStatus,
+    "On The Way" as OrderStatus,
+    "Delivered", 
+    "Returned" as OrderStatus
   ];
 
-  // Fetch Order details
   useEffect(() => {
     if (order_no) {
       loadOrderDetails(order_no);
@@ -267,7 +349,7 @@ export default function OrderDetails() {
       const data = await fetchOrderDetails(no);
       setOrder(data);
     } catch (error) {
-      console.error('❌ Failed to load order details:', error);
+      console.error('Failed to load order details:', error);
     }
   };
 
@@ -281,19 +363,13 @@ export default function OrderDetails() {
           if (session) {
             token = JSON.parse(session).token;
           }
-
-          const payload: any = {};
-          if (order?.user_id) {
-            payload.id = order.user_id;
-          }
-
           const response = await fetch('https://api.goldenlife.my/api/getAll-OderAddress', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ id: order.user_id })
           });
           const data = await response.json();
           if (data.status === 'success' && data.addresses) {
@@ -315,9 +391,9 @@ export default function OrderDetails() {
     } else {
       setFullAddressText('Not provided');
     }
-  }, [order?.user_address]);
+  }, [order?.user_address, order?.user_id]);
 
-  // NEW: Transaction Fetch Logic
+  // Transaction Fetch Logic
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -326,7 +402,6 @@ export default function OrderDetails() {
         if (session) {
           token = JSON.parse(session).token;
         }
-
         const response = await fetch('https://api.goldenlife.my/api/vendor/transactions/history', {
           method: 'GET',
           headers: {
@@ -335,14 +410,8 @@ export default function OrderDetails() {
             'Accept': 'application/json'
           }
         });
-
         const data = await response.json();
-
         if (data.status === true && data.transactions) {
-          console.log(data.transactions);
-          setTransactions(data.transactions);
-
-          // Fetch Transactions
           if (order) {
             const matchingTxn = data.transactions.find((txn: any) =>
               txn.invoice_number?.includes(order.order_no) ||
@@ -357,9 +426,8 @@ export default function OrderDetails() {
         console.error('Error fetching transactions:', err);
       }
     };
-
     fetchTransactions();
-  }, [order_no]);
+  }, [order_no, order]);
 
   const handleUpdateStatus = async (newStatus: OrderStatus) => {
     if (!order) return;
@@ -411,17 +479,10 @@ export default function OrderDetails() {
 
   return (
     <div className="max-w-[1400px] mx-auto p-6 space-y-6">
-      <style>{`
-        @media print {
-          @page { margin: 12mm; size: auto; }
-          .screen-only, header, nav, footer, .fixed, .backdrop-blur { display: none !important; }
-          .print-only { display: block !important; }
-          body { background: white !important; }
-        }
-      `}</style>
-
+      {/* Print Invoice Component */}
       <PrintInvoice order={order} formatDate={formatDate} fullAddressText={fullAddressText} orderTransaction={orderTransaction} />
 
+      {/* Screen Only Content */}
       <div className="screen-only">
         <Button onClick={() => navigate('/vendor/dashboard/orders')} variant="outline" className="gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Orders
@@ -453,7 +514,6 @@ export default function OrderDetails() {
           {progressSteps.map((step, index) => {
             const isCompleted = index < currentStepIndex || order.status === step;
             const isActive = index === currentStepIndex;
-
             return (
               <div key={step} className="flex-1 flex items-center">
                 <div
@@ -466,10 +526,7 @@ export default function OrderDetails() {
                 >
                   {isCompleted ? <Check className="w-5 h-5" /> : <span className="font-semibold">{index + 1}</span>}
                 </div>
-                <span
-                  className={`ml-3 text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-light font-bold' : 'text-gray-500'
-                    }`}
-                >
+                <span className={`ml-3 text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-light font-bold' : 'text-gray-500'}`}>
                   {step}
                 </span>
                 {index < progressSteps.length - 1 && (
@@ -558,17 +615,12 @@ export default function OrderDetails() {
                     <div className="flex items-center gap-3">
                       <CreditCard size={16} className="text-blue-600" />
                       <div>
-                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || (order as any).payment?.payment_method || '—'}</div>
+                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || (order as any).payment?.transaction_number || '—'}</div>
                       </div>
                     </div>
-                    <Button 
-                      onClick={() => window.print()} 
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-                    >
-                      <Printer size={14} />
-                      PRINT RECEIPT
+                    <Button onClick={() => window.print()} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+                      <Printer size={14} /> PRINT RECEIPT
                     </Button>
                   </div>
                 </div>
@@ -576,7 +628,6 @@ export default function OrderDetails() {
             </CardContent>
           </Card>
 
-          {/* New Transaction History Card */}
           {orderTransaction && (
             <Card className="screen-only border-green-200">
               <CardHeader className="bg-green-50 rounded-t-xl border-b border-green-100 pb-3">
@@ -586,37 +637,16 @@ export default function OrderDetails() {
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Invoice Ref</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.invoice_number}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Amount</span>
-                    <span className="font-bold text-gray-900">৳{parseFloat(orderTransaction.amount).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Transaction ID</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.Transaction_ID}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500">Status</span>
-                    <Badge variant={orderTransaction.status === 'approved' ? 'default' : 'secondary'} className={orderTransaction.status === 'approved' ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
-                      {(orderTransaction.status || 'Pending').toUpperCase()}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Method</span>
-                    <span className="font-medium text-gray-900 capitalize">{orderTransaction.payment_method}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Acct No.</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.number}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-gray-500">Invoice Ref</span><span className="font-medium text-gray-900">{orderTransaction.invoice_number}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Amount</span><span className="font-bold text-gray-900">৳{parseFloat(orderTransaction.amount).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Transaction ID</span><span className="font-medium text-gray-900">{orderTransaction.Transaction_ID}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-gray-500">Status</span><Badge variant={orderTransaction.status === 'approved' ? 'default' : 'secondary'} className={orderTransaction.status === 'approved' ? 'bg-green-100 text-green-800' : ''}>{(orderTransaction.status || 'Pending').toUpperCase()}</Badge></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Method</span><span className="font-medium text-gray-900 capitalize">{orderTransaction.payment_method}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Acct No.</span><span className="font-medium text-gray-900">{orderTransaction.number}</span></div>
                 </div>
               </CardContent>
             </Card>
           )}
-
         </div>
       </div>
 
@@ -624,7 +654,7 @@ export default function OrderDetails() {
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
         currentStatus={order.status}
-        onUpdate={handleUpdateStatus}
+        onUpdate={handleUpdateStatus} 
         orderNo={order.order_no}
       />
     </div>

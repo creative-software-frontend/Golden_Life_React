@@ -22,7 +22,7 @@ interface FormatBDTOptions {
  * Format amount as BDT currency
  */
 export const formatBDT = (
-  amount: number | string,
+  amount: number | string | undefined | null,
   options: FormatBDTOptions = {}
 ): string => {
   const {
@@ -34,8 +34,20 @@ export const formatBDT = (
     locale = 'en-BD',
   } = options;
 
+  // Handle null, undefined, or empty values
+  if (amount === undefined || amount === null || amount === '') {
+    return showSymbol ? (compact ? '৳0' : '0 BDT') : '0';
+  }
+
   // Convert to number if string
-  const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  let numericAmount: number;
+  if (typeof amount === 'string') {
+    // Remove any existing currency symbols and commas
+    const cleaned = amount.replace(/[৳BDT\$,]/gi, '').trim();
+    numericAmount = parseFloat(cleaned);
+  } else {
+    numericAmount = amount;
+  }
   
   // Handle invalid numbers
   if (isNaN(numericAmount)) {
@@ -69,8 +81,8 @@ export const formatBDT = (
  * Remove $ sign from any string and convert to BDT format
  * Useful for cleaning API responses or hardcoded strings
  */
-export const cleanCurrencyString = (str: string): string => {
-  if (!str) return str;
+export const cleanCurrencyString = (str: string | undefined | null): string => {
+  if (!str) return formatBDT(0);
   
   // Remove $ sign and trim
   const cleaned = str.replace(/\$/g, '').trim();
@@ -91,8 +103,8 @@ export const cleanCurrencyString = (str: string): string => {
  * Example: formatPriceRange(10, 20) => "10 - 20 BDT"
  */
 export const formatPriceRange = (
-  min: number | string,
-  max: number | string,
+  min: number | string | undefined | null,
+  max: number | string | undefined | null,
   options?: FormatBDTOptions
 ): string => {
   const minFormatted = formatBDT(min, { ...options, showSymbol: false });
@@ -106,21 +118,21 @@ export const formatPriceRange = (
  * Example: formatDiscount(100, 80) => { original: "100 BDT", discounted: "80 BDT", savings: "20 BDT" }
  */
 export const formatDiscount = (
-  originalPrice: number | string,
-  discountedPrice: number | string
+  originalPrice: number | string | undefined | null,
+  discountedPrice: number | string | undefined | null
 ) => {
-  const original = parseFloat(String(originalPrice));
-  const discounted = parseFloat(String(discountedPrice));
-  
-  if (isNaN(original) || isNaN(discounted)) {
-    return {
-      original: formatBDT(0),
-      discounted: formatBDT(0),
-      savings: formatBDT(0),
-      percentage: 0,
-    };
-  }
+  // Helper function to safely parse price
+  const parsePrice = (price: number | string | undefined | null): number => {
+    if (price === undefined || price === null || price === '') return 0;
+    if (typeof price === 'number') return price;
+    const cleaned = price.replace(/[৳BDT\$,]/gi, '').trim();
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
 
+  const original = parsePrice(originalPrice);
+  const discounted = parsePrice(discountedPrice);
+  
   const savings = original - discounted;
   const percentage = original > 0 ? ((savings / original) * 100).toFixed(0) : 0;
 
@@ -128,18 +140,21 @@ export const formatDiscount = (
     original: formatBDT(original),
     discounted: formatBDT(discounted),
     savings: formatBDT(savings),
-    percentage: parseInt(percentage),
+    percentage: parseInt(percentage as string),
   };
 };
 
 /**
  * Extract number from currency string
  * Example: extractCurrencyNumber("$100") => 100
+ * Example: extractCurrencyNumber("৳1,234.56") => 1234.56
+ * Example: extractCurrencyNumber("100 BDT") => 100
  */
-export const extractCurrencyNumber = (str: string): number => {
-  if (!str) return 0;
+export const extractCurrencyNumber = (str: string | undefined | null): number => {
+  if (!str || str === '') return 0;
   
-  const cleaned = str.replace(/[\$\,\s]/g, '');
+  // Remove currency symbols, BDT text, commas, and spaces
+  const cleaned = String(str).replace(/[৳BDT\$,]/gi, '').trim();
   const num = parseFloat(cleaned);
   
   return isNaN(num) ? 0 : num;
@@ -150,7 +165,7 @@ export const extractCurrencyNumber = (str: string): number => {
  * For backward compatibility with existing code
  */
 export const formatPrice = (
-  price: number,
+  price: number | string | undefined | null,
   currency: string = 'BDT'
 ): string => {
   return formatBDT(price, { compact: currency === '৳' });
@@ -161,20 +176,33 @@ export const formatPrice = (
  */
 export const CurrencyPresets = {
   // Full format: "1,234.56 BDT"
-  full: (amount: number | string) => formatBDT(amount, { showSymbol: true, prefix: false }),
+  full: (amount: number | string | undefined | null) => formatBDT(amount, { showSymbol: true, prefix: false }),
   
   // Compact format: "৳1,234.56"
-  compact: (amount: number | string) => formatBDT(amount, { compact: true }),
+  compact: (amount: number | string | undefined | null) => formatBDT(amount, { compact: true }),
   
   // Number only: "1,234.56"
-  number: (amount: number | string) => formatBDT(amount, { showSymbol: false }),
+  number: (amount: number | string | undefined | null) => formatBDT(amount, { showSymbol: false }),
   
   // Prefix format: "BDT 1,234.56"
-  prefix: (amount: number | string) => formatBDT(amount, { prefix: true }),
+  prefix: (amount: number | string | undefined | null) => formatBDT(amount, { prefix: true }),
   
   // No decimals: "1,235 BDT"
-  noDecimals: (amount: number | string) => formatBDT(amount, { showDecimals: false }),
+  noDecimals: (amount: number | string | undefined | null) => formatBDT(amount, { showDecimals: false }),
   
   // For charts/graphs (compact, no decimals)
-  chart: (amount: number | string) => formatBDT(amount, { compact: true, showDecimals: false }),
+  chart: (amount: number | string | undefined | null) => formatBDT(amount, { compact: true, showDecimals: false }),
 };
+
+// Default export
+const currencyFormatter = {
+  formatBDT,
+  cleanCurrencyString,
+  formatPriceRange,
+  formatDiscount,
+  extractCurrencyNumber,
+  formatPrice,
+  CurrencyPresets,
+};
+
+export default currencyFormatter;
