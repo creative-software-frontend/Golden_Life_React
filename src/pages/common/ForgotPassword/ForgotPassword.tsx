@@ -221,12 +221,22 @@ const ForgotPassword: React.FC = () => {
                         type="tel"
                         placeholder="01XXXXXXXXX"
                         value={mobile}
-                        onChange={(e) => { setMobile(e.target.value); setMobileError(''); }}
+                        onChange={(e) => { 
+                          const cleaned = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+                          setMobile(cleaned); 
+                          setMobileError(''); 
+                        }}
+                        maxLength={11}
+                        pattern="[0-9]{11}"
+                        title="Please enter 11 digit mobile number"
                         className={`w-full pl-10 pr-4 py-3.5 border ${mobileError ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:border-transparent transition-all`}
                         disabled={isLoading}
                       />
                     </div>
                     {mobileError && <p className="text-sm text-red-500 mt-1">{mobileError}</p>}
+                    {mobile && mobile.length !== 11 && mobile.length > 0 && (
+                      <p className="text-red-500 text-xs mt-1">Mobile number must be 11 digits</p>
+                    )}
                   </div>
 
                   <button
