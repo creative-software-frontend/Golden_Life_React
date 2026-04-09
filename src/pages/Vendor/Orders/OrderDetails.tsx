@@ -8,8 +8,9 @@ import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
 import { StatusUpdateModal } from './components/StatusUpdateModal';
-import QRCode from 'qrcode';
-import JsBarcode from 'jsbarcode';
+import PrintInvoice from '@/components/Invoice/PrintInvoice';
+import { usePrintInvoice } from '@/hooks/usePrintInvoice';
+import { OrderForPrint } from '@/hooks/usePrintInvoice';
 
 // Helper function to format address
 const formatAddress = (address: string | undefined) => {
@@ -18,234 +19,6 @@ const formatAddress = (address: string | undefined) => {
     return 'Address not available';
   }
   return address;
-};
-
-/* ─── Print-only Invoice ─────────────────────────────────────── */
-const PrintInvoice = ({ order, formatDate, fullAddressText, orderTransaction }: { order: Order; formatDate: (d: string) => string; fullAddressText?: string | null; orderTransaction?: any }) => {
-  const subtotal = parseFloat(order.total) - parseFloat(order.delivery_charge);
-  const baseURL = 'https://api.goldenlife.my';
-  const invoiceNumber = order.order_no;
-  const orderDate = formatDate(order.created_at);
-  const printDateTime = new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  // QR Code and Barcode refs
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
-  const barcodeRef = useRef<SVGSVGElement>(null);
-  const trackingUrl = `${window.location.origin}/order-tracking/${invoiceNumber}`;
-
-  // Generate QR Code
-  useEffect(() => {
-    if (qrCanvasRef.current) {
-      QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
-        width: 100,
-        margin: 1,
-        color: { dark: '#1e293b', light: '#ffffff' },
-        errorCorrectionLevel: 'M',
-      }, (error) => {
-        if (error) console.error('QR Code generation error:', error);
-      });
-    }
-  }, [trackingUrl]);
-
-  // Generate Barcode
-  useEffect(() => {
-    if (barcodeRef.current) {
-      try {
-        JsBarcode(barcodeRef.current, invoiceNumber, {
-          format: 'CODE128',
-          width: 2,
-          height: 60,
-          displayValue: true,
-          fontSize: 12,
-          font: 'monospace',
-          textMargin: 4,
-          margin: 5,
-          background: '#ffffff',
-          lineColor: '#1e293b',
-        });
-      } catch (error) {
-        console.error('Barcode generation error:', error);
-      }
-    }
-  }, [invoiceNumber]);
-
-  return (
-    <>
-      <style>{`
-        @media screen {
-          .print-only { display: none !important; }
-        }
-        @media print {
-          /* Hide dashboard, show only invoice */
-          body * { visibility: hidden; }
-          .print-only, .print-only * { visibility: visible; }
-          
-          /* Force the invoice to break out of any scroll containers */
-          .print-only {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-            display: block !important;
-            padding: 0 !important; /* Managed by @page */
-            margin: 0 !important;
-          }
-          
-          /* Ensure the table headers repeat on every new page */
-          .print-only table {
-            page-break-inside: auto;
-          }
-          .print-only tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-          .print-only thead {
-            display: table-header-group;
-          }
-          
-          /* Prevent summary blocks from breaking across pages if possible without huge gaps */
-          .no-break {
-            page-break-inside: auto;
-          }
-          
-          @page { margin: 15mm; }
-        }
-      `}</style>
-
-      <div className="print-only" style={{
-        fontFamily: 'Arial, sans-serif',
-        color: '#111',
-        background: '#fff',
-        boxSizing: 'border-box'
-      }}>
-        {/* ─── Header ─── */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
-          <div>
-            <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
-          </div>
-
-          <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
-            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-            <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
-              Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
-            </p>
-          </div>
-
-          {/* QR Code & Barcode Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-            <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
-
-            <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
-            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
-          </div>
-        </div>
-
-        {/* ─── Billing + Shipping Info ─── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
-          {/* Billing Info (Buyer Profile) */}
-          <div>
-            <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Information</p>
-            <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
-            <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
-              {order.student?.personal_info?.location || order.student_address?.address || fullAddressText || formatAddress(order.user_address)}
-            </p>
-            {order.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.student.email}</p>}
-            <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-          </div>
-
-          {/* Additional Info if needed */}
-          <div>
-             <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Status</p>
-             <p style={{ fontSize: '13px', color: '#444', margin: '0 0 4px' }}>Status: <span style={{ fontWeight: 700, color: '#111' }}>{order.status}</span></p>
-             <p style={{ fontSize: '13px', color: '#444' }}>Payment: <span style={{ fontWeight: 700, color: '#111' }}>{order.payment?.payment_method || '—'}</span></p>
-          </div>
-        </div>
-
-        {/* ─── Product Table ─── */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', fontSize: '13px' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #eee' }}>
-              <th style={{ padding: '10px 14px 10px 0', textAlign: 'left', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product Description</th>
-              <th style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '80px' }}>Qty</th>
-              <th style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Unit Price</th>
-              <th style={{ padding: '10px 0 10px 14px', textAlign: 'right', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', width: '110px' }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.products?.map((product: any) => (
-              <tr key={product.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '12px 14px 12px 0', verticalAlign: 'middle' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <img
-                      src={product.product_image?.startsWith('http') ? product.product_image : `${baseURL}/uploads/ecommarce/product_image/${product.product_image}`}
-                      alt={product.product_name}
-                      style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee', flexShrink: 0 }}
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/40?text=?'; }}
-                    />
-                    <span style={{ fontWeight: 700, color: '#111' }}>{product.product_name}</span>
-                  </div>
-                </td>
-                <td style={{ padding: '12px 14px', textAlign: 'center', color: '#555' }}>{product.quantity}</td>
-                <td style={{ padding: '12px 14px', textAlign: 'right', color: '#555' }}>৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</td>
-                <td style={{ padding: '12px 0 12px 14px', textAlign: 'right', fontWeight: 800, color: '#111' }}>৳{parseFloat(product.subtotal).toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* ─── Totals ─── */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-          <div style={{ width: '280px', fontSize: '13px' }}>
-            {[
-              { label: 'Subtotal', value: `৳${subtotal.toFixed(2)}` },
-              { label: 'Delivery Fee', value: `৳${parseFloat(order.delivery_charge).toFixed(2)}` },
-              { label: 'Total Amount Paid', value: `৳${parseFloat(order.total).toFixed(2)}`, bold: true },
-              { label: 'Total Due', value: '৳0', bold: true },
-            ].map(({ label, value, bold }) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}>
-                <span style={{ color: bold ? '#111' : '#555', fontWeight: bold ? 800 : 500 }}>{label}</span>
-                <span style={{ fontWeight: bold ? 800 : 600, color: '#111' }}>{value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ─── Payment Method (Left Aligned) ─── */}
-        <div style={{ padding: '12px', background: '#f0f7ff', border: '1px solid #dbeafe', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <CreditCard size={16} color="#2563eb" />
-          <div>
-            <div style={{ fontWeight: 600, color: '#1e3a8a', fontSize: '14px' }}>{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-            <div style={{ fontSize: '12px', color: '#3b82f6' }}>
-              TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}
-            </div>
-          </div>
-        </div>
-
-        {/* ─── Footer ─── */}
-        <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', fontSize: '11px', color: '#555', lineHeight: 1.6, marginTop: '24px' }}>
-          <p style={{ margin: '0 0 15px 0' }}>
-            Please note that depending on the availability of your products, your order will be shipped within 5 to 7 business days. Please go through the return instructions as well as warranty period of the products upon receiving. For any additional queries please call 654-123-123 or send us an email at support@goldenlife.my
-          </p>
-          <p style={{ fontWeight: 800, color: '#111', fontSize: '12px', margin: 0 }}>
-            Thank you for shopping!
-          </p>
-          <p style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic', margin: '10px 0 0 0' }}>
-            Printed on: {printDateTime}
-          </p>
-        </div>
-      </div>
-    </>
-  );
 };
 
 export default function OrderDetails() {
@@ -260,13 +33,19 @@ export default function OrderDetails() {
   // New state for transactions
   const [orderTransaction, setOrderTransaction] = useState<any | null>(null);
 
-  // Added 8 full statuses
+  // Print invoice hook
+  const { printInvoice } = usePrintInvoice();
   const progressSteps: OrderStatus[] = [
-    "Order Placed", "Processing", "Packaging", "Sent To Courier",
-    "Ready To Courier", "On The Way", "Delivered", "Returned"
+    "Order Placed", 
+    "Processing", 
+    "Packaging", 
+    "Sent To Courier" as OrderStatus,
+    "Ready To Courier" as OrderStatus,
+    "On The Way" as OrderStatus,
+    "Delivered", 
+    "Returned" as OrderStatus
   ];
 
-  // Fetch Order details
   useEffect(() => {
     if (order_no) {
       loadOrderDetails(order_no);
@@ -278,7 +57,7 @@ export default function OrderDetails() {
       const data = await fetchOrderDetails(no);
       setOrder(data);
     } catch (error) {
-      console.error('❌ Failed to load order details:', error);
+      console.error('Failed to load order details:', error);
     }
   };
 
@@ -292,19 +71,13 @@ export default function OrderDetails() {
           if (session) {
             token = JSON.parse(session).token;
           }
-
-          const payload: any = {};
-          if (order?.user_id) {
-            payload.id = order.user_id;
-          }
-
           const response = await fetch('https://api.goldenlife.my/api/getAll-OderAddress', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ id: order.user_id })
           });
           const data = await response.json();
           if (data.status === 'success' && data.addresses) {
@@ -326,9 +99,9 @@ export default function OrderDetails() {
     } else {
       setFullAddressText('Not provided');
     }
-  }, [order?.user_address]);
+  }, [order?.user_address, order?.user_id]);
 
-  // NEW: Transaction Fetch Logic
+  // Transaction Fetch Logic
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
@@ -337,7 +110,6 @@ export default function OrderDetails() {
         if (session) {
           token = JSON.parse(session).token;
         }
-
         const response = await fetch('https://api.goldenlife.my/api/vendor/transactions/history', {
           method: 'GET',
           headers: {
@@ -346,9 +118,7 @@ export default function OrderDetails() {
             'Accept': 'application/json'
           }
         });
-
         const data = await response.json();
-
         if (data.status === true && data.transactions) {
           console.log(data.transactions);
           // setTransactions(data.transactions);
@@ -368,9 +138,8 @@ export default function OrderDetails() {
         console.error('Error fetching transactions:', err);
       }
     };
-
     fetchTransactions();
-  }, [order_no]);
+  }, [order_no, order]);
 
   const handleUpdateStatus = async (newStatus: OrderStatus) => {
     if (!order) return;
@@ -423,7 +192,12 @@ export default function OrderDetails() {
   return (
     <div className="max-w-[1400px] mx-auto p-6 space-y-6">
 
-      <PrintInvoice order={order} formatDate={formatDate} fullAddressText={fullAddressText} orderTransaction={orderTransaction} />
+      <PrintInvoice
+        order={order}
+        fullAddressText={fullAddressText}
+        orderTransaction={orderTransaction}
+        baseURL="https://api.goldenlife.my"
+      />
 
       <div className="screen-only">
         <Button onClick={() => navigate('/vendor/dashboard/orders')} variant="outline" className="gap-2">
@@ -440,8 +214,28 @@ export default function OrderDetails() {
           <p className="text-gray-500 mt-1">{formatDate(order.created_at)}</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => window.print()} variant="outline" className="gap-2">
-            <Printer className="w-4 h-4" /> Print
+          <Button 
+            onClick={() => {
+              if (order) {
+                const orderForPrint: OrderForPrint = {
+                  order_no: order.order_no,
+                  created_at: order.created_at,
+                  status: order.status,
+                  total: order.total,
+                  delivery_charge: order.delivery_charge,
+                  user_name: order.user_name,
+                  user_phone: order.user_phone,
+                  user_address: order.user_address,
+                  products: order.products || [],
+                  payment: (order as any).payment || null,
+                };
+                printInvoice(orderForPrint);
+              }
+            }} 
+            variant="outline" 
+            className="gap-2"
+          >
+            <Printer className="w-4 h-4" /> PRINT RECEIPT
           </Button>
           <Button onClick={() => setIsStatusModalOpen(true)} className="bg-primary-light hover:bg-primary-light/90 text-white">
             Update Status
@@ -456,7 +250,6 @@ export default function OrderDetails() {
           {progressSteps.map((step, index) => {
             const isCompleted = index < currentStepIndex || order.status === step;
             const isActive = index === currentStepIndex;
-
             return (
               <div key={step} className="flex-1 flex items-center">
                 <div
@@ -469,10 +262,7 @@ export default function OrderDetails() {
                 >
                   {isCompleted ? <Check className="w-5 h-5" /> : <span className="font-semibold">{index + 1}</span>}
                 </div>
-                <span
-                  className={`ml-3 text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-light font-bold' : 'text-gray-500'
-                    }`}
-                >
+                <span className={`ml-3 text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-light font-bold' : 'text-gray-500'}`}>
                   {step}
                 </span>
                 {index < progressSteps.length - 1 && (
@@ -495,11 +285,11 @@ export default function OrderDetails() {
             <CardContent>
               {order.products && order.products.length > 0 ? (
                 <div className="space-y-4">
-                  {order.products.map((product) => (
+                  {order.products.map((product: any) => (
                     <div key={product.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-all duration-200">
                       <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border">
                         <img
-                          src={product.product_image.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
+                          src={product.product_image?.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
                           alt={product.product_name}
                           className="w-full h-full object-cover"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/80?text=No+Image'; }}
@@ -579,8 +369,8 @@ export default function OrderDetails() {
                     <div className="flex items-center gap-3">
                       <CreditCard size={16} className="text-blue-600" />
                       <div>
-                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || order.payment?.payment_method || '—'}</div>
-                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || order.payment?.transaction_number || '—'}</div>
+                        <div className="font-semibold text-blue-900">{orderTransaction?.payment_method || (order as any).payment?.payment_method || '—'}</div>
+                        <div className="text-xs text-blue-600/80">TXN: {orderTransaction?.Transaction_ID || (order as any).payment?.transaction_number || '—'}</div>
                       </div>
                     </div>
                     <Button
@@ -597,7 +387,6 @@ export default function OrderDetails() {
             </CardContent>
           </Card>
 
-          {/* New Transaction History Card */}
           {orderTransaction && (
             <Card className="screen-only border-green-200">
               <CardHeader className="bg-green-50 rounded-t-xl border-b border-green-100 pb-3">
@@ -607,37 +396,16 @@ export default function OrderDetails() {
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Invoice Ref</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.invoice_number}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Amount</span>
-                    <span className="font-bold text-gray-900">৳{parseFloat(orderTransaction.amount).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Transaction ID</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.Transaction_ID}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500">Status</span>
-                    <Badge variant={orderTransaction.status === 'approved' ? 'default' : 'secondary'} className={orderTransaction.status === 'approved' ? 'bg-green-100 text-green-800 hover:bg-green-100' : ''}>
-                      {(orderTransaction.status || 'Pending').toUpperCase()}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Method</span>
-                    <span className="font-medium text-gray-900 capitalize">{orderTransaction.payment_method}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Acct No.</span>
-                    <span className="font-medium text-gray-900">{orderTransaction.number}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-gray-500">Invoice Ref</span><span className="font-medium text-gray-900">{orderTransaction.invoice_number}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Amount</span><span className="font-bold text-gray-900">৳{parseFloat(orderTransaction.amount).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Transaction ID</span><span className="font-medium text-gray-900">{orderTransaction.Transaction_ID}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-gray-500">Status</span><Badge variant={orderTransaction.status === 'approved' ? 'default' : 'secondary'} className={orderTransaction.status === 'approved' ? 'bg-green-100 text-green-800' : ''}>{(orderTransaction.status || 'Pending').toUpperCase()}</Badge></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Method</span><span className="font-medium text-gray-900 capitalize">{orderTransaction.payment_method}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Acct No.</span><span className="font-medium text-gray-900">{orderTransaction.number}</span></div>
                 </div>
               </CardContent>
             </Card>
           )}
-
         </div>
       </div>
 
@@ -645,9 +413,9 @@ export default function OrderDetails() {
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
         currentStatus={order.status}
-        onUpdate={handleUpdateStatus}
+        onUpdate={handleUpdateStatus} 
         orderNo={order.order_no}
       />
     </div>
-  );
+  ); 
 }

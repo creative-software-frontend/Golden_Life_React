@@ -6,10 +6,11 @@ import axios from 'axios';
 
 interface ResetPasswordFormProps {
   mobile: string;
+  otp: string; // ✅ OTP প্রপস হিসেবে নিচ্ছে
   onResetSuccess: () => void;
 }
 
-const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) => {
+const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormProps) => {
   const [formData, setFormData] = useState({
     password: '',
     password_confirmation: ''
@@ -22,11 +23,7 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   const validatePassword = (password: string): boolean => {
-    // At least 6 characters
-    if (password.length < 6) {
-      return false;
-    }
-    return true;
+    return password.length >= 6;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +35,6 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
     e.preventDefault();
     setError(null);
 
-    // Validation
     if (!formData.password || !formData.password_confirmation) {
       setError('Please fill in both password fields');
       return;
@@ -58,17 +54,21 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
 
     try {
       console.log('🔵 [Reset Password] Resetting password for:', mobile);
+      console.log('🔵 [Reset Password] Using OTP:', otp);
+      
+      // ✅ সঠিক ফরম্যাট: form-data with all required fields
+      const formDataObj = new FormData();
+      formDataObj.append('mobile', mobile);
+      formDataObj.append('otp', otp); // ✅ OTP যোগ করা হয়েছে
+      formDataObj.append('password', formData.password);
+      formDataObj.append('password_confirmation', formData.password_confirmation);
       
       const response = await axios.post(
         `${baseURL}/api/password/reset`,
-        { 
-          mobile,
-          password: formData.password,
-          password_confirmation: formData.password_confirmation
-        },
+        formDataObj,
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json'
           }
         }
@@ -87,9 +87,16 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
     } catch (err: any) {
       console.error('🔴 [Reset Password] Error:', err);
       
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Failed to reset password. Please try again.';
+      let errorMessage = 'Failed to reset password. Please try again.';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.data?.errors) {
+        const errors = Object.values(err.response.data.errors).flat();
+        errorMessage = errors.join(', ');
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
       
       setError(errorMessage);
       toast.error(errorMessage);
@@ -105,7 +112,6 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
       exit={{ opacity: 0, y: -20 }}
     >
       <div className="space-y-4">
-        {/* Info Text */}
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
@@ -120,9 +126,7 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* New Password */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               New Password
@@ -162,7 +166,6 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
             </p>
           </div>
 
-          {/* Confirm Password */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Confirm Password
@@ -199,7 +202,6 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
             </div>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4" />
@@ -207,7 +209,6 @@ const ResetPasswordForm = ({ mobile, onResetSuccess }: ResetPasswordFormProps) =
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}

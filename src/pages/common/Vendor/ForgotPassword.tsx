@@ -16,7 +16,10 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
   const [step, setStep] = useState<Step>('mobile');
   const [mobile, setMobile] = useState('');
   const [userId, setUserId] = useState<number | null>(null);
+  const [otp, setOtp] = useState(''); 
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -26,31 +29,49 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
   const handleClose = () => {
     setStep('mobile');
     setMobile('');
-    setUserId(null);
+    setOtp('');
     onClose();
   };
 
-  const handleSendOtpSuccess = (userMobile: string, userId: number) => {
+  const handleSendOtpSuccess = (userMobile: string, newUserId?: number) => {
     setMobile(userMobile);
-    setUserId(userId);
+    if (newUserId) {
+      setUserId(newUserId);
+    }
     setStep('otp');
   };
 
-  const handleOtpVerifySuccess = () => {
-    setStep('reset');
+  const handleOtpVerify = async (verifiedUserId: number, verifiedOtp: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // You can add API call here if needed
+      setOtp(verifiedOtp);
+      setStep('reset');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpResend = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Add resend OTP logic here
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResetPasswordSuccess = () => {
     handleClose();
   };
 
-  // Don't render until mounted to avoid hydration issues
   if (!mounted) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        // Backdrop - Fixed overlay
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -58,7 +79,6 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
           onClick={handleClose}
         >
-          {/* Modal Content */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -67,7 +87,6 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-100">
                 <h2 className="text-xl font-semibold text-gray-800">
                   {step === 'mobile' && 'Forgot Password'}
@@ -82,7 +101,6 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
                 </button>
               </div>
 
-              {/* Content */}
               <div className="p-6">
                 {step === 'mobile' && (
                   <ForgotPasswordModal
@@ -91,18 +109,29 @@ const ForgotPassword = ({ isOpen, onClose }: ForgotPasswordProps) => {
                   />
                 )}
 
-                {step === 'otp' && (
+                {step === 'otp' && userId && (
                   <OtpVerificationModal
                     mobile={mobile}
                     userId={userId}
-                    onVerifySuccess={handleOtpVerifySuccess}
-                    onBack={() => setStep('mobile')}
+                    onVerify={handleOtpVerify}
+                    onResend={handleOtpResend}
+                    isLoading={isLoading}
+                    error={error}
+                    onClose={() => setStep('mobile')}
+                    onSuccess={() => {}}
                   />
+                )}
+
+                {step === 'otp' && !userId && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Loading OTP verification...</p>
+                  </div>
                 )}
 
                 {step === 'reset' && (
                   <ResetPasswordForm
                     mobile={mobile}
+                    otp={otp}
                     onResetSuccess={handleResetPasswordSuccess}
                   />
                 )}

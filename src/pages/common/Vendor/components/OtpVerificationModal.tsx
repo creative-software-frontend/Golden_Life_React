@@ -1,303 +1,151 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, AlertCircle, RefreshCw } from 'lucide-react';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import { Smartphone, Loader2, CheckCircle2, X } from 'lucide-react';
+import OTPInput from './OTPInput';
+import CountdownTimer from './CountdownTimer';
 
-interface OtpVerificationModalProps {
+interface OTPVerificationModalProps {
   mobile: string;
-  userId: number | null;
-  onVerifySuccess: () => void;
-  onBack: () => void;
+  userId: number;
+  onVerify: (userId: number, otp: string) => Promise<void>;
+  onResend: () => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
-const OtpVerificationModal = ({ 
-  mobile, 
-  userId, 
-  onVerifySuccess, 
-  onBack 
-}: OtpVerificationModalProps) => {
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(60); // 60 seconds countdown
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+const OTPVerificationModal: React.FC<OTPVerificationModalProps> = ({
+  mobile,
+  userId,
+  onVerify,
+  onResend,
+  isLoading,
+  error,
+  onClose,
+  onSuccess,
+}) => {
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [showCountdown, setShowCountdown] = useState(true);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-  // Countdown timer for OTP resend
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
-
-  // Format time display
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Handle OTP input change
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) value = value.slice(0, 1);
-    
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    setError(null);
-
-    // Auto-focus next input
-    if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  // Handle key press (backspace navigation)
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  // Handle paste
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').slice(0, 4);
-    
-    if (!/^\d+$/.test(pastedData)) {
-      setError('OTP must contain only numbers');
-      return;
-    }
-
-    const newOtp = [...otp];
-    pastedData.split('').forEach((char, index) => {
-      if (index < 4) newOtp[index] = char;
-    });
-    setOtp(newOtp);
-
-    // Focus on the next empty input or last input
-    const nextEmptyIndex = newOtp.findIndex((val) => val === '');
-    const focusIndex = nextEmptyIndex !== -1 ? nextEmptyIndex : 3;
-    inputRefs.current[focusIndex]?.focus();
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    const otpValue = otp.join('');
-
-    if (otpValue.length !== 4) {
-      setError('Please enter complete 4-digit OTP');
-      return;
-    }
-
-    if (!userId) {
-      setError('User ID not found. Please start over.');
-      return;
-    }
-
-    setIsLoading(true);
+  const handleOtpComplete = async (otpCode: string) => {
+    setOtpError(null);
 
     try {
-      console.log('🔵 [OTP Verification] Verifying OTP:', { mobile, userId, otp: otpValue });
-      
-      // Note: Based on your API structure, you might need to adjust this endpoint
-      // Some APIs verify OTP separately, others combine it with password reset
-      // This is a verification step before showing the reset password form
-      
-      const response = await axios.post(
-        `${baseURL}/api/password/verify-otp`,
-        { 
-          mobile,
-          user_id: userId,
-          otp: otpValue 
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
-      );
-
-      console.log('🟢 [OTP Verification] Response:', response.data);
-
-      if (response.data?.success) {
-        toast.success('OTP verified successfully!');
-        onVerifySuccess();
-      } else {
-        throw new Error(response.data?.message || 'Invalid OTP');
-      }
+      await onVerify(userId, otpCode);
+      onSuccess();
     } catch (err: any) {
-      console.error('🔴 [OTP Verification] Error:', err);
-      
-      // If verify-otp endpoint doesn't exist, we'll proceed to reset directly
-      // The actual verification will happen during password reset
-      if (err.response?.status === 404) {
-        console.log('⚠️ [OTP Verification] Verify endpoint not found, proceeding to reset form');
-        toast.info('Proceeding to password reset...');
-        onVerifySuccess();
-        return;
-      }
-
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Invalid OTP. Please try again.';
-      
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setOtpError(err.message || 'Invalid OTP. Please try again.');
     }
   };
 
-  const handleResendOtp = async () => {
-    if (timeLeft > 0) return;
-
-    setError(null);
-    setIsLoading(true);
+  const handleResend = async () => {
+    setOtpError(null);
+    setShowCountdown(false);
 
     try {
-      console.log('🔵 [Resend OTP] Sending new OTP to:', mobile);
-      
-      const response = await axios.post(
-        `${baseURL}/api/password/forgot`,
-        { mobile },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        }
-      );
-
-      if (response.data?.success) {
-        setTimeLeft(60);
-        setOtp(['', '', '', '', '', '']);
-        toast.success('OTP resent successfully! Please check your mobile.');
-        inputRefs.current[0]?.focus();
-      } else {
-        throw new Error(response.data?.message || 'Failed to resend OTP');
-      }
+      await onResend();
+      setShowCountdown(true);
     } catch (err: any) {
-      console.error('🔴 [Resend OTP] Error:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to resend OTP';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setOtpError(err.message || 'Failed to resend OTP');
     }
   };
+
+  // Format mobile for display
+  const formattedMobile = mobile.length === 11 
+    ? `${mobile.slice(0, 4)}-${mobile.slice(4, 8)}-${mobile.slice(8)}`
+    : mobile;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="space-y-6"
-    >
-      {/* Info Text */}
-      <div className="text-center space-y-2">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Shield className="w-8 h-8 text-primary" />
-          </div>
-        </div>
-        <p className="text-gray-600">
-          We've sent a 4-digit OTP to your mobile number
-        </p>
-        <p className="text-sm font-medium text-gray-800">
-          {mobile.replace(/(\d{3})(\d{3})(\d{4})/, '+88 $1-$2-$3')}
-        </p>
-      </div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 relative"
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-all"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-      {/* Form */}
-      <form onSubmit={handleVerifyOtp} className="space-y-4">
-        {/* OTP Input Fields */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 text-center block">
-            Enter OTP
-          </label>
-          <div className="flex gap-2 justify-center">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-                className={`w-12 h-14 text-center text-xl font-semibold border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
-                disabled={isLoading}
-              />
-            ))}
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="mx-auto w-16 h-16 bg-orange-100 text-[#FF8A00] flex items-center justify-center rounded-full mb-4">
+            <Smartphone className="w-8 h-8" />
           </div>
-          {error && (
-            <div className="flex items-center gap-2 text-red-600 text-sm justify-center mt-2">
-              <AlertCircle className="w-4 h-4" />
-              <span>{error}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Resend OTP */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Didn't receive the code?{' '}
-            {timeLeft > 0 ? (
-              <span className="text-gray-500">
-                Resend in {formatTime(timeLeft)}
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                disabled={isLoading}
-                className="text-primary hover:text-primary/80 font-medium inline-flex items-center gap-1 disabled:opacity-50"
-              >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                Resend OTP
-              </button>
-            )}
+          <h2 className="text-2xl font-black text-gray-900 mb-2">
+            Verify Your Mobile
+          </h2>
+          <p className="text-gray-500 text-sm">
+            Enter 4-digit OTP sent to
+          </p>
+          <p className="text-gray-800 font-bold mt-1">
+            +88 {formattedMobile}
           </p>
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isLoading || otp.some((d) => !d)}
-          className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-            isLoading || otp.some((d) => !d)
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-primary hover:bg-primary/90 text-white'
-          }`}
-        >
-          {isLoading ? 'Verifying...' : 'Verify & Continue'}
-        </button>
-      </form>
+        {/* Error Message */}
+        {otpError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-100 mb-4"
+          >
+            {otpError}
+          </motion.div>
+        )}
 
-      {/* Back Button */}
-      <div className="text-center">
-        <button
-          onClick={onBack}
-          className="text-sm text-gray-600 hover:text-primary transition-colors"
+        {/* OTP Input */}
+        <OTPInput
+          length={4}
+          onComplete={handleOtpComplete}
+          disabled={isLoading}
+          error={otpError || undefined}
+        />
+
+        {/* Verify Button */}
+        <motion.button
+          onClick={() => {
+            // Auto-triggered by OTP input
+          }}
+          disabled={true}
+          className="w-full bg-[#FF8A00] text-white font-bold text-lg py-4 rounded-xl shadow-lg transition-all mt-6 opacity-70 cursor-not-allowed"
         >
-          ← Change Mobile Number
-        </button>
-      </div>
-    </motion.div>
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Verifying...
+            </span>
+          ) : (
+            'Verify & Continue'
+          )}
+        </motion.button>
+
+        {/* Countdown Timer & Resend */}
+        {showCountdown && (
+          <CountdownTimer
+            duration={60}
+            onComplete={() => {}}
+            onResend={handleResend}
+            isLoading={isLoading}
+          />
+        )}
+
+        {/* Success Indicator */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-xs text-gray-500 text-center">
+            <CheckCircle2 className="w-4 h-4 inline mr-1" />
+            Registration successful! Please verify your mobile number.
+          </p>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
-export default OtpVerificationModal;
+export default OTPVerificationModal;

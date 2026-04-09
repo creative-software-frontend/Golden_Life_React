@@ -166,7 +166,6 @@ const RegisterForm = () => {
       }
 
       setSuccessMessage("Account created successfully! OTP sent.");
-      // setShowOtpModal(true); // already in original code
 
 
       // Show the OTP modal!
@@ -271,12 +270,12 @@ const RegisterForm = () => {
       }
 
       if (data.success) {
-        setSuccessMessage("Account verified successfully! Redirecting to login...");
+        setSuccessMessage("Account verified successfully! ");
 
         // DO NOT auto-login - redirect to login page
-        navigate("/vendor/login", {
+        navigate("/vendor/dashboard", {
           state: {
-            message: "Account verified! Please login with your credentials.",
+            message: "Account verified! ",
             mobile: formData.mobile
           }
         });

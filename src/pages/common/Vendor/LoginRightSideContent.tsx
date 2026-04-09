@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 const LoginRightSideContent = () => {
-  // কোম্পানির মেট্রিক্স ডাটা - লুসিড আইকন সহ
   const metrics = [
     { value: "৳50Cr+", label: "Monthly GMV", subLabel: "Gross Merchandise Value", icon: TrendingUp },
     { value: "15k+", label: "Active Sellers", subLabel: "Growing 25% MoM", icon: Users },

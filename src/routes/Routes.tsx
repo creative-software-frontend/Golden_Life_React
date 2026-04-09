@@ -48,7 +48,9 @@ import AuthLayout from "@/layout/AuthLayout/AuthLayout";
 import ProductDetails from "@/pages/ProductDetail/ProductDetails";
 import VendorProductDetails from "@/pages/Vendor/Products/ProductDetails";
 import VendorLogin from "@/pages/common/Vendor/VendorLogin";
+import VendorLoginNew from "@/pages/common/Vendor/VendorLoginNew";
 import VendorRegister from "@/pages/common/Vendor/VendorRegister";
+import VendorRegisterWithOTP from "@/pages/common/Vendor/VendorRegisterWithOTP";
 import CategoryPage from "@/pages/common/CategoryPage/CategoryPage";
 import StudentProtectedRoute from "@/components/ProtectedRoute/StudentProtectedRoute";
 import ProfileSettings from "@/pages/profile/ProfileSettings";
@@ -120,7 +122,15 @@ export const routes = createBrowserRouter([
         element: <VendorLogin />,
     },
     {
-        path: '/vendor/register', // Add this route
+        path: '/vendor/login-otp',
+        element: <VendorLoginNew />,
+    },
+    // {
+    //     path: '/vendor/register',
+    //     element: <VendorRegisterWithOTP />,
+    // },
+    {
+        path: '/vendor/register',
         element: <VendorRegister />,
     },
     {
