@@ -8,6 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { ProductCard } from "@/pages/common/ProductCard/ProductCard";
+import { VendorMismatchModal } from "@/components/shared/VendorMismatchModal";
 
 export default function AllProduct() {
     const { t, i18n } = useTranslation("global");
@@ -24,6 +25,10 @@ export default function AllProduct() {
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState<number | string>(12);
+
+    // Vendor Switch State
+    const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+    const [pendingProduct, setPendingProduct] = useState<any>(null);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
@@ -120,16 +125,39 @@ export default function AllProduct() {
 
     const handleAddToCart = (product: any) => {
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const currentVendorId = (product as any).vendor_id || (product as any).vendor?.id || "empty_vendor";
+
+        // Vendor Check
+        if (existingCart.length > 0) {
+            const firstCartItemVendorId = existingCart[0].vendor_id || existingCart[0].vendor?.id || "empty_store";
+            if (String(firstCartItemVendorId) !== String(currentVendorId)) {
+                setPendingProduct(product);
+                setIsVendorModalOpen(true);
+                return;
+            }
+        }
+
         const existingIndex = existingCart.findIndex((item: any) => item.id === product.id);
         const name = i18n.language === 'bn' ? (product.titleBn || product.titleEn) : product.titleEn;
 
         if (existingIndex !== -1) {
             existingCart[existingIndex].quantity += 1;
         } else {
-            existingCart.push({ ...product, name, image: product.product_image, quantity: 1 });
+            existingCart.push({ ...product, name, image: product.product_image, quantity: 1, vendor_id: currentVendorId });
         }
         localStorage.setItem("cart", JSON.stringify(existingCart));
         window.dispatchEvent(new Event("cartUpdated"));
+    };
+
+    const handleConfirmVendorSwitch = () => {
+        if (!pendingProduct) return;
+        const name = i18n.language === 'bn' ? (pendingProduct.titleBn || pendingProduct.titleEn) : pendingProduct.titleEn;
+        const currentVendorId = pendingProduct.vendor_id || pendingProduct.vendor?.id;
+        const newCart = [{ ...pendingProduct, name, image: pendingProduct.product_image, quantity: 1, vendor_id: currentVendorId }];
+        localStorage.setItem("cart", JSON.stringify(newCart));
+        window.dispatchEvent(new Event("cartUpdated"));
+        setIsVendorModalOpen(false);
+        setPendingProduct(null);
     };
 
     if (loading) {
@@ -353,6 +381,12 @@ export default function AllProduct() {
                     )}
                 </div>
             </div>
+
+            <VendorMismatchModal
+                isOpen={isVendorModalOpen}
+                onClose={() => { setIsVendorModalOpen(false); setPendingProduct(null); }}
+                onConfirm={handleConfirmVendorSwitch}
+            />
         </section>
     );
 }

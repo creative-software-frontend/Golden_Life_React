@@ -99,7 +99,6 @@ export default function WalletWithdraw() {
     // --- Form State ---
     const [amount, setAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('bkash');
-    const [attachment, setAttachment] = useState<File | null>(null);
     const [guideTab, setGuideTab] = useState<'bkash' | 'nagad'>('bkash');
 
     // Gateway-Specific States
@@ -194,7 +193,6 @@ export default function WalletWithdraw() {
         setAmount('');
         setMfsNumber('');
         setBankDetails({ bankName: '', branchName: '', accountName: '', accountNumber: '' });
-        setAttachment(null);
         await fetchWallet(true); // Silent refresh
         if (activeTab === 'history') fetchHistory(true);
         triggerWalletUpdate(); // Global Sync
@@ -230,8 +228,6 @@ export default function WalletWithdraw() {
                 amount={amount}
                 accountNumber={getFinalAccountDetails()}
                 paymentMethod={paymentMethod}
-                attachment={attachment}
-                token={getAuthToken()}
             />
             {/* --- Instruction Modal --- */}
             {showGuideModal && (
@@ -580,15 +576,6 @@ export default function WalletWithdraw() {
                             )}
                         </div>
 
-                        {/* Attachment */}
-                        <div className="space-y-3">
-                            <label className="text-sm font-bold text-slate-700">Proof Image (Optional)</label>
-                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all">
-                                <UploadCloud className="w-8 h-8 text-slate-400 mb-2" />
-                                <p className="text-xs font-semibold text-slate-500">{attachment ? attachment.name : "Click to upload"}</p>
-                                <input type="file" className="hidden" onChange={(e) => e.target.files && setAttachment(e.target.files[0])} />
-                            </label>
-                        </div>
 
                         <button type="submit" disabled={!amount} className="w-full py-5 bg-secondary hover:bg-secondary/90 text-white rounded-2xl font-bold text-xl shadow-lg shadow-secondary/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                             Submit Withdrawal Request

@@ -114,13 +114,22 @@ export default function EditProduct() {
           ebook: product.ebook ?? '0',
           images: [],
           existing_images: [
-            product.product_image || '', // Use empty string to satisfy Zod
+            product.product_image || '', // Main image is string at index 0
             ...gallery.map((g: any) => {
               if (!g) return null;
-              if (typeof g === 'string') return g;
-              return g.gal_img || g.image || g.image_name || g.url || null;
+              // If it's just a string, we don't have an ID, but we keep the image name
+              if (typeof g === 'string') return { id: 0, image: g };
+              // Look for filename in common properties
+              const imgName = g.gal_img || g.image || g.image_name || g.url || '';
+              // Return object with ID (numeric) and image name
+              return { id: Number(g.id) || 0, image: imgName };
             })
-          ].filter((img, idx) => idx === 0 || (img && typeof img === 'string')) as string[],
+          ].filter((img, idx) => {
+            // Index 0 is the main image (string or object)
+            if (idx === 0) return true;
+            // Subsequent indices are gallery image objects
+            return img !== null && typeof img === 'object' && (img.id !== 0 || img.image !== '');
+          }) as any[],
           removed_images: []
         };
 
@@ -193,11 +202,19 @@ export default function EditProduct() {
         }
       }
 
-      // Handle existing gallery images (keeping) - Using array format for robustness
+      // Handle existing gallery images (keeping) - Using keep_images[index] format for API
       if (data.existing_gallery_images && data.existing_gallery_images.length > 0) {
         console.log(`  📷 Keeping ${data.existing_gallery_images.length} existing gallery images`);
-        data.existing_gallery_images.forEach((img: string) => {
-          formData.append('existing_gallery_images[]', img);
+        data.existing_gallery_images.forEach((imgObj: any, index: number) => {
+          // Send ID if present, otherwise just ignore (or use image name if API supports it, but Postman shows IDs)
+          if (imgObj && (imgObj.id || imgObj.id === 0)) {
+            const idToKeep = imgObj.id.toString();
+            // Don't send '0' as it's likely a placeholder for missing ID
+            if (idToKeep !== '0') {
+              formData.append(`keep_images[${index}]`, idToKeep);
+              console.log(`  ➕ Added keep_images[${index}]: ${idToKeep}`);
+            }
+          }
         });
       }
 

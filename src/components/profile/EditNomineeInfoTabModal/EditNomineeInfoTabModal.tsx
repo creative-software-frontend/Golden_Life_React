@@ -232,7 +232,7 @@ export default function EditNomineeInfoTabModal({
                   </div>
                 </div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nominee Photo</p>
-                <input type="file" ref={nomineeRef} className="hidden" onChange={(e) => handleFileChange(e, 'nominee_image')} accept="image/*" />
+                <input type="file" ref={nomineeRef} className="hidden" onChange={(e) => handleFileChange(e, 'image')} accept="image/*" />
               </div>
 
               {/* Data Section */}

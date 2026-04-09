@@ -59,6 +59,7 @@ import VendorLayout from "@/layout/VendorLayout/VendorLayout";
 import VendorHome from "@/pages/VendorHome/VendorHome";
 import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
 import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
+import VendorInfo from "@/pages/Home/VendorInfo/VendorInfo";
 
 // Vendor Profile
 import VendorProfile from "@/pages/Vendor/Profile/index";
@@ -201,6 +202,10 @@ export const routes = createBrowserRouter([
                     {
                         path: 'product/:id',
                         element: <ProductDetails />,
+                    },
+                    {
+                        path: 'vendor-info/:id',
+                        element: <VendorInfo />,
                     },
                     {
                         path: "category/:id",

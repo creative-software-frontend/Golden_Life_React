@@ -23,8 +23,8 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   // State for tracking images
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
-  const [existingGalleryImages, setExistingGalleryImages] = useState<string[]>(
-    (initialData?.existing_images?.slice(1) || []).filter((img): img is string => !!img)
+  const [existingGalleryImages, setExistingGalleryImages] = useState<any[]>(
+    (initialData?.existing_images?.slice(1) || []).filter((img: any) => !!img)
   );
   const [removedGalleryImages, setRemovedGalleryImages] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'short-en' | 'short-bn' | 'long-en' | 'long-bn'>('short-en');
@@ -85,14 +85,15 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     if (rawImages && Array.isArray(rawImages)) {
       // Index 0 is main image, 1+ are gallery
       if (rawImages.length > 1) {
-        // Filter out nulls and type cast to string[]
-        const gallery = rawImages.slice(1).filter((img): img is string => !!img);
+        // Filter out nulls
+        const gallery = rawImages.slice(1).filter((img: any) => !!img);
         setExistingGalleryImages(gallery);
       }
     } else if (typeof rawImages === 'string') {
       try {
         const parsed = rawImages.startsWith('[') ? JSON.parse(rawImages) : rawImages.split(',');
         const array = (Array.isArray(parsed) ? parsed : [parsed]).filter(Boolean);
+        // If it's just strings from a legacy format, keep them as is
         setExistingGalleryImages(array.slice(1));
       } catch (e) { console.error(e); }
     }
@@ -151,10 +152,13 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
 
   // Handle existing gallery image removal
   const handleExistingGalleryImageRemove = (index: number) => {
-    const imageUrl = existingGalleryImages[index];
+    const imageObj = existingGalleryImages[index];
     const newExistingImages = existingGalleryImages.filter((_, i) => i !== index);
     setExistingGalleryImages(newExistingImages);
-    const newRemovedImages = [...removedGalleryImages, imageUrl];
+    
+    // Track removed image names for safety
+    const imgName = typeof imageObj === 'string' ? imageObj : imageObj.image;
+    const newRemovedImages = [...removedGalleryImages, imgName];
     setRemovedGalleryImages(newRemovedImages);
     setValue('removed_images', newRemovedImages);
   };
@@ -227,7 +231,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   const handleReset = () => {
     setMainImage(null);
     setGalleryImages([]);
-    const gallery = (initialData?.existing_images?.slice(1) || []).filter((img): img is string => !!img);
+    const gallery = (initialData?.existing_images?.slice(1) || []).filter((img: any) => !!img);
     setExistingGalleryImages(gallery);
     setRemovedGalleryImages([]);
     setActiveTab('short-en');
@@ -614,23 +618,26 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
               {(existingGalleryImages.length > 0 || galleryImages.length > 0) && (
                 <div className="grid grid-cols-4 gap-3 mt-4">
                   {/* Existing Images */}
-                  {existingGalleryImages.map((imgName, index) => (
-                    <div key={`existing-${index}`} className="group relative aspect-square rounded-lg overflow-hidden border-2 border-gray-100 hover:border-primary-light transition-all shadow-sm">
-                      <img
-                        src={imgName.startsWith('http') ? imgName : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgName}`}
-                        alt={`Existing Gallery ${index + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleExistingGalleryImageRemove(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                      >
-                        <X size={12} />
-                      </button>
-                      <div className="absolute bottom-0 left-0 right-0 bg-primary-dark/70 text-white text-[8px] font-bold text-center p-0.5 backdrop-blur-sm">Existing</div>
-                    </div>
-                  ))}
+                  {existingGalleryImages.map((imgObj, index) => {
+                    const imgName = typeof imgObj === 'string' ? imgObj : imgObj.image;
+                    return (
+                      <div key={`existing-${index}`} className="group relative aspect-square rounded-lg overflow-hidden border-2 border-gray-100 hover:border-primary-light transition-all shadow-sm">
+                        <img
+                          src={imgName.startsWith('http') ? imgName : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgName}`}
+                          alt={`Existing Gallery ${index + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleExistingGalleryImageRemove(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                        >
+                          <X size={12} />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 bg-primary-dark/70 text-white text-[8px] font-bold text-center p-0.5 backdrop-blur-sm">Existing</div>
+                      </div>
+                    );
+                  })}
 
                   {/* New Images */}
                   {galleryImages.map((file, index) => (
