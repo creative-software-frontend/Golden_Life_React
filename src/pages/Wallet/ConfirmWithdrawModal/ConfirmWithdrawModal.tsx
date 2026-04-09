@@ -11,11 +11,10 @@ interface ConfirmWithdrawModalProps {
     amount: string;
     accountNumber: string;
     paymentMethod: string;
-    attachment: File | null;
 }
 
 export default function ConfirmWithdrawModal({ 
-    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, attachment
+    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod
 }: ConfirmWithdrawModalProps) {
     const { withdrawFunds } = useAppStore();
     
@@ -41,7 +40,6 @@ export default function ConfirmWithdrawModal({
             formData.append('password', pinCode); 
             formData.append('pin_code', pinCode); 
             
-            if (attachment) formData.append('attachment', attachment);
 
             const result = await withdrawFunds(formData);
 

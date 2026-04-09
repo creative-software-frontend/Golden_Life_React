@@ -59,12 +59,29 @@ export default function NomineeInfoTab() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
-                <div className="relative">
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight italic">Nominee Details</h2>
-                    <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
-                        <ShieldCheck size={12} className="text-emerald-500" />
-                        Legal Representative & Inheritance Record
-                    </p>
+                <div className="relative flex items-center gap-4">
+                    {/* Nominee Photo (Left Side) */}
+                    <div className="w-16 h-16 shrink-0 rounded-full border-2 border-emerald-100 shadow-sm overflow-hidden bg-slate-50 relative">
+                        {nomineeData.nominee_image ? (
+                            <img 
+                                src={getNomineeDocUrl(nomineeData.nominee_image, 'nominee_image') || ''} 
+                                className="w-full h-full object-cover" 
+                                alt="Nominee Photo" 
+                            />
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-emerald-200">
+                                <User size={24} />
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight italic">Nominee Details</h2>
+                        <p className="text-[10px] text-slate-400 font-black mt-1 uppercase tracking-widest flex items-center gap-2">
+                            <ShieldCheck size={12} className="text-emerald-500" />
+                            Legal Representative & Inheritance Record
+                        </p>
+                    </div>
                 </div>
                 <button
                     onClick={() => setIsEditModalOpen(true)}
@@ -76,6 +93,7 @@ export default function NomineeInfoTab() {
             </div>
 
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 ml-1">
                         <User size={16} className="text-emerald-500" />

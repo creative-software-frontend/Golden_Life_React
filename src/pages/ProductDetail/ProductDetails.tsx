@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom"; // <-- Added useNavigate
 import {
     ShoppingCart, Heart, Minus, Plus, Star,
-    CheckCircle, ChevronLeft, ChevronRight, Zap // <-- Added Zap
+    CheckCircle, ChevronLeft, ChevronRight, Zap, Store
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import useModalStore from '@/store/modalStore';
+import { VendorMismatchModal } from "@/components/shared/VendorMismatchModal";
+import { log } from "util";
 
 // --- INTERFACES ---
 interface GalleryItem {
@@ -46,7 +48,7 @@ export default function ProductDetails() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate(); // <-- Initialize navigate
     const { t, i18n } = useTranslation("global");
-    const { setCartOpen, setCheckoutModalOpen } = useModalStore();
+    const { openBuyNow } = useModalStore();
 
     // --- STATE ---
     const [product, setProduct] = useState<Product | null>(null);
@@ -58,6 +60,9 @@ export default function ProductDetails() {
     // Slider State
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
+
+    // Vendor Switch State
+    const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 
     // --- API & IMAGE PATHS ---
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -81,7 +86,28 @@ export default function ProductDetails() {
                 const data = response.data?.data;
 
                 if (data?.product) {
-                    setProduct(data.product);
+                    let productData;
+                    if (Array.isArray(data.product)) {
+                        productData = data.product.find((p: any) => String(p.id) === String(id)) || data.product[0];
+                    } else {
+                        productData = data.product;
+                    }
+
+                    // FALLBACK: If the single product API omits vendor_id, fetch it from the full list
+                    if (!productData.vendor_id) {
+                        try {
+                            const allProductsRes = await axios.get(`${baseURL}/api/products`);
+                            const allProductsList = allProductsRes.data?.data?.products || allProductsRes.data?.data || [];
+                            const match = allProductsList.find((p: any) => String(p.id) === String(id));
+                            if (match && match.vendor_id) {
+                                productData.vendor_id = match.vendor_id;
+                            }
+                        } catch (e) {
+                            console.error("Failed to fetch fallback vendor ID", e);
+                        }
+                    }
+
+                    setProduct(productData);
                 }
 
                 if (data?.gallery && Array.isArray(data.gallery)) {
@@ -105,41 +131,61 @@ export default function ProductDetails() {
         if (!product) return;
 
         const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const existingProductIndex = existingCart.findIndex((item: any) => item.id === product.id);
+        const currentVendorId = (product as any).vendor_id || (product as any).vendor?.id || "empty_vendor";
 
-        const displayName = i18n.language === 'bn' ? product.product_title_bangla : product.product_title_english;
+        // Vendor Check
+        if (existingCart.length > 0) {
+            const firstCartItemVendorId = existingCart[0].vendor_id || existingCart[0].vendor?.id || "empty_store";
+            if (String(firstCartItemVendorId) !== String(currentVendorId)) {
+                setIsVendorModalOpen(true);
+                return;
+            }
+        }
 
-        // Calculate the fallback price
-        const fallbackPrice = parseFloat(product.offer_price || product.regular_price || product.seller_price) || 0;
+        const existingIndex = existingCart.findIndex((item: any) => item.id === product.id);
+        const name = i18n.language === 'bn' ? (product.product_title_bangla || product.product_title_english) : product.product_title_english;
 
-        // --- NEW: Pass offer_price and regular_price so the Cart can show discounts ---
-        const cartItem = {
-            id: product.id,
-            name: displayName,
-            product_title_english: product.product_title_english, // Added to match cart logic
-            image: `${mainImgBase}${product.product_image}`,
-            price: fallbackPrice,
-            offer_price: parseFloat(product.offer_price) || 0,     // ADDED
-            regular_price: parseFloat(product.regular_price) || 0, // ADDED
-            quantity: quantity
-        };
-
-        if (existingProductIndex !== -1) {
-            existingCart[existingProductIndex].quantity += quantity;
+        if (existingIndex !== -1) {
+            existingCart[existingIndex].quantity += quantity;
         } else {
-            existingCart.push(cartItem);
+            existingCart.push({
+                ...product,
+                name,
+                image: product.product_image?.startsWith('http') ? product.product_image : `${mainImgBase}${product.product_image}`,
+                quantity: quantity,
+                vendor_id: currentVendorId
+            });
         }
 
         localStorage.setItem("cart", JSON.stringify(existingCart));
         window.dispatchEvent(new Event("cartUpdated"));
     };
+
+    const handleConfirmVendorSwitch = () => {
+        if (!product) return;
+
+        const name = i18n.language === 'bn' ? (product.product_title_bangla || product.product_title_english) : product.product_title_english;
+        const currentVendorId = (product as any).vendor_id || (product as any).vendor?.id;
+
+        const cartItem = {
+            ...product,
+            name,
+            image: product.product_image?.startsWith('http') ? product.product_image : `${mainImgBase}${product.product_image}`,
+            quantity: quantity,
+            vendor_id: currentVendorId
+        };
+
+        const newCart = [cartItem];
+        localStorage.setItem("cart", JSON.stringify(newCart));
+        window.dispatchEvent(new Event("cartUpdated"));
+        setIsVendorModalOpen(false);
+    };
+
     // <-- NEW: Handle Buy Now -->
     const handleBuyNow = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart();
-        setCartOpen(false);          // Close the cart sidebar
-        setCheckoutModalOpen(true); // Open the checkout modal
+        openBuyNow(product);
     };
 
 
@@ -261,6 +307,18 @@ export default function ProductDetails() {
 
                         <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 flex flex-col justify-center">
                             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 mb-3 leading-tight">{title}</h1>
+
+                            {(product as any)?.vendor && (
+                                <Link
+                                    to={`/dashboard/vendor-info/${(product as any).vendor.id || (product as any).vendor_id}`}
+                                    className="inline-flex items-center gap-2 mb-4 text-emerald-600 hover:text-emerald-700 w-max group"
+                                >
+                                    <Store className="w-5 h-5" />
+                                    <span className="font-bold text-sm sm:text-base border-b border-transparent group-hover:border-emerald-600 transition-colors">
+                                        Store: {(product as any).vendor.businee_name}
+                                    </span>
+                                </Link>
+                            )}
 
                             <div className="flex flex-wrap items-center gap-4 mb-6">
                                 <div className="flex items-center gap-1 text-yellow-400 bg-yellow-50 px-2.5 py-1 rounded-md">
@@ -436,6 +494,12 @@ export default function ProductDetails() {
                 </div>
 
             </div>
+
+            <VendorMismatchModal
+                isOpen={isVendorModalOpen}
+                onClose={() => setIsVendorModalOpen(false)}
+                onConfirm={handleConfirmVendorSwitch}
+            />
         </motion.div>
     );
 }

@@ -81,6 +81,16 @@ export const ProductCard = ({ product, baseURL, onAddToCart, isSkeleton = false 
                     )}
                 </div>
 
+                {product.vendor && (
+                    <Link
+                        to={`/dashboard/vendor-info/${product.vendor.id || product.vendor_id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[10px] sm:text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline mb-1 w-full truncate"
+                    >
+                        Store: {product.vendor.businee_name}
+                    </Link>
+                )}
+
                 {/* Clicking Title also goes to details */}
                 <Link to={`/dashboard/product/${product.id}`}>
                     <h3 className="line-clamp-2 text-[13px] sm:text-[14px] font-bold text-slate-800 leading-snug min-h-[38px] group-hover:text-emerald-700 transition-colors">

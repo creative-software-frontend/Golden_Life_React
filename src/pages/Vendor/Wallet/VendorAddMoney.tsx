@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft, Wallet, Smartphone, ShieldCheck,
     Loader2, AlertCircle, History, Plus, Clock, Building2,
-    HelpCircle, X, CheckCircle2
+    HelpCircle, X, CheckCircle2, Image as ImageIcon
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -455,6 +455,46 @@ export default function VendorAddMoney() {
                                         onChange={(e) => setTrxId(e.target.value)}
                                         placeholder="TRX-XXXXXX"
                                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-secondary outline-none uppercase transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Attachment Section */}
+                            <div className="space-y-4">
+                                <label className="text-sm font-bold text-slate-700">Attachment (Optional Proof Image)</label>
+                                <div 
+                                    className={cn(
+                                        "relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-3xl transition-all cursor-pointer group",
+                                        attachment ? "border-secondary bg-secondary/5" : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                                    )}
+                                    onClick={() => document.getElementById('vendor-wallet-add-attachment')?.click()}
+                                >
+                                    {attachment ? (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="p-3 bg-secondary/10 rounded-2xl text-secondary">
+                                                <ImageIcon className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-700">{attachment.name}</p>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase">Click to change file</p>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="p-3 bg-slate-200 rounded-2xl text-slate-400 group-hover:bg-slate-300 group-hover:text-slate-500 transition-colors">
+                                                <Plus className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-500">Click to upload proof image</p>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase">JPG, PNG, PDF up to 5MB</p>
+                                        </div>
+                                    )}
+                                    <input 
+                                        id="vendor-wallet-add-attachment"
+                                        type="file" 
+                                        className="hidden" 
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) setAttachment(file);
+                                        }}
+                                        accept="image/*"
                                     />
                                 </div>
                             </div>
