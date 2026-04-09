@@ -176,12 +176,12 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
           <div>
             <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
+            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
           </div>
 
           <div style={{ textAlign: 'right', flex: 1 }}>
-            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
-            <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
+            <p style={{ fontSize: '20px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
               Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
             </p>
           </div>
@@ -236,12 +236,7 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
             </div>
           </div>
 
-          {/* Right Column: QR Code & Barcode */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <canvas ref={qrCanvasRef} width={90} height={90} style={{ borderRadius: '4px' }} />
-            <svg ref={barcodeRef} style={{ maxWidth: '180px', height: '70px' }} />
-            <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
-          </div>
+          
         </div>
 
         {/* Product Table */}
@@ -280,10 +275,16 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
               );
             })}
           </tbody>
+          
         </table>
 
         {/* Totals */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex', marginBottom: '24px', gap: '24px' }}>
+          {/* Right Column: QR Code & Barcode */}
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'left', gap: '20px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <canvas ref={qrCanvasRef} width={90} height={90} style={{ borderRadius: '4px' }} />
+            <svg ref={barcodeRef} style={{ maxWidth: '180px', height: '70px' }} />
+             </div>
           <div style={{ width: '280px', fontSize: '13px' }}>
             {[
               { label: 'Subtotal', value: formatBDT(subtotal, { compact: true }) },

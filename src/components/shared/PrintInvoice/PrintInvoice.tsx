@@ -176,11 +176,11 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #f5d800', paddingBottom: '16px', marginBottom: '24px' }}>
           <div>
             <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
+            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
           </div>
 
           <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
-            <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
             <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
               Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
             </p>
