@@ -1,20 +1,25 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { 
-    ChevronRight, Timer, SearchX, Loader2, 
-    Search, Grid3X3, Table as TableIcon 
+import {
+    ChevronRight, Timer, SearchX, Loader2,
+    Search, Grid3X3, Table as TableIcon
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
+import { useAppStore } from "@/store/useAppStore";
 import { ProductCard } from "@/pages/common/ProductCard/ProductCard";
 
 export default function FreshSell() {
     const { t, i18n } = useTranslation('global');
     const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 30, seconds: 0 });
-    const [products, setProducts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    // --- STORE ---
+    const {
+        allProducts: products,
+        isProductLoading: loading,
+        fetchProducts
+    } = useAppStore();
 
     // --- FILTER & VIEW STATES ---
     const [search, setSearch] = useState("");
@@ -39,49 +44,10 @@ export default function FreshSell() {
         return () => clearInterval(timer);
     }, []);
 
-    // Fetch Products
+    // Fetch Products via Store
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const session = sessionStorage.getItem("student_session");
-                const token = session ? JSON.parse(session).token : null;
-                
-                const endpoint = keyword
-                    ? `${baseURL}/api/products/search?keyword=${keyword}`
-                    : `${baseURL}/api/products`;
-
-                const response = await axios.get(endpoint, {
-                    headers: { Authorization: token ? `Bearer ${token}` : "" }
-                });
-
-                let rawData = response.data?.products || response.data?.data?.products || response.data?.data || [];
-                if (!Array.isArray(rawData)) rawData = [];
-
-                const mappedData = rawData.map((item: any) => ({
-                    ...item,
-                    id: item.id,
-                    date: item.created_at ? new Date(item.created_at).getTime() : item.id,
-                    titleEn: item.product_title_english || item.name_en || "Product",
-                    titleBn: item.product_title_bangla || item.name_bn || "",
-                    offer_price: parseFloat(item.offer_price) || parseFloat(item.price) || 0,
-                    regular_price: parseFloat(item.regular_price) || parseFloat(item.mrp) || 0,
-                    stock_qty: item.stock || item.quantity || 0,
-                    product_image: item.product_image?.startsWith("http")
-                        ? item.product_image
-                        : `${baseURL}/uploads/ecommarce/product_image/${item.product_image}`
-                }));
-
-                // For Fresh Sell, we might only want a slice if not searching
-                setProducts(keyword ? mappedData : mappedData.slice(0, 10));
-            } catch (error) {
-                console.error("Fetch error:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, [keyword, baseURL]);
+        fetchProducts(keyword || "");
+    }, [keyword, fetchProducts]);
 
     // Filtering & Sorting
     const filteredAndSortedProducts = useMemo(() => {
@@ -89,8 +55,8 @@ export default function FreshSell() {
 
         if (search) {
             const lowerSearch = search.toLowerCase();
-            result = result.filter(p => 
-                p.titleEn.toLowerCase().includes(lowerSearch) || 
+            result = result.filter(p =>
+                p.titleEn.toLowerCase().includes(lowerSearch) ||
                 p.titleBn.toLowerCase().includes(lowerSearch)
             );
         }
@@ -106,7 +72,7 @@ export default function FreshSell() {
             if (sortBy === "lowToHigh") return a.offer_price - b.offer_price;
             if (sortBy === "highToLow") return b.offer_price - a.offer_price;
             return 0;
-        });
+        }).slice(0, 10);
     }, [products, search, stock, sortBy]);
 
     const handleAddToCart = (product: any) => {
@@ -141,7 +107,7 @@ export default function FreshSell() {
     return (
         <section className="py-8 w-full container mx-auto px-4 sm:px-6">
             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
-                
+
                 {/* 1. Gradient Header with Timer */}
                 <div className="bg-gradient-to-br from-[#2d5a35] via-[#4d8b59] to-[#5ca367] p-8 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
@@ -188,12 +154,12 @@ export default function FreshSell() {
                 <div className="p-4 sm:p-8 border-b border-slate-100 bg-slate-50/40 backdrop-blur-sm relative">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex flex-col xl:flex-row items-center gap-6">
-                            
+
                             <div className="flex items-center gap-4 w-full xl:w-auto">
                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Filter By</span>
-                                <select 
-                                    value={stock} 
-                                    onChange={(e) => setStock(e.target.value)} 
+                                <select
+                                    value={stock}
+                                    onChange={(e) => setStock(e.target.value)}
                                     className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
                                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
                                 >
@@ -221,9 +187,9 @@ export default function FreshSell() {
                             <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-center">
                                 <div className="flex items-center gap-4 w-full sm:w-auto">
                                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hidden sm:block whitespace-nowrap">Sort By</span>
-                                    <select 
-                                        value={sortBy} 
-                                        onChange={(e) => setSortBy(e.target.value)} 
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
                                         className="h-12 w-full sm:w-[180px] px-6 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all cursor-pointer hover:border-emerald-300 shadow-sm appearance-none"
                                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1rem' }}
                                     >
@@ -237,19 +203,19 @@ export default function FreshSell() {
                                 <div className="flex items-center gap-1 bg-white p-1 rounded-full border border-slate-200 shadow-sm ml-auto sm:ml-0 overflow-hidden">
                                     <button
                                         onClick={() => setViewMode('grid')}
-                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'grid' 
-                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'grid'
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20'
                                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <Grid3X3 size={16} /> GRID
                                     </button>
                                     <button
                                         onClick={() => setViewMode('table')}
-                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'table' 
-                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' 
+                                        className={`px-5 py-2.5 rounded-full text-[10px] font-black transition-all flex items-center gap-2 ${viewMode === 'table'
+                                            ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20'
                                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <TableIcon size={16} /> TABLE
                                     </button>
@@ -337,11 +303,7 @@ export default function FreshSell() {
                 </div>
             </div>
 
-            <div className="text-center mt-12">
-                <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em]">
-                    Premium Direct Sourcing Series
-                </p>
-            </div>
+
         </section>
     );
-}
+}

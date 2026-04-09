@@ -6,6 +6,8 @@ import useModalStore from '@/store/modalStore';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+import { useAppStore } from '@/store/useAppStore';
+
 interface Props {
     data: { subTotal: number | string; totalItems: number };
     selectedAddress?: Address;
@@ -17,24 +19,8 @@ interface Props {
     deliveryFee: number | string;
 }
 
-// Helper to get Token
-const getAuthToken = () => {
-    const session = sessionStorage.getItem("student_session");
-    if (!session) return null;
-    try {
-        const parsedSession = JSON.parse(session);
-        if (new Date().getTime() > parsedSession.expiry) {
-            sessionStorage.removeItem("student_session");
-            return null;
-        }
-        return parsedSession.token;
-    } catch (e) {
-        return null;
-    }
-};
-
 const CheckoutSummaryView = ({
-    data, // We will override subTotal/totalItems dynamically to handle deletions
+    data, 
     selectedAddress,
     paymentMethod,
     setPaymentMethod,
@@ -44,6 +30,13 @@ const CheckoutSummaryView = ({
     deliveryFee
 }: Props) => {
     const { changeCheckoutModal, toggleClicked, triggerWalletUpdate } = useModalStore();
+    const { 
+        walletBalance: storeWalletBalance, 
+        isWalletLoading: isFetchingBalance, 
+        fetchWallet,
+        fetchNavbarData 
+    } = useAppStore();
+
     const navigate = useNavigate();
 
     const [termsAccepted, setTermsAccepted] = useState(false);
@@ -53,34 +46,15 @@ const CheckoutSummaryView = ({
     // --- CART ITEMS STATE ---
     const [cartItems, setCartItems] = useState<any[]>([]);
 
-    // --- WALLET BALANCE STATE ---
-    const [walletBalance, setWalletBalance] = useState<number>(0);
-    const [isFetchingBalance, setIsFetchingBalance] = useState(true);
+    // Convert string balance from store to number for calculations
+    const walletBalance = parseFloat(storeWalletBalance) || 0;
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-    // Fetch Initial Cart & Wallet Balance
+    // 1. Initial Data Load
     useEffect(() => {
-        const fetchWalletBalance = async () => {
-            setIsFetchingBalance(true);
-            try {
-                const token = getAuthToken();
-                const response = await axios.get(`${baseURL}/api/wallet-balance`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && { Authorization: `Bearer ${token}` })
-                    }
-                });
-                if (response.data?.success && response.data?.data) {
-                    setWalletBalance(parseFloat(response.data.data.balance) || 0);
-                }
-            } catch (error) {
-                console.error("Wallet Fetch Error:", error);
-                setWalletBalance(0);
-            } finally {
-                setTimeout(() => setIsFetchingBalance(false), 300);
-            }
-        };
+        // Ensure store has wallet data
+        fetchWallet();
 
         try {
             const items = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -88,9 +62,7 @@ const CheckoutSummaryView = ({
         } catch (err) {
             console.error("Error loading cart", err);
         }
-
-        fetchWalletBalance();
-    }, [baseURL]);
+    }, [fetchWallet]);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -100,7 +72,6 @@ const CheckoutSummaryView = ({
     }, []);
 
     // --- DYNAMIC CALCULATIONS ---
-    // We calculate these dynamically so they instantly update when an item is deleted
     const { currentSubTotal, originalTotal, currentTotalItems } = cartItems.reduce(
         (acc, item) => {
             const qty = Number(item.quantity) || 1;
@@ -129,11 +100,11 @@ const CheckoutSummaryView = ({
         const updatedCart = cartItems.filter(item => item.id !== idToRemove);
         setCartItems(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
-        window.dispatchEvent(new Event("cartUpdated")); // Notify other components (like navbar cart count)
+        window.dispatchEvent(new Event("cartUpdated")); 
 
         if (updatedCart.length === 0) {
             toast.error("Cart is empty.");
-            onClose(); // Automatically close if they delete the last item
+            onClose(); 
         } else {
             toast.success("Item removed");
         }
@@ -159,7 +130,8 @@ const CheckoutSummaryView = ({
         setIsPlacingOrder(true);
 
         try {
-            const token = getAuthToken();
+            const session = sessionStorage.getItem("student_session");
+            const token = session ? JSON.parse(session).token : null;
             if (!token) throw new Error("No authentication token");
 
             if (cartItems.length === 0) throw new Error("Cart is empty");
@@ -208,8 +180,14 @@ const CheckoutSummaryView = ({
                 localStorage.removeItem("cart");
                 window.dispatchEvent(new Event("cartUpdated"));
 
+                // GLOBAL STORE REFRESH: Refresh wallet and navbar components automatically
+                await Promise.all([
+                    fetchWallet(true), 
+                    fetchNavbarData(true)
+                ]);
+
                 if (paymentMethod.toLowerCase() === 'wallet') {
-                    triggerWalletUpdate?.();
+                    triggerWalletUpdate?.(); // Sync with components using this manual trigger
                 }
 
                 onConfirm();

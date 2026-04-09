@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios, { AxiosError } from 'axios';
 import { Lock, X, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAppStore } from '@/store/useAppStore';
 
 interface ConfirmTransferModalProps {
     isOpen: boolean;
@@ -11,14 +11,12 @@ interface ConfirmTransferModalProps {
     amount: string;
     receiverType: string;
     affiliateId: string;
-    baseURL: string;
-    token: string | null;
 }
 
 export default function ConfirmTransferModal({ 
-    isOpen, onClose, onSuccess, onError, amount, receiverType, affiliateId, baseURL, token
+    isOpen, onClose, onSuccess, onError, amount, receiverType, affiliateId
 }: ConfirmTransferModalProps) {
-    
+    const { sendFunds } = useAppStore();
     const [pinCode, setPinCode] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -32,44 +30,27 @@ export default function ConfirmTransferModal({
 
         try {
             const formData = new FormData();
-            formData.append('type', 'send'); // Most likely 'send' or 'transfer'
+            formData.append('type', 'send');
             formData.append('amount', amount);
             formData.append('receiver_type', receiverType);
             formData.append('affiliate_id', affiliateId);
             formData.append('pin_code', pinCode); 
             
-            const response = await axios.post(`${baseURL}/api/transactions`, formData, {
-                headers: { ...(token && { Authorization: `Bearer ${token}` }) }
-            });
+            const result = await sendFunds(formData);
 
-            if (response.data?.status === 'success' || response.data?.status === true) {
-                const msg = response.data?.message || "Transfer completed successfully!";
-                toast.success(msg);
-                onSuccess(msg);
+            if (result.success) {
+                toast.success(result.message);
+                onSuccess(result.message);
                 setPinCode('');
                 onClose();
             } else {
-                const msg = String(response.data?.message || "Transfer failed. Please check your details.");
-                toast.error(msg);
-                onError(msg);
-                setIsSubmitting(false);
+                toast.error(result.message);
+                onError(result.message);
             }
         } catch (error: any) {
-            const responseData = error.response?.data;
-            let finalErrorMessage = "Failed to process transfer. Please try again.";
-
-            if (responseData) {
-                finalErrorMessage = responseData.message || finalErrorMessage;
-                if (responseData.errors) {
-                    const firstErrorKey = Object.keys(responseData.errors)[0];
-                    const firstErrorVal = responseData.errors[firstErrorKey];
-                    finalErrorMessage = Array.isArray(firstErrorVal) ? firstErrorVal[0] : finalErrorMessage;
-                }
-            }
-
-            toast.error(finalErrorMessage);
-            onError(String(finalErrorMessage));
-            setIsSubmitting(false); 
+            const msg = "Failed to process transfer. Please try again.";
+            toast.error(msg);
+            onError(msg);
         } finally {
             setIsSubmitting(false);
         }

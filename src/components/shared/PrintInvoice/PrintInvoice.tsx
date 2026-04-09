@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
-import { CreditCard } from 'lucide-react';
 import QRCode from 'qrcode';
 import JsBarcode from 'jsbarcode';
+import { CreditCard } from 'lucide-react';
 import { formatBDT } from '@/utils/currencyFormatter';
 
 interface PrintInvoiceProps {
@@ -84,7 +84,7 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
   useEffect(() => {
     if (qrCanvasRef.current) {
       QRCode.toCanvas(qrCanvasRef.current, trackingUrl, {
-        width: 90,
+        width: 100,
         margin: 1,
         color: { dark: '#1e293b', light: '#ffffff' },
         errorCorrectionLevel: 'M',
@@ -178,70 +178,55 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
             <img src="/image/logo/logo.jpg" alt="Golden Life" style={{ height: '48px', objectFit: 'contain' }} />
           </div>
 
-          <div style={{ textAlign: 'right', flex: 1 }}>
+          <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
             <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px', color: '#111' }}>Invoice</h1>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#333', margin: 0 }}>#{order.order_no}</h2>
             <p style={{ fontSize: '12px', color: '#777', marginTop: '6px', marginBottom: 0 }}>
               Date: {orderDate} &nbsp;|&nbsp; Status: {order.status}
             </p>
           </div>
+
+          {/* QR Code & Barcode Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
+
+            <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
+            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
+          </div>
         </div>
 
-        {/* Billing + Shipping Info with QR/Barcode */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
-          {/* Left Column: Billing + Shipping Addresses */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            {/* Billing Info */}
-            <div>
-              <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Address</p>
-              {buyerProfile ? (
-                <>
-                  <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{buyerProfile.student?.name || order.user_name}</p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
-                    {buyerProfile.personal_info?.location || buyerProfile.personal_info?.district || formatAddress(order.user_address)}
-                  </p>
-                  {buyerProfile.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.student.email}</p>}
-                  <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{buyerProfile.student?.mobile || order.user_phone}</p>
-                </>
-              ) : (
-                <>
-                  <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
-                    {order.student?.personal_info?.location || order.student_address?.address || fullAddressText || formatAddress(order.user_address)}
-                  </p>
-                  {order.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.student.email}</p>}
-                  <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-                </>
-              )}
-            </div>
-
-            {/* Shipping Address */}
-            <div>
-              <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Address</p>
-              {shippingInfo ? (
-                <>
-                  <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{shippingInfo.name}</p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{shippingInfo.address}</p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{shippingInfo.phone}</p>
-                </>
-              ) : (
-                <>
-                  <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
-                    {order.student_address?.address || fullAddressText || formatAddress(order.user_address)}
-                  </p>
-                  <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
-                </>
-              )}
-            </div>
+        {/* Billing + Shipping Info */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', borderTop: '1px solid #eee', paddingTop: '14px', marginBottom: '24px' }}>
+          {/* Billing Info */}
+          <div>
+            <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Billing Information</p>
+            {buyerProfile ? (
+              <>
+                <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{buyerProfile.student?.name || order.user_name}</p>
+                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
+                  {buyerProfile.personal_info?.location || buyerProfile.personal_info?.district || formatAddress(order.user_address)}
+                </p>
+                {buyerProfile.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{buyerProfile.student.email}</p>}
+                <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{buyerProfile.student?.mobile || order.user_phone}</p>
+              </>
+            ) : (
+              <>
+                <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 4px', color: '#111' }}>{order.user_name}</p>
+                <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>
+                  {order.student?.personal_info?.location || order.student_address?.address || fullAddressText || formatAddress(order.user_address)}
+                </p>
+                {order.student?.email && <p style={{ fontSize: '13px', color: '#444', margin: '0 0 3px' }}>{order.student.email}</p>}
+                <p style={{ fontSize: '13px', color: '#444', margin: 0 }}>{order.user_phone}</p>
+              </>
+            )}
           </div>
 
-          {/* Right Column: QR Code & Barcode */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-            <canvas ref={qrCanvasRef} width={90} height={90} style={{ borderRadius: '4px' }} />
-            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
-            <svg ref={barcodeRef} style={{ maxWidth: '180px', height: '70px' }} />
-            <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
+          {/* Shipping Status / Additional Info */}
+          <div>
+             <p style={{ fontSize: '10px', fontWeight: 900, letterSpacing: '0.15em', color: '#111', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>Shipping Status</p>
+             <p style={{ fontSize: '13px', color: '#444', margin: '0 0 4px' }}>Status: <span style={{ fontWeight: 700, color: '#111' }}>{order.status}</span></p>
+             <p style={{ fontSize: '13px', color: '#444' }}>Payment: <span style={{ fontWeight: 700, color: '#111' }}>{order.payment?.payment_method || '—'}</span></p>
           </div>
         </div>
 

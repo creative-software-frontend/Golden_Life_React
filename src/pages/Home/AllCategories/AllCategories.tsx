@@ -35,9 +35,8 @@ const itemVariants = {
 export default function Categories() {
     const { t, i18n } = useTranslation('global');
 
-    const [loading, setLoading] = useState(true);
     const [hoveredId, setHoveredId] = useState<number | null>(null); // Track which card is hovered
-    const { categories, fetchCategories, isLoading } = useAppStore();
+    const { categories, fetchCategories, isCategoryLoading: loading } = useAppStore();
 
     // 2. Simply trigger the fetch on mount
     useEffect(() => {

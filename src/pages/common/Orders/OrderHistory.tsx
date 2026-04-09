@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Package,
@@ -10,10 +9,9 @@ import {
   Truck,
   ShoppingBag,
   ExternalLink,
-  Download,
   ArrowRight,
 } from 'lucide-react';
-
+import { useAppStore } from '@/store/useAppStore';
 
 // --- Types ---
 interface Product {
@@ -68,64 +66,26 @@ const OrderSkeleton = () => (
 
 const OrderHistory = () => {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    orders,
+    isOrdersLoading: loading,
+    fetchOrders,
+    studentProfile,
+    personalInfo
+  } = useAppStore();
+
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
 
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
-  // FIX: Passing both `id` and `orderNo` in state in case the Details API needs the DB id instead of the string.
   const goToDetails = (e: React.MouseEvent, orderId: number, orderNo: string) => {
     e.stopPropagation();
     navigate(`/dashboard/order-details`, { state: { id: orderId, orderNo: orderNo } });
   };
 
-  const getAuthToken = () => {
-    const session = sessionStorage.getItem("student_session");
-    if (!session) return null;
-    try {
-      const parsedSession = JSON.parse(session);
-      if (new Date().getTime() > parsedSession.expiry) {
-        sessionStorage.removeItem("student_session");
-        return null;
-      }
-      return parsedSession.token;
-    } catch (e) {
-      return null;
-    }
-  };
-
   useEffect(() => {
-    const fetchOrders = async () => {
-      const token = getAuthToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const headers = { Authorization: `Bearer ${token}` };
-
-        // We now only fetch the orders directly
-        const ordersRes = await axios.get(`${baseURL}/api/student/orders`, { headers });
-
-        // Handle the data structure returned by your API
-        const rawOrders = Array.isArray(ordersRes.data.orders) ? ordersRes.data.orders : [];
-
-        // If the API already includes the product details you need, 
-        // you can set them directly without the extra mapping logic.
-        setOrders(rawOrders);
-
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrders();
-  }, [baseURL]);
+  }, [fetchOrders]);
   const toggleOrder = (id: number) => {
     setExpandedOrderId(expandedOrderId === id ? null : id);
   };
@@ -188,12 +148,12 @@ const OrderHistory = () => {
         </div>
 
         <div className="space-y-4 sm:space-y-5 lg:space-y-6">
-          {orders.map((order) => (
+          {orders.map((order: Order) => (
             <div
               key={order.id}
               className={`transition-all duration-300 rounded-2xl sm:rounded-3xl overflow-hidden backdrop-blur-sm border ${expandedOrderId === order.id
-                  ? 'bg-white/90 border-emerald-200 shadow-xl shadow-emerald-100/30'
-                  : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
+                ? 'bg-white/90 border-emerald-200 shadow-xl shadow-emerald-100/30'
+                : 'bg-white/70 border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300'
                 }`}
             >
               <div
@@ -304,7 +264,7 @@ const OrderHistory = () => {
                     </div>
 
                     <div className="divide-y divide-slate-100">
-                      {order.products?.map((item) => (
+                      {order.products?.map((item: Product) => (
                         <div
                           key={item.id}
                           className="py-4 px-2 flex flex-col md:grid md:grid-cols-12 md:items-center gap-3 group hover:bg-slate-50/50 transition-colors rounded-xl"
@@ -361,8 +321,6 @@ const OrderHistory = () => {
           ))}
         </div>
       </div>
-
-
     </div>
   );
 };

@@ -37,10 +37,7 @@ import { cn } from "@/lib/utils"
 import { getNavData } from "@/data/navData"
 import useModalStore from '@/store/modalStore';
 import {
-    Baby,
-    Camera,
-    Camera as CameraIcon,
-    Settings, HelpCircle, UserCircle, ChevronUp,
+    Settings, HelpCircle, UserCircle,
     Carrot,
     ChefHat,
     ChevronDown,
@@ -50,12 +47,9 @@ import {
     Download,
     Fish,
     Sparkles,
-    HelpCircleIcon,
     Home,
     Landmark,
-    LayoutDashboard,
     Loader2,
-    LogInIcon,
     Menu,
     Milk,
     Package,
@@ -68,33 +62,13 @@ import {
     ShoppingCart,
     Snowflake,
     Tags,
-    User as UserIcon,
+    RotateCw,
     Wallet,
-    X,
-    RotateCw
+    Camera as CameraIcon
 } from 'lucide-react';
 import NotificationBell from "@/components/ui/NotificationBell"
 import { useAppStore } from "@/store/useAppStore"
 
-// Helper function to assign icons based on category name
-const getCategoryIcon = (categoryName: string) => {
-    const name = categoryName?.toLowerCase() || "";
-    if (name.includes('fruit') || name.includes('vegetable')) return Carrot;
-    if (name.includes('snack') || name.includes('confectionery')) return ShoppingCart;
-    if (name.includes('dairy') || name.includes('egg')) return Pill;
-    if (name.includes('seafood') && !name.includes('meat')) return Milk;
-    if (name.includes('beverage')) return Fish;
-    if (name.includes('meat') && !name.includes('seafood')) return Coffee;
-    if (name.includes('pantry')) return Cookie;
-    if (name.includes('frozen')) return Package;
-    if (name.includes('personal')) return Snowflake;
-    if (name.includes('household')) return Scissors;
-    if (name.includes('baby')) return Home;
-    if (name.includes('health')) return Baby;
-    if (name.includes('meatseafood')) return ChefHat;
-    if (name.includes('milk')) return ChefHat;
-    return Tags; // Default fallback icon
-};
 
 // 1. Helper to get Token
 const getAuthToken = () => {
@@ -114,7 +88,7 @@ const getAuthToken = () => {
 
 
 export default function UserLayout() {
-    const { changeCheckoutModal, isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore(); // Added walletUpdateTrigger
+    const { walletUpdateTrigger } = useModalStore(); 
     const [activeCategory, setActiveCategory] = React.useState("shopping");
     const [isMobileWalletOpen, setIsMobileWalletOpen] = React.useState(false)
     const { t, i18n } = useTranslation("global")
@@ -122,8 +96,8 @@ export default function UserLayout() {
     const location = useLocation();
 
     const {
-        categories, fetchCategories, studentProfile, fetchProfile,
-        walletBalance, fetchWallet, isCategoryLoading, isWalletLoading, logout
+        categories, fetchCategories, studentProfile, fetchNavbarData, fetchProfile,
+        walletBalance, isCategoryLoading, isWalletLoading
     } = useAppStore();
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
@@ -136,8 +110,7 @@ export default function UserLayout() {
         setIsRefreshing(true);
         try {
             await Promise.all([
-                fetchWallet(true),
-                fetchProfile(true)
+                fetchNavbarData(true)
             ]);
         } finally {
             setIsRefreshing(false);
@@ -157,16 +130,15 @@ export default function UserLayout() {
     // 2. Fetch on mount and when walletUpdateTrigger changes
     React.useEffect(() => {
         fetchCategories();
-        fetchProfile();
-        fetchWallet();
+        fetchProfile(); 
+        fetchNavbarData();
 
         const interval = setInterval(() => {
-            fetchProfile(true); // Silent update (no loading states)
-            fetchWallet(true);
+            fetchNavbarData(true); 
         }, 12000);
 
         return () => clearInterval(interval);
-    }, [fetchCategories, fetchProfile, fetchWallet]);
+    }, [fetchCategories, fetchNavbarData, walletUpdateTrigger]);
 
 
     // 2. Define the handleLogout function
@@ -206,8 +178,8 @@ export default function UserLayout() {
     };
     // Close menu when clicking outside
     React.useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };

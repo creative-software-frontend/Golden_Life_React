@@ -3,7 +3,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import { Wallet, Search, Menu, User as UserIcon, Bell, GraduationCap, Package, Settings, PlusCircle, Camera as CameraIcon, Loader2, LayoutDashboard, X, ChevronDown, Send, Download, Landmark } from 'lucide-react';
+import { Wallet, Search, Menu, GraduationCap, Package, ChevronDown, PlusCircle, Send, Download, Landmark, Loader2, LayoutDashboard, X } from 'lucide-react';
 import { ImageSearchButton } from '@/components/search';
 
 import PhoneInput from 'react-phone-number-input';
@@ -14,6 +14,8 @@ import LoginOptionsModal from '@/components/LoginoptionsModal';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { useAppStore } from '@/store/useAppStore';
 import { getAuthToken } from '@/store/utils';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Header: React.FC = () => {
     const { isLoginModalOpen, openLoginModal, closeLoginModal, walletUpdateTrigger } = useModalStore();
@@ -50,16 +52,10 @@ const Header: React.FC = () => {
     const walletBalanceValue = useAppStore(s => s.walletBalance);
     const isWalletLoading = useAppStore(s => s.isWalletLoading);
     const isProfileLoading = useAppStore(s => s.isProfileLoading);
-    const fetchWallet = useAppStore(s => s.fetchWallet);
-    const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    useEffect(() => {
-        fetchProfile();
-    }, [fetchProfile]);
+    // Initial fetch is handled by UserLayout.
+    // We only consume the data here.
 
-    useEffect(() => {
-        fetchWallet();
-    }, [walletUpdateTrigger]);
 
     // Handle clicks outside the search dropdown
     useEffect(() => {
@@ -275,6 +271,19 @@ const Header: React.FC = () => {
                                         </div>
                                         <span>Order History</span>
                                     </Link>
+                                    <button
+                                        onClick={() => {
+                                            sessionStorage.removeItem("student_session");
+                                            navigate("/login");
+                                            window.location.reload();
+                                        }}
+                                        className="group flex items-center gap-3 w-full px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-50 transition-all duration-200"
+                                    >
+                                        <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-red-100 transition-all duration-200">
+                                            <X className="w-4 h-4 text-red-400 group-hover:text-red-500" />
+                                        </div>
+                                        <span>Sign Out</span>
+                                    </button>
                                 </div>
                             </div>
                         )}

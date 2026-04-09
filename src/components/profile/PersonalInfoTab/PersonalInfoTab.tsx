@@ -1,97 +1,33 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
     User, Home, MapPin, Calendar, Heart,
     Globe, Users, ShieldCheck, Activity, Loader2,
     Edit2
 } from 'lucide-react';
 import EditPersonalInfoModal from '../EditPersonalInfoModal.tsx/EditPersonalInfoModal';
-import { PersonalData } from '../types/types';
-
+import { useAppStore } from '@/store/useAppStore';
 import { InfoCard } from '../InfoCard/InfoCard';
 
-interface PersonalInfoTabProps {
-    personalData?: any | null;
-    baseURL?: string;
-    token?: string | null;
-    onUpdate?: (updatedData: PersonalData) => void;
-}
+import { getAuthToken } from '@/store/utils';
 
-export default function PersonalInfoTab({
-    personalData: propData,
-    baseURL: propBaseURL,
-    token: propToken,
-    onUpdate
-}: PersonalInfoTabProps) {
+export default function PersonalInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [internalData, setInternalData] = useState<PersonalData | null>(null);
-    const [loading, setLoading] = useState(false);
+    const internalData = useAppStore(s => s.personalInfo);
+    const loading = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    // Get config internally if not provided via props
-    const baseURL = propBaseURL || import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-    const getActiveToken = () => {
-        if (propToken) return propToken;
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            return JSON.parse(session).token;
-        } catch (e) { return null; }
-    };
-
-    const token = getActiveToken();
-
-    const fetchPersonalInfo = async (signal?: AbortSignal) => {
-        if (!token || !baseURL) return;
-
-        setLoading(true);
-        try {
-            const response = await axios.get(`${baseURL}/api/student/personal-info`, {
-                signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.data?.success) {
-                // The API returns { data: { ... } }
-                setInternalData(response.data.data);
-            }
-        } catch (error: any) {
-            if (error.name !== 'CanceledError') {
-                console.error('❌ Personal info fetch failed:', error);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const token = getAuthToken();
 
     useEffect(() => {
-        const controller = new AbortController();
+        fetchProfile();
+    }, [fetchProfile]);
 
-        if (propData) {
-            // Handle if data is wrapped in {data: ...} or direct
-            const dataToSet = propData?.data ? propData.data : propData;
-            setInternalData(dataToSet);
-        } else {
-            fetchPersonalInfo(controller.signal);
-        }
-
-        return () => controller.abort();
-    }, [propData, token, baseURL]);
-
-    const handleLocalUpdate = (updatedData: PersonalData) => {
-        // We update locally first for instant feedback, then re-fetch as requested
-        setInternalData(updatedData);
-        fetchPersonalInfo();
-        if (onUpdate) onUpdate(updatedData);
+    const handleLocalUpdate = () => {
+        fetchProfile(true);
     };
 
-    // Better empty/loading check
-    const isDataEmpty = !internalData || Object.keys(internalData).length <= 2;
-
-    if (loading || isDataEmpty) {
+    if (loading && !internalData) {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
@@ -105,6 +41,8 @@ export default function PersonalInfoTab({
             </div>
         );
     }
+
+    if (!internalData) return null;
 
     return (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

@@ -4,7 +4,6 @@ import axios from 'axios';
 import {
     LayoutDashboard, User, FileText, FileBadge, Info, ShieldCheck, UserCircle2, Facebook, Send, Twitter, Youtube, Linkedin
 } from 'lucide-react';
-import { AdditionalInfoData } from '@/components/profile/types/types';
 import { useAppStore } from '@/store/useAppStore';
 import { baseURL } from '@/store/utils';
 
@@ -31,12 +30,12 @@ const SocialIcon = ({ icon: Icon, url, color }: { icon: any, url: string | null,
 
 export default function ProfileSidebar() {
     const studentProfile = useAppStore(s => s.studentProfile);
+    const additionalInfo = useAppStore(s => s.additionalInfo);
     const walletBalance = useAppStore(s => s.walletBalance);
     const isProfileLoading = useAppStore(s => s.isProfileLoading);
     const fetchProfile = useAppStore(s => s.fetchProfile);
     const fetchWallet = useAppStore(s => s.fetchWallet);
 
-    const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfoData | null>(null);
     const [stats, setStats] = useState<DashboardStats>({ boucher: 0, earning: 0, recharge: 0 });
 
     useEffect(() => {
@@ -44,17 +43,16 @@ export default function ProfileSidebar() {
         fetchProfile();
         fetchWallet();
 
-        // Fetch local-only additional info & stats (keep this for now if it's not in store)
+        // Fetch local-only stats (keep this for now if it's not in store yet, or move to store)
         const fetchLocalStats = async () => {
             const session = sessionStorage.getItem("student_session");
             const token = session ? JSON.parse(session).token : null;
             if (!token) return;
 
             try {
-                const [dashboardRes, additionalRes] = await Promise.all([
-                    axios.get(`${baseURL}/api/student/dashboard`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${baseURL}/api/student/additional-info`, { headers: { Authorization: `Bearer ${token}` } })
-                ]);
+                const dashboardRes = await axios.get(`${baseURL}/api/student/dashboard`, { 
+                    headers: { Authorization: `Bearer ${token}` } 
+                });
 
                 if (dashboardRes.data?.success) {
                     const data = dashboardRes.data.data;
@@ -64,9 +62,6 @@ export default function ProfileSidebar() {
                         recharge: data.recharge_balance || 0
                     });
                 }
-                if (additionalRes.data?.success) {
-                    setAdditionalInfo(additionalRes.data.data);
-                }
             } catch (err) {
                 console.error('ProfileSidebar: Local data fetch failed:', err);
             }
@@ -74,6 +69,7 @@ export default function ProfileSidebar() {
 
         fetchLocalStats();
     }, [fetchProfile, fetchWallet]);
+
 
     // Avatar Logic
     const cacheBreaker = Date.now();

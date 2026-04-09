@@ -6,6 +6,7 @@ import { StudentData } from '../BasicInfoTab/BasicInfoTab';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAppStore } from '@/store/useAppStore';
+import useModalStore from '@/store/modalStore';
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -25,7 +26,6 @@ interface FormDataState {
 
 export default function EditProfileModal({ isOpen, onClose, student, baseURL }: EditProfileModalProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const fetchProfile = useAppStore(s => s.fetchProfile);
 
     const initialFormData = React.useMemo(() => ({
         name: student?.name || '',
@@ -42,7 +42,10 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
     useEffect(() => {
         if (isOpen) {
             setFormData(initialFormData);
-            setPreviewUrl(student?.image ? `${baseURL}/uploads/student/image/${student.image}` : null);
+            const imgPath = student.image?.startsWith('http')
+                ? student.image
+                : `${baseURL}/uploads/student/image/${student.image}`;
+            setPreviewUrl(student.image ? imgPath : null);
         }
     }, [isOpen, initialFormData, student, baseURL]);
 
@@ -96,8 +99,17 @@ export default function EditProfileModal({ isOpen, onClose, student, baseURL }: 
             if (response.data?.status === "success" || response.data?.success) {
                 toast.success(response.data.message || "Basic profile updated successfully!");
 
-                // Trigger global refresh to sync all components (Header, Sidebar)
-                await fetchProfile(true); 
+                // 1. Force refresh of all profile photos (with cache breaking)
+                const { triggerProfileUpdate } = useModalStore.getState();
+                triggerProfileUpdate();
+
+                // 2. Trigger global fetch for fresh data in navbar and profile
+                const { fetchNavbarData, fetchProfile } = useAppStore.getState();
+                await Promise.all([
+                    fetchNavbarData(true),
+                    fetchProfile(true)
+                ]);
+
                 onClose();
             } else {
                 toast.error(response.data?.message || "Failed to update profile photo.");

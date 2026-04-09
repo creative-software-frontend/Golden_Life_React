@@ -41,68 +41,27 @@ const SocialLink = ({ icon: Icon, label, url, color }: { icon: any, label: strin
     </a>
 );
 
+import { useAppStore } from '@/store/useAppStore';
+import { getAuthToken } from '@/store/utils';
+
 export default function AdditionalInfoTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [infoData, setInfoData] = useState<AdditionalInfoData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const infoData = useAppStore(s => s.additionalInfo);
+    const loading = useAppStore(s => s.isProfileLoading);
+    const fetchProfile = useAppStore(s => s.fetchProfile);
 
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-    const getActiveToken = () => {
-        const session = sessionStorage.getItem("student_session");
-        if (!session) return null;
-        try {
-            return JSON.parse(session).token;
-        } catch (e) { return null; }
-    };
-
-    const token = getActiveToken();
-
-    const fetchAdditionalInfo = async (signal?: AbortSignal) => {
-        if (!token || !baseURL) {
-            setLoading(false);
-            return;
-        }
-
-        setLoading(true);
-        setError(false);
-        try {
-            const response = await axios.get(`${baseURL}/api/student/additional-info`, {
-                signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.data?.success) {
-                setInfoData(response.data.data);
-            } else {
-                setError(true);
-            }
-        } catch (error: any) {
-            if (error.name !== 'CanceledError') {
-                console.error('❌ Additional info fetch failed:', error);
-                setError(true);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    const token = getAuthToken();
 
     useEffect(() => {
-        const controller = new AbortController();
-        fetchAdditionalInfo(controller.signal);
-        return () => controller.abort();
-    }, [token, baseURL]);
+        fetchProfile();
+    }, [fetchProfile]);
 
-    const handleLocalUpdate = (updatedData: AdditionalInfoData) => {
-        setInfoData(updatedData);
-        fetchAdditionalInfo();
+    const handleLocalUpdate = () => {
+        fetchProfile(true);
     };
 
-    if (loading || error || !infoData) {
+    if (loading && !infoData) {
         return (
             <div className="p-16 text-center text-slate-400 flex flex-col items-center gap-4 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
                 <div className="relative">
@@ -116,6 +75,9 @@ export default function AdditionalInfoTab() {
             </div>
         );
     }
+
+    if (!infoData) return null;
+
 
 
     return (
