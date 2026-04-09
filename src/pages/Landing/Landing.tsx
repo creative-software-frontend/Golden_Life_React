@@ -12,6 +12,7 @@ import Services from "../Landing/sections/Services";
 import Reviews from "../Landing/sections/Reviews";
 import ProductFAQ from "../Landing/sections/ProductFAQ";
 import Experience from"../Landing/sections/Experience";
+import OurInventory from "../Landing/sections/OurInventory";
 
 const Landing: React.FC = () => {
     return (
@@ -23,7 +24,8 @@ const Landing: React.FC = () => {
        
             {/* 3. REVIEWS (Full Width) */}
             {/* We place this OUTSIDE the container so the background hits the edges */}
-             <Products />
+             {/* <Products /> */}
+            <OurInventory />
             <Services />
             <Reviews />
           <ProductFAQ></ProductFAQ>
