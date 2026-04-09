@@ -189,10 +189,8 @@ const PrintInvoice: React.FC<PrintInvoiceProps> = ({
           {/* QR Code & Barcode Section */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
             <canvas ref={qrCanvasRef} width={100} height={100} style={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 600 }}>Scan to Track</span>
 
             <svg ref={barcodeRef} style={{ maxWidth: '200px', height: '80px' }} />
-            <span style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{invoiceNumber}</span>
           </div>
         </div>
 
