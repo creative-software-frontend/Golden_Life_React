@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAppStore } from '@/store/useAppStore';
+import type { Transaction } from '@/store/slices/walletSlice';
 
 // --- Configuration ---
 const BANK_DETAILS = {
@@ -19,23 +21,21 @@ const BANK_DETAILS = {
     branch: "Dhanmondi Branch",
 };
 
-// --- Interfaces ---
-interface Transaction {
-    id: number;
-    type: string;
-    amount: string;
-    payment_method: string;
-    number: string;
-    Transaction_ID: string | null;
-    status: string;
-    created_at: string;
-}
 
 export default function VendorAddMoney() {
     const navigate = useNavigate();
     // Updated translation hook based on your request
     const { t, i18n } = useTranslation('global');
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+    // --- Store Integration ---
+    const { 
+        walletBalance: currentBalance, 
+        transactions: storeTransactions, 
+        fetchNavbarData, 
+        fetchHistory,
+        isWalletLoading: isLoadingStore 
+    } = useAppStore();
 
     // --- State Management ---
     const [activeTab, setActiveTab] = useState<'add' | 'history'>('add');
@@ -44,17 +44,18 @@ export default function VendorAddMoney() {
     const [accountNumber, setAccountNumber] = useState<string>('');
     const [trxId, setTrxId] = useState<string>('');
     const [attachment, setAttachment] = useState<File | null>(null);
-    const [currentBalance, setCurrentBalance] = useState<string>('0.00');
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
 
     // Status States
-    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [showGuideModal, setShowGuideModal] = useState(false); // Modal state
     const [guideTab, setGuideTab] = useState<'bkash' | 'nagad'>('bkash');
+
+    // Filtered transactions for 'add' type
+    const transactions = storeTransactions.filter((t: any) => t.type === 'add');
+    const isLoadingBalance = isLoadingStore && currentBalance === "0.00";
+    const isLoadingHistory = isLoadingStore && transactions.length === 0;
 
     const presetAmounts = [500, 1000, 2000, 5000];
     const paymentMethods = [
@@ -70,34 +71,9 @@ export default function VendorAddMoney() {
         return session ? JSON.parse(session).token : null;
     };
 
-    const fetchBalance = async () => {
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/vendor/wallet`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setCurrentBalance(Number(data?.data?.balance || 0).toFixed(2));
-        } catch (err) { console.error(err); }
-        finally { setIsLoadingBalance(false); }
-    };
-
-    const fetchHistory = async () => {
-        setIsLoadingHistory(true);
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/vendor/transactions/history`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data?.status === "success" || data?.transactions) {
-                setTransactions(data.transactions.filter((t: Transaction) => t.type === 'add'));
-            }
-        } catch (err) { console.error(err); }
-        finally { setIsLoadingHistory(false); }
-    };
-
     useEffect(() => {
-        fetchBalance();
-        fetchHistory();
+        fetchNavbarData(true);
+        fetchHistory(true);
     }, []);
 
     // --- Dynamic Input Validation ---
@@ -203,8 +179,8 @@ export default function VendorAddMoney() {
                 setAttachment(null);
 
                 // Refresh Data
-                if (typeof fetchBalance === 'function') fetchBalance();
-                if (typeof fetchHistory === 'function') fetchHistory();
+                fetchNavbarData(true);
+                fetchHistory(true);
 
                 setTimeout(() => setSuccess(null), 5000);
             } else {

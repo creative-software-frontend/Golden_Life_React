@@ -11,6 +11,8 @@ import { useVendorProfile, getVendorDisplayName, getVendorAvatarUrl } from '@/ho
 import VendorNotificationBell from '@/pages/Vendor/VendorHeader/NotificationBell';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { useVendorAuth } from '@/hooks/useVendorAuth';
+import { useAppStore } from '@/store/useAppStore';
+import { baseURL } from '@/store/utils';
 
 // --- CUSTOM ICONS ---
 const MenuFoldLeftIcon = ({ size = 24, className = "" }) => (
@@ -38,75 +40,40 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     const navigate = useNavigate();
     const { handleLogout } = useVendorAuth();
 
-    // --- Fetch Vendor Profile ---
-    const { profile, isLoading: isProfileLoading } = useVendorProfile();
+    const { 
+        walletBalance, 
+        notifications, 
+        unreadCount, 
+        vendorProfile: profile, 
+        fetchNavbarData, 
+        isNavbarLoading: isLoading 
+    } = useAppStore();
+
+    const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
+    const walletRefDesktop = useRef<HTMLDivElement>(null);
+    const walletRefMobile = useRef<HTMLDivElement>(null);
 
     // Profile completion check
     const { percentage: profilePercentage, isComplete: isProfileComplete } = useProfileCompletion(profile?.vendor);
 
-    // --- State for Wallet ---
-    const [isLoading, setIsLoading] = useState(true);
-    const [walletBalance, setWalletBalance] = useState('0.00');
-    const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
-
-    const walletRefDesktop = useRef<HTMLDivElement>(null);
-    const walletRefMobile = useRef<HTMLDivElement>(null);
-
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-
-    // --- Get Vendor Token ---
+    // --- Helpers ---
     const getVendorToken = () => {
         const session = sessionStorage.getItem('vendor_session');
         return session ? JSON.parse(session).token : null;
     };
 
-    // --- Fetch Wallet Balance ---
+    const isProfileLoading = isLoading && !profile;
+
+    // --- Fetch Navbar Data ---
     useEffect(() => {
-        let isFirstFetch = true;
+        fetchNavbarData();
+        
+        // Set up interval for auto-update every 10 seconds (less aggressive than 5s)
+        const intervalId = setInterval(() => fetchNavbarData(true), 10000);
 
-        const fetchBalance = async () => {
-            if (isFirstFetch) {
-                setIsLoading(true);
-            }
-            
-            try {
-                const token = getVendorToken();
-
-                if (!token) {
-                    if (isFirstFetch) setIsLoading(false);
-                    return;
-                }
-
-                const response = await axios.get(`${baseURL}/api/vendor/wallet`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (response.data?.success) {
-                    const fetchedBalance = response.data.data.balance || 0;
-                    setWalletBalance(Number(fetchedBalance).toFixed(2));
-                } else {
-                    setWalletBalance('0.00');
-                }
-            } catch (error) {
-                console.error("Failed to fetch wallet balance:", error);
-                setWalletBalance('0.00');
-            } finally {
-                if (isFirstFetch) {
-                    setIsLoading(false);
-                    isFirstFetch = false;
-                }
-            }
-        };
-
-        fetchBalance();
-
-        // Set up interval for auto-update every 5 seconds
-        const intervalId = setInterval(fetchBalance, 5000);
-
-        // Clean up interval on component unmount
         return () => clearInterval(intervalId);
-    }, [baseURL]);
+    }, [fetchNavbarData]);
 
     // --- Close Menu on Click Outside ---
     useEffect(() => {

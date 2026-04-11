@@ -51,15 +51,34 @@ export const createNavbarSlice: StateCreator<AppState, [], [], NavbarSlice> = (s
 
                 // 3. Update Profile (Partial)
                 if (data.user_info) {
-                    const currentProfile = get().studentProfile;
-                    set({
-                        studentProfile: {
-                            ...currentProfile,
-                            name: data.user_info.name,
-                            email: data.user_info.email,
-                            image: data.user_info.image,
-                        } as any 
-                    });
+                    const isVendor = !!sessionStorage.getItem("vendor_session");
+                    if (isVendor) {
+                        const currentProfile = get().vendorProfile;
+                        set({
+                            vendorProfile: {
+                                ...currentProfile,
+                                user: {
+                                    ...(currentProfile?.user || {}),
+                                    name: data.user_info.name,
+                                    email: data.user_info.email,
+                                    image: data.user_info.image,
+                                },
+                                vendor: {
+                                    ...(currentProfile?.vendor || {}),
+                                },
+                            } as any
+                        });
+                    } else {
+                        const currentProfile = get().studentProfile;
+                        set({
+                            studentProfile: {
+                                ...currentProfile,
+                                name: data.user_info.name,
+                                email: data.user_info.email,
+                                image: data.user_info.image,
+                            } as any
+                        });
+                    }
                 }
 
                 set({ isNavbarFetched: true });

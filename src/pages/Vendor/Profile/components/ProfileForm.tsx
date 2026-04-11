@@ -35,10 +35,10 @@ export function ProfileForm({
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
-      mobile: user?.mobile || '',
+      mobile: user?.mobile ? user.mobile.replace(/^\+880/, '') : '',
       owner_name: vendor?.owner_name || '',
       businee_name: vendor?.businee_name || '',  
-      mobile_business: vendor?.mobile || '',
+      mobile_business: vendor?.mobile ? vendor.mobile.replace(/^\+880/, '') : '',
       country: vendor?.country || '',
       district: vendor?.district || '',
       address: vendor?.address || '',
@@ -130,9 +130,8 @@ export function ProfileForm({
             <input
               type="text"
               {...register('name')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              readOnly
+              className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed outline-none"
               placeholder="Enter your full name"
             />
             {errors.name && (
@@ -159,12 +158,18 @@ export function ProfileForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Mobile Number *
             </label>
-            <input
-              type="tel"
-              {...register('mobile')}
-              disabled
-              className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed"
-            />
+            <div className="flex items-center">
+              <span className="inline-flex items-center px-4 py-2.5 bg-gray-200 border border-r-0 border-gray-200 rounded-l-xl text-gray-600 font-bold text-sm">
+                +880
+              </span>
+              <input
+                type="tel"
+                {...register('mobile')}
+                disabled
+                className="flex-1 px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-r-xl cursor-not-allowed outline-none font-medium"
+                placeholder="1XXXXXXXXX"
+              />
+            </div>
             {errors.mobile && (
               <p className="mt-1 text-xs text-red-500">{errors.mobile.message}</p>
             )}
@@ -186,9 +191,8 @@ export function ProfileForm({
             <input
               type="text"
               {...register('owner_name')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.owner_name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              readOnly
+              className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed outline-none"
               placeholder="Owner's full name"
             />
             {errors.owner_name && (
@@ -217,12 +221,18 @@ export function ProfileForm({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Business Mobile
             </label>
-            <input
-              type="tel"
-              {...register('mobile_business')}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all"
-              placeholder="+8801XXXXXXXXX"
-            />
+            <div className="flex items-center">
+              <span className="inline-flex items-center px-4 py-2.5 bg-gray-200 border border-r-0 border-gray-200 rounded-l-xl text-gray-600 font-bold text-sm">
+                +880
+              </span>
+              <input
+                type="tel"
+                {...register('mobile_business')}
+                readOnly
+                className="flex-1 px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-r-xl cursor-not-allowed outline-none font-medium"
+                placeholder="1XXXXXXXXX"
+              />
+            </div>
           </div>
         </div>
       </div>

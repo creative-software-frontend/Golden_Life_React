@@ -15,6 +15,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { formatBDT } from '@/utils/currencyFormatter';
+import { useAppStore } from '@/store/useAppStore';
+import type { OverviewStats } from '@/store/slices/vendorDashboardSlice';
+import { cn } from "@/lib/utils";
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -55,27 +58,188 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
 };
 
 // Sales Chart Component
-const SalesChart = () => {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const salesData = [218, 350, 280, 420, 380, 450, 400];
-    const maxSale = Math.max(...salesData);
+// Sales Chart Component
+const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: string }) => {
+    const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+    
+    const data = chartData?.[timeframe];
+    if (!data || !data.performance || data.performance.length === 0) {
+        return (
+            <div className="h-40 flex flex-col items-center justify-center text-muted-foreground bg-muted/10 rounded-xl border border-dashed">
+                <Package className="w-8 h-8 mb-2 opacity-20" />
+                <p className="text-sm italic">No chart data available for this period</p>
+            </div>
+        );
+    }
+
+    const performance = data.performance;
+    const values = performance.map((p: any) => parseFloat(p.total_sales));
+    
+    // Use data.highest/lowest from API if provided
+    const highestVal = data.highest || Math.max(...values, 0);
+    const lowestVal = data.lowest || Math.min(...values, 0);
+    
+    // Vertical scale with 25% headroom for a "wave" aesthetic
+    const displayMax = highestVal === 0 ? 1000 : highestVal * 1.25;
+    const height = 160;
+    const width = 1000;
+
+    // Coordinate helpers
+    const getX = (idx: number) => {
+        if (performance.length === 1) return width / 2;
+        return (idx / (performance.length - 1)) * width;
+    };
+    const getY = (val: number) => {
+        return height - (val / displayMax) * height;
+    };
+
+    const points = performance.map((p: any, idx: number) => ({
+        x: getX(idx),
+        y: getY(parseFloat(p.total_sales)),
+        val: p.total_sales,
+        label: p.date_label
+    }));
+
+    // Generate Smooth Wave Path
+    const generatePath = () => {
+        if (points.length === 0) return "";
+        if (points.length === 1) return `M 0 ${points[0].y} L ${width} ${points[0].y}`;
+
+        let d = `M ${points[0].x} ${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const curr = points[i];
+            const next = points[i + 1];
+            const controlX = (curr.x + next.x) / 2;
+            d += ` C ${controlX} ${curr.y}, ${controlX} ${next.y}, ${next.x} ${next.y}`;
+        }
+        return d;
+    };
+
+    const pathD = generatePath();
+    const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
 
     return (
-        <div>
-            <div className="flex justify-between items-end h-40 gap-1">
-                {salesData.map((sale, idx) => (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                        <div
-                            className="w-full bg-primary/70 hover:bg-primary transition-all duration-300 rounded-t"
-                            style={{ height: `${(sale / maxSale) * 100}%`, minHeight: '4px' }}
+        <div className="relative h-60 flex flex-col gap-6">
+            <div className="flex gap-4 flex-1">
+                {/* Y-Axis Labeling */}
+                <div className="flex flex-col justify-between text-[9px] text-muted-foreground pb-12 pt-1 w-12 border-r border-border/50 pr-2 select-none">
+                    <span className="font-bold text-right">{formatBDT(displayMax, { compact: true })}</span>
+                    <span className="font-bold text-right text-primary/40">{formatBDT(displayMax / 2, { compact: true })}</span>
+                    <span className="font-bold text-right">0</span>
+                </div>
+
+                <div className="flex-1 relative group/chart">
+                    {/* SVG Wave Graph */}
+                    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-40 overflow-visible" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="waveArea" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
+                            </linearGradient>
+                        </defs>
+
+                        {/* Peak/Trough Highlight Lines */}
+                        {data.highest > 0 && (
+                            <line 
+                                x1="0" y1={getY(data.highest)} x2={width} y2={getY(data.highest)} 
+                                className="stroke-primary/40 stroke-[2] stroke-dash transition-all duration-700" 
+                                strokeDasharray="6 6"
+                            />
+                        )}
+
+                        {/* Area Gradient */}
+                        <path d={areaD} fill="url(#waveArea)" className="transition-all duration-1000 ease-out" />
+                        
+                        {/* Smooth Line */}
+                        <path 
+                            d={pathD} 
+                            fill="none" 
+                            stroke="hsl(var(--primary))" 
+                            strokeWidth="4" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            className="transition-all duration-1000 ease-out drop-shadow-xl"
                         />
-                        <span className="text-[10px] text-muted-foreground">{days[idx]}</span>
+
+                        {/* Interactive Dot Markers */}
+                        {points.map((p, idx) => (
+                            <g key={idx}>
+                                {hoveredIdx === idx && (
+                                    <circle cx={p.x} cy={p.y} r="12" className="fill-primary/20 animate-ping" />
+                                )}
+                                <circle 
+                                    cx={p.x} cy={p.y} 
+                                    r={hoveredIdx === idx ? "7" : "5"} 
+                                    className={cn(
+                                        "fill-background stroke-primary transition-all duration-300",
+                                        hoveredIdx === idx ? "stroke-[4px]" : "stroke-[3px]"
+                                    )} 
+                                />
+                                {/* Broad Hover Target */}
+                                <rect 
+                                    x={idx === 0 ? 0 : p.x - (width / (points.length - 1) / 2)}
+                                    y="0" width={points.length === 1 ? width : width / (points.length - 1)} height={height} 
+                                    fill="transparent" className="cursor-pointer"
+                                    onMouseEnter={() => setHoveredIdx(idx)}
+                                    onMouseLeave={() => setHoveredIdx(null)}
+                                />
+                            </g>
+                        ))}
+                    </svg>
+
+                    {/* Dynamic Tooltip Overlay */}
+                    {hoveredIdx !== null && (
+                        <div 
+                            className="absolute bg-slate-900 text-white text-[11px] font-bold px-4 py-2 rounded-2xl shadow-2xl z-50 pointer-events-none transition-all duration-300 border border-white/20 backdrop-blur-md"
+                            style={{ 
+                                left: `${(points[hoveredIdx].x / width) * 100}%`,
+                                top: `${(points[hoveredIdx].y / height) * 100}%`,
+                                transform: 'translate(-50%, -150%)'
+                            }}
+                        >
+                            <div className="flex flex-col gap-1 min-w-[100px]">
+                                <span className="text-white/40 text-[9px] uppercase tracking-[0.2em]">{points[hoveredIdx].label}</span>
+                                <span className="text-primary text-sm tracking-tight">{formatBDT(points[hoveredIdx].val)}</span>
+                            </div>
+                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-900 border-r border-b border-white/20 rotate-45" />
+                        </div>
+                    )}
+
+                    {/* X-Axis Data Labels */}
+                    <div className="flex justify-between mt-6 px-1">
+                        {performance.map((p: any, idx: number) => (
+                            <span 
+                                key={idx} 
+                                className={cn(
+                                    "text-[10px] font-black uppercase tracking-tighter transition-all duration-500 w-16 text-center select-none",
+                                    hoveredIdx === idx ? "text-primary scale-150 rotate-[-5deg]" : "text-muted-foreground/40"
+                                )}
+                            >
+                                {p.date_label}
+                            </span>
+                        ))}
                     </div>
-                ))}
+
+                    {/* Subtle Grid Background */}
+                    <div className="absolute inset-x-0 bottom-6 pointer-events-none -z-10 bg-muted/5 rounded-3xl h-40 border-b border-border/50 items-end flex">
+                        <div className="absolute top-0 w-full border-t border-border/10 border-dashed" />
+                        <div className="absolute top-1/2 w-full border-t border-border/10 border-dashed" />
+                    </div>
+                </div>
             </div>
-            <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-                <span>Lowest: {formatBDT(218, { compact: true, showDecimals: false })}</span>
-                <span>Highest: {formatBDT(450, { compact: true, showDecimals: false })}</span>
+
+            {/* High/Low Status Badges */}
+            <div className="flex justify-between px-4 text-[10px] font-black uppercase tracking-[0.15em] py-3 rounded-2xl bg-gradient-to-r from-muted/50 to-muted/20 border border-border/50">
+                <div className="flex items-center gap-3">
+                    <div className="w-5 h-1 bg-primary/40 rounded-full" />
+                    <span className="text-muted-foreground">Highest Sale</span>
+                    <span className="text-primary text-xs tracking-tighter">{formatBDT(data.highest || highestVal)}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-5 h-1 bg-slate-500/40 rounded-full" />
+                    <span className="text-muted-foreground">Lowest Sale</span>
+                    <span className="text-foreground text-xs tracking-tighter">{formatBDT(data.lowest || lowestVal)}</span>
+                </div>
             </div>
         </div>
     );
@@ -83,133 +247,49 @@ const SalesChart = () => {
 
 const VendorHome: React.FC = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('Today');
-    const [loading, setLoading] = useState(true);
-    const [orders, setOrders] = useState<any[]>([]);
-    const [vendorData, setVendorData] = useState<any>(null);
-    const [userData, setUserData] = useState<any>(null);
+    const [activeTab, setActiveTab] = useState<'Today' | 'Weekly' | 'Monthly' | 'Yearly'>('Today');
+    const [chartTimeframe, setChartTimeframe] = useState<'week' | 'month' | 'year'>('week');
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    // --- Store Integration ---
+    const { 
+        vendorProfile, 
+        dashboardData, 
+        isDashboardLoading: loading,
+        fetchProfile, 
+        fetchVendorDashboard 
+    } = useAppStore();
 
-    const getAuthToken = () => {
-        const session = sessionStorage.getItem('vendor_session');
-        if (!session) return null;
-        try {
-            const parsed = JSON.parse(session);
-            return parsed.token || null;
-        } catch {
-            return null;
-        }
-    };
-
-    const fetchVendorProfile = async () => {
-        try {
-            const token = getAuthToken();
-            if (!token) return;
-
-            const response = await axios.get(`${baseURL}/api/vendor/profile`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // ✅ Set both vendor and user data
-            if (response.data?.vendor) {
-                setVendorData(response.data.vendor);
-            }
-            if (response.data?.user) {
-                setUserData(response.data.user);
-            }
-        } catch (error) {
-            console.error('Error fetching vendor profile:', error);
-        }
-    };
-
-    const fetchOrders = async () => {
-        setLoading(true);
-        try {
-            const token = getAuthToken();
-            if (!token) {
-                console.error('No authentication token found');
-                setLoading(false);
-                return;
-            }
-
-            const response = await axios.get(`${baseURL}/api/vendor/orders/history`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            console.log('Orders API Response:', response.data);
-
-            // Handle both 'success' (boolean) and 'status' (string) responses
-            const isSuccess = response.data?.success === true || response.data?.status === 'success';
-
-            if (isSuccess) {
-                const ordersData = response.data?.orders || [];
-                console.log(`Loaded ${ordersData.length} orders`);
-                setOrders(ordersData);
-            } else {
-                console.warn('API returned non-success status:', response.data);
-                setOrders([]);
-            }
-        } catch (error) {
-            console.error('Error fetching orders:', error);
-            setOrders([]);
-        } finally {
-            setLoading(false);
-        }
+    const handleManualRefresh = () => {
+        fetchVendorDashboard();
     };
 
     useEffect(() => {
-        fetchVendorProfile();
-        fetchOrders();
+        fetchProfile();
+        fetchVendorDashboard();
+
+        // Background polling every 30 seconds for dynamic data
+        const interval = setInterval(() => {
+            fetchVendorDashboard(true); // silent fetch
+        }, 30000);
+
+        return () => clearInterval(interval);
     }, []);
 
-    const getFilteredOrders = () => {
-        const now = new Date();
-        let startDate: Date;
+    // Welcome logic
+    const businessName = vendorProfile?.vendor?.business_name || vendorProfile?.user?.name || 'Vendor';
+    const tabs: ('Today' | 'Weekly' | 'Monthly' | 'Yearly')[] = ['Today', 'Weekly', 'Monthly', 'Yearly'];
 
-        switch (activeTab) {
-            case 'Today':
-                startDate = new Date(now.setHours(0, 0, 0, 0));
-                break;
-            case 'Weekly':
-                startDate = new Date(now.setDate(now.getDate() - 7));
-                break;
-            case 'Monthly':
-                startDate = new Date(now.setDate(now.getDate() - 30));
-                break;
-            case 'Yearly':
-                startDate = new Date(now.setDate(now.getDate() - 365));
-                break;
-            default:
-                startDate = new Date(0);
-        }
+    // Map store data to local variables for component
+    const overview = dashboardData?.overview;
+    const currentStats: OverviewStats | undefined = 
+        activeTab === 'Today' ? overview?.today :
+        activeTab === 'Weekly' ? overview?.weekly :
+        activeTab === 'Monthly' ? overview?.monthly :
+        overview?.yearly;
 
-        return orders.filter(order => {
-            const orderDate = new Date(order.created_at);
-            return orderDate >= startDate;
-        });
-    };
+    const recentOrders = dashboardData?.recent_orders || [];
 
-    const filteredOrders = getFilteredOrders();
-
-    // Calculate metrics
-    const totalOrders = filteredOrders.length;
-    const deliveredOrders = filteredOrders.filter(o => o.status === "Delivered").length;
-    const pendingOrders = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").length;
-    const cancelledOrders = filteredOrders.filter(o => o.status === "Cancelled").length;
-
-    const totalAmount = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
-    const deliveredAmount = filteredOrders.filter(o => o.status === "Delivered").reduce((sum, o) => sum + parseFloat(o.total), 0);
-    const pendingAmount = filteredOrders.filter(o => o.status === "Order Placed" || o.status === "Pending").reduce((sum, o) => sum + parseFloat(o.total), 0);
-    const cancelledAmount = filteredOrders.filter(o => o.status === "Cancelled").reduce((sum, o) => sum + parseFloat(o.total), 0);
-    const cancelPercentage = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
-
-    // const businessName = vendorData?.businee_name || userData?.name || 'Vendor';
-    const businessName = userData?.name || vendorData?.businee_name ||  'Vendor';
-    const tabs = ['Today', 'Weekly', 'Monthly', 'Yearly'];
-    const recentOrders = filteredOrders.slice(0, 4);
-
-    if (loading) {
+    if (loading && !dashboardData) {
         return (
             <div className="min-h-[400px] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -221,13 +301,23 @@ const VendorHome: React.FC = () => {
         <div className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto">
 
             {/* Welcome Section */}
-            <div className="mb-8">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                    Welcome back, <span className="text-primary">{businessName}</span>!
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                    {filteredOrders.length} orders found for {activeTab.toLowerCase()}
-                </p>
+            <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                        Welcome back, <span className="text-primary">{businessName}</span>!
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Showing statistics for {activeTab.toLowerCase()}
+                    </p>
+                </div>
+                <button 
+                    onClick={handleManualRefresh}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-4 py-2 bg-background border rounded-lg hover:bg-muted transition-colors text-sm font-semibold disabled:opacity-50"
+                >
+                    <TrendingUp className={cn("w-4 h-4", loading && "animate-pulse")} />
+                    {loading ? "Refreshing..." : "Refresh Data"}
+                </button>
             </div>
 
             {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
@@ -261,11 +351,11 @@ const VendorHome: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-end">
                             <div>
-                                <span className="text-2xl font-bold text-foreground">{totalOrders}</span>
+                                <span className="text-2xl font-bold text-foreground">{currentStats?.total_parcel.count || 0}</span>
                                 <p className="text-xs text-muted-foreground mt-1">Orders</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{totalAmount.toFixed(2)} BDT</span>
+                                <span className="text-lg font-semibold text-primary">{currentStats?.total_parcel.amount.toFixed(2) || "0.00"} BDT</span>
                                 <p className="text-xs text-muted-foreground mt-1">Amount</p>
                             </div>
                         </div>
@@ -281,11 +371,11 @@ const VendorHome: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-end">
                             <div>
-                                <span className="text-2xl font-bold text-foreground">{deliveredOrders}</span>
+                                <span className="text-2xl font-bold text-foreground">{currentStats?.delivered.count || 0}</span>
                                 <p className="text-xs text-muted-foreground mt-1">Orders</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{deliveredAmount.toFixed(2)} BDT</span>
+                                <span className="text-lg font-semibold text-primary">{currentStats?.delivered.amount.toFixed(2) || "0.00"} BDT</span>
                                 <p className="text-xs text-muted-foreground mt-1">Amount</p>
                             </div>
                         </div>
@@ -301,11 +391,11 @@ const VendorHome: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-end">
                             <div>
-                                <span className="text-2xl font-bold text-foreground">{pendingOrders}</span>
+                                <span className="text-2xl font-bold text-foreground">{currentStats?.pending.count || 0}</span>
                                 <p className="text-xs text-muted-foreground mt-1">Orders</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{pendingAmount.toFixed(2)} BDT</span>
+                                <span className="text-lg font-semibold text-primary">{currentStats?.pending.amount.toFixed(2) || "0.00"} BDT</span>
                                 <p className="text-xs text-muted-foreground mt-1">Amount</p>
                             </div>
                         </div>
@@ -321,11 +411,13 @@ const VendorHome: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-end">
                             <div>
-                                <span className="text-2xl font-bold text-foreground">{cancelledOrders} ({cancelPercentage}%)</span>
+                                <span className="text-2xl font-bold text-foreground">
+                                    {currentStats?.cancel.count || 0} ({currentStats?.cancel.percentage || 0}%)
+                                </span>
                                 <p className="text-xs text-muted-foreground mt-1">Orders</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-lg font-semibold text-primary">{cancelledAmount.toFixed(2)} BDT</span>
+                                <span className="text-lg font-semibold text-primary">{currentStats?.cancel.amount.toFixed(2) || "0.00"} BDT</span>
                                 <p className="text-xs text-muted-foreground mt-1">Amount</p>
                             </div>
                         </div>
@@ -345,10 +437,10 @@ const VendorHome: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">{formatBDT(0)}</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">{formatBDT(dashboardData?.total_revenue || 0)}</p>
                                     <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
                                         <TrendingUp className="w-4 h-4" />
-                                        Coming soon
+                                        Verified Revenue
                                     </p>
                                 </div>
                                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
@@ -362,7 +454,7 @@ const VendorHome: React.FC = () => {
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Active Orders</p>
                                     <p className="text-3xl font-bold text-foreground mt-2">
-                                        {filteredOrders.filter(o => o.status !== "Delivered" && o.status !== "Cancelled").length}
+                                        {dashboardData?.active_orders || 0}
                                     </p>
                                     <p className="text-green-600 text-sm font-semibold mt-1 flex items-center gap-1">
                                         <TrendingUp className="w-4 h-4" />
@@ -379,12 +471,12 @@ const VendorHome: React.FC = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-muted-foreground text-sm font-medium">Store Rating</p>
-                                    <p className="text-3xl font-bold text-foreground mt-2">4.8</p>
+                                    <p className="text-3xl font-bold text-foreground mt-2">{dashboardData?.store_rating.toFixed(1) || "0.0"}</p>
                                     <div className="flex text-yellow-500 mt-2">
                                         {[...Array(5)].map((_, i) => (
                                             <Star
                                                 key={i}
-                                                className={`w-4 h-4 ${i < 4.8 ? 'fill-current' : 'stroke-current'}`}
+                                                className={`w-4 h-4 ${(i < (dashboardData?.store_rating || 0)) ? 'fill-current' : 'stroke-current'}`}
                                             />
                                         ))}
                                     </div>
@@ -399,19 +491,32 @@ const VendorHome: React.FC = () => {
                     {/* Sales Chart */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-lg text-foreground">Sales Performance (Last 30 Days)</h3>
-                            <div className="flex gap-1">
-                                <button className="px-2 py-1 text-xs rounded-md bg-primary/10 text-primary">Week</button>
-                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Month</button>
-                                <button className="px-2 py-1 text-xs rounded-md hover:bg-muted">Year</button>
+                            <h3 className="font-semibold text-lg text-foreground">Sales Performance</h3>
+                            <div className="flex gap-1 bg-muted p-1 rounded-lg">
+                                {(['week', 'month', 'year'] as const).map((t) => (
+                                    <button
+                                        key={t}
+                                        onClick={() => setChartTimeframe(t)}
+                                        className={cn(
+                                            "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all",
+                                            chartTimeframe === t 
+                                                ? "bg-white text-primary shadow-sm" 
+                                                : "text-muted-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs text-muted-foreground">
-                                <span>Daily Sales (BDT)</span>
-                                <span className="text-primary font-semibold">Coming soon</span>
+                                <span>Revenue Tracking (BDT)</span>
+                                <span className={cn("text-[10px] font-black uppercase px-2 py-0.5 rounded-md", chartTimeframe === 'week' ? 'bg-indigo-100 text-indigo-700' : 'bg-primary/10 text-primary')}>
+                                    {chartTimeframe}ly view
+                                </span>
                             </div>
-                            <SalesChart />
+                            <SalesChart chartData={dashboardData?.sales_charts} timeframe={chartTimeframe} />
                         </div>
                     </div>
                 </div>
@@ -451,12 +556,32 @@ const VendorHome: React.FC = () => {
                             <AlertCircle className="w-5 h-5 text-red-500" />
                         </div>
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                            <div className={cn(
+                                "flex items-center justify-between p-3 rounded-lg border",
+                                (dashboardData?.inventory.low_stock_count || 0) > 0 
+                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800" 
+                                    : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                            )}>
                                 <div>
-                                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">Low Stock Alert</p>
-                                    <p className="text-xs text-red-500 dark:text-red-500">Coming soon</p>
+                                    <p className={cn(
+                                        "text-sm font-semibold",
+                                        (dashboardData?.inventory.low_stock_count || 0) > 0 ? "text-red-700 dark:text-red-400" : "text-green-700 dark:text-green-400"
+                                    )}>
+                                        {(dashboardData?.inventory.low_stock_count || 0) > 0 ? "Low Stock Alert" : "Inventory Status"}
+                                    </p>
+                                    <p className={cn(
+                                        "text-xs",
+                                        (dashboardData?.inventory.low_stock_count || 0) > 0 ? "text-red-500" : "text-green-500"
+                                    )}>
+                                        {(dashboardData?.inventory.low_stock_count || 0) > 0 ? "Items need restocking" : "All items in stock"}
+                                    </p>
                                 </div>
-                                <p className="text-xl font-bold text-red-600 dark:text-red-400">-</p>
+                                <p className={cn(
+                                    "text-xl font-bold",
+                                    (dashboardData?.inventory.low_stock_count || 0) > 0 ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
+                                )}>
+                                    {dashboardData?.inventory.low_stock_count || 0}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -464,7 +589,7 @@ const VendorHome: React.FC = () => {
                     {/* Recent Orders */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Recent Orders</h3>
-                        <span className="text-xs text-muted-foreground">{filteredOrders.length} orders</span>
+                        <span className="text-xs text-muted-foreground">{recentOrders.length} recent orders</span>
                         <RecentOrdersStack orders={recentOrders} />
                     </div>
                 </div>

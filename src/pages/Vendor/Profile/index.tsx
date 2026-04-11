@@ -8,6 +8,7 @@ import { StatsCard } from './components/StatsCard';
 import { SocialLinks } from './components/SocialLinks';
 import { toast } from 'react-toastify';
 import { Edit2, Loader2, AlertCircle, UserX } from 'lucide-react';
+import { useAppStore } from '@/store/useAppStore';
 
 export default function VendorProfile() {
   const navigate = useNavigate();
@@ -159,6 +160,10 @@ export default function VendorProfile() {
         toast.success('Profile updated successfully! ');
         setIsEditMode(false);
         handleImageRemove();
+        
+        // Refresh navbar data to reflect changes immediately
+        useAppStore.getState().fetchNavbarData(true);
+        
         console.log('Profile updated successfully, data refreshed');
       } else {
         toast.error('Failed to update profile');

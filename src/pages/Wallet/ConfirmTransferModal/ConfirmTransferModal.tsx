@@ -8,13 +8,21 @@ interface ConfirmTransferModalProps {
     onClose: () => void;
     onSuccess: (message: string) => void;
     onError: (message: string) => void;
-    amount: string;
-    receiverType: string;
-    affiliateId: string;
+    amount: number;
+    receiver_type: string;
+    affiliate_id: string;
+    type: string;
 }
 
-export default function ConfirmTransferModal({ 
-    isOpen, onClose, onSuccess, onError, amount, receiverType, affiliateId
+export default function ConfirmTransferModal({
+    isOpen,
+    onClose,
+    onSuccess,
+    onError,
+    amount,
+    receiver_type,
+    affiliate_id,
+    type
 }: ConfirmTransferModalProps) {
     const { sendFunds } = useAppStore();
     const [pinCode, setPinCode] = useState<string>('');
@@ -24,33 +32,48 @@ export default function ConfirmTransferModal({
 
     const handleTransfer = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (pinCode.length !== 4) return;
+
+        if (pinCode.length !== 4) {
+            toast.error("Please enter a valid 4-digit PIN");
+            return;
+        }
 
         setIsSubmitting(true);
 
         try {
-            const formData = new FormData();
-            formData.append('type', 'send');
-            formData.append('amount', amount);
-            formData.append('receiver_type', receiverType);
-            formData.append('affiliate_id', affiliateId);
-            formData.append('pin_code', pinCode); 
-            
-            const result = await sendFunds(formData);
+            // 1. We only use the JSON payload now (Standard for Laravel APIs)
+            const payload = {
+                type: type || 'send',
+                amount: Number(amount),
+                receiver_type: receiver_type,
+                affiliate_id: affiliate_id,
+                pin_code: pinCode // Fixed: used 'pinCode' from state
+            };
 
-            if (result.success) {
-                toast.success(result.message);
-                onSuccess(result.message);
+            console.log("Submitting Transfer:", payload);
+            const result = await sendFunds(payload);
+            console.log("Full API Response:", result);
+
+            // Prioritize message content over success flag (because backend is inconsistent)
+            const message = result?.message || "";
+
+            if (message.toLowerCase().includes("successfully") ||
+                message.toLowerCase().includes("sent") ||
+                result?.success === true) {
+
+                toast.success(message || "Money sent successfully.");
+
+                onSuccess?.(message || "Money sent successfully.");
                 setPinCode('');
                 onClose();
             } else {
-                toast.error(result.message);
-                onError(result.message);
+                toast.error(message || "Transfer failed.");
+                onError?.(message || "Transfer failed.");
             }
         } catch (error: any) {
-            const msg = "Failed to process transfer. Please try again.";
+            const msg = error.response?.data?.message || "Transfer failed. Please try again.";
             toast.error(msg);
-            onError(msg);
+            onError?.(msg);
         } finally {
             setIsSubmitting(false);
         }
@@ -63,62 +86,64 @@ export default function ConfirmTransferModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/20 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-background rounded-[24px] p-6 w-full max-w-sm shadow-2xl border border-border">
+            <div className="bg-background rounded-[32px] p-8 w-full max-w-sm shadow-2xl border border-border relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-secondary" />
+
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-black text-foreground flex items-center gap-2">
-                        <Lock className="text-secondary" /> Verify Transfer
+                        <Lock className="text-secondary w-5 h-5" /> Verify Transfer
                     </h3>
                     <button onClick={handleClose} className="text-muted-foreground hover:bg-muted p-1.5 rounded-full transition-colors">
-                        <X size={20}/>
+                        <X size={20} />
                     </button>
                 </div>
-                
-                {/* Summary Card */}
-                <div className="bg-muted rounded-xl p-4 mb-4 border border-border text-center">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
-                        Sending to <ArrowRight size={12} strokeWidth={3} /> <span className="text-foreground">{receiverType}</span>
+
+                <div className="bg-muted/50 rounded-2xl p-5 mb-6 border border-border/50 text-center">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
+                        Sending to <ArrowRight size={10} strokeWidth={4} /> <span className="text-secondary">{receiver_type}</span>
                     </p>
-                    <p className="text-lg font-black text-foreground break-all">{affiliateId}</p>
-                    <div className="mt-2 text-3xl font-black text-secondary">৳{amount}</div>
+                    <p className="text-md font-black text-foreground break-all mb-2">{affiliate_id}</p>
+                    <div className="text-3xl font-black text-foreground">৳{amount}</div>
                 </div>
 
-                <form onSubmit={handleTransfer} className="space-y-4">
+                <form onSubmit={handleTransfer} className="space-y-6">
                     <div>
-                        <label className="text-xs font-bold text-muted-foreground uppercase">
-                            Enter Your 4-Digit PIN
+                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider mb-2 block text-center">
+                            Enter Your 4-Digit Security PIN
                         </label>
-                        <input 
-                            type="password" 
-                            value={pinCode} 
-                            onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))} 
-                            maxLength={4} 
-                            placeholder="••••" 
+                        <input
+                            type="password"
+                            inputMode="numeric"
+                            value={pinCode}
+                            onChange={(e) => setPinCode(e.target.value.replace(/[^0-9]/g, ''))}
+                            maxLength={4}
+                            placeholder="••••"
                             autoFocus
-                            className="w-full mt-1 px-4 py-3 bg-muted border-2 border-border rounded-xl focus:border-secondary focus:ring-4 focus:ring-secondary/20 outline-none text-center text-2xl tracking-[0.5em] font-black text-foreground transition-all" 
-                            required 
+                            className="w-full px-4 py-4 bg-muted border-2 border-transparent focus:border-secondary focus:bg-background rounded-2xl outline-none text-center text-3xl tracking-[0.5em] font-black text-foreground transition-all"
+                            required
                         />
 
-                        <div className="flex justify-center items-center gap-2 mt-2 text-[11px] font-bold text-muted-foreground">
-                            <span>{pinCode.length} / 4 digits</span>
-                            {pinCode.length > 0 && pinCode.length !== 4 && (
-                                <span className="text-amber-500">• Must be exactly 4</span>
-                            )}
-                            {pinCode.length === 4 && (
-                                <span className="text-emerald-500">✓ Perfect</span>
+                        <div className="flex justify-center items-center gap-2 mt-3 text-[10px] font-black uppercase tracking-tighter">
+                            {pinCode.length === 4 ? (
+                                <span className="text-emerald-500 flex items-center gap-1">
+                                    <ShieldCheck size={12} /> PIN Complete
+                                </span>
+                            ) : (
+                                <span className="text-muted-foreground">{pinCode.length} / 4 Digits</span>
                             )}
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
-                        disabled={isSubmitting || pinCode.length !== 4} 
-                        className="w-full flex justify-center items-center gap-2 py-3 bg-secondary hover:opacity-90 text-secondary-foreground rounded-xl font-black tracking-wide transition-all disabled:opacity-50"
+                    <button
+                        type="submit"
+                        disabled={isSubmitting || pinCode.length !== 4}
+                        className="w-full flex justify-center items-center gap-2 py-4 bg-secondary text-white rounded-2xl font-black shadow-lg shadow-secondary/20 hover:opacity-95 transition-all disabled:opacity-50 disabled:shadow-none"
                     >
                         {isSubmitting ? (
-                            <Loader2 className="animate-spin mx-auto" />
+                            <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                             <>
-                                <ShieldCheck size={20}/> Confirm & Send
+                                <ShieldCheck size={20} /> Authorize Payment
                             </>
                         )}
                     </button>

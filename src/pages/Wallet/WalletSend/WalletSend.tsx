@@ -24,7 +24,7 @@ interface VerifiedUserData {
 
 export default function WalletSend() {
     const navigate = useNavigate();
-    const { 
+    const {
         walletBalance: storeWalletBalance,
         transactions: storeTransactions,
         isWalletLoading: isLoadingBalance,
@@ -78,7 +78,10 @@ export default function WalletSend() {
             const result = await searchReceiver(affiliateId);
             if (result.success && result.data) {
                 const userData = result.data;
-                const foundType = userData?.type || userData?.role || "student";
+
+                // Improved detection: prioritize 'type', then 'role', default to 'student'
+                // Also ensure we trim() to prevent hidden whitespace issues
+                const foundType = (userData?.type || userData?.role || "student").toLowerCase().trim();
 
                 setVerifiedUser({
                     type: foundType,
@@ -88,6 +91,10 @@ export default function WalletSend() {
                     mobile: userData?.mobile || "",
                     image: userData?.image || ""
                 });
+                console.log(foundType);
+
+
+                // Set this as a backup
                 setReceiverType(foundType);
             } else {
                 setVerifyError(result.message || "User not found.");
@@ -150,6 +157,8 @@ export default function WalletSend() {
             toast.error(msg);
             return;
         }
+        // Capture the type here to be 100% sure
+        const finalType = verifiedUser?.type || receiverType;
 
         if (!verifiedUser) {
             const msg = "Please verify the receiver first.";
@@ -202,15 +211,20 @@ export default function WalletSend() {
                 onSuccess={handleSuccess}
                 onError={handleError}
             />
-
             <ConfirmTransferModal
                 isOpen={showConfirmModal}
                 onClose={() => setShowConfirmModal(false)}
-                onSuccess={(msg) => handleTransferSuccess(msg)}
-                onError={handleError}
-                amount={amount}
-                receiverType={receiverType}
-                affiliateId={affiliateId}
+                onSuccess={handleTransferSuccess}
+                onError={(msg) => toast.error(msg)}
+
+                // Pass values directly to ensure no empty strings are sent
+                amount={Number(amount)}
+
+                // FIX: Pull type directly from verifiedUser first, fallback to receiverType
+                receiver_type={verifiedUser?.type || receiverType}
+
+                affiliate_id={affiliateId}
+                type="send"
             />
 
             {/* --- Main Page Header --- */}

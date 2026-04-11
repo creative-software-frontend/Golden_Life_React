@@ -6,18 +6,21 @@ import { createNotificationSlice, NotificationSlice } from './slices/notificatio
 import { createNavbarSlice, NavbarSlice } from './slices/navbarSlice';
 import { createOrderSlice, OrderSlice } from './slices/orderSlice';
 import { createProductSlice, ProductSlice } from './slices/productSlice';
+import { createVendorDashboardSlice, VendorDashboardSlice } from './slices/vendorDashboardSlice';
 
 // 1. Define the master AppState that combines all slices
-export type AppState = CategorySlice & ProfileSlice & WalletSlice & NotificationSlice & NavbarSlice & OrderSlice & ProductSlice & {
+export type AppState = CategorySlice & ProfileSlice & WalletSlice & NotificationSlice & NavbarSlice & OrderSlice & ProductSlice & VendorDashboardSlice & {
     isCategoryLoading: boolean;
     isProfileLoading: boolean;
     isWalletLoading: boolean;
     isNotificationLoading: boolean;
+    isDashboardLoading: boolean;
     
     isCategoryFetched: boolean;
     isProfileFetched: boolean;
     isWalletFetched: boolean;
     isNotificationFetched: boolean;
+    isDashboardFetched: boolean;
 };
 
 // 2. Create the store and spread the slices inside
@@ -26,11 +29,13 @@ export const useAppStore = create<AppState>()((set, get, api) => ({
     isProfileLoading: false,
     isWalletLoading: false,
     isNotificationLoading: false,
+    isDashboardLoading: false,
     
     isCategoryFetched: false,
     isProfileFetched: false,
     isWalletFetched: false,
     isNotificationFetched: false,
+    isDashboardFetched: false,
 
     // Inject all the specific slices
     ...createCategorySlice(set, get, api),
@@ -40,4 +45,5 @@ export const useAppStore = create<AppState>()((set, get, api) => ({
     ...createNavbarSlice(set, get, api),
     ...createOrderSlice(set, get, api),
     ...createProductSlice(set, get, api),
+    ...createVendorDashboardSlice(set, get, api),
 }));

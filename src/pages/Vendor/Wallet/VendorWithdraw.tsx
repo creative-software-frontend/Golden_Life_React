@@ -9,21 +9,10 @@ import {
 import { cn } from "@/lib/utils";
 import SetPinModal from '@/pages/Wallet/SetPinModal/SetPinModal';
 import ConfirmWithdrawModal from '@/pages/Wallet/ConfirmWithdrawModal/ConfirmWithdrawModal';
+import { useAppStore } from '@/store/useAppStore';
+import type { Transaction } from '@/store/slices/walletSlice';
 
 
-interface Transaction {
-    id: number | string;
-    amount: string | number;
-    type: string;
-    gateway: string;
-    status: 'pending' | 'completed' | 'failed' | 'rejected' | 'success';
-    created_at: string;
-    trx_id?: string;
-    account_number?: string;
-    invoice_number?: string;
-    payment_method?: string;
-    number?: string;
-}
 
 // Add your dynamic merchant number here
 const MERCHANT_NUMBER = "01677468675";
@@ -88,10 +77,20 @@ export default function VendorWithdraw() {
     const navigate = useNavigate();
     const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
+    // --- Store Integration ---
+    const { 
+        walletBalance: currentBalanceStr, 
+        transactions: storeTransactions, 
+        fetchNavbarData, 
+        fetchHistory,
+        isWalletLoading: isLoadingStore 
+    } = useAppStore();
+
+    const currentBalance = Number(currentBalanceStr || 0);
+
     // --- Tab & History States ---
     const [activeTab, setActiveTab] = useState<'withdraw' | 'history'>('withdraw');
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
     // --- Modal States ---
     const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -112,9 +111,7 @@ export default function VendorWithdraw() {
         accountNumber: ''
     });
 
-    // --- UI & Data State ---
-    const [currentBalance, setCurrentBalance] = useState(0);
-    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -125,49 +122,20 @@ export default function VendorWithdraw() {
         return session ? JSON.parse(session).token : null;
     };
 
-    // --- API Calls ---
-    const fetchBalance = async () => {
-        setIsLoadingBalance(true);
-        try {
-            const token = getAuthToken();
-            if (!token) return;
-            const response = await axios.get(`${baseURL}/api/vendor/wallet`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const fetchedBalance = response.data?.data?.balance || response.data?.balance || 0;
-            setCurrentBalance(Number(fetchedBalance));
-        } catch (error) {
-            console.error("Failed to fetch balance:", error);
-        } finally {
-            setIsLoadingBalance(false);
-        }
-    };
-
-    const fetchHistory = async () => {
-        setIsLoadingHistory(true);
-        try {
-            const token = getAuthToken();
-            const { data } = await axios.get(`${baseURL}/api/vendor/transactions/history`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (data?.status === "success" || data?.transactions) {
-                const history = data.transactions || data.data || [];
-                setTransactions(history.filter((t: Transaction) => t.type === 'withdraw'));
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsLoadingHistory(false);
-        }
-    };
-
-    useEffect(() => { fetchBalance(); }, [baseURL]);
+    useEffect(() => {
+        fetchNavbarData(true);
+    }, [baseURL]);
 
     useEffect(() => {
         if (activeTab === 'history') {
-            fetchHistory();
+            fetchHistory(true);
         }
     }, [activeTab]);
+
+    // Update local transactions when store changes
+    useEffect(() => {
+        setTransactions(storeTransactions.filter((t: any) => t.type === 'withdraw'));
+    }, [storeTransactions]);
 
     // --- Helpers ---
     const getGatewayConfig = (method: string) => {
@@ -229,7 +197,8 @@ export default function VendorWithdraw() {
         setAmount('');
         setMfsNumber('');
 
-        if (activeTab === 'history') fetchHistory();
+        fetchNavbarData(true);
+        fetchHistory(true);
     };
 
     const getFinalAccountDetails = () => {
@@ -432,7 +401,7 @@ export default function VendorWithdraw() {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
-                            {isLoadingBalance ? (
+                            {isLoadingStore && currentBalanceStr === "0.00" ? (
                                 <div className="h-9 w-32 bg-slate-200 animate-pulse rounded-lg"></div>
                             ) : (
                                 <p className="text-3xl md:text-4xl font-bold text-slate-900">৳ {currentBalance.toFixed(2)}</p>

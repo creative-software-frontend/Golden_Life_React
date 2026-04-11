@@ -81,11 +81,10 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
       <button
         ref={buttonRef}
         onClick={toggleDropdown}
-        className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${
-          isOpen
+        className={`relative p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${isOpen
             ? 'bg-primary-light/10 text-primary-light shadow-inner'
             : 'bg-white text-slate-500 hover:text-primary-light hover:bg-slate-50 shadow-sm border border-slate-200'
-        }`}
+          }`}
         disabled={syncing}
       >
         <Bell className="h-5 w-5" strokeWidth={2.5} />
@@ -149,11 +148,10 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
                     <div
                       key={notif.id}
                       onClick={() => unread && !syncing && markAsRead(notif.id)}
-                      className={`group relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                        unread
+                      className={`group relative flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${unread
                           ? 'bg-primary-light/5 hover:bg-primary-light/10 border-l-4 border-primary-light'
                           : 'bg-white hover:bg-slate-50 border-l-4 border-transparent opacity-80'
-                      } ${syncing ? 'opacity-60 pointer-events-none' : ''}`}
+                        } ${syncing ? 'opacity-60 pointer-events-none' : ''}`}
                     >
                       <div className="p-2 sm:p-2.5 rounded-full shrink-0 bg-white shadow-sm border border-slate-200">
                         {getIcon(notif)}
@@ -161,16 +159,14 @@ const VendorNotificationBell = ({ baseURL, token }: VendorNotificationBellProps)
 
                       <div className="flex-1 space-y-1">
                         <p
-                          className={`text-sm ${
-                            unread ? 'font-semibold text-slate-900' : 'font-normal text-slate-700'
-                          }`}
+                          className={`text-sm ${unread ? 'font-semibold text-slate-900' : 'font-normal text-slate-700'
+                            }`}
                         >
                           {notif.data.title}
                         </p>
                         <p
-                          className={`text-[13px] leading-relaxed line-clamp-2 ${
-                            unread ? 'text-slate-700' : 'text-slate-500'
-                          }`}
+                          className={`text-[13px] leading-relaxed line-clamp-2 ${unread ? 'text-slate-700' : 'text-slate-500'
+                            }`}
                         >
                           {notif.data.message}
                         </p>

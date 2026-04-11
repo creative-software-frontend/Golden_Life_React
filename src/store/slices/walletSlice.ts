@@ -44,13 +44,22 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
         if (!silent) set({ isWalletLoading: true });
 
         try {
-            const response = await axios.get(`${baseURL}/api/wallet-balance`, {
+            const isVendor = !!sessionStorage.getItem('vendor_session');
+            const url = isVendor 
+                ? `${baseURL}/api/vendor/wallet` 
+                : `${baseURL}/api/wallet-balance`;
+
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const fetchedBalance = response.data?.data?.balance || response.data?.balance || "0.00";
-            set({ 
-                walletBalance: fetchedBalance, 
-                isWalletFetched: true 
+
+            // Handle vendor response structure vs student
+            const data = response.data?.data || response.data;
+            const fetchedBalance = data?.balance || data || "0.00";
+            
+            set({
+                walletBalance: Number(fetchedBalance).toFixed(2),
+                isWalletFetched: true
             });
         } catch (error) {
             console.error("Wallet Fetch Error:", error);
@@ -69,14 +78,20 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
         if (!silent) set({ isWalletLoading: true });
 
         try {
-            const response = await axios.get(`${baseURL}/api/student/transactions`, {
+            const isVendor = !!sessionStorage.getItem('vendor_session');
+            const url = isVendor 
+                ? `${baseURL}/api/vendor/transactions/history` 
+                : `${baseURL}/api/student/transactions`;
+
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (response.data?.status === "success" || response.data?.transactions) {
+
+            if (response.data?.status === "success" || response.data?.transactions || response.data?.data) {
                 const history = response.data.transactions || response.data.data || [];
-                set({ 
-                    transactions: history, 
-                    isWalletFetched: true 
+                set({
+                    transactions: history,
+                    isWalletFetched: true
                 });
             }
         } catch (error) {
@@ -92,7 +107,7 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
 
         try {
             const { data } = await axios.post(`${baseURL}/api/transactions`, formData, {
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${token}`,
                     // Don't set Content-Type for FormData
                 }
@@ -100,18 +115,20 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
 
             if (data?.status === 'success' || data?.status === true || data?.success === true) {
                 // Update local state silently
-                const { fetchWallet, fetchHistory } = get();
-                await fetchWallet(true);
-                await fetchHistory(true);
+                const { fetchNavbarData, fetchHistory } = get();
+                await Promise.all([
+                    fetchNavbarData(true),
+                    fetchHistory(true)
+                ]);
                 return { success: true, message: data.message || "Withdrawal successful!" };
             } else {
                 return { success: false, message: data.message || "Transaction failed." };
             }
         } catch (error: any) {
             console.error("Withdraw Error:", error);
-            return { 
-                success: false, 
-                message: error.response?.data?.message || "Error processing withdrawal." 
+            return {
+                success: false,
+                message: error.response?.data?.message || "Error processing withdrawal."
             };
         }
     },
@@ -135,13 +152,13 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
             }
         } catch (error: any) {
             console.error("Set Pin Error:", error);
-            return { 
-                success: false, 
-                message: error.response?.data?.message || "Error setting PIN." 
+            return {
+                success: false,
+                message: error.response?.data?.message || "Error setting PIN."
             };
         }
     },
-    
+
     searchReceiver: async (key: string) => {
         const token = getAuthToken();
         try {
@@ -159,35 +176,44 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
             }
         } catch (error: any) {
             console.error("Search Receiver Error:", error);
-            return { 
-                success: false, 
-                message: error.response?.data?.message || "Unable to verify user." 
+            return {
+                success: false,
+                message: error.response?.data?.message || "Unable to verify user."
             };
         }
     },
 
-    sendFunds: async (formData: FormData) => {
+    sendFunds: async (payload: any) => { // 'payload' is the object from your Modal
         const token = getAuthToken();
         if (!token) return { success: false, message: "Authentication required" };
 
         try {
-            const { data } = await axios.post(`${baseURL}/api/transactions`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
+            // Log this to your browser console to verify one last time
+            console.log("Final Payload leaving the Store:", payload);
+
+            const { data } = await axios.post(`${baseURL}/api/send-money`, payload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json', // Force JSON
+                    'Accept': 'application/json'        // Tell Laravel to respond in JSON
+                }
             });
 
-            if (data?.status === 'success' || data?.status === true || data?.success === true) {
+            if (data?.status === 'success' || data?.success) {
                 const { fetchWallet, fetchHistory } = get();
                 await Promise.all([fetchWallet(true), fetchHistory(true)]);
-                return { success: true, message: data.message || "Transfer completed successfully!" };
-            } else {
-                return { success: false, message: data.message || "Transfer failed." };
+                return { success: true, message: data.message };
             }
+
+            return { success: false, message: data.message || "Transfer failed." };
+
         } catch (error: any) {
-            console.error("Send Funds Error:", error);
-            return { 
-                success: false, 
-                message: error.response?.data?.message || "Failed to process transfer." 
-            };
+            // If Laravel returns validation errors, they are inside error.response.data
+            const backendMessage = error.response?.data?.errors?.receiver_type?.[0]
+                || error.response?.data?.message
+                || "Server Error";
+
+            return { success: false, message: backendMessage };
         }
     }
 });

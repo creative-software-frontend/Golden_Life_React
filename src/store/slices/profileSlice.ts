@@ -84,8 +84,26 @@ export interface AdditionalInfo {
     updated_at: string;
 }
 
+export interface VendorProfile {
+    user: {
+        id: number;
+        name: string;
+        email: string;
+        mobile: string;
+        image?: string;
+    };
+    vendor: {
+        id: number;
+        seller_id: string;
+        business_name: string;
+        owner_name: string;
+        image?: string;
+    };
+}
+
 export interface ProfileSlice {
     studentProfile: Student | null;
+    vendorProfile: VendorProfile | null;
     personalInfo: PersonalInfo | null;
     documentInfo: DocumentInfo | null;
     nomineeInfo: NomineeInfo | null;
@@ -96,6 +114,7 @@ export interface ProfileSlice {
 
 export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = (set, get) => ({
     studentProfile: null,
+    vendorProfile: null,
     personalInfo: null,
     documentInfo: null,
     nomineeInfo: null,
@@ -111,24 +130,40 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
         if (!silent) set({ isProfileLoading: true });
 
         try {
-            const response = await axios.get(`${baseURL}/api/student/profile`, {
+            const isVendor = !!sessionStorage.getItem('vendor_session');
+            const url = isVendor 
+                ? `${baseURL}/api/vendor/profile` 
+                : `${baseURL}/api/student/profile`;
+
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
             const resData = response.data;
-            if (resData?.status === "success") {
-                set({ 
-                    studentProfile: resData.student,
-                    personalInfo: resData.personal_info,
-                    documentInfo: resData.document_info,
-                    nomineeInfo: resData.nominee_info,
-                    additionalInfo: resData.additional_info,
-                    isProfileFetched: true 
-                });
+            if (resData?.status === "success" || resData?.vendor) {
+                if (isVendor) {
+                    set({
+                        vendorProfile: {
+                            user: resData.user,
+                            vendor: resData.vendor
+                        },
+                        isProfileFetched: true
+                    });
+                } else {
+                    set({ 
+                        studentProfile: resData.student,
+                        personalInfo: resData.personal_info,
+                        documentInfo: resData.document_info,
+                        nomineeInfo: resData.nominee_info,
+                        additionalInfo: resData.additional_info,
+                        isProfileFetched: true 
+                    });
+                }
 
                 // Sync balance with WalletSlice if available
-                if (resData.balance !== undefined) {
-                    set({ walletBalance: resData.balance });
+                const balance = resData.balance || resData.data?.balance;
+                if (balance !== undefined) {
+                    set({ walletBalance: balance.toString() });
                 }
             }
         } catch (error) {
@@ -143,6 +178,7 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
         // Reset state across all slices
         set({
             studentProfile: null,
+            vendorProfile: null,
             personalInfo: null,
             documentInfo: null,
             nomineeInfo: null,
@@ -151,6 +187,7 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
             categories: [],
             transactions: []
         });
+        sessionStorage.removeItem("vendor_session");
         navigate("/login");
         window.location.reload();
     }
