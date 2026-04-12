@@ -477,6 +477,8 @@ export default function UserLayout() {
             </Sidebar>
 
             <SidebarInset>
+                <Cart />
+                <LiveChat />
                 <header className="flex flex-col sticky top-0 z-40 border-b bg-white lg:hidden">
 
                     {/* --- ROW 1: Identity, Language, & Profile --- */}
@@ -748,9 +750,6 @@ export default function UserLayout() {
                 </div>
 
                 <main className="relative flex-1 w-full min-w-0 transition-all duration-200 ease-in-out peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] lg:peer-data-[variant=inset]:m-2 lg:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 lg:peer-data-[variant=inset]:ml-0 lg:peer-data-[variant=inset]:rounded-xl lg:peer-data-[variant=inset]:shadow flex flex-col min-h-screen bg-gray-50/30">
-
-                    <Cart />
-                    <LiveChat />
                     <Outlet />
                     <Footer />
                 </main>

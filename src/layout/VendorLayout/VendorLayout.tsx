@@ -6,11 +6,12 @@ import VendorFooter from './VendorFooter';
 import { useProfile } from '../../pages/Vendor/Profile/hooks/useProfile';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { ProfileCompletionPopup } from '../../pages/Vendor/Profile/components/ProfileCompletionPopup';
+import LiveChat from '@/pages/Home/LiveChat/Livechat';
 
 const VendorLayout: React.FC = () => {
     // 1. Master State: Controls the Sidebar for the whole app
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+
     // Profile completion states
     const [showProfilePopup, setShowProfilePopup] = useState(false);
     const [hasDismissedPopup, setHasDismissedPopup] = useState(() => {
@@ -34,7 +35,7 @@ const VendorLayout: React.FC = () => {
             const timer = setTimeout(() => {
                 setShowProfilePopup(true);
             }, 500);
-            
+
             return () => clearTimeout(timer);
         }
     }, [isLoading, profileData, isComplete, hasDismissedPopup]);
@@ -53,15 +54,15 @@ const VendorLayout: React.FC = () => {
 
     return (
         <div className="flex h-screen bg-muted/40 text-foreground overflow-hidden">
-            
+
             {/* Sidebar receives state and toggle function */}
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-                
+                <LiveChat showLegacy={false} />
                 {/* Navbar receives state and toggle function so the custom icon works */}
                 <Navbar toggleSidebar={toggleSidebar} isOpen={isSidebarOpen} />
-                
+
                 <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 md:p-8">
                     {/* Your page content renders here */}
                     <Outlet />
@@ -69,14 +70,14 @@ const VendorLayout: React.FC = () => {
 
                 <VendorFooter />
             </div>
-            
+
             {/* Profile Completion Popup */}
             <ProfileCompletionPopup
-              isOpen={showProfilePopup}
-              percentage={percentage}
-              missingFields={missingFields}
-              onCompleteProfile={handleCompleteProfile}
-              onDismiss={handleDismissPopup}
+                isOpen={showProfilePopup}
+                percentage={percentage}
+                missingFields={missingFields}
+                onCompleteProfile={handleCompleteProfile}
+                onDismiss={handleDismissPopup}
             />
         </div>
     );

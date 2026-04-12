@@ -161,8 +161,8 @@ export default function VendorProfile() {
         setIsEditMode(false);
         handleImageRemove();
         
-        // Refresh navbar data to reflect changes immediately
-        useAppStore.getState().fetchNavbarData(true);
+        // Refresh full profile data to reflect changes immediately across all components (Navbar, Sidebar, etc.)
+        useAppStore.getState().fetchProfile(true);
         
         console.log('Profile updated successfully, data refreshed');
       } else {

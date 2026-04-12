@@ -65,15 +65,18 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
 
     const isProfileLoading = isLoading && !profile;
 
-    // --- Fetch Navbar Data ---
+    // --- Fetch Navbar and Profile Data ---
+    const { fetchProfile } = useAppStore();
+
     useEffect(() => {
         fetchNavbarData();
+        fetchProfile(); // Ensure full profile data is available for accurate avatar display
         
         // Set up interval for auto-update every 10 seconds (less aggressive than 5s)
         const intervalId = setInterval(() => fetchNavbarData(true), 10000);
 
         return () => clearInterval(intervalId);
-    }, [fetchNavbarData]);
+    }, [fetchNavbarData, fetchProfile]);
 
     // --- Close Menu on Click Outside ---
     useEffect(() => {

@@ -59,9 +59,9 @@ export const createNavbarSlice: StateCreator<AppState, [], [], NavbarSlice> = (s
                                 ...currentProfile,
                                 user: {
                                     ...(currentProfile?.user || {}),
-                                    name: data.user_info.name,
-                                    email: data.user_info.email,
-                                    image: data.user_info.image,
+                                    ...(data.user_info.name && { name: data.user_info.name }),
+                                    ...(data.user_info.email && { email: data.user_info.email }),
+                                    ...(data.user_info.image && { image: data.user_info.image }),
                                 },
                                 vendor: {
                                     ...(currentProfile?.vendor || {}),

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bot, X } from 'lucide-react';
 import AIChatbot from './AIChatbot';
+import { useAppStore } from '@/store/useAppStore';
 
 type Message = {
     id: number
@@ -12,10 +13,44 @@ type Message = {
     sender: 'user' | 'agent'
 }
 
-export default function LiveChat() {
+interface LiveChatProps {
+    showLegacy?: boolean;
+}
+
+export default function LiveChat({ showLegacy = true }: LiveChatProps) {
     const [t] = useTranslation("global");
     const [isOpen, setIsOpen] = useState(false)
     const [isAIChatOpen, setIsAIChatOpen] = useState(false)
+    const { clearChatbotMessages } = useAppStore();
+
+    // --- Optimized Session Cleanup Logic ---
+    useEffect(() => {
+        const getActiveToken = () => {
+            try {
+                const student = sessionStorage.getItem("student_session");
+                const vendor = sessionStorage.getItem("vendor_session");
+                if (student) return JSON.parse(student).token;
+                if (vendor) return JSON.parse(vendor).token;
+            } catch (e) {
+                return null;
+            }
+            return null;
+        };
+
+        const currentToken = getActiveToken();
+        const lastToken = sessionStorage.getItem('last_chatbot_token');
+
+        // If we have a token and it's different from the last one seen by the chatbot
+        if (currentToken && currentToken !== lastToken) {
+            console.log("🔄 Session changed or re-login detected. Clearing chatbot history.");
+            clearChatbotMessages();
+            sessionStorage.setItem('last_chatbot_token', currentToken);
+        } else if (!currentToken && lastToken) {
+            // If they logged out, ensure we're ready for the next login
+            sessionStorage.removeItem('last_chatbot_token');
+            clearChatbotMessages();
+        }
+    }, [clearChatbotMessages]);
     const [messages, setMessages] = useState<Message[]>([
         { id: 1, text: "Hello! How can I help you today?", sender: 'agent' }
     ])
@@ -108,37 +143,39 @@ export default function LiveChat() {
             <AIChatbot isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} />
 
             {/* Original Floating Bar (Legacy Chat) */}
-            <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light no-print">
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="px-4 text-black-500 font-bold text-sm"
-                >
-                    {t("chat")}
-                </button>
-                <div className="flex justify-center  space-x-2">
-                    <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
-                        <FontAwesomeIcon icon={faWhatsapp} className="h-7 w-7 text-green-600 hover:text-green-700" />
-                    </Link>
-                    <div className="border-l border-gray-300 h-8 mx-2" />
+            {showLegacy && (
+                <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light no-print">
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="px-4 text-black-500 font-bold text-sm"
+                    >
+                        {t("chat")}
+                    </button>
+                    <div className="flex justify-center  space-x-2">
+                        <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
+                            <FontAwesomeIcon icon={faWhatsapp} className="h-7 w-7 text-green-600 hover:text-green-700" />
+                        </Link>
+                        <div className="border-l border-gray-300 h-8 mx-2" />
 
-                    <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer">
-                        <FontAwesomeIcon icon={faTelegram} className="h-7 w-7 text-blue-600 hover:text-blue-700" />
-                    </Link>
+                        <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer">
+                            <FontAwesomeIcon icon={faTelegram} className="h-7 w-7 text-blue-600 hover:text-blue-700" />
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* New Bottom Floating Bar (AI Chatbot) - Same Design */}
-            <div className="fixed bottom-20 right-0 z-40 h-auto rounded-l-full bg-white px-2 py-3 shadow-lg hover:bg-gray-100 border-2 border-[#67AC79] no-print group transition-all">
+            {/* New Bottom Floating Bar (AI Chatbot) - Refined Design */}
+            <div className="fixed bottom-24 right-0 z-40 h-auto rounded-l-[40px] bg-white pl-4 pr-2 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.1)] hover:shadow-[0_10px_40px_rgba(103,172,121,0.2)] border border-[#67AC79]/30 border-r-0 no-print group transition-all duration-300">
                 <button
                     onClick={() => setIsAIChatOpen(true)}
-                    className="flex flex-col items-center px-4"
+                    className="flex flex-col items-start px-2"
                 >
-                    <span className="text-[10px] font-black text-[#67AC79] uppercase mb-1">{t('chatbot.title')}</span>
-                    <div className="flex items-center space-x-2 group-hover:scale-105 transition-transform">
-                        <div className="bg-[#67AC79] p-1.5 rounded-full text-white">
-                            <Bot size={20} />
+                    <span className="text-[9px] font-black text-[#67AC79] uppercase tracking-[0.15em] mb-1 ml-11">{t('chatbot.title')}</span>
+                    <div className="flex items-center space-x-3 group-hover:translate-x-[-4px] transition-transform duration-300">
+                        <div className="bg-[#67AC79] p-2.5 rounded-full text-white shadow-lg shadow-[#67AC79]/30 group-hover:scale-110 transition-transform">
+                            <Bot size={22} />
                         </div>
-                        <div className="text-xs font-bold text-slate-700">Ask AI Chatbot</div>
+                        <div className="text-[13px] font-black text-[#1e293b]">{t('chatbot.buttonText', 'Ask AI Chatbot')}</div>
                     </div>
                 </button>
             </div>
