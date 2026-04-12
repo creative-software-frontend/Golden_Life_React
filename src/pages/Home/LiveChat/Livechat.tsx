@@ -1,11 +1,10 @@
-'use client'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWhatsapp, faTelegram } from '@fortawesome/free-brands-svg-icons';
-// import { Telegram } from 'lucide-react'; // Use Lucid Icons for Telegram
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Bot, X } from 'lucide-react';
+import AIChatbot from './AIChatbot';
 
 type Message = {
     id: number
@@ -16,6 +15,7 @@ type Message = {
 export default function LiveChat() {
     const [t] = useTranslation("global");
     const [isOpen, setIsOpen] = useState(false)
+    const [isAIChatOpen, setIsAIChatOpen] = useState(false)
     const [messages, setMessages] = useState<Message[]>([
         { id: 1, text: "Hello! How can I help you today?", sender: 'agent' }
     ])
@@ -65,7 +65,7 @@ export default function LiveChat() {
                             onClick={() => setIsOpen(false)}
                             className="text-gray-500 hover:text-gray-700"
                         >
-                            ×
+                            <X size={24} />
                         </button>
                     </div>
                     <div className="flex-grow overflow-y-auto p-4 space-y-4">
@@ -103,12 +103,17 @@ export default function LiveChat() {
                     </form>
                 </div>
             </div>
+
+            {/* AI Chatbot Component */}
+            <AIChatbot isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} />
+
+            {/* Original Floating Bar (Legacy Chat) */}
             <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light no-print">
                 <button
-                    onClick={() => setIsOpen(true)} // Ensure `setIsOpen` is defined in your component
-                    className="px-4  text-black-500"
+                    onClick={() => setIsOpen(true)}
+                    className="px-4 text-black-500 font-bold text-sm"
                 >
-                    { t("chat") }
+                    {t("chat")}
                 </button>
                 <div className="flex justify-center  space-x-2">
                     <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
@@ -122,7 +127,21 @@ export default function LiveChat() {
                 </div>
             </div>
 
-
+            {/* New Bottom Floating Bar (AI Chatbot) - Same Design */}
+            <div className="fixed bottom-20 right-0 z-40 h-auto rounded-l-full bg-white px-2 py-3 shadow-lg hover:bg-gray-100 border-2 border-[#67AC79] no-print group transition-all">
+                <button
+                    onClick={() => setIsAIChatOpen(true)}
+                    className="flex flex-col items-center px-4"
+                >
+                    <span className="text-[10px] font-black text-[#67AC79] uppercase mb-1">{t('chatbot.title')}</span>
+                    <div className="flex items-center space-x-2 group-hover:scale-105 transition-transform">
+                        <div className="bg-[#67AC79] p-1.5 rounded-full text-white">
+                            <Bot size={20} />
+                        </div>
+                        <div className="text-xs font-bold text-slate-700">Ask AI Chatbot</div>
+                    </div>
+                </button>
+            </div>
         </>
     )
 }

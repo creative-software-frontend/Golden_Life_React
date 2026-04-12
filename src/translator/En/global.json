@@ -782,6 +782,19 @@
         }
       }
     }
+  },
+  "chatbot": {
+    "title": "Golden Life AI",
+    "status": "Online • Always Active",
+    "welcome": "Welcome! I am your AI Assistant",
+    "askPrompt": "Ask any question. I'm ready to help you.",
+    "inputPlaceholder": "Write here...",
+    "questions": {
+      "reseller": "I want to start working as a reseller",
+      "productList": "How to list products?",
+      "payment": "What are the payment methods?",
+      "orderTrack": "How to track orders?",
+      "withdraw": "How long does it take to withdraw?"
+    }
   }
-
 }
