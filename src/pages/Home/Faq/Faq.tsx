@@ -55,9 +55,9 @@ const Faq: React.FC = () => {
 
   return (
     <>
-     
 
-   
+
+
 
 
       {/* FAQ Section */}

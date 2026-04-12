@@ -18,6 +18,7 @@ import { formatBDT } from '@/utils/currencyFormatter';
 import { useAppStore } from '@/store/useAppStore';
 import type { OverviewStats } from '@/store/slices/vendorDashboardSlice';
 import { cn } from "@/lib/utils";
+import useModalStore from '@/store/modalStore';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
@@ -61,7 +62,7 @@ const RecentOrdersStack = ({ orders }: { orders: any[] }) => {
 // Sales Chart Component
 const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: string }) => {
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-    
+
     const data = chartData?.[timeframe];
     if (!data || !data.performance || data.performance.length === 0) {
         return (
@@ -74,11 +75,11 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
 
     const performance = data.performance;
     const values = performance.map((p: any) => parseFloat(p.total_sales));
-    
+
     // Use data.highest/lowest from API if provided
     const highestVal = data.highest || Math.max(...values, 0);
     const lowestVal = data.lowest || Math.min(...values, 0);
-    
+
     // Vertical scale with 25% headroom for a "wave" aesthetic
     const displayMax = highestVal === 0 ? 1000 : highestVal * 1.25;
     const height = 160;
@@ -140,24 +141,24 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
 
                         {/* Peak/Trough Highlight Lines */}
                         {data.highest > 0 && (
-                            <line 
-                                x1="0" y1={getY(data.highest)} x2={width} y2={getY(data.highest)} 
-                                className="stroke-primary/40 stroke-[2] stroke-dash transition-all duration-700" 
+                            <line
+                                x1="0" y1={getY(data.highest)} x2={width} y2={getY(data.highest)}
+                                className="stroke-primary/40 stroke-[2] stroke-dash transition-all duration-700"
                                 strokeDasharray="6 6"
                             />
                         )}
 
                         {/* Area Gradient */}
                         <path d={areaD} fill="url(#waveArea)" className="transition-all duration-1000 ease-out" />
-                        
+
                         {/* Smooth Line */}
-                        <path 
-                            d={pathD} 
-                            fill="none" 
-                            stroke="hsl(var(--primary))" 
-                            strokeWidth="4" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
+                        <path
+                            d={pathD}
+                            fill="none"
+                            stroke="hsl(var(--primary))"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="transition-all duration-1000 ease-out drop-shadow-xl"
                         />
 
@@ -167,18 +168,18 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
                                 {hoveredIdx === idx && (
                                     <circle cx={p.x} cy={p.y} r="12" className="fill-primary/20 animate-ping" />
                                 )}
-                                <circle 
-                                    cx={p.x} cy={p.y} 
-                                    r={hoveredIdx === idx ? "7" : "5"} 
+                                <circle
+                                    cx={p.x} cy={p.y}
+                                    r={hoveredIdx === idx ? "7" : "5"}
                                     className={cn(
                                         "fill-background stroke-primary transition-all duration-300",
                                         hoveredIdx === idx ? "stroke-[4px]" : "stroke-[3px]"
-                                    )} 
+                                    )}
                                 />
                                 {/* Broad Hover Target */}
-                                <rect 
+                                <rect
                                     x={idx === 0 ? 0 : p.x - (width / (points.length - 1) / 2)}
-                                    y="0" width={points.length === 1 ? width : width / (points.length - 1)} height={height} 
+                                    y="0" width={points.length === 1 ? width : width / (points.length - 1)} height={height}
                                     fill="transparent" className="cursor-pointer"
                                     onMouseEnter={() => setHoveredIdx(idx)}
                                     onMouseLeave={() => setHoveredIdx(null)}
@@ -189,9 +190,9 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
 
                     {/* Dynamic Tooltip Overlay */}
                     {hoveredIdx !== null && (
-                        <div 
+                        <div
                             className="absolute bg-slate-900 text-white text-[11px] font-bold px-4 py-2 rounded-2xl shadow-2xl z-50 pointer-events-none transition-all duration-300 border border-white/20 backdrop-blur-md"
-                            style={{ 
+                            style={{
                                 left: `${(points[hoveredIdx].x / width) * 100}%`,
                                 top: `${(points[hoveredIdx].y / height) * 100}%`,
                                 transform: 'translate(-50%, -150%)'
@@ -208,8 +209,8 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
                     {/* X-Axis Data Labels */}
                     <div className="flex justify-between mt-6 px-1">
                         {performance.map((p: any, idx: number) => (
-                            <span 
-                                key={idx} 
+                            <span
+                                key={idx}
                                 className={cn(
                                     "text-[10px] font-black uppercase tracking-tighter transition-all duration-500 w-16 text-center select-none",
                                     hoveredIdx === idx ? "text-primary scale-150 rotate-[-5deg]" : "text-muted-foreground/40"
@@ -251,13 +252,14 @@ const VendorHome: React.FC = () => {
     const [chartTimeframe, setChartTimeframe] = useState<'week' | 'month' | 'year'>('week');
 
     // --- Store Integration ---
-    const { 
-        vendorProfile, 
-        dashboardData, 
+    const {
+        vendorProfile,
+        dashboardData,
         isDashboardLoading: loading,
-        fetchProfile, 
-        fetchVendorDashboard 
+        fetchProfile,
+        fetchVendorDashboard
     } = useAppStore();
+    const { setIsAIChatOpen } = useModalStore();
 
     const handleManualRefresh = () => {
         fetchVendorDashboard();
@@ -281,11 +283,11 @@ const VendorHome: React.FC = () => {
 
     // Map store data to local variables for component
     const overview = dashboardData?.overview;
-    const currentStats: OverviewStats | undefined = 
+    const currentStats: OverviewStats | undefined =
         activeTab === 'Today' ? overview?.today :
-        activeTab === 'Weekly' ? overview?.weekly :
-        activeTab === 'Monthly' ? overview?.monthly :
-        overview?.yearly;
+            activeTab === 'Weekly' ? overview?.weekly :
+                activeTab === 'Monthly' ? overview?.monthly :
+                    overview?.yearly;
 
     const recentOrders = dashboardData?.recent_orders || [];
 
@@ -310,7 +312,7 @@ const VendorHome: React.FC = () => {
                         Showing statistics for {activeTab.toLowerCase()}
                     </p>
                 </div>
-                <button 
+                <button
                     onClick={handleManualRefresh}
                     disabled={loading}
                     className="flex items-center gap-2 px-4 py-2 bg-background border rounded-lg hover:bg-muted transition-colors text-sm font-semibold disabled:opacity-50"
@@ -499,8 +501,8 @@ const VendorHome: React.FC = () => {
                                         onClick={() => setChartTimeframe(t)}
                                         className={cn(
                                             "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all",
-                                            chartTimeframe === t 
-                                                ? "bg-white text-primary shadow-sm" 
+                                            chartTimeframe === t
+                                                ? "bg-white text-primary shadow-sm"
                                                 : "text-muted-foreground hover:text-foreground"
                                         )}
                                     >
@@ -542,8 +544,8 @@ const VendorHome: React.FC = () => {
                             />
                             <QuickActionButton
                                 icon={Headphones}
-                                label="Contact Support"
-                                onClick={() => console.log('Contact Support')}
+                                label="Support AI"
+                                onClick={() => setIsAIChatOpen(true)}
                                 variant="outline"
                             />
                         </div>
@@ -558,8 +560,8 @@ const VendorHome: React.FC = () => {
                         <div className="space-y-3">
                             <div className={cn(
                                 "flex items-center justify-between p-3 rounded-lg border",
-                                (dashboardData?.inventory.low_stock_count || 0) > 0 
-                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800" 
+                                (dashboardData?.inventory.low_stock_count || 0) > 0
+                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
                                     : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
                             )}>
                                 <div>
@@ -595,7 +597,7 @@ const VendorHome: React.FC = () => {
                 </div>
             </div>
 
-            
+
         </div>
     );
 };

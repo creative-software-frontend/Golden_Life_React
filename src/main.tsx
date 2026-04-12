@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { GoldenLifeQueryProvider } from './providers/GoldenLifeQueryProvider';
 import global_En from './translator/En/global.json';
 import global_Bn from './translator/Bn/global.json';
 import i18next from 'i18next';
@@ -30,7 +31,9 @@ if (rootElement) {
       {/* 3. Wrap everything inside the Redux Provider */}
 
       <I18nextProvider i18n={i18next}>
-        <App />
+        <GoldenLifeQueryProvider>
+          <App />
+        </GoldenLifeQueryProvider>
       </I18nextProvider>
 
     </StrictMode>

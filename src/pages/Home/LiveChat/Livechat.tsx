@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Bot, X } from 'lucide-react';
 import AIChatbot from './AIChatbot';
 import { useAppStore } from '@/store/useAppStore';
+import useModalStore from '@/store/modalStore';
 
 type Message = {
     id: number
@@ -20,7 +21,7 @@ interface LiveChatProps {
 export default function LiveChat({ showLegacy = true }: LiveChatProps) {
     const [t] = useTranslation("global");
     const [isOpen, setIsOpen] = useState(false)
-    const [isAIChatOpen, setIsAIChatOpen] = useState(false)
+    const { isAIChatOpen, setIsAIChatOpen } = useModalStore();
     const { clearChatbotMessages } = useAppStore();
 
     // --- Optimized Session Cleanup Logic ---

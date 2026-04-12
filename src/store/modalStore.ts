@@ -21,6 +21,7 @@ interface ModalStore {
     isBuyNowClicked: boolean;
     clicked: boolean;
     buyNowProduct: any | null;
+    isAIChatOpen: boolean;
 
     // --- ADDED: Wallet trigger states ---
     walletUpdateTrigger: number;
@@ -39,6 +40,7 @@ interface ModalStore {
     // --- ADDED: Blob preview URL from FileReader after a successful image upload ---
     profileBlobPreview: string | null;
     setProfileBlobPreview: (url: string | null) => void;
+    setIsAIChatOpen: (isOpen: boolean) => void;
 
     // Toggle state methods
     toggleClicked: () => void;
@@ -90,6 +92,7 @@ const useModalStore = create<ModalStore>((set) => ({
     isBuyNowClicked: false,
     clicked: false,
     buyNowProduct: null,
+    isAIChatOpen: false,
 
     // --- ADDED: Initial state for wallet trigger ---
     walletUpdateTrigger: 0,
@@ -113,6 +116,7 @@ const useModalStore = create<ModalStore>((set) => ({
     toggleClicked: () => set((state) => ({ clicked: !state.clicked })),
     setCartOpen: (isOpen: boolean) => set({ clicked: isOpen }),
     setCheckoutModalOpen: (isOpen: boolean) => set({ isCheckoutModalOpen: isOpen }),
+    setIsAIChatOpen: (isOpen: boolean) => set({ isAIChatOpen: isOpen }),
 
     // Buy Now Controls
     openBuyNow: (product: any) => set({ buyNowProduct: product, isCheckoutBookModalOpen: true }),
