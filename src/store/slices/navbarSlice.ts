@@ -49,9 +49,9 @@ export const createNavbarSlice: StateCreator<AppState, [], [], NavbarSlice> = (s
                     });
                 }
 
-                // 3. Update Profile (Partial)
+                // 3. Update Profile (Partial) - Only merge to avoid losing details from full profile fetch
                 if (data.user_info) {
-                    const isVendor = !!sessionStorage.getItem("vendor_session");
+                    const isVendor = window.location.pathname.includes('/vendor');
                     if (isVendor) {
                         const currentProfile = get().vendorProfile;
                         set({
@@ -63,19 +63,17 @@ export const createNavbarSlice: StateCreator<AppState, [], [], NavbarSlice> = (s
                                     ...(data.user_info.email && { email: data.user_info.email }),
                                     ...(data.user_info.image && { image: data.user_info.image }),
                                 },
-                                vendor: {
-                                    ...(currentProfile?.vendor || {}),
-                                },
                             } as any
                         });
                     } else {
                         const currentProfile = get().studentProfile;
+                        // Only set if we don't have a profile or to update specific fields
                         set({
                             studentProfile: {
-                                ...currentProfile,
-                                name: data.user_info.name,
-                                email: data.user_info.email,
-                                image: data.user_info.image,
+                                ...(currentProfile || {}),
+                                ...(data.user_info.name && { name: data.user_info.name }),
+                                ...(data.user_info.email && { email: data.user_info.email }),
+                                ...(data.user_info.image && { image: data.user_info.image }),
                             } as any
                         });
                     }

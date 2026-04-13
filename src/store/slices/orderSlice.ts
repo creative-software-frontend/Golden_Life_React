@@ -83,7 +83,8 @@ export const createOrderSlice: StateCreator<AppState, [], [], OrderSlice> = (set
     isOrderDetailsLoading: false,
 
     fetchOrders: async (silent = false) => {
-        if (get().isOrdersLoading || (get().isOrdersFetched && !silent)) return;
+        // Redined Guard: Only skip if already fetched and not a silent refresh.
+        if (get().isOrdersFetched && !silent) return;
 
         const token = getAuthToken();
         if (!token) return;
@@ -91,16 +92,22 @@ export const createOrderSlice: StateCreator<AppState, [], [], OrderSlice> = (set
         if (!silent) set({ isOrdersLoading: true });
 
         try {
-            const response = await axios.get(`${baseURL}/api/student/orders`, {
+            const url = `${baseURL}/api/student/orders`;
+            console.log(`📡 orderSlice: Fetching orders from ${url}`);
+            
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            
             const rawOrders = Array.isArray(response.data.orders) ? response.data.orders : [];
+            console.log(`✅ orderSlice: Fetched ${rawOrders.length} orders`);
+            
             set({ 
                 orders: rawOrders, 
                 isOrdersFetched: true 
             });
-        } catch (error) {
-            console.error("Orders Fetch Error:", error);
+        } catch (error: any) {
+            console.error("❌ orderSlice Fetch Error:", error.response?.data || error.message);
         } finally {
             if (!silent) set({ isOrdersLoading: false });
         }

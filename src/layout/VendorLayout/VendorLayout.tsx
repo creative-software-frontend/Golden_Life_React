@@ -7,6 +7,9 @@ import { useProfile } from '../../pages/Vendor/Profile/hooks/useProfile';
 import { useProfileCompletion } from '../../hooks/useProfileCompletion';
 import { ProfileCompletionPopup } from '../../pages/Vendor/Profile/components/ProfileCompletionPopup';
 import LiveChat from '@/pages/Home/LiveChat/Livechat';
+import HotlineModal from '@/components/shared/HotlineModal';
+import FAQModal from '@/components/shared/FAQModal';
+import TicketModal from '@/components/shared/TicketModal';
 
 const VendorLayout: React.FC = () => {
     // 1. Master State: Controls the Sidebar for the whole app
@@ -79,6 +82,11 @@ const VendorLayout: React.FC = () => {
                 onCompleteProfile={handleCompleteProfile}
                 onDismiss={handleDismissPopup}
             />
+
+            {/* Global Vendor Modals */}
+            <HotlineModal />
+            <FAQModal />
+            <TicketModal />
         </div>
     );
 };

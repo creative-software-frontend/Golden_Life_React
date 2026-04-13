@@ -19,16 +19,20 @@ interface FAQResponse {
     data: FAQ[];
 }
 
-const fetchFAQs = async (search?: string): Promise<FAQ[]> => {
-    const url = `https://api.goldenlife.my/api/get-faqs${search ? `?search=${encodeURIComponent(search)}` : ''}`;
+const fetchFAQs = async (search?: string, categoryId?: string): Promise<FAQ[]> => {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (categoryId) params.append('category_id', categoryId);
+    
+    const url = `https://api.goldenlife.my/api/get-faqs${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await axios.get<FAQResponse>(url);
     return response.data.data;
 };
 
-export const useFAQs = (search?: string) => {
+export const useFAQs = (search?: string, categoryId?: string) => {
     return useQuery({
-        queryKey: ['faqs', search],
-        queryFn: () => fetchFAQs(search),
+        queryKey: ['faqs', search, categoryId],
+        queryFn: () => fetchFAQs(search, categoryId),
         enabled: true, // Always fetch if search changes or on mount
     });
 };

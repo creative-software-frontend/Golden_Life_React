@@ -40,13 +40,13 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     const navigate = useNavigate();
     const { handleLogout } = useVendorAuth();
 
-    const { 
-        walletBalance, 
-        notifications, 
-        unreadCount, 
-        vendorProfile: profile, 
-        fetchNavbarData, 
-        isNavbarLoading: isLoading 
+    const {
+        walletBalance,
+        notifications,
+        unreadCount,
+        vendorProfile: profile,
+        fetchNavbarData,
+        isNavbarLoading: isLoading
     } = useAppStore();
 
     const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
@@ -71,7 +71,7 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
     useEffect(() => {
         fetchNavbarData();
         fetchProfile(); // Ensure full profile data is available for accurate avatar display
-        
+
         // Set up interval for auto-update every 10 seconds (less aggressive than 5s)
         const intervalId = setInterval(() => fetchNavbarData(true), 10000);
 
@@ -298,8 +298,8 @@ const Navbar: React.FC<{ toggleSidebar: () => void; isOpen: boolean }> = ({ togg
                                         <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                                             <div
                                                 className={`h-full transition-all duration-500 ease-out rounded-full ${isProfileComplete
-                                                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
-                                                        : 'bg-gradient-to-r from-amber-500 to-amber-600'
+                                                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
+                                                    : 'bg-gradient-to-r from-amber-500 to-amber-600'
                                                     }`}
                                                 style={{ width: `${profilePercentage}%` }}
                                             />

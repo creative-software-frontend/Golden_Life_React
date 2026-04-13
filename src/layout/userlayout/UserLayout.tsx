@@ -96,7 +96,7 @@ export default function UserLayout() {
     const location = useLocation();
 
     const {
-        categories, fetchCategories, studentProfile, fetchNavbarData, fetchProfile,
+        categories, fetchCategories, studentProfile, fetchNavbarData, fetchProfile, fetchOrders,
         walletBalance, isCategoryLoading, isWalletLoading
     } = useAppStore();
 
@@ -129,16 +129,24 @@ export default function UserLayout() {
 
     // 2. Fetch on mount and when walletUpdateTrigger changes
     React.useEffect(() => {
-        fetchCategories();
-        fetchProfile(); 
-        fetchNavbarData();
+        const loadInitialData = async () => {
+            console.log("🚀 UserLayout: Initializing Student Panel Data...");
+            await Promise.all([
+                fetchCategories(),
+                fetchProfile(), 
+                fetchNavbarData(),
+                fetchOrders()
+            ]);
+        };
+
+        loadInitialData();
 
         const interval = setInterval(() => {
             fetchNavbarData(true); 
         }, 12000);
 
         return () => clearInterval(interval);
-    }, [fetchCategories, fetchNavbarData, walletUpdateTrigger]);
+    }, [fetchCategories, fetchNavbarData, fetchProfile, fetchOrders, walletUpdateTrigger]);
 
 
     // 2. Define the handleLogout function

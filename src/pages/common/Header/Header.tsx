@@ -237,13 +237,13 @@ const Header: React.FC = () => {
 
                             {/* 2nd: Text Info (Name & Tier) */}
                             <div className="flex flex-col items-start justify-center text-left hidden md:flex">
-                                    {isProfileLoading && !studentProfile ? (
-                                        <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-md" />
-                                    ) : (
-                                        <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
-                                            {studentProfile?.name || "Student"}
-                                        </span>
-                                    )}
+                                {isProfileLoading && !studentProfile ? (
+                                    <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-md" />
+                                ) : (
+                                    <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                        {studentProfile?.name || "Student"}
+                                    </span>
+                                )}
 
                                 <div className="flex items-center gap-1.5 mt-1.5">
                                     <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">

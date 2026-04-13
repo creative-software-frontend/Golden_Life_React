@@ -10,7 +10,10 @@ import {
     Star,
     Plus,
     FileText,
-    Headphones
+    Headphones,
+    Phone,
+    HelpCircle,
+    Ticket as TicketIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -259,7 +262,7 @@ const VendorHome: React.FC = () => {
         fetchProfile,
         fetchVendorDashboard
     } = useAppStore();
-    const { setIsAIChatOpen } = useModalStore();
+    const { setIsAIChatOpen, setIsHotlineModalOpen, setIsFAQModalOpen, setIsTicketModalOpen } = useModalStore();
 
     const handleManualRefresh = () => {
         fetchVendorDashboard();
@@ -324,9 +327,9 @@ const VendorHome: React.FC = () => {
 
             {/* ========== BOTTOM SECTION - Order Cards with Filters ========== */}
             <div className="mt-8 mb-8 bg-card rounded-xl p-6 shadow-sm border">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h2 className="text-xl font-bold text-foreground">Order Overview</h2>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                         {tabs.map((tab) => (
                             <button
                                 key={tab}
@@ -492,9 +495,9 @@ const VendorHome: React.FC = () => {
 
                     {/* Sales Chart */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                             <h3 className="font-semibold text-lg text-foreground">Sales Performance</h3>
-                            <div className="flex gap-1 bg-muted p-1 rounded-lg">
+                            <div className="flex gap-1 bg-muted p-1 rounded-lg w-full sm:w-auto overflow-x-auto scrollbar-none">
                                 {(['week', 'month', 'year'] as const).map((t) => (
                                     <button
                                         key={t}
@@ -546,6 +549,24 @@ const VendorHome: React.FC = () => {
                                 icon={Headphones}
                                 label="Support AI"
                                 onClick={() => setIsAIChatOpen(true)}
+                                variant="outline"
+                            />
+                            <QuickActionButton
+                                icon={Phone}
+                                label="Hotline Number"
+                                onClick={() => setIsHotlineModalOpen(true)}
+                                variant="outline"
+                            />
+                            <QuickActionButton
+                                icon={HelpCircle}
+                                label="FAQ"
+                                onClick={() => setIsFAQModalOpen(true)}
+                                variant="outline"
+                            />
+                            <QuickActionButton
+                                icon={TicketIcon}
+                                label="Support Ticket"
+                                onClick={() => setIsTicketModalOpen(true)}
                                 variant="outline"
                             />
                         </div>

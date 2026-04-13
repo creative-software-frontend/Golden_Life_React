@@ -121,24 +121,31 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
     additionalInfo: null,
 
     fetchProfile: async (silent = false) => {
-        // Guard: If we're already loading or already have data (and not a silent refresh), skip.
-        if (get().isProfileLoading || (get().isProfileFetched && !silent)) return;
+        // Refined Guard: Only skip if already fetching PROFILE specifically, 
+        // or if already fetched and not a silent refresh.
+        if (get().isProfileFetched && !silent) return;
 
         const token = getAuthToken();
-        if (!token) return;
+        if (!token) {
+            console.warn("⚠️ profileSlice: No auth token found");
+            return;
+        }
 
         if (!silent) set({ isProfileLoading: true });
 
         try {
-            const isVendor = !!sessionStorage.getItem('vendor_session');
-            const url = isVendor 
-                ? `${baseURL}/api/vendor/profile` 
+            // Determine API endpoint based on current path or token type
+            const isVendor = window.location.pathname.includes('/vendor');
+            const url = isVendor
+                ? `${baseURL}/api/vendor/profile`
                 : `${baseURL}/api/student/profile`;
+
+            console.log(`📡 profileSlice: Fetching from ${url}`);
 
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             const resData = response.data;
             if (resData?.status === "success" || resData?.vendor) {
                 if (isVendor) {
@@ -150,24 +157,30 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
                         isProfileFetched: true
                     });
                 } else {
-                    set({ 
+                    // Update Student Profile with all related info from API
+                    set({
                         studentProfile: resData.student,
                         personalInfo: resData.personal_info,
                         documentInfo: resData.document_info,
                         nomineeInfo: resData.nominee_info,
                         additionalInfo: resData.additional_info,
-                        isProfileFetched: true 
+                        isProfileFetched: true
                     });
                 }
 
-                // Sync balance with WalletSlice if available
+                // Sync balance with WalletSlice - API returns balance at top level
                 const balance = resData.balance || resData.data?.balance;
                 if (balance !== undefined) {
+                    console.log("💰 profileSlice: Updating wallet balance:", balance);
                     set({ walletBalance: balance.toString() });
                 }
+
+                console.log("✅ profileSlice: Profile fetched successfully");
+            } else {
+                console.warn("⚠️ profileSlice: API returned unexpected structure", resData);
             }
-        } catch (error) {
-            console.error("Profile Fetch Error:", error);
+        } catch (error: any) {
+            console.error("❌ profileSlice Fetch Error:", error.response?.data || error.message);
         } finally {
             if (!silent) set({ isProfileLoading: false });
         }
@@ -191,4 +204,4 @@ export const createProfileSlice: StateCreator<AppState, [], [], ProfileSlice> = 
         navigate("/login");
         window.location.reload();
     }
-});
+});

@@ -22,6 +22,9 @@ interface ModalStore {
     clicked: boolean;
     buyNowProduct: any | null;
     isAIChatOpen: boolean;
+    isHotlineModalOpen: boolean;
+    isFAQModalOpen: boolean;
+    isTicketModalOpen: boolean;
 
     // --- ADDED: Wallet trigger states ---
     walletUpdateTrigger: number;
@@ -41,6 +44,9 @@ interface ModalStore {
     profileBlobPreview: string | null;
     setProfileBlobPreview: (url: string | null) => void;
     setIsAIChatOpen: (isOpen: boolean) => void;
+    setIsHotlineModalOpen: (isOpen: boolean) => void;
+    setIsFAQModalOpen: (isOpen: boolean) => void;
+    setIsTicketModalOpen: (isOpen: boolean) => void;
 
     // Toggle state methods
     toggleClicked: () => void;
@@ -93,6 +99,9 @@ const useModalStore = create<ModalStore>((set) => ({
     clicked: false,
     buyNowProduct: null,
     isAIChatOpen: false,
+    isHotlineModalOpen: false,
+    isFAQModalOpen: false,
+    isTicketModalOpen: false,
 
     // --- ADDED: Initial state for wallet trigger ---
     walletUpdateTrigger: 0,
@@ -117,6 +126,9 @@ const useModalStore = create<ModalStore>((set) => ({
     setCartOpen: (isOpen: boolean) => set({ clicked: isOpen }),
     setCheckoutModalOpen: (isOpen: boolean) => set({ isCheckoutModalOpen: isOpen }),
     setIsAIChatOpen: (isOpen: boolean) => set({ isAIChatOpen: isOpen }),
+    setIsHotlineModalOpen: (isOpen: boolean) => set({ isHotlineModalOpen: isOpen }),
+    setIsFAQModalOpen: (isOpen: boolean) => set({ isFAQModalOpen: isOpen }),
+    setIsTicketModalOpen: (isOpen: boolean) => set({ isTicketModalOpen: isOpen }),
 
     // Buy Now Controls
     openBuyNow: (product: any) => set({ buyNowProduct: product, isCheckoutBookModalOpen: true }),
