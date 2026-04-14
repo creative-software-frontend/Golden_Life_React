@@ -7,8 +7,24 @@ import { ProfileForm } from './components/ProfileForm';
 import { StatsCard } from './components/StatsCard';
 import { SocialLinks } from './components/SocialLinks';
 import { toast } from 'react-toastify';
-import { Edit2, Loader2, AlertCircle, UserX } from 'lucide-react';
+import { Edit2, Loader2, AlertCircle, UserX, Plus, FileText, Headphones, Phone, HelpCircle, Ticket as TicketIcon } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import useModalStore from '@/store/modalStore';
+
+// Quick Action Button Component
+const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
+  const baseClass = "w-full px-3 py-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex flex-col sm:flex-row items-center justify-center gap-2 text-center";
+  const variants: Record<string, string> = {
+    primary: "bg-primary-light text-white hover:bg-primary-dark shadow-sm hover:shadow-md",
+    outline: "border-2 border-primary-light/20 bg-white text-gray-700 hover:bg-primary-light/5 hover:border-primary-light"
+  };
+  return (
+    <button onClick={onClick} className={`${baseClass} ${variants[variant as keyof typeof variants] || variants.primary}`}>
+      <Icon className="w-4 h-4" />
+      {label}
+    </button>
+  );
+};
 
 export default function VendorProfile() {
   const navigate = useNavigate();
@@ -16,6 +32,7 @@ export default function VendorProfile() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { setIsAIChatOpen, setIsHotlineModalOpen, setIsFAQModalOpen, setIsTicketModalOpen } = useModalStore();
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   // Debug logging for data changes
@@ -160,10 +177,10 @@ export default function VendorProfile() {
         toast.success('Profile updated successfully! ');
         setIsEditMode(false);
         handleImageRemove();
-        
+
         // Refresh full profile data to reflect changes immediately across all components (Navbar, Sidebar, etc.)
         useAppStore.getState().fetchProfile(true);
-        
+
         console.log('Profile updated successfully, data refreshed');
       } else {
         toast.error('Failed to update profile');
@@ -255,9 +272,7 @@ export default function VendorProfile() {
                     Change Password
                   </button>
 
-                  <button className="w-full px-6 py-3.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all duration-300">
-                    Help & Support
-                  </button>
+
                 </div>
 
                 {/* Verification Status */}
@@ -272,13 +287,56 @@ export default function VendorProfile() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-gray-600">Mobile Verified</span>
                     <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${user.mobile_verify
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-700'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-amber-100 text-amber-700'
                       }`}>
                       {user.mobile_verify ? '✓ Verified' : '⚠ Not Verified'}
                     </span>
                   </div>
                 </div>
+                {/* Quick Actions */}
+                <div className="mt-8 pt-6 border-t-2 border-gray-100">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <QuickActionButton
+                      icon={Plus}
+                      label="Add Product"
+                      onClick={() => navigate('/vendor/dashboard/products/add')}
+                      variant="primary"
+                    />
+                    <QuickActionButton
+                      icon={FileText}
+                      label="Report"
+                      onClick={() => navigate('/vendor/dashboard/reports')}
+                      variant="outline"
+                    />
+                    <QuickActionButton
+                      icon={Headphones}
+                      label="Support AI"
+                      onClick={() => setIsAIChatOpen(true)}
+                      variant="outline"
+                    />
+                    <QuickActionButton
+                      icon={Phone}
+                      label="Hotline"
+                      onClick={() => setIsHotlineModalOpen(true)}
+                      variant="outline"
+                    />
+                    <QuickActionButton
+                      icon={HelpCircle}
+                      label="FAQ"
+                      onClick={() => setIsFAQModalOpen(true)}
+                      variant="outline"
+                    />
+                    <QuickActionButton
+                      icon={TicketIcon}
+                      label="Ticket"
+                      onClick={() => setIsTicketModalOpen(true)}
+                      variant="outline"
+                    />
+                  </div>
+                </div>
+
               </div>
             )}
 

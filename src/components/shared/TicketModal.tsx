@@ -10,10 +10,13 @@ import {
     AlertCircle,
     ChevronLeft,
     Image as ImageIcon,
-    Loader2
+    Loader2,
+    ShieldCheck,
+    User
 } from 'lucide-react';
 import useModalStore from '@/store/modalStore';
 import { useTickets, useCreateTicket, useSendMessage, useTicketDetails, Ticket } from '@/hooks/useTickets';
+import { useAppStore } from '@/store/useAppStore';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
@@ -27,6 +30,8 @@ const TicketModal = () => {
     const [message, setMessage] = useState('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const currentUserId = useAppStore(state => state.studentProfile?.id || state.vendorProfile?.user?.id || 0);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,56 +191,56 @@ const TicketModal = () => {
                                             <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 pb-2">
                                                 <table className="w-full text-left border-collapse min-w-[600px]">
                                                     <thead>
-                                                    <tr className="bg-gray-50/50 border-b border-gray-100">
-                                                        <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Ticket ID</th>
-                                                        <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Subject</th>
-                                                        <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Priority</th>
-                                                        <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Status</th>
-                                                        <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">Date</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-gray-50">
-                                                    {tickets.map((ticket) => (
-                                                        <tr
-                                                            key={ticket.id}
-                                                            onClick={() => {
-                                                                setSelectedTicket(ticket);
-                                                                setViewMode('chat');
-                                                            }}
-                                                            className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
-                                                        >
-                                                            <td className="px-6 py-4">
-                                                                <span className="text-xs font-black text-blue-600">#{ticket.id}</span>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <span className="text-sm font-bold text-[#1a2b3b] group-hover:text-blue-600 transition-colors line-clamp-1">
-                                                                    {ticket.subject}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="flex items-center gap-1.5">
-                                                                    <div className={cn("w-1.5 h-1.5 rounded-full",
-                                                                        ticket.priority.toLowerCase() === 'high' ? 'bg-red-500' :
-                                                                            ticket.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
-                                                                    )} />
-                                                                    <span className={cn("text-[11px] font-bold uppercase", getPriorityColor(ticket.priority))}>
-                                                                        {ticket.priority}
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <span className={cn("inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight", getStatusColor(ticket.status))}>
-                                                                    {ticket.status}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-6 py-4 text-right">
-                                                                <span className="text-[11px] font-bold text-gray-400 font-mono">
-                                                                    {format(new Date(ticket.created_at), 'dd MMM, yy')}
-                                                                </span>
-                                                            </td>
+                                                        <tr className="bg-gray-50/50 border-b border-gray-100">
+                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Ticket ID</th>
+                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Subject</th>
+                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Priority</th>
+                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Status</th>
+                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">Date</th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-50">
+                                                        {tickets.map((ticket) => (
+                                                            <tr
+                                                                key={ticket.id}
+                                                                onClick={() => {
+                                                                    setSelectedTicket(ticket);
+                                                                    setViewMode('chat');
+                                                                }}
+                                                                className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
+                                                            >
+                                                                <td className="px-6 py-4">
+                                                                    <span className="text-xs font-black text-blue-600">#{ticket.id}</span>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <span className="text-sm font-bold text-[#1a2b3b] group-hover:text-blue-600 transition-colors line-clamp-1">
+                                                                        {ticket.subject}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <div className={cn("w-1.5 h-1.5 rounded-full",
+                                                                            ticket.priority.toLowerCase() === 'high' ? 'bg-red-500' :
+                                                                                ticket.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                                                                        )} />
+                                                                        <span className={cn("text-[11px] font-bold uppercase", getPriorityColor(ticket.priority))}>
+                                                                            {ticket.priority}
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <span className={cn("inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight", getStatusColor(ticket.status))}>
+                                                                        {ticket.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 text-right">
+                                                                    <span className="text-[11px] font-bold text-gray-400 font-mono">
+                                                                        {format(new Date(ticket.created_at), 'd.M.yyyy')}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -365,7 +370,7 @@ const TicketModal = () => {
                                                     <div>
                                                         <h3 className="font-black text-[#1a2b3b] text-sm">Original Ticket</h3>
                                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                                            {format(new Date(selectedTicket.created_at), 'dd MMM yy, hh:mm a')}
+                                                            {format(new Date(selectedTicket.created_at), 'd.M.yyyy, hh:mm a')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -387,27 +392,71 @@ const TicketModal = () => {
                                             </div>
                                         </div>
 
-                                        {/* Right Panel: Chat Messages */}
-                                        <div className="flex-1 flex flex-col bg-[#fafbfc] min-w-0">
+                                        {/* Right Panel: Chat Messages & Input */}
+                                        <div className="flex-1 flex flex-col min-h-0 bg-white">
                                             <div className="flex-1 p-6 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
                                                 {isLoadingDetails ? (
-                                                    <div className="flex justify-center py-4"><Loader2 className="animate-spin text-blue-600" /></div>
+                                                    <div className="flex justify-center py-4">
+                                                        <Loader2 className="animate-spin text-blue-600" />
+                                                    </div>
                                                 ) : details?.conversations.length ? (
-                                                    details.conversations.map((msg) => (
-                                                        <div key={msg.id} className="flex gap-4 flex-row-reverse">
-                                                            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
-                                                                <span className="text-white text-[10px] font-black">USER</span>
-                                                            </div>
-                                                            <div className="flex-1 flex flex-col items-end max-w-[85%]">
-                                                                <div className="bg-blue-600 p-4 rounded-3xl rounded-tr-none text-white shadow-xl shadow-blue-600/10">
-                                                                    <p className="text-[13px] font-medium leading-relaxed">{msg.msg}</p>
+                                                    details.conversations.map((msg) => {
+                                                        const isUserMsg = currentUserId > 0 ? Number(msg.user_id) === currentUserId : !!msg.user_id && Number(msg.user_id) !== 1;
+                                                        const isAdmin = !isUserMsg;
+                                                        const formattedDate = format(new Date(msg.created_at), 'd.M.yyyy, hh:mm a').toUpperCase();
+
+                                                        return (
+                                                            <div key={msg.id} className={cn("flex w-full", isAdmin ? "justify-start" : "justify-end")}>
+                                                                <div className={cn("flex flex-col max-w-[85%]", isAdmin ? "items-start" : "items-end")}>
+
+                                                                    {/* 1. Message Bubble with Icon Inside */}
+                                                                    <div className={cn(
+                                                                        "p-3 px-4 rounded-3xl shadow-sm",
+                                                                        isAdmin
+                                                                            ? "bg-[#4d4ee2] text-white rounded-tl-none shadow-[#4d4ee2]/10"
+                                                                            : "bg-blue-600 text-white rounded-tr-none shadow-blue-600/10"
+                                                                    )}>
+                                                                        <div className="flex items-start gap-2">
+                                                                            {/* The Icon */}
+                                                                            <div className="mt-0.5 shrink-0 opacity-80">
+                                                                                {isAdmin ? (
+                                                                                    <ShieldCheck size={15} strokeWidth={2.5} />
+                                                                                ) : (
+                                                                                    <User size={15} strokeWidth={2.5} />
+                                                                                )}
+                                                                            </div>
+
+                                                                            {/* The Message Text */}
+                                                                            <div
+                                                                                className="text-[13px] font-medium leading-relaxed space-y-2 [&>p]:m-0 break-words"
+                                                                                dangerouslySetInnerHTML={{ __html: msg.msg }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* 2. Meta Line (Admin · Date) or (Date · You) */}
+                                                                    <div className={cn(
+                                                                        "flex items-center gap-1.5 mt-2 px-1 text-[10px] font-black uppercase tracking-widest",
+                                                                        isAdmin ? "text-indigo-600" : "text-gray-400"
+                                                                    )}>
+                                                                        {isAdmin ? (
+                                                                            <>
+                                                                                <span>Admin</span>
+                                                                                <span className="text-gray-400 opacity-60">·</span>
+                                                                                <span className="text-gray-400 font-bold">{formattedDate}</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <span className="text-gray-400 font-bold">{formattedDate}</span>
+                                                                                <span className="text-gray-400 opacity-60">·</span>
+                                                                                <span className="text-blue-600">You</span>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                                <span className="text-[10px] font-black text-gray-400 mt-2 mr-2 uppercase tracking-widest">
-                                                                    {format(new Date(msg.created_at), 'hh:mm a')}
-                                                                </span>
                                                             </div>
-                                                        </div>
-                                                    ))
+                                                        );
+                                                    })
                                                 ) : (
                                                     <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
                                                         <MessageSquare size={48} strokeWidth={1} className="mb-4" />

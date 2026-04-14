@@ -25,7 +25,7 @@ import useModalStore from '@/store/modalStore';
 
 // Quick Action Button Component
 const QuickActionButton = ({ icon: Icon, label, onClick, variant = 'primary' }: any) => {
-    const baseClass = "w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2";
+    const baseClass = "w-full px-3 py-3 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 flex flex-col sm:flex-row items-center justify-center gap-2 text-center";
     const variants: Record<string, string> = {
         primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md",
         outline: "border border-border bg-background hover:bg-accent hover:text-accent-foreground"
@@ -532,16 +532,16 @@ const VendorHome: React.FC = () => {
                     {/* Quick Actions */}
                     <div className="bg-card rounded-xl p-5 shadow-sm border">
                         <h3 className="font-semibold text-lg mb-4 text-foreground">Quick Actions</h3>
-                        <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
                             <QuickActionButton
                                 icon={Plus}
-                                label="Add New Product"
+                                label="Add Product"
                                 onClick={() => navigate('/vendor/dashboard/products/add')}
                                 variant="primary"
                             />
                             <QuickActionButton
                                 icon={FileText}
-                                label="Generate Report"
+                                label="Report"
                                 onClick={() => console.log('Generate Report')}
                                 variant="outline"
                             />
@@ -553,7 +553,7 @@ const VendorHome: React.FC = () => {
                             />
                             <QuickActionButton
                                 icon={Phone}
-                                label="Hotline Number"
+                                label="Hotline"
                                 onClick={() => setIsHotlineModalOpen(true)}
                                 variant="outline"
                             />
@@ -565,7 +565,7 @@ const VendorHome: React.FC = () => {
                             />
                             <QuickActionButton
                                 icon={TicketIcon}
-                                label="Support Ticket"
+                                label="Ticket"
                                 onClick={() => setIsTicketModalOpen(true)}
                                 variant="outline"
                             />
