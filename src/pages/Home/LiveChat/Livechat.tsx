@@ -5,8 +5,12 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bot, X } from 'lucide-react';
 import AIChatbot from './AIChatbot';
+import TicketModal from '@/components/shared/TicketModal';
+import HotlineModal from '@/components/shared/HotlineModal';
+import FAQModal from '@/components/shared/FAQModal';
 import { useAppStore } from '@/store/useAppStore';
 import useModalStore from '@/store/modalStore';
+import { Ticket as TicketIcon, HelpCircle, PhoneCall } from 'lucide-react';
 
 type Message = {
     id: number
@@ -21,7 +25,12 @@ interface LiveChatProps {
 export default function LiveChat({ showLegacy = true }: LiveChatProps) {
     const [t] = useTranslation("global");
     const [isOpen, setIsOpen] = useState(false)
-    const { isAIChatOpen, setIsAIChatOpen } = useModalStore();
+    const {
+        isAIChatOpen,
+        setIsAIChatOpen,
+        setIsTicketModalOpen,
+        openLoginModal
+    } = useModalStore();
     const { clearChatbotMessages } = useAppStore();
 
     // --- Optimized Session Cleanup Logic ---
@@ -140,27 +149,51 @@ export default function LiveChat({ showLegacy = true }: LiveChatProps) {
                 </div>
             </div>
 
-            {/* AI Chatbot Component */}
+            {/* Support Modals */}
             <AIChatbot isOpen={isAIChatOpen} onClose={() => setIsAIChatOpen(false)} />
+            <TicketModal />
+            <HotlineModal />
+            <FAQModal />
 
             {/* Original Floating Bar (Legacy Chat) */}
             {showLegacy && (
-                <div className="fixed top-[55%] -translate-y-1/2 right-0 z-40 h-auto rounded-l-full bg-white px-2  Py-3 shadow-lg hover:bg-gray-100 border-2 border-primary-light no-print">
+                <div className="fixed top-[65%] -translate-y-1/2 right-0 z-40 bg-white rounded-l-[2rem] shadow-2xl border-2 border-primary-light no-print hover:bg-gray-50 transition-all duration-300 group flex flex-col items-center py-4 px-6">
+                    {/* Upper Row: Chat Label */}
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="px-4 text-black-500 font-bold text-sm"
+                        className="mb-4 w-full bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-md"
                     >
                         {t("chat")}
                     </button>
-                    <div className="flex justify-center  space-x-2">
-                        <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer">
-                            <FontAwesomeIcon icon={faWhatsapp} className="h-7 w-7 text-green-600 hover:text-green-700" />
-                        </Link>
-                        <div className="border-l border-gray-300 h-8 mx-2" />
 
-                        <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer">
-                            <FontAwesomeIcon icon={faTelegram} className="h-7 w-7 text-blue-600 hover:text-blue-700" />
+                    {/* Lower Row: Icons in a single row */}
+                    <div className="flex items-center justify-center gap-5">
+                        <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform duration-300">
+                            <FontAwesomeIcon icon={faWhatsapp} className="h-6 w-6 text-green-600" />
                         </Link>
+
+                        <div className="h-6 w-[1px] bg-gray-200" />
+
+                        <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform duration-300">
+                            <FontAwesomeIcon icon={faTelegram} className="h-6 w-6 text-blue-600" />
+                        </Link>
+
+                        <div className="h-6 w-[1px] bg-gray-200" />
+
+                        <button
+                            onClick={() => {
+                                const hasToken = sessionStorage.getItem("student_session") || sessionStorage.getItem("vendor_session");
+                                if (hasToken) {
+                                    setIsTicketModalOpen(true);
+                                } else {
+                                    toast.info("Please login to create a support ticket");
+                                    openLoginModal();
+                                }
+                            }}
+                            className="hover:scale-125 transition-transform duration-300 flex items-center justify-center"
+                        >
+                            <TicketIcon className="h-5 w-5 text-[#4d4ee2]" />
+                        </button>
                     </div>
                 </div>
             )}

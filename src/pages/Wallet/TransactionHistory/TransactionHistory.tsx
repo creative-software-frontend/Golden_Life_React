@@ -147,10 +147,10 @@ export default function TransactionHistory() {
                                         <div className="flex items-start md:items-center gap-4 w-full md:w-auto">
                                             {/* Icon */}
                                             <div className={`flex items-center justify-center w-12 h-12 rounded-2xl shrink-0 transition-colors duration-300 ${isPositive
-                                                    ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'
-                                                    : isPurchase
-                                                        ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
-                                                        : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100'
+                                                ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'
+                                                : isPurchase
+                                                    ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-100'
+                                                    : 'bg-rose-50 text-rose-600 group-hover:bg-rose-100'
                                                 }`}>
                                                 {isPositive ? <ArrowDownLeft size={24} strokeWidth={2.5} /> : <ArrowUpRight size={24} strokeWidth={2.5} />}
                                             </div>

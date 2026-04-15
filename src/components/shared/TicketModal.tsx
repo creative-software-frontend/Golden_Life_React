@@ -401,8 +401,8 @@ const TicketModal = () => {
                                                     </div>
                                                 ) : details?.conversations.length ? (
                                                     details.conversations.map((msg) => {
-                                                        const isUserMsg = currentUserId > 0 ? Number(msg.user_id) === currentUserId : !!msg.user_id && Number(msg.user_id) !== 1;
-                                                        const isAdmin = !isUserMsg;
+                                                        const isAdmin = !msg.user_id || Number(msg.user_id) === 1;
+                                                        const isUserMsg = !isAdmin;
                                                         const formattedDate = format(new Date(msg.created_at), 'd.M.yyyy, hh:mm a').toUpperCase();
 
                                                         return (

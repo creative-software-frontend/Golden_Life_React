@@ -29,6 +29,9 @@ export default function HelpLayout() {
     const [categories, setCategories] = React.useState<any[]>([])
     const [isLoadingCategories, setIsLoadingCategories] = React.useState(true)
 
+    const isVendor = location.pathname.startsWith('/vendor');
+    const basePath = isVendor ? '/vendor/dashboard/help' : '/dashboard/help';
+
     const handleClear = () => setSearchTerm('')
 
     // --- BANNER LOGIC ---
@@ -36,12 +39,16 @@ export default function HelpLayout() {
         const titleStyle = "text-2xl md:text-4xl font-black tracking-tight drop-shadow-sm"
         // Updated paths to match /dashboard/help structure
         switch (location.pathname) {
-            case '/dashboard/help/our-story': return <h1 className={titleStyle}>{t("Hmenu.story")}</h1>;
-            case '/dashboard/help/career': return <h1 className={titleStyle}>{t("Hmenu.Career")}</h1>;
-            case '/dashboard/help/contact': return <h1 className={titleStyle}>{t("Hmenu.ContactUs")}</h1>;
-            case '/dashboard/help/privacy-policy': return <h1 className={titleStyle}>{t("Hmenu.PrivacyPolicy")}</h1>;
-            case '/dashboard/help/terms': return <h1 className={titleStyle}>{t("Hmenu.TermsofUse")}</h1>;
-            case '/dashboard/help/profile/settings': return <h1 className={titleStyle}>Profile Settings</h1>;
+            case `${basePath}/our-story`: return <h1 className={titleStyle}>{t("Hmenu.story")}</h1>;
+            case `${basePath}/career`: return <h1 className={titleStyle}>{t("Hmenu.Career")}</h1>;
+            case `${basePath}/contact`: return <h1 className={titleStyle}>{t("Hmenu.ContactUs")}</h1>;
+            case `${basePath}/privacy-policy`: return <h1 className={titleStyle}>{t("Hmenu.PrivacyPolicy")}</h1>;
+            case `${basePath}/terms`: return <h1 className={titleStyle}>{t("Hmenu.TermsofUse")}</h1>;
+            case `${basePath}/profile/settings`: return <h1 className={titleStyle}>Profile Settings</h1>;
+            case `${basePath}/faq`: return <h1 className={titleStyle}>Frequently Asked FAQ</h1>;
+            case `${basePath}/ticket`: return <h1 className={titleStyle}>Support Ticket</h1>;
+            case `${basePath}/hotline`: return <h1 className={titleStyle}>Hotline Support</h1>;
+            case `${basePath}/ai`: return <h1 className={titleStyle}>AI Support Agent</h1>;
             default: return <h1 className={titleStyle}>{t("Hmenu.WelcometoHelp")}</h1>;
         }
     }
@@ -86,24 +93,24 @@ export default function HelpLayout() {
                         </div>
                     </section>
 
-                    {/* Navigation Tabs */}
-                    <div className="sticky top-0 bg-white z-10 border-b border-gray-200">
-                        <div className="hidden sm:block">
-                            <nav className="-mb-px flex space-x-8 justify-center" aria-label="Tabs">
-                                <Link to="/dashboard/help/our-story" className={getTabClass("/dashboard/help/our-story")}>
-                                    {t("Hmenu.1")}
+                    {/* Navigation Tabs - Responsive with scrolling */}
+                    <div className="sticky top-0 bg-white z-20 border-b border-gray-200 shadow-sm">
+                        <div className="max-w-7xl mx-auto">
+                            <nav className="-mb-px flex space-x-6 md:space-x-12 justify-start md:justify-center overflow-x-auto px-6 py-2 no-scrollbar" aria-label="Tabs">
+                                <Link to={basePath} className={getTabClass(basePath)}>
+                                    Help Center
                                 </Link>
-                                <Link to="/dashboard/help" className={getTabClass("/dashboard/help")}>
-                                    {t("Hmenu.2")}
+                                <Link to={`${basePath}/ai`} className={getTabClass(`${basePath}/ai`)}>
+                                    Support AI
                                 </Link>
-                                <Link to="/dashboard/help/profile/settings" className={getTabClass("/dashboard/help/profile/settings")}>
-                                    Settings
+                                <Link to={`${basePath}/hotline`} className={getTabClass(`${basePath}/hotline`)}>
+                                    Hotline
                                 </Link>
-                                <Link to="/dashboard/help/contact" className={getTabClass("/dashboard/help/contact")}>
-                                    {t("Hmenu.4")}
+                                <Link to={`${basePath}/faq`} className={getTabClass(`${basePath}/faq`)}>
+                                    FAQ
                                 </Link>
-                                <Link to="/dashboard/help/privacy-policy" className={getTabClass("/dashboard/help/privacy-policy")}>
-                                    {t("Hmenu.5")}
+                                <Link to={`${basePath}/ticket`} className={getTabClass(`${basePath}/ticket`)}>
+                                    Ticket
                                 </Link>
                             </nav>
                         </div>

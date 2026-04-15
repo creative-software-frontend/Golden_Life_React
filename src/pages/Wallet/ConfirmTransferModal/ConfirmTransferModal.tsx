@@ -12,6 +12,8 @@ interface ConfirmTransferModalProps {
     receiver_type: string;
     affiliate_id: string;
     type: string;
+    chargePercentage?: number;
+    currentBalance: number;
 }
 
 export default function ConfirmTransferModal({
@@ -22,13 +24,18 @@ export default function ConfirmTransferModal({
     amount,
     receiver_type,
     affiliate_id,
-    type
+    type,
+    chargePercentage = 0,
+    currentBalance
 }: ConfirmTransferModalProps) {
     const { sendFunds } = useAppStore();
     const [pinCode, setPinCode] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     if (!isOpen) return null;
+
+    const chargeAmount = (Number(amount) || 0) * (Number(chargePercentage || 0) / 100);
+    const totalDeduction = (Number(amount) || 0) + chargeAmount;
 
     const handleTransfer = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,16 +49,17 @@ export default function ConfirmTransferModal({
 
         try {
             // 1. We only use the JSON payload now (Standard for Laravel APIs)
-            const payload = {
-                type: type || 'send',
-                amount: Number(amount),
-                receiver_type: receiver_type,
-                affiliate_id: affiliate_id,
-                pin_code: pinCode // Fixed: used 'pinCode' from state
-            };
+            const formData = new FormData();
+            formData.append('type', type || 'send');
+            formData.append('amount', String(amount));
+            formData.append('receiver_type', receiver_type);
+            formData.append('affiliate_id', affiliate_id);
+            formData.append('pin_code', pinCode);
+            // Inform backend of the charge to be deducted from the sender's wallet
+            formData.append('charge', String(chargeAmount.toFixed(2))); 
 
-            console.log("Submitting Transfer:", payload);
-            const result = await sendFunds(payload);
+            console.log("Submitting Transfer (FormData):", Object.fromEntries(formData.entries()));
+            const result = await sendFunds(formData);
             console.log("Full API Response:", result);
 
             // Prioritize message content over success flag (because backend is inconsistent)
@@ -98,12 +106,34 @@ export default function ConfirmTransferModal({
                     </button>
                 </div>
 
-                <div className="bg-muted/50 rounded-2xl p-5 mb-6 border border-border/50 text-center">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 flex items-center justify-center gap-1.5">
+                <div className="bg-muted/50 rounded-2xl p-5 mb-6 border border-border/50">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center justify-center gap-1.5">
                         Sending to <ArrowRight size={10} strokeWidth={4} /> <span className="text-secondary">{receiver_type}</span>
                     </p>
-                    <p className="text-md font-black text-foreground break-all mb-2">{affiliate_id}</p>
-                    <div className="text-3xl font-black text-foreground">৳{amount}</div>
+                    <p className="text-md font-black text-foreground break-all mb-4 text-center">{affiliate_id}</p>
+                    
+                    <div className="space-y-2.5 border-t border-border/50 pt-3">
+                        <div className="flex justify-between text-xs font-bold text-muted-foreground">
+                            <span>Current Balance:</span>
+                            <span>৳{(Number(currentBalance) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold text-muted-foreground border-t border-border/10 pt-2">
+                            <span>Amount to Send:</span>
+                            <span>৳{(Number(amount) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold text-secondary">
+                            <span>Fee ({chargePercentage}%):</span>
+                            <span>+ ৳{(Number(chargeAmount) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between pt-2 border-t border-border/50">
+                            <span className="text-sm font-black text-foreground">Total:</span>
+                            <span className="text-xl font-black text-foreground">৳{totalDeduction.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between pt-1.5 text-[10px] font-bold text-muted-foreground border-t border-dashed border-border/30 mt-1">
+                            <span>Remaining Balance:</span>
+                            <span>৳{Math.max(0, (Number(currentBalance) || 0) - (totalDeduction || 0)).toFixed(2)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <form onSubmit={handleTransfer} className="space-y-6">

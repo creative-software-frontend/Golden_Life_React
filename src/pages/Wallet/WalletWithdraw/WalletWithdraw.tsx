@@ -121,6 +121,8 @@ export default function WalletWithdraw() {
     const isWalletLoading = useAppStore(s => s.isWalletLoading);
     const fetchWallet = useAppStore(s => s.fetchWallet);
     const fetchHistory = useAppStore(s => s.fetchHistory);
+    const fetchCharges = useAppStore(s => s.fetchCharges);
+    const withdrawCharge = useAppStore(s => s.withdrawCharge);
 
     const getAuthToken = (): string | null => {
         const session = sessionStorage.getItem("student_session");
@@ -128,8 +130,11 @@ export default function WalletWithdraw() {
     };
 
     useEffect(() => {
-        fetchWallet();
-    }, [fetchWallet]);
+        fetchWallet(true);
+        fetchHistory(true);
+        fetchCharges();
+    }, []);
+
 
     useEffect(() => {
         if (activeTab === 'history') {
@@ -161,8 +166,12 @@ export default function WalletWithdraw() {
             toast.error(msg);
             return;
         }
-        if (Number(amount) > Number(walletBalanceValue)) {
-            const msg = "Insufficient funds.";
+        const chargePercent = parseFloat(String(withdrawCharge).replace(/[^0-9.-]/g, '')) || 0;
+        const chargeAmount = Number(amount) * (chargePercent / 100);
+        const totalDeduction = Number(amount) + chargeAmount;
+
+        if (totalDeduction > Number(walletBalanceValue)) {
+            const msg = `Insufficient funds! (Total including ${chargePercent}% fee: ৳${totalDeduction.toFixed(2)})`;
             setErrorMessage(msg);
             toast.error(msg);
             return;
@@ -228,6 +237,8 @@ export default function WalletWithdraw() {
                 amount={amount}
                 accountNumber={getFinalAccountDetails()}
                 paymentMethod={paymentMethod}
+                chargePercentage={parseFloat(String(withdrawCharge).replace(/[^0-9.-]/g, '')) || 0}
+                currentBalance={parseFloat(String(walletBalanceValue).replace(/[^0-9.-]/g, '')) || 0}
             />
             {/* --- Instruction Modal --- */}
             {showGuideModal && (
@@ -389,11 +400,12 @@ export default function WalletWithdraw() {
                         </div>
                         <div>
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
-                            {isWalletLoading ? (
+                            {isWalletLoading && walletBalanceValue === "0.00" ? (
                                 <div className="h-9 w-32 bg-slate-200 animate-pulse rounded-lg"></div>
                             ) : (
                                 <p className="text-3xl md:text-4xl font-bold text-slate-900">৳ {Number(walletBalanceValue).toFixed(2)}</p>
                             )}
+
                         </div>
                     </div>
                 </div>

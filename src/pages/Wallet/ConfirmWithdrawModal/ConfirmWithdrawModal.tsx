@@ -11,10 +11,12 @@ interface ConfirmWithdrawModalProps {
     amount: string;
     accountNumber: string;
     paymentMethod: string;
+    chargePercentage?: number;
+    currentBalance: number;
 }
 
 export default function ConfirmWithdrawModal({ 
-    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod
+    isOpen, onClose, onSuccess, onError, amount, accountNumber, paymentMethod, chargePercentage = 0, currentBalance
 }: ConfirmWithdrawModalProps) {
     const { withdrawFunds } = useAppStore();
     
@@ -22,6 +24,10 @@ export default function ConfirmWithdrawModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     if (!isOpen) return null;
+
+    const numAmount = parseFloat(amount) || 0;
+    const chargeAmount = numAmount * (Number(chargePercentage || 0) / 100);
+    const totalDeduction = numAmount + chargeAmount;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,12 +87,56 @@ export default function ConfirmWithdrawModal({
                 </div>
 
                 {/* Summary Card */}
-                <div className="bg-muted/40 rounded-xl p-4 text-center mb-6 border border-border/50">
-                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1 flex items-center justify-center gap-1.5">
-                        Withdrawing to <ArrowRight size={10} strokeWidth={3} /> <span className="text-foreground">{paymentMethod}</span>
-                    </p>
-                    <p className="text-lg font-black text-foreground mb-1 tracking-wide">{accountNumber}</p>
-                    <p className="text-3xl font-black text-secondary tracking-tight">৳{amount}</p>
+                <div className="bg-muted/40 rounded-xl p-4 mb-6 border border-border/50">
+                    <div className="flex flex-col items-center mb-4">
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-3 flex items-center justify-center gap-1.5">
+                            Withdrawing to <ArrowRight size={10} strokeWidth={3} /> <span className="text-secondary">{paymentMethod.toUpperCase()}</span>
+                        </p>
+                        
+                        {/* Gateway Logo */}
+                        <div className="mb-2">
+                            {['bkash', 'bikash'].includes(paymentMethod.toLowerCase()) && (
+                                <div className="p-2 bg-white rounded-xl shadow-sm border border-border/50">
+                                    <img src="/image/payment/bikash.png" alt="bKash" className="h-8 w-auto object-contain" />
+                                </div>
+                            )}
+                            {['nagad', 'nogod'].includes(paymentMethod.toLowerCase()) && (
+                                <div className="p-2 bg-white rounded-xl shadow-sm border border-border/50">
+                                    <img src="/image/payment/nogod.png" alt="Nagad" className="h-8 w-auto object-contain" />
+                                </div>
+                            )}
+                            {paymentMethod.toLowerCase() === 'rocket' && (
+                                <div className="p-2 bg-white rounded-xl shadow-sm border border-border/50">
+                                    <img src="/image/payment/rocket.jpg" alt="Rocket" className="h-8 w-auto object-contain" />
+                                </div>
+                            )}
+                        </div>
+                        
+                        <p className="text-xl font-black text-foreground tracking-tight">{accountNumber}</p>
+                    </div>
+                    
+                    <div className="space-y-2.5 border-t border-border/50 pt-4">
+                        <div className="flex justify-between text-[11px] font-bold text-muted-foreground">
+                            <span>Current Balance:</span>
+                            <span className="text-foreground">৳{(Number(currentBalance) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-[11px] font-bold text-muted-foreground border-t border-border/10 pt-2.5">
+                            <span>Requested:</span>
+                            <span className="text-foreground">৳{(Number(numAmount) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-[11px] font-bold text-amber-600">
+                            <span>Fee ({chargePercentage}%):</span>
+                            <span>+ ৳{(Number(chargeAmount) || 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between pt-3 border-t border-border/50 items-baseline">
+                            <span className="text-[11px] font-black uppercase text-foreground tracking-wider">Total to Deduct:</span>
+                            <span className="text-2xl font-black text-emerald-600">৳{totalDeduction.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between pt-2 text-[10px] font-bold text-muted-foreground border-t border-dashed border-border/30 mt-1">
+                            <span>Remaining Balance:</span>
+                            <span>৳{Math.max(0, (Number(currentBalance) || 0) - (totalDeduction || 0)).toFixed(2)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">

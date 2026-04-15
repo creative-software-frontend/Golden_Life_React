@@ -30,7 +30,9 @@ export default function WalletSend() {
         isWalletLoading: isLoadingBalance,
         fetchWallet,
         fetchHistory,
-        searchReceiver
+        searchReceiver,
+        sendMoneyCharge,
+        fetchCharges
     } = useAppStore();
 
     // --- Tabs State ---
@@ -53,13 +55,17 @@ export default function WalletSend() {
     const [showSetPinModal, setShowSetPinModal] = useState<boolean>(false);
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
-    const currentBalance = parseFloat(storeWalletBalance) || 0;
+    const storeSendMoneyCharge = useAppStore(s => s.sendMoneyCharge);
+    
+    const currentBalance = parseFloat(String(storeWalletBalance).replace(/[^0-9.-]/g, '')) || 0;
+    const chargePercent = parseFloat(String(storeSendMoneyCharge).replace(/[^0-9.-]/g, '')) || 0;
     const presetAmounts: number[] = [100, 500, 1000, 2000];
 
     useEffect(() => {
         fetchWallet();
         fetchHistory();
-    }, [fetchWallet, fetchHistory]);
+        fetchCharges();
+    }, [fetchWallet, fetchHistory, fetchCharges]);
 
     // --- 2. Verify User Using Store ---
     const handleVerifyUser = async () => {
@@ -144,21 +150,15 @@ export default function WalletSend() {
     const triggerPinConfirmation = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (Number(amount) <= 0) {
-            const msg = "Amount must be greater than 0.";
-            setErrorMessage(msg);
-            toast.error(msg);
-            return;
-        }
+        const chargeAmount = Number(amount) * (chargePercent / 100);
+        const totalDeduction = Number(amount) + chargeAmount;
 
-        if (Number(amount) > currentBalance) {
-            const msg = "Insufficient funds!";
+        if (totalDeduction > currentBalance) {
+            const msg = `Insufficient funds! (Total including ${chargePercent}% fee: ৳${totalDeduction.toFixed(2)})`;
             setErrorMessage(msg);
             toast.error(msg);
             return;
         }
-        // Capture the type here to be 100% sure
-        const finalType = verifiedUser?.type || receiverType;
 
         if (!verifiedUser) {
             const msg = "Please verify the receiver first.";
@@ -225,6 +225,8 @@ export default function WalletSend() {
 
                 affiliate_id={affiliateId}
                 type="send"
+                chargePercentage={chargePercent}
+                currentBalance={currentBalance}
             />
 
             {/* --- Main Page Header --- */}
@@ -495,7 +497,7 @@ export default function WalletSend() {
                                                     </div>
                                                     <div>
                                                         <p className="text-[15px] md:text-base font-bold text-foreground truncate">
-                                                            {isPositive ? '+' : '-'} ৳{Number(tx.amount).toFixed(2)}
+                                                            {isPositive ? '+' : '-'} ৳{Number(tx.amount || 0).toFixed(2)}
                                                         </p>
                                                         <p className="text-[10px] md:text-xs font-semibold text-muted-foreground uppercase mt-0.5">
                                                             {(tx.type || 'transaction').replace('_', ' ')}

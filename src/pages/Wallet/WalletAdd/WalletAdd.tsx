@@ -157,7 +157,7 @@ export default function WalletAdd() {
 
                 // 4. Update the Zustand Store (Silent fetch for balance so the UI doesn't flash)
                 await fetchWallet(true); // This updates the balance everywhere
-                
+
                 // If on history tab, refresh history too
                 if (activeTab === 'history') {
                     await fetchHistory();
@@ -416,7 +416,7 @@ export default function WalletAdd() {
                             {/* Attachment Section */}
                             <div className="space-y-4">
                                 <label className="text-sm font-bold text-slate-700">Attachment (Optional Proof Image)</label>
-                                <div 
+                                <div
                                     className={cn(
                                         "relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-3xl transition-all cursor-pointer group",
                                         attachment ? "border-secondary bg-secondary/5" : "border-slate-200 bg-slate-50 hover:bg-slate-100"
@@ -440,10 +440,10 @@ export default function WalletAdd() {
                                             <p className="text-[10px] text-slate-400 font-bold uppercase">JPG, PNG, PDF up to 5MB</p>
                                         </div>
                                     )}
-                                    <input 
+                                    <input
                                         id="wallet-add-attachment"
-                                        type="file" 
-                                        className="hidden" 
+                                        type="file"
+                                        className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) setAttachment(file);

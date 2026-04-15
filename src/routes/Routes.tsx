@@ -94,6 +94,15 @@ import VendorTransactions from "@/pages/Vendor/Wallet/VendorTransactions";
 
 
 
+// Help Pages
+import HelpLanding from "@/pages/Help/HelpLanding";
+import HotlinePage from "@/pages/Help/HotlinePage";
+import SupportTicketPage from "@/pages/Help/SupportTicketPage";
+import FAQPage from "@/pages/Help/FAQPage";
+import AISupportPage from "@/pages/Help/AISupportPage";
+
+
+
 export const routes = createBrowserRouter([
     // PUBLIC ROUTES (No Layout - Full Screen Pages)
     {
@@ -262,7 +271,24 @@ export const routes = createBrowserRouter([
                         children: [
                             {
                                 index: true, // Default view: /dashboard/help
-                                element: <Faq />
+                                element: <HelpLanding />
+                            },
+                            {
+                                path: 'faq',
+                                element: <FAQPage />
+                            },
+
+                            {
+                                path: 'ticket',
+                                element: <SupportTicketPage />
+                            },
+                            {
+                                path: 'hotline',
+                                element: <HotlinePage />
+                            },
+                            {
+                                path: 'ai',
+                                element: <AISupportPage />
                             },
                             {
                                 path: 'profile/settings', // Becomes /dashboard/help/profile/settings
@@ -367,6 +393,37 @@ export const routes = createBrowserRouter([
                             //     path: 'wallet/receiveHistory', // Renders at /vendor/dashboard/wallet/withdraw
                             //     element: <WalletReceiveHistory />
                             // },
+                            {
+                                path: 'help',
+                                element: <HelpLayout />,
+                                children: [
+                                    {
+                                        index: true,
+                                        element: <HelpLanding />
+                                    },
+                                    {
+                                        path: 'faq',
+                                        element: <FAQPage />
+                                    },
+
+                                    {
+                                        path: 'ticket',
+                                        element: <SupportTicketPage />
+                                    },
+                                    {
+                                        path: 'hotline',
+                                        element: <HotlinePage />
+                                    },
+                                    {
+                                        path: 'ai',
+                                        element: <AISupportPage />
+                                    },
+                                    {
+                                        path: 'contact',
+                                        element: <Contact />,
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]

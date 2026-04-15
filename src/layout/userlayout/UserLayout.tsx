@@ -88,7 +88,7 @@ const getAuthToken = () => {
 
 
 export default function UserLayout() {
-    const { walletUpdateTrigger } = useModalStore(); 
+    const { walletUpdateTrigger } = useModalStore();
     const [activeCategory, setActiveCategory] = React.useState("shopping");
     const [isMobileWalletOpen, setIsMobileWalletOpen] = React.useState(false)
     const { t, i18n } = useTranslation("global")
@@ -133,7 +133,7 @@ export default function UserLayout() {
             console.log("🚀 UserLayout: Initializing Student Panel Data...");
             await Promise.all([
                 fetchCategories(),
-                fetchProfile(), 
+                fetchProfile(),
                 fetchNavbarData(),
                 fetchOrders()
             ]);
@@ -142,7 +142,7 @@ export default function UserLayout() {
         loadInitialData();
 
         const interval = setInterval(() => {
-            fetchNavbarData(true); 
+            fetchNavbarData(true);
         }, 12000);
 
         return () => clearInterval(interval);

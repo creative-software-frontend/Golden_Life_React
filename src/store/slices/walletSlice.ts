@@ -27,12 +27,17 @@ export interface WalletSlice {
     withdrawFunds: (formData: FormData) => Promise<{ success: boolean; message: string }>;
     setPin: (pinCode: string) => Promise<{ success: boolean; message: string }>;
     searchReceiver: (key: string) => Promise<{ success: boolean; data?: any; message?: string }>;
-    sendFunds: (formData: FormData) => Promise<{ success: boolean; message: string }>;
+    sendFunds: (payload: any) => Promise<{ success: boolean; message: string }>;
+    sendMoneyCharge: string;
+    withdrawCharge: string;
+    fetchCharges: () => Promise<void>;
 }
 
 export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set, get) => ({
     walletBalance: "0.00",
     transactions: [],
+    sendMoneyCharge: "0.00",
+    withdrawCharge: "0.00",
 
     fetchWallet: async (silent = false) => {
         // Guard: If we're already loading or already have data (and not a silent refresh), skip.
@@ -183,19 +188,14 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
         }
     },
 
-    sendFunds: async (payload: any) => { // 'payload' is the object from your Modal
+    sendFunds: async (formData: FormData) => {
         const token = getAuthToken();
         if (!token) return { success: false, message: "Authentication required" };
 
         try {
-            // Log this to your browser console to verify one last time
-            console.log("Final Payload leaving the Store:", payload);
-
-            const { data } = await axios.post(`${baseURL}/api/send-money`, payload, {
+            const { data } = await axios.post(`${baseURL}/api/send-money`, formData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json', // Force JSON
-                    'Accept': 'application/json'        // Tell Laravel to respond in JSON
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -214,6 +214,27 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
                 || "Server Error";
 
             return { success: false, message: backendMessage };
+        }
+    },
+
+    fetchCharges: async () => {
+        const token = getAuthToken();
+        try {
+            const [sendRes, withdrawRes] = await Promise.all([
+                axios.get(`${baseURL}/api/sendMoney_charge`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
+                }),
+                axios.get(`${baseURL}/api/withdraw_charge`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {}
+                })
+            ]);
+
+            set({
+                sendMoneyCharge: sendRes.data?.data || "0.00",
+                withdrawCharge: withdrawRes.data?.data || "0.00"
+            });
+        } catch (error) {
+            console.error("Fetch Charges Error:", error);
         }
     }
 });

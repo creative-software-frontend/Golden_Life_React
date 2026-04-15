@@ -83,6 +83,8 @@ export default function VendorWithdraw() {
         transactions: storeTransactions, 
         fetchNavbarData, 
         fetchHistory,
+        fetchCharges,
+        withdrawCharge,
         isWalletLoading: isLoadingStore 
     } = useAppStore();
 
@@ -124,6 +126,7 @@ export default function VendorWithdraw() {
 
     useEffect(() => {
         fetchNavbarData(true);
+        fetchCharges();
     }, [baseURL]);
 
     useEffect(() => {
@@ -161,8 +164,12 @@ export default function VendorWithdraw() {
             toast.error(msg);
             return;
         }
-        if (Number(amount) > currentBalance) {
-            const msg = "Insufficient funds.";
+        const chargePercent = parseFloat(String(withdrawCharge).replace(/[^0-9.-]/g, '')) || 0;
+        const chargeAmount = Number(amount) * (chargePercent / 100);
+        const totalDeduction = Number(amount) + chargeAmount;
+
+        if (totalDeduction > currentBalance) {
+            const msg = `Insufficient funds! (Total including ${chargePercent}% fee: ৳${totalDeduction.toFixed(2)})`;
             setErrorMessage(msg);
             toast.error(msg);
             return;
@@ -240,6 +247,8 @@ export default function VendorWithdraw() {
                 amount={amount}
                 accountNumber={getFinalAccountDetails()}
                 paymentMethod={paymentMethod}
+                chargePercentage={parseFloat(String(withdrawCharge).replace(/[^0-9.-]/g, '')) || 0}
+                currentBalance={currentBalance}
             />
             {/* --- Instruction Modal --- */}
             {showGuideModal && (
