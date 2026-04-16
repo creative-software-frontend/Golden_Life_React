@@ -123,16 +123,16 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
     const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
 
     return (
-        <div className="relative h-60 flex flex-col gap-6">
-            <div className="flex gap-4 flex-1">
+        <div className="relative h-auto sm:h-60 flex flex-col gap-6">
+            <div className="flex gap-2 sm:gap-4 flex-1">
                 {/* Y-Axis Labeling */}
-                <div className="flex flex-col justify-between text-[9px] text-muted-foreground pb-12 pt-1 w-12 border-r border-border/50 pr-2 select-none">
+                <div className="flex flex-col justify-between text-[9px] text-muted-foreground pb-12 pt-1 w-10 sm:w-12 border-r border-border/50 pr-2 select-none">
                     <span className="font-bold text-right">{formatBDT(displayMax, { compact: true })}</span>
                     <span className="font-bold text-right text-primary/40">{formatBDT(displayMax / 2, { compact: true })}</span>
                     <span className="font-bold text-right">0</span>
                 </div>
 
-                <div className="flex-1 relative group/chart">
+                <div className="flex-1 relative group/chart min-h-[160px]">
                     {/* SVG Wave Graph */}
                     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-40 overflow-visible" preserveAspectRatio="none">
                         <defs>
@@ -146,8 +146,9 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
                         {data.highest > 0 && (
                             <line
                                 x1="0" y1={getY(data.highest)} x2={width} y2={getY(data.highest)}
-                                className="stroke-primary/40 stroke-[2] stroke-dash transition-all duration-700"
+                                className="stroke-primary/40 stroke-[1.5] sm:stroke-[2] stroke-dash transition-all duration-700"
                                 strokeDasharray="6 6"
+                                style={{ vectorEffect: 'non-scaling-stroke' }}
                             />
                         )}
 
@@ -159,7 +160,8 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
                             d={pathD}
                             fill="none"
                             stroke="hsl(var(--primary))"
-                            strokeWidth="4"
+                            strokeWidth="3"
+                            style={{ vectorEffect: 'non-scaling-stroke' }}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             className="transition-all duration-1000 ease-out drop-shadow-xl"
@@ -211,17 +213,25 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
 
                     {/* X-Axis Data Labels */}
                     <div className="flex justify-between mt-6 px-1">
-                        {performance.map((p: any, idx: number) => (
-                            <span
-                                key={idx}
-                                className={cn(
-                                    "text-[10px] font-black uppercase tracking-tighter transition-all duration-500 w-16 text-center select-none",
-                                    hoveredIdx === idx ? "text-primary scale-150 rotate-[-5deg]" : "text-muted-foreground/40"
-                                )}
-                            >
-                                {p.date_label}
-                            </span>
-                        ))}
+                        {performance.map((p: any, idx: number) => {
+                            // Show fewer labels on mobile to prevent overlapping
+                            const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+                            const showLabel = !isMobile || performance.length <= 5 || idx === 0 || idx === performance.length - 1 || idx === Math.floor(performance.length / 2);
+
+                            if (!showLabel) return <div key={idx} className="flex-1" />;
+
+                            return (
+                                <span
+                                    key={idx}
+                                    className={cn(
+                                        "text-[9px] sm:text-[10px] font-black uppercase tracking-tighter transition-all duration-500 flex-1 text-center select-none",
+                                        hoveredIdx === idx ? "text-primary scale-125 sm:scale-150 rotate-[-5deg]" : "text-muted-foreground/40"
+                                    )}
+                                >
+                                    {p.date_label}
+                                </span>
+                            );
+                        })}
                     </div>
 
                     {/* Subtle Grid Background */}
@@ -233,15 +243,19 @@ const SalesChart = ({ chartData, timeframe }: { chartData: any, timeframe: strin
             </div>
 
             {/* High/Low Status Badges */}
-            <div className="flex justify-between px-4 text-[10px] font-black uppercase tracking-[0.15em] py-3 rounded-2xl bg-gradient-to-r from-muted/50 to-muted/20 border border-border/50">
-                <div className="flex items-center gap-3">
-                    <div className="w-5 h-1 bg-primary/40 rounded-full" />
-                    <span className="text-muted-foreground">Highest Sale</span>
+            <div className="flex flex-col sm:flex-row justify-between px-4 text-[10px] font-black uppercase tracking-[0.15em] py-3 rounded-2xl bg-gradient-to-r from-muted/50 to-muted/20 border border-border/50 gap-3 sm:gap-0">
+                <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-5 h-1 bg-primary/40 rounded-full" />
+                        <span className="text-muted-foreground">Highest Sale</span>
+                    </div>
                     <span className="text-primary text-xs tracking-tighter">{formatBDT(data.highest || highestVal)}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="w-5 h-1 bg-slate-500/40 rounded-full" />
-                    <span className="text-muted-foreground">Lowest Sale</span>
+                <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                    <div className="flex items-center gap-3">
+                        <div className="w-5 h-1 bg-slate-500/40 rounded-full" />
+                        <span className="text-muted-foreground">Lowest Sale</span>
+                    </div>
                     <span className="text-foreground text-xs tracking-tighter">{formatBDT(data.lowest || lowestVal)}</span>
                 </div>
             </div>

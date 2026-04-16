@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import CustomSelect from '@/components/shared/CustomSelect';
 import {
     Ticket as TicketIcon,
     X,
@@ -12,7 +13,8 @@ import {
     Image as ImageIcon,
     Loader2,
     ShieldCheck,
-    User
+    User,
+    ChevronDown
 } from 'lucide-react';
 import useModalStore from '@/store/modalStore';
 import { useTickets, useCreateTicket, useSendMessage, useTicketDetails, Ticket } from '@/hooks/useTickets';
@@ -30,6 +32,7 @@ const TicketModal = () => {
     const [message, setMessage] = useState('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [activeMobileTab, setActiveMobileTab] = useState('details'); // 'details' or 'chat'
 
     const currentUserId = useAppStore(state => state.studentProfile?.id || state.vendorProfile?.user?.id || 0);
 
@@ -180,71 +183,118 @@ const TicketModal = () => {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
-                                    className="p-6"
+                                    className="p-4 md:p-6"
                                 >
                                     {isLoading ? (
-                                        <div className="space-y-3">
-                                            {[1, 2, 3, 4].map(n => <div key={n} className="h-12 bg-white rounded-xl animate-pulse shadow-sm" />)}
+                                        /* Enhanced Responsive Skeleton */
+                                        <div className="space-y-4">
+                                            {[1, 2, 3, 4].map(n => (
+                                                <div key={n} className="h-20 md:h-12 bg-white rounded-2xl md:rounded-xl animate-pulse shadow-sm border border-gray-100" />
+                                            ))}
                                         </div>
                                     ) : tickets?.length ? (
-                                        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                                            <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 pb-2">
-                                                <table className="w-full text-left border-collapse min-w-[600px]">
-                                                    <thead>
-                                                        <tr className="bg-gray-50/50 border-b border-gray-100">
-                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Ticket ID</th>
-                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Subject</th>
-                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Priority</th>
-                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Status</th>
-                                                            <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">Date</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-gray-50">
-                                                        {tickets.map((ticket) => (
-                                                            <tr
-                                                                key={ticket.id}
-                                                                onClick={() => {
-                                                                    setSelectedTicket(ticket);
-                                                                    setViewMode('chat');
-                                                                }}
-                                                                className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
-                                                            >
-                                                                <td className="px-6 py-4">
-                                                                    <span className="text-xs font-black text-blue-600">#{ticket.id}</span>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <span className="text-sm font-bold text-[#1a2b3b] group-hover:text-blue-600 transition-colors line-clamp-1">
-                                                                        {ticket.subject}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <div className={cn("w-1.5 h-1.5 rounded-full",
-                                                                            ticket.priority.toLowerCase() === 'high' ? 'bg-red-500' :
-                                                                                ticket.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
-                                                                        )} />
-                                                                        <span className={cn("text-[11px] font-bold uppercase", getPriorityColor(ticket.priority))}>
-                                                                            {ticket.priority}
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-4">
-                                                                    <span className={cn("inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight", getStatusColor(ticket.status))}>
-                                                                        {ticket.status}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-6 py-4 text-right">
-                                                                    <span className="text-[11px] font-bold text-gray-400 font-mono">
-                                                                        {format(new Date(ticket.created_at), 'd.M.yyyy')}
-                                                                    </span>
-                                                                </td>
+                                        <div className="space-y-4">
+                                            {/* --- DESKTOP VIEW (Table) --- */}
+                                            <div className="hidden md:block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                                                <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
+                                                    <table className="w-full text-left border-collapse min-w-[600px]">
+                                                        <thead>
+                                                            <tr className="bg-gray-50/50 border-b border-gray-100">
+                                                                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Ticket ID</th>
+                                                                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Subject</th>
+                                                                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Priority</th>
+                                                                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500">Status</th>
+                                                                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">Date</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-50">
+                                                            {tickets.map((ticket) => (
+                                                                <tr
+                                                                    key={ticket.id}
+                                                                    onClick={() => {
+                                                                        setSelectedTicket(ticket);
+                                                                        setViewMode('chat');
+                                                                    }}
+                                                                    className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
+                                                                >
+                                                                    <td className="px-6 py-4">
+                                                                        <span className="text-xs font-black text-blue-600">#{ticket.id}</span>
+                                                                    </td>
+                                                                    <td className="px-6 py-4">
+                                                                        <span className="text-sm font-bold text-[#1a2b3b] group-hover:text-blue-600 transition-colors line-clamp-1">
+                                                                            {ticket.subject}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-4">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <div className={cn("w-1.5 h-1.5 rounded-full",
+                                                                                ticket.priority.toLowerCase() === 'high' ? 'bg-red-500' :
+                                                                                    ticket.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                                                                            )} />
+                                                                            <span className={cn("text-[11px] font-bold uppercase", getPriorityColor(ticket.priority))}>
+                                                                                {ticket.priority}
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="px-6 py-4">
+                                                                        <span className={cn("inline-flex px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight", getStatusColor(ticket.status))}>
+                                                                            {ticket.status}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-4 text-right">
+                                                                        <span className="text-[11px] font-bold text-gray-400 font-mono">
+                                                                            {format(new Date(ticket.created_at), 'd.M.yyyy')}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            {/* --- MOBILE VIEW (Cards) --- */}
+                                            <div className="grid grid-cols-1 gap-3 md:hidden">
+                                                {tickets.map((ticket) => (
+                                                    <div
+                                                        key={ticket.id}
+                                                        onClick={() => {
+                                                            setSelectedTicket(ticket);
+                                                            setViewMode('chat');
+                                                        }}
+                                                        className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm active:scale-[0.98] transition-all"
+                                                    >
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">#{ticket.id}</span>
+                                                            <span className="text-[10px] font-bold text-gray-400 font-mono">
+                                                                {format(new Date(ticket.created_at), 'd.M.yyyy')}
+                                                            </span>
+                                                        </div>
+
+                                                        <h4 className="text-sm font-bold text-[#1a2b3b] mb-4 line-clamp-2 leading-snug">
+                                                            {ticket.subject}
+                                                        </h4>
+
+                                                        <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <div className={cn("w-1.5 h-1.5 rounded-full",
+                                                                    ticket.priority.toLowerCase() === 'high' ? 'bg-red-500' :
+                                                                        ticket.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                                                                )} />
+                                                                <span className={cn("text-[10px] font-black uppercase tracking-wider", getPriorityColor(ticket.priority))}>
+                                                                    {ticket.priority}
+                                                                </span>
+                                                            </div>
+                                                            <span className={cn("px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight", getStatusColor(ticket.status))}>
+                                                                {ticket.status}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     ) : (
+                                        /* Empty State */
                                         <div className="h-64 flex flex-col items-center justify-center text-gray-400 opacity-60">
                                             <TicketIcon size={48} strokeWidth={1} className="mb-4" />
                                             <p className="font-bold">No tickets found</p>
@@ -259,44 +309,66 @@ const TicketModal = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="p-8"
+                                    className="p-5 sm:p-8"
                                 >
-                                    <form onSubmit={handleCreateTicket} className="space-y-5">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-gray-500 uppercase ml-1">Department</label>
-                                                <select name="department" required className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium text-sm">
-                                                    <option value="IT Support">IT Support</option>
-                                                    <option value="Billing">Billing</option>
-                                                    <option value="General">General</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-gray-500 uppercase ml-1">Priority</label>
-                                                <select name="priority" required className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium text-sm">
-                                                    <option value="Low">Low</option>
-                                                    <option value="Medium">Medium</option>
-                                                    <option value="High">High</option>
-                                                </select>
-                                            </div>
+                                    <form onSubmit={handleCreateTicket} className="space-y-4 sm:space-y-5 px-1 sm:px-0 pb-12 sm:pb-0">
+
+                                        {/* Dropdowns */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <CustomSelect
+                                                label="Department"
+                                                name="department"
+                                                options={["IT Support", "Billing", "General", "Sales", "HR"]}
+                                                defaultValue="IT Support"
+                                            />
+
+                                            <CustomSelect
+                                                label="Priority"
+                                                name="priority"
+                                                options={["Low", "Medium", "High", "Urgent"]}
+                                                defaultValue="Low"
+                                            />
                                         </div>
 
+                                        {/* Subject */}
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Subject</label>
-                                            <input name="subject" required type="text" placeholder="Explain briefly..." className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium text-sm" />
+                                            <input
+                                                name="subject"
+                                                required
+                                                type="text"
+                                                autoComplete="off" // Add this if you want to disable browser's native autocomplete popups
+                                                placeholder="Explain briefly..."
+                                                className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-sm"
+                                            />
                                         </div>
 
+                                        {/* Related Service */}
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Related Service</label>
-                                            <input name="related_service" required type="text" placeholder="e.g. Software Installation" className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium text-sm" />
+                                            <input
+                                                name="related_service"
+                                                required
+                                                type="text"
+                                                placeholder="e.g. Software Installation"
+                                                className="w-full h-12 px-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-sm"
+                                            />
                                         </div>
 
+                                        {/* Description */}
                                         <div className="space-y-1.5">
                                             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Description</label>
-                                            <textarea name="description" required rows={4} placeholder="Describe your issue in detail..." className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all font-medium text-sm resize-none"></textarea>
+                                            <textarea
+                                                name="description"
+                                                required
+                                                rows={4}
+                                                placeholder="Describe your issue in detail..."
+                                                className="w-full p-4 bg-white rounded-xl border border-gray-200 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-sm resize-none min-h-[100px]"
+                                            ></textarea>
                                         </div>
 
-                                        <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                                        {/* Actions */}
+                                        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                                             <div className="relative">
                                                 <input
                                                     type="file"
@@ -307,22 +379,32 @@ const TicketModal = () => {
                                                 />
                                                 <label
                                                     htmlFor="ticket-image"
-                                                    className="flex items-center gap-2 group cursor-pointer"
+                                                    className="flex items-center gap-3 group cursor-pointer w-full justify-center sm:justify-start"
                                                 >
-                                                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                                                    <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all shrink-0">
                                                         <ImageIcon size={20} />
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600 transition-all max-w-[150px] truncate">
-                                                        {selectedImage ? selectedImage.name : 'Attach Image'}
-                                                    </span>
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-sm font-bold text-gray-700 group-hover:text-blue-600 transition-all">
+                                                            {selectedImage ? 'Image Selected' : 'Attach Image'}
+                                                        </span>
+                                                        <span className="text-[10px] font-medium text-gray-400 truncate max-w-[150px]">
+                                                            {selectedImage ? selectedImage.name : 'Max size 5MB'}
+                                                        </span>
+                                                    </div>
                                                 </label>
                                             </div>
+
                                             <button
-                                                disabled={createMutation.isPending}
+                                                disabled={createMutation?.isPending}
                                                 type="submit"
-                                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 disabled:opacity-50 transition-all shadow-lg shadow-blue-600/20"
+                                                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                                             >
-                                                {createMutation.isPending && <Loader2 className="animate-spin" size={18} />}
+                                                {createMutation?.isPending ? (
+                                                    <Loader2 className="animate-spin" size={18} />
+                                                ) : (
+                                                    <Plus size={18} strokeWidth={3} />
+                                                )}
                                                 Create Ticket
                                             </button>
                                         </div>
@@ -359,9 +441,35 @@ const TicketModal = () => {
                                         </div>
                                     </div>
 
+                                    {/* Mobile Tab Switcher - Only visible on small screens */}
+                                    <div className="flex md:hidden border-b border-gray-100 bg-white shrink-0">
+                                        <button
+                                            onClick={() => setActiveMobileTab('details')}
+                                            className={cn(
+                                                "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors",
+                                                activeMobileTab === 'details' ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"
+                                            )}
+                                        >
+                                            Details
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveMobileTab('chat')}
+                                            className={cn(
+                                                "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-colors",
+                                                activeMobileTab === 'chat' ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400"
+                                            )}
+                                        >
+                                            Chat
+                                        </button>
+                                    </div>
+
                                     <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
                                         {/* Left Panel: Original Ticket Info & Image */}
-                                        <div className="w-full md:w-[35%] lg:w-[40%] max-h-[40vh] md:max-h-none md:h-full border-b md:border-b-0 md:border-r border-gray-100 bg-white overflow-y-auto shrink-0 scrollbar-none">
+                                        {/* Logic: Hidden on mobile unless 'details' tab is active; Always block on md+ */}
+                                        <div className={cn(
+                                            "w-full md:w-[35%] lg:w-[40%] max-h-none md:h-full border-b md:border-b-0 md:border-r border-gray-100 bg-white overflow-y-auto shrink-0 scrollbar-none",
+                                            activeMobileTab === 'details' ? "block" : "hidden md:block"
+                                        )}>
                                             <div className="p-4 md:p-6 flex flex-col">
                                                 <div className="flex items-center gap-3 mb-6">
                                                     <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
@@ -393,7 +501,11 @@ const TicketModal = () => {
                                         </div>
 
                                         {/* Right Panel: Chat Messages & Input */}
-                                        <div className="flex-1 flex flex-col min-h-0 bg-white">
+                                        {/* Logic: Hidden on mobile unless 'chat' tab is active; Always flex on md+ */}
+                                        <div className={cn(
+                                            "flex-1 flex flex-col min-h-0 bg-white",
+                                            activeMobileTab === 'chat' ? "flex" : "hidden md:flex"
+                                        )}>
                                             <div className="flex-1 p-6 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
                                                 {isLoadingDetails ? (
                                                     <div className="flex justify-center py-4">
@@ -402,14 +514,11 @@ const TicketModal = () => {
                                                 ) : details?.conversations.length ? (
                                                     details.conversations.map((msg) => {
                                                         const isAdmin = !msg.user_id || Number(msg.user_id) === 1;
-                                                        const isUserMsg = !isAdmin;
                                                         const formattedDate = format(new Date(msg.created_at), 'd.M.yyyy, hh:mm a').toUpperCase();
 
                                                         return (
                                                             <div key={msg.id} className={cn("flex w-full", isAdmin ? "justify-start" : "justify-end")}>
                                                                 <div className={cn("flex flex-col max-w-[85%]", isAdmin ? "items-start" : "items-end")}>
-
-                                                                    {/* 1. Message Bubble with Icon Inside */}
                                                                     <div className={cn(
                                                                         "p-3 px-4 rounded-3xl shadow-sm",
                                                                         isAdmin
@@ -417,24 +526,15 @@ const TicketModal = () => {
                                                                             : "bg-blue-600 text-white rounded-tr-none shadow-blue-600/10"
                                                                     )}>
                                                                         <div className="flex items-start gap-2">
-                                                                            {/* The Icon */}
                                                                             <div className="mt-0.5 shrink-0 opacity-80">
-                                                                                {isAdmin ? (
-                                                                                    <ShieldCheck size={15} strokeWidth={2.5} />
-                                                                                ) : (
-                                                                                    <User size={15} strokeWidth={2.5} />
-                                                                                )}
+                                                                                {isAdmin ? <ShieldCheck size={15} strokeWidth={2.5} /> : <User size={15} strokeWidth={2.5} />}
                                                                             </div>
-
-                                                                            {/* The Message Text */}
                                                                             <div
                                                                                 className="text-[13px] font-medium leading-relaxed space-y-2 [&>p]:m-0 break-words"
                                                                                 dangerouslySetInnerHTML={{ __html: msg.msg }}
                                                                             />
                                                                         </div>
                                                                     </div>
-
-                                                                    {/* 2. Meta Line (Admin · Date) or (Date · You) */}
                                                                     <div className={cn(
                                                                         "flex items-center gap-1.5 mt-2 px-1 text-[10px] font-black uppercase tracking-widest",
                                                                         isAdmin ? "text-indigo-600" : "text-gray-400"

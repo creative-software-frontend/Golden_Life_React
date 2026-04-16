@@ -7,6 +7,7 @@ import { useVendorOtp } from './hooks/useVendorOtp';
 import MobileOTPTab from './components/MobileOTPTab';
 import EmailPasswordTab from './components/EmailPasswordTab';
 import VendorForgotPasswordModal from './components/VendorForgotPasswordModal';
+import { ArrowLeft } from 'lucide-react';
 
 type ActiveTab = 'mobile' | 'email';
 
@@ -129,9 +130,12 @@ const VendorLoginNew: React.FC = () => {
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col items-center mt-8 md:mt-12 mb-8 px-4">
-      {/* Logo */}
+
+
       <div className="mb-8 transform scale-125 md:scale-150 origin-bottom">
-        <Logo />
+        <Link to="/">
+          <Logo />
+        </Link>
       </div>
 
       {/* Main Card */}
@@ -150,11 +154,10 @@ const VendorLoginNew: React.FC = () => {
               setActiveTab('mobile');
               setError(null);
             }}
-            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${
-              activeTab === 'mobile'
-                ? 'bg-black text-white shadow-md'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'mobile'
+              ? 'bg-black text-white shadow-md'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Mobile (OTP)
           </button>
@@ -164,11 +167,10 @@ const VendorLoginNew: React.FC = () => {
               setActiveTab('email');
               setError(null);
             }}
-            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${
-              activeTab === 'email'
-                ? 'bg-black text-white shadow-md'
-                : 'text-gray-500 hover:text-gray-800'
-            }`}
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'email'
+              ? 'bg-black text-white shadow-md'
+              : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Email (Password)
           </button>
@@ -182,7 +184,7 @@ const VendorLoginNew: React.FC = () => {
               onVerifyOtp={handleVerifyOtp}
               isLoading={isLoading}
               error={error}
-              onSuccess={() => {}} 
+              onSuccess={() => { }}
             />
           ) : (
             <EmailPasswordTab
@@ -203,8 +205,25 @@ const VendorLoginNew: React.FC = () => {
               Apply Now
             </Link>
           </p>
+          <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
+            <Link
+              to="/instructor/login"
+              className="group flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow"
+            >
+              <span>Are you a instructor ?</span>
+              <span className="text-[#FF8A00] font-bold">instructor here</span>
+              <svg
+                className="w-4 h-4 text-[#FF8A00] transform group-hover:translate-x-1 transition-transform duration-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
 
-          
+
         </div>
       </div>
 

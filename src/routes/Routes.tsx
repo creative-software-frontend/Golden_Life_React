@@ -60,6 +60,9 @@ import VendorHome from "@/pages/VendorHome/VendorHome";
 import VendorProtectedRoute from "@/components/ProtectedRoute/VendorProtectedRoute";
 import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 import VendorInfo from "@/pages/Home/VendorInfo/VendorInfo";
+import InstructorLogin from "@/pages/common/Instructor/InstructorLogin";
+import InstructorRegister from "@/pages/common/Instructor/InstructorRegister";
+
 
 // Vendor Profile
 import VendorProfile from "@/pages/Vendor/Profile/index";
@@ -142,6 +145,15 @@ export const routes = createBrowserRouter([
         path: '/vendor/register',
         element: <VendorRegister />,
     },
+    {
+        path: '/instructor/login',
+        element: <InstructorLogin />,
+    },
+    {
+        path: '/instructor/register',
+        element: <InstructorRegister />,
+    },
+
     {
         path: '/',
         // REMOVE 'element: <LandingLayout/>' from here to stop it applying to everything

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Package, User, Phone, MapPin, Printer, Check, CreditCard, Receipt, Mail } from 'lucide-react';
+import { ArrowLeft, Package, User, Phone, MapPin, Printer, Check, CreditCard, Receipt, Mail, Calendar } from 'lucide-react';
 import { useOrders } from './hooks/useOrders';
 import { Order, OrderStatus } from './types/order.types';
 import { OrderStatusBadge } from './components/OrderStatusBadge';
@@ -199,21 +199,24 @@ export default function OrderDetails() {
         baseURL="https://api.goldenlife.my"
       />
 
-      <div className="screen-only">
-        <Button onClick={() => navigate('/vendor/dashboard/orders')} variant="outline" className="gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to Orders
+      <div className="screen-only flex items-center justify-between">
+        <Button onClick={() => navigate('/vendor/dashboard/orders')} variant="outline" className="gap-2 h-10 px-4 rounded-xl font-bold border-gray-200 hover:bg-gray-50 transition-all">
+          <ArrowLeft className="w-4 h-4" /> Back
         </Button>
       </div>
 
-      <div className="screen-only flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mt-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">Order #{order.order_no}</h1>
+      <div className="screen-only flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mt-4">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Order #{order.order_no}</h1>
             <OrderStatusBadge status={order.status} />
           </div>
-          <p className="text-gray-500 mt-1">{formatDate(order.created_at)}</p>
+          <p className="text-gray-500 text-sm font-medium flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            {formatDate(order.created_at)}
+          </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Button 
             onClick={() => {
               if (order) {
@@ -233,88 +236,97 @@ export default function OrderDetails() {
               }
             }} 
             variant="outline" 
-            className="gap-2"
+            className="flex-1 sm:flex-none gap-2 h-11 px-6 font-bold"
           >
-            <Printer className="w-4 h-4" /> PRINT RECEIPT
+            <Printer className="w-4 h-4" /> PRINT
           </Button>
-          <Button onClick={() => setIsStatusModalOpen(true)} className="bg-primary-light hover:bg-primary-light/90 text-white">
+          <Button 
+            onClick={() => setIsStatusModalOpen(true)} 
+            className="flex-1 sm:flex-none bg-primary-light hover:bg-primary-light/90 text-white h-11 px-6 font-bold shadow-lg shadow-primary-light/20"
+          >
             Update Status
           </Button>
         </div>
       </div>
 
       {/* Order Progress Timeline */}
-      <div className="screen-only bg-white rounded-xl border p-6 overflow-x-auto custom-scrollbar">
-        <h3 className="font-semibold text-lg mb-6 text-gray-900 uppercase tracking-tight">ORDER PROGRESS</h3>
-        <div className="flex items-center min-w-[1100px] md:min-w-[1200px] gap-2">
-          {progressSteps.map((step, index) => {
-            const isCompleted = index < currentStepIndex || order.status === step;
-            const isActive = index === currentStepIndex;
-            return (
-              <div key={step} className="flex-1 flex items-center">
-                <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 flex-shrink-0 ${isActive
-                    ? 'bg-primary-light text-white shadow-lg scale-110'
-                    : isCompleted
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-200 text-gray-500'
-                    }`}
-                >
-                  {isCompleted ? <Check className="w-5 h-5" /> : <span className="font-semibold">{index + 1}</span>}
+      <div className="screen-only bg-white rounded-2xl border border-gray-100 p-5 sm:p-7 shadow-sm">
+        <h3 className="font-black text-xs sm:text-sm mb-8 text-gray-400 uppercase tracking-[0.2em]">ORDER PROGRESS</h3>
+        <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+          <div className="flex items-center min-w-[900px] lg:min-w-0">
+            {progressSteps.map((step, index) => {
+              const isCompleted = index < currentStepIndex || order.status === step;
+              const isActive = index === currentStepIndex;
+              return (
+                <div key={step} className="flex-1 flex items-center">
+                  <div className="flex flex-col items-center gap-2 group cursor-default">
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-2xl transition-all duration-500 shadow-sm ${isActive
+                        ? 'bg-primary-light text-white ring-4 ring-primary-light/10 shadow-primary-light/20 rotate-[-5deg]'
+                        : isCompleted
+                          ? 'bg-green-500 text-white ring-4 ring-green-100 shadow-green-100'
+                          : 'bg-gray-50 text-gray-300'
+                        }`}
+                    >
+                      {isCompleted ? <Check className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} /> : <Package className="w-5 h-5 opacity-40" />}
+                    </div>
+                    <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider transition-colors duration-300 ${isActive ? 'text-primary-light' : 'text-gray-400'}`}>
+                      {step}
+                    </span>
+                  </div>
+                  {index < progressSteps.length - 1 && (
+                    <div className="flex-1 px-4">
+                      <div className={`h-[2px] rounded-full transition-all duration-700 min-w-[30px] ${index < currentStepIndex ? 'bg-green-500' : 'bg-gray-100'}`} />
+                    </div>
+                  )}
                 </div>
-                <span className={`ml-3 text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-300 ${isActive ? 'text-primary-light font-bold' : 'text-gray-500'}`}>
-                  {step}
-                </span>
-                {index < progressSteps.length - 1 && (
-                  <div className={`flex-1 h-px mx-2 md:mx-4 transition-all duration-300 min-w-[20px] ${index < currentStepIndex ? 'bg-green-500' : 'bg-gray-200'}`} />
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <Card className="screen-only">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold flex items-center gap-2">
-                <Package className="w-5 h-5" /> Order Items ({order.products?.length || 0})
+          <Card className="screen-only border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gray-50/50 border-b border-gray-100">
+              <CardTitle className="text-base font-black flex items-center gap-2 text-gray-600 uppercase tracking-wider">
+                <Package className="w-5 h-5 text-primary-light" /> Order Items ({order.products?.length || 0})
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               {order.products && order.products.length > 0 ? (
                 <div className="space-y-4">
                   {order.products.map((product: any) => (
-                    <div key={product.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50 transition-all duration-200">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border">
+                    <div key={product.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-gray-50 bg-gray-50/30 rounded-2xl hover:bg-white hover:border-primary-light/20 hover:shadow-md transition-all duration-300 group">
+                      <div className="w-full sm:w-20 h-20 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-gray-100 p-2 shadow-sm">
                         <img
                           src={product.product_image?.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
                           alt={product.product_name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/80?text=No+Image'; }}
                         />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{product.product_name}</h3>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                          <span className="font-medium">
-                            Price: ৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 leading-tight line-clamp-2">{product.product_name}</h3>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs font-black uppercase tracking-wider text-gray-400">
+                          <span className="flex items-center gap-1.5">
+                            Price: <span className="text-gray-600">৳{product.price ? parseFloat(product.price).toFixed(2) : (parseFloat(product.subtotal) / parseFloat(product.quantity?.toString() || '1')).toFixed(2)}</span>
                           </span>
-                          <span className="flex items-center gap-1">
-                            Quantity: <Badge variant="secondary" className="font-semibold">{product.quantity}</Badge>
+                          <span className="flex items-center gap-1.5">
+                            Qty: <Badge variant="secondary" className="font-black bg-white text-primary-light border-primary-light/10 h-5 px-1.5">{product.quantity}</Badge>
                           </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">Subtotal</p>
-                        <p className="text-xl font-bold text-primary-light">৳{parseFloat(product.subtotal).toFixed(2)}</p>
+                      <div className="text-left sm:text-right pt-4 sm:pt-0 border-t sm:border-0 border-gray-100 flex sm:flex-col justify-between items-center sm:items-end">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Subtotal</p>
+                        <p className="text-xl font-bold text-primary-light tracking-tight">৳{parseFloat(product.subtotal).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-gray-500 py-8">No products in this order</p>
+                <p className="text-center text-gray-400 font-bold py-12">No products in this order</p>
               )}
             </CardContent>
           </Card>
