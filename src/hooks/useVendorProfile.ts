@@ -22,7 +22,7 @@ interface VendorProfile {
 export function useVendorProfile() {
   const [profile, setProfile] = useState<VendorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   useEffect(() => {
     fetchProfile();
@@ -71,18 +71,18 @@ export const getVendorDisplayName = (profile: VendorProfile | null): string => {
 // Helper to get avatar URL
 export const getVendorAvatarUrl = (profile: VendorProfile | null): string => {
   if (!profile) return '';
-  
+
   // Try vendor image first
   const vendorImage = profile.vendor?.image;
   if (vendorImage) {
     return getVendorImageUrl(vendorImage);
   }
-  
+
   // Fallback to user image
   const userImage = profile.user?.image;
   if (userImage) {
     return getVendorImageUrl(userImage);
   }
-  
+
   return '';
 };

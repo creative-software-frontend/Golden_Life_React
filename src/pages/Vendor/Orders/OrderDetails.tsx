@@ -36,13 +36,13 @@ export default function OrderDetails() {
   // Print invoice hook
   const { printInvoice } = usePrintInvoice();
   const progressSteps: OrderStatus[] = [
-    "Order Placed", 
-    "Processing", 
-    "Packaging", 
+    "Order Placed",
+    "Processing",
+    "Packaging",
     "Sent To Courier" as OrderStatus,
     "Ready To Courier" as OrderStatus,
     "On The Way" as OrderStatus,
-    "Delivered", 
+    "Delivered",
     "Returned" as OrderStatus
   ];
 
@@ -71,7 +71,7 @@ export default function OrderDetails() {
           if (session) {
             token = JSON.parse(session).token;
           }
-          const response = await fetch('https://api.goldenlife.my/api/getAll-OderAddress', {
+          const response = await fetch('https://admin.goldenlifeltd.com/api/getAll-OderAddress', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export default function OrderDetails() {
         if (session) {
           token = JSON.parse(session).token;
         }
-        const response = await fetch('https://api.goldenlife.my/api/vendor/transactions/history', {
+        const response = await fetch('https://admin.goldenlifeltd.com/api/vendor/transactions/history', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ export default function OrderDetails() {
         order={order}
         fullAddressText={fullAddressText}
         orderTransaction={orderTransaction}
-        baseURL="https://api.goldenlife.my"
+        baseURL="https://admin.goldenlifeltd.com"
       />
 
       <div className="screen-only flex items-center justify-between">
@@ -217,7 +217,7 @@ export default function OrderDetails() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-          <Button 
+          <Button
             onClick={() => {
               if (order) {
                 const orderForPrint: OrderForPrint = {
@@ -234,14 +234,14 @@ export default function OrderDetails() {
                 };
                 printInvoice(orderForPrint);
               }
-            }} 
-            variant="outline" 
+            }}
+            variant="outline"
             className="flex-1 sm:flex-none gap-2 h-11 px-6 font-bold"
           >
             <Printer className="w-4 h-4" /> PRINT
           </Button>
-          <Button 
-            onClick={() => setIsStatusModalOpen(true)} 
+          <Button
+            onClick={() => setIsStatusModalOpen(true)}
             className="flex-1 sm:flex-none bg-primary-light hover:bg-primary-light/90 text-white h-11 px-6 font-bold shadow-lg shadow-primary-light/20"
           >
             Update Status
@@ -301,7 +301,7 @@ export default function OrderDetails() {
                     <div key={product.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-gray-50 bg-gray-50/30 rounded-2xl hover:bg-white hover:border-primary-light/20 hover:shadow-md transition-all duration-300 group">
                       <div className="w-full sm:w-20 h-20 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-gray-100 p-2 shadow-sm">
                         <img
-                          src={product.product_image?.startsWith('http') ? product.product_image : `https://api.goldenlife.my/uploads/ecommarce/product_image/${product.product_image}`}
+                          src={product.product_image?.startsWith('http') ? product.product_image : `https://admin.goldenlifeltd.com/uploads/ecommarce/product_image/${product.product_image}`}
                           alt={product.product_name}
                           className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://via.placeholder.com/80?text=No+Image'; }}
@@ -425,9 +425,9 @@ export default function OrderDetails() {
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
         currentStatus={order.status}
-        onUpdate={handleUpdateStatus} 
+        onUpdate={handleUpdateStatus}
         orderNo={order.order_no}
       />
     </div>
-  ); 
+  );
 }

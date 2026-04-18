@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://api.goldenlife.my',
+        target: 'https://admin.goldenlifeltd.com',
         changeOrigin: true,
         secure: false,
         headers: {

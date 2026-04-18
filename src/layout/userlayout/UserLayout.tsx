@@ -100,7 +100,7 @@ export default function UserLayout() {
         walletBalance, isCategoryLoading, isWalletLoading
     } = useAppStore();
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // --- CATEGORY API STATE ---
 

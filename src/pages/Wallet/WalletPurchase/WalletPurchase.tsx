@@ -11,7 +11,7 @@ export default function WalletPurchase() {
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     const getAuthToken = () => {
         try {
@@ -36,10 +36,10 @@ export default function WalletPurchase() {
                 const filteredData = data.transactions.filter((t) => t.type === 'purchase');
                 setPurchases(filteredData);
             }
-        } catch (err) { 
-            console.error("Failed to fetch:", err); 
-        } finally { 
-            setIsLoading(false); 
+        } catch (err) {
+            console.error("Failed to fetch:", err);
+        } finally {
+            setIsLoading(false);
         }
     }, [baseURL]);
 
@@ -52,7 +52,7 @@ export default function WalletPurchase() {
         let bgColor = "bg-rose-500";
         if (lowerStatus === 'pending') bgColor = "bg-orange-400";
         if (!status || lowerStatus === 'completed' || lowerStatus === 'success') bgColor = "bg-emerald-500";
-        
+
         return (
             <span className={`px-3 md:px-6 py-1 md:py-1.5 text-[9px] md:text-[11px] font-black text-white ${bgColor} rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap`}>
                 {status || 'Success'}
@@ -98,7 +98,7 @@ export default function WalletPurchase() {
             {/* 2. Transaction History Section */}
             <div className="px-4 md:px-6 mt-2">
                 <div className="bg-white rounded-[24px] md:rounded-[40px] shadow-sm border border-slate-100 overflow-hidden">
-                    
+
                     {/* Header with Record Count */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 md:px-8 py-6 md:py-8">
                         <h2 className="text-base md:text-xl font-black text-slate-700 uppercase tracking-tight">History</h2>
@@ -128,7 +128,7 @@ export default function WalletPurchase() {
                         ) : (
                             purchases.map((tx, idx) => (
                                 <div key={tx.id || idx} className="grid grid-cols-2 sm:grid-cols-4 items-center px-4 md:px-6 py-4 md:py-6 border border-slate-50 rounded-[20px] md:rounded-[30px] bg-white hover:shadow-md transition-all group">
-                                    
+
                                     {/* Col 1: Details */}
                                     <div className="flex items-center gap-3 md:gap-4">
                                         <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-2xl flex items-center justify-center shrink-0 bg-slate-50 text-slate-400">

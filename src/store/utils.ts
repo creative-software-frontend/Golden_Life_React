@@ -1,4 +1,4 @@
-export const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+export const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
 /**
  * Detects if the current context is for a Vendor (based on URL)
@@ -15,10 +15,10 @@ export const getAuthToken = () => {
     // Check path to prioritize session
     const isVendorPath = window.location.pathname.startsWith('/vendor');
     const isDashboardPath = window.location.pathname.startsWith('/dashboard');
-    
+
     const vendorSession = sessionStorage.getItem("vendor_session");
     const studentSession = sessionStorage.getItem("student_session");
-    
+
     let session = null;
 
     if (isVendorPath) {

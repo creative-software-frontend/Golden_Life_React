@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 import Logo from '../Logo';
-import { useInstructorOtp } from './hooks/useInstructorOtp';
 import MobileOTPTab from './components/MobileOTPTab';
 import EmailPasswordTab from './components/EmailPasswordTab';
 import InstructorForgotPasswordModal from './components/InstructorForgotPasswordModal';
 import InstructorLoginRightSideContent from './components/InstructorLoginRightSideContent';
-
+import {
+  useInstructorLoginMutation,
+  useSendLoginOtpMutation,
+  useVerifyLoginOtpMutation,
+} from '@/hooks/useInstructorAuth';
 
 type ActiveTab = 'mobile' | 'email';
 
 const InstructorLogin: React.FC = () => {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
 
   // Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>('mobile');
@@ -22,111 +24,55 @@ const InstructorLogin: React.FC = () => {
   // Forgot Password Modal State
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  // Loading & Error States
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Store mobile for multi-step OTP (needed for verify step)
+  const [loginMobile, setLoginMobile] = useState('');
 
-  // OTP Hook
-  const { sendOtp, verifyOtp } = useInstructorOtp();
+  // ─── TanStack Query Mutations ─────────────────────────────────────────────
+  const loginMutation = useInstructorLoginMutation();
+  const sendOtpMutation = useSendLoginOtpMutation();
+  const verifyOtpMutation = useVerifyLoginOtpMutation();
 
-  // Handle Send OTP (Mobile Tab)
+  // ─── Derived loading / error states for child components ─────────────────
+  const isMobileLoading = sendOtpMutation.isPending || verifyOtpMutation.isPending;
+  const mobileError = sendOtpMutation.error?.message || verifyOtpMutation.error?.message || null;
+
+  const isEmailLoading = loginMutation.isPending;
+  const emailError = loginMutation.error?.message || null;
+
+  // ─── Handlers ────────────────────────────────────────────────────────────
+
   const handleSendOtp = async (mobile: string) => {
-    setIsLoading(true);
-    setError(null);
+    setLoginMobile(mobile);
+    sendOtpMutation.reset();
+    verifyOtpMutation.reset();
+    await sendOtpMutation.mutateAsync({ mobile });
+    // On success, MobileOTPTab transitions to OTP input step
+  };
 
-    try {
-      const response = await sendOtp(mobile, 'mobile');
-
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to send OTP');
-      }
-
-      return response;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to send OTP. Please try again.';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
+  const handleVerifyOtp = async (otp: string) => {
+    verifyOtpMutation.reset();
+    const result = await verifyOtpMutation.mutateAsync({ mobile: loginMobile, otp });
+    if (result.token) {
+      toast.success('Login successful! Welcome back.');
+      navigate('/instructor/dashboard');
     }
   };
 
-  // Handle Verify OTP (Mobile Tab)
-  const handleVerifyOtp = async (otpCode: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await verifyOtp(otpCode);
-
-      if (!response.success || !response.token) {
-        throw new Error('Invalid OTP or no token received');
-      }
-
-      // Store auth token
-      handleAuthSuccess(response.token);
-      return response;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Invalid OTP. Please try again.';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle Email/Password Login
   const handleEmailLogin = async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.post(`${baseURL}/api/instructor/login`, {
-        email,
-        password,
-      });
-
-      if (!response.data.token) {
-        throw new Error('No token received');
-      }
-
-      // Store auth token
-      handleAuthSuccess(response.data.token);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Invalid email or password';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
+    loginMutation.reset();
+    const result = await loginMutation.mutateAsync({ email, password });
+    if (result.token) {
+      toast.success(`Welcome back, ${result.user?.name || 'Instructor'}!`);
+      navigate('/instructor/dashboard');
     }
   };
 
-  // Handle Successful Authentication
-  const handleAuthSuccess = (token: string) => {
-    const expirationDate = new Date();
-    expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-
-    // Store in sessionStorage
-    sessionStorage.setItem('instructor_session', JSON.stringify({
-      token: token,
-      isVerified: true,
-      expiry: expirationDate.getTime()
-    }));
-
-    // Store in cookies
-    document.cookie = `instructor_token=${token}; path=/; max-age=86400; SameSite=Strict; Secure`;
-
-    // Redirect to instructor dashboard
-    navigate('/instructor/dashboard');
-  };
-
-  // Handle Forgot Password
-  const handleForgotPassword = () => {
-    setShowForgotPassword(true);
-  };
-
-  const handleCloseForgotPassword = () => {
-    setShowForgotPassword(false);
+  const handleTabChange = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    // Reset mutation states on tab switch
+    loginMutation.reset();
+    sendOtpMutation.reset();
+    verifyOtpMutation.reset();
   };
 
   return (
@@ -144,9 +90,10 @@ const InstructorLogin: React.FC = () => {
               <span className="text-sm font-medium">Back to Home</span>
             </Link>
 
-            <div className="flex flex-col items-center">
-              <Logo />
-
+            <div className="flex flex-col items-center transform scale-125 md:scale-150">
+              <Link to="/">
+                <Logo />
+              </Link>
             </div>
 
             <div className="w-24 hidden md:block"></div> {/* Spacer for symmetry */}
@@ -164,10 +111,7 @@ const InstructorLogin: React.FC = () => {
             <div className="mx-8 mb-6 flex bg-gray-100 p-1.5 rounded-xl">
               <button
                 type="button"
-                onClick={() => {
-                  setActiveTab('mobile');
-                  setError(null);
-                }}
+                onClick={() => handleTabChange('mobile')}
                 className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'mobile'
                   ? 'bg-black text-white shadow-md'
                   : 'text-gray-500 hover:text-gray-800'
@@ -177,10 +121,7 @@ const InstructorLogin: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setActiveTab('email');
-                  setError(null);
-                }}
+                onClick={() => handleTabChange('email')}
                 className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'email'
                   ? 'bg-black text-white shadow-md'
                   : 'text-gray-500 hover:text-gray-800'
@@ -196,16 +137,16 @@ const InstructorLogin: React.FC = () => {
                 <MobileOTPTab
                   onSendOtp={handleSendOtp}
                   onVerifyOtp={handleVerifyOtp}
-                  isLoading={isLoading}
-                  error={error}
+                  isLoading={isMobileLoading}
+                  error={mobileError}
                   onSuccess={() => { }}
                 />
               ) : (
                 <EmailPasswordTab
                   onLogin={handleEmailLogin}
-                  isLoading={isLoading}
-                  error={error}
-                  onForgotPassword={handleForgotPassword}
+                  isLoading={isEmailLoading}
+                  error={emailError}
+                  onForgotPassword={() => setShowForgotPassword(true)}
                 />
               )}
 
@@ -225,8 +166,8 @@ const InstructorLogin: React.FC = () => {
                   to="/vendor/login"
                   className="group flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow"
                 >
-                  <span>Are you a vendor ?</span>
-                  <span className="text-[#FF8A00] font-bold">vendor here</span>
+                  <span>Are you a vendor?</span>
+                  <span className="text-[#FF8A00] font-bold">Login here</span>
                   <svg
                     className="w-4 h-4 text-[#FF8A00] transform group-hover:translate-x-1 transition-transform duration-300"
                     fill="none"
@@ -243,7 +184,7 @@ const InstructorLogin: React.FC = () => {
           {/* Forgot Password Modal */}
           <InstructorForgotPasswordModal
             isOpen={showForgotPassword}
-            onClose={handleCloseForgotPassword}
+            onClose={() => setShowForgotPassword(false)}
           />
         </div>
       </div>
@@ -252,7 +193,6 @@ const InstructorLogin: React.FC = () => {
       <InstructorLoginRightSideContent />
     </div>
   );
-
 };
 
 export default InstructorLogin;

@@ -34,7 +34,7 @@ const OrderDetails = () => {
   } = useAppStore();
 
   const [error, setError] = useState("");
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
   const { printInvoice } = usePrintInvoice();
 
   useEffect(() => {

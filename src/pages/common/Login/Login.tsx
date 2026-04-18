@@ -8,7 +8,7 @@ type LoginMethod = 'mobile' | 'email';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // --- Form States ---
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('mobile');
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     // Mobile number validation: only digits, max 11 characters
     if (name === 'mobile') {
       const cleaned = value.replace(/[^0-9]/g, '').slice(0, 11);
@@ -35,7 +35,7 @@ const Login: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-    
+
     if (errors[name as keyof typeof errors]) setErrors(prev => ({ ...prev, [name]: '' }));
     if (apiError) setApiError('');
   };
@@ -181,16 +181,16 @@ const Login: React.FC = () => {
             {loginMethod === 'mobile' ? (
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                <input 
-                  name="mobile" 
-                  type="tel" 
-                  placeholder="01XXXXXXXXX" 
-                  value={formData.mobile} 
-                  onChange={handleChange} 
+                <input
+                  name="mobile"
+                  type="tel"
+                  placeholder="01XXXXXXXXX"
+                  value={formData.mobile}
+                  onChange={handleChange}
                   maxLength={11}
                   pattern="[0-9]{11}"
                   title="Please enter 11 digit mobile number"
-                  className={`w-full px-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`} 
+                  className={`w-full px-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`}
                 />
                 {errors.mobile && <p className="text-sm text-red-500">{errors.mobile}</p>}
                 {formData.mobile && formData.mobile.length !== 11 && formData.mobile.length > 0 && (
@@ -206,13 +206,13 @@ const Login: React.FC = () => {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password</label>
                   <div className="relative">
-                    <input 
-                      name="password" 
-                      type={showPassword ? 'text' : 'password'} 
-                      placeholder="••••••••" 
-                      value={formData.password} 
-                      onChange={handleChange} 
-                      className={`w-full px-4 py-3.5 pr-12 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`} 
+                    <input
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3.5 pr-12 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`}
                     />
                     {formData.password.length > 0 && (
                       <button

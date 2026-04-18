@@ -7,7 +7,7 @@ export function useOrders() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');

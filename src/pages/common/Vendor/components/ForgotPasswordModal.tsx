@@ -14,7 +14,7 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const validateMobile = (mobile: string): boolean => {
     const mobileRegex = /^01[3-9]\d{8}$/;
@@ -66,11 +66,11 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
       }
     } catch (err: any) {
       console.error('🔴 [Send OTP] Error:', err);
-      
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Failed to send OTP. Please try again.';
-      
+
+      const errorMessage = err.response?.data?.message ||
+        err.message ||
+        'Failed to send OTP. Please try again.';
+
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -112,9 +112,8 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
                 if (error) setError(null);
               }}
               placeholder="01XXXXXXXXX"
-              className={`w-full px-4 py-3 border ${
-                error ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+              className={`w-full px-4 py-3 border ${error ? 'border-red-500' : 'border-gray-300'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
               disabled={isLoading}
             />
             <p className="text-xs text-gray-500">
@@ -132,11 +131,10 @@ const ForgotPasswordModal = ({ onSendOtpSuccess, onClose }: ForgotPasswordModalP
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
-              isLoading
+            className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${isLoading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-primary hover:bg-primary/90 text-white'
-            }`}
+              }`}
           >
             {isLoading ? (
               <>

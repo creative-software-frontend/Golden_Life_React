@@ -526,7 +526,7 @@ export function ProductForm({
                   />
                 ) : initialData?.existing_images?.[0] ? (
                   <img
-                    src={`${initialData.existing_images[0].startsWith('http') ? initialData.existing_images[0] : `https://api.goldenlife.my/uploads/ecommarce/product_image/${initialData.existing_images[0]}`}`}
+                    src={`${initialData.existing_images[0].startsWith('http') ? initialData.existing_images[0] : `https://admin.goldenlifeltd.com/uploads/ecommarce/product_image/${initialData.existing_images[0]}`}`}
                     alt="Current main image"
                     className="w-full h-full object-cover"
                   />
@@ -608,7 +608,7 @@ export function ProductForm({
                   {existingGalleryImages.map((imgUrl, index) => (
                     <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
                       <img
-                        src={imgUrl.startsWith('http') ? imgUrl : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgUrl}`}
+                        src={imgUrl.startsWith('http') ? imgUrl : `https://admin.goldenlifeltd.com/uploads/ecommarce/gal_img/${imgUrl}`}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-full object-cover"
                       />

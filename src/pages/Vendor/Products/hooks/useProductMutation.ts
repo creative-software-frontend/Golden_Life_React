@@ -6,8 +6,8 @@ import { ProductFormData } from '../types/product.types';
 export function useProductMutation() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
@@ -26,7 +26,7 @@ export function useProductMutation() {
       setError(null);
 
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
@@ -42,9 +42,9 @@ export function useProductMutation() {
         }
       );
 
-      const isSuccess = response.data?.success === true || 
-                       response.data?.status === 'success' ||
-                       response.data?.message?.toLowerCase().includes('success');
+      const isSuccess = response.data?.success === true ||
+        response.data?.status === 'success' ||
+        response.data?.message?.toLowerCase().includes('success');
 
       if (isSuccess) {
         return true;
@@ -64,20 +64,20 @@ export function useProductMutation() {
   const updateProduct = async (id: number, formData: FormData): Promise<boolean> => {
     console.log('🟢 [API] updateProduct CALLED with ID:', id);
     console.log('🟢 [API] FormData keys:', Array.from(formData.keys()));
-    
+
     try {
       setIsLoading(true);
       setError(null);
 
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
 
 
       // Ensure product_id is in the form data, matching API expectations
-      formData.append('product_id', id.toString());      console.log('🟢 [API] Sending update request for product ID:', id);
+      formData.append('product_id', id.toString()); console.log('🟢 [API] Sending update request for product ID:', id);
       console.log('🟢 [API] Full API URL:', `${baseURL}/api/vendor/product/update?product_id=${id}`);
       console.log('🟢 [API] FormData entries:');
       for (const [key, value] of formData.entries()) {
@@ -102,9 +102,9 @@ export function useProductMutation() {
       console.log('🟢 [API] Update response received:', response.data);
       console.log('🟢 [API] Checking success criteria...');
 
-      const isSuccess = response.data?.success === true || 
-                       response.data?.status === 'success' ||
-                       response.data?.message?.toLowerCase().includes('success');
+      const isSuccess = response.data?.success === true ||
+        response.data?.status === 'success' ||
+        response.data?.message?.toLowerCase().includes('success');
 
       if (isSuccess) {
         toast.success('Product updated successfully!');
@@ -120,7 +120,7 @@ export function useProductMutation() {
         console.error('Error status:', err.response.status);
         console.error('Error data:', err.response.data);
       }
-      
+
       let errorMessage = 'Failed to update product';
       if (err.response?.status === 404) {
         errorMessage = 'Update endpoint not found.';
@@ -131,7 +131,7 @@ export function useProductMutation() {
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       }
-      
+
       setError(errorMessage);
       toast.error(errorMessage);
       return false;
@@ -146,7 +146,7 @@ export function useProductMutation() {
       setError(null);
 
       const token = getAuthToken();
-      
+
       if (!token) {
         throw new Error('Authentication required. Please log in again.');
       }
@@ -160,7 +160,7 @@ export function useProductMutation() {
       );
 
       let productData = response.data?.data || response.data?.product || response.data;
-      
+
       if (response.data?.status === true || response.data?.success === true) {
         productData = response.data?.data || response.data?.product || productData;
       }

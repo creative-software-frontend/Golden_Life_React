@@ -68,7 +68,7 @@ const LoginForm = () => {
     setApiError("");
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const baseUrl = import.meta.env.VITE_API_URL || "https://admin.goldenlifeltd.com";
       const endpoint = `${baseUrl}/api/vendor/login`;
 
       const response = await fetch(endpoint, {
@@ -103,7 +103,7 @@ const LoginForm = () => {
           token: data.token,
           isVerified: true,
           // Expires in 24 hours
-          expiry: new Date().getTime() + 86400000 
+          expiry: new Date().getTime() + 86400000
         }));
 
         // 2. Save to Browser Cookies
@@ -185,7 +185,7 @@ const LoginForm = () => {
     } catch (error: any) {
       setOtpError(error.message);
       // Re-throw to let modal know it failed
-      throw error; 
+      throw error;
     } finally {
       setIsOtpLoading(false);
     }

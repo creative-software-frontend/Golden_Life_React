@@ -5,46 +5,35 @@ import {
   Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, ArrowLeft,
   User, Phone, MapPin, Building2, CheckCircle2, Smartphone, X
 } from "lucide-react";
+import { toast } from "react-toastify";
 import Logo from "../Logo";
 import InstructorRegisterRightSideContent from "./components/InstructorRegisterRightSideContent";
-
-
-// Scroll Animation Variants
-const scrollVariant = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 }
-  }
-};
+import {
+  useInstructorRegisterMutation,
+  useVerifyRegisterOtpMutation,
+  useSendLoginOtpMutation,
+} from "@/hooks/useInstructorAuth";
 
 const InstructorRegister = () => {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // OTP & Auth States
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]); // 4-digit OTP
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [otpError, setOtpError] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
+  const [otpError, setOtpError] = useState("");
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // API Feedback States
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   // Inline Field Errors State
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     name: "",
-    subject: "", // Changed from shopName
-    experience: "", // Changed from businessType
+    subject: "",
+    experience: "",
     address: "",
     mobile: "",
     email: "",
@@ -52,6 +41,13 @@ const InstructorRegister = () => {
     confirmPassword: "",
     acceptTerms: false
   });
+
+  // ─── TanStack Query Mutations ─────────────────────────────────────────────
+  const registerMutation = useInstructorRegisterMutation();
+  const verifyOtpMutation = useVerifyRegisterOtpMutation();
+  const resendOtpMutation = useSendLoginOtpMutation();
+
+  // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -65,7 +61,6 @@ const InstructorRegister = () => {
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: "" }));
     }
-    if (errorMessage) setErrorMessage("");
   };
 
   // --- VALIDATION LOGIC ---
@@ -112,60 +107,28 @@ const InstructorRegister = () => {
   // --- SUBMIT REGISTRATION ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrorMessage("");
-
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
-      const endpoint = `${baseUrl}/api/instructor/register`;
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          subject: formData.subject,
-          experience: formData.experience,
-          address: formData.address,
-          mobile: formData.mobile,
-          email: formData.email,
-          password: formData.password,
-          password_confirmation: formData.confirmPassword
-        })
+      const data = await registerMutation.mutateAsync({
+        name: formData.name,
+        subject: formData.subject,
+        experience: formData.experience,
+        address: formData.address,
+        mobile: formData.mobile,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
       });
-
-      const data = await response.json();
-
-      if (response.status === 403 || response.status === 429) {
-        throw new Error("Too many attempts. Your IP is temporarily blocked.");
-      }
-
-      if (!response.ok) {
-        if (data.errors) {
-          const firstErrorKey = Object.keys(data.errors)[0];
-          throw new Error(data.errors[firstErrorKey][0]);
-        }
-        throw new Error(data.message || "Failed to register. Please try again.");
-      }
 
       if (data.user_id) {
         setUserId(data.user_id);
       }
 
-      setSuccessMessage("Instructor application submitted! OTP sent.");
+      toast.success("Application submitted! Please verify your mobile.");
       setShowOtpModal(true);
-
     } catch (error: any) {
-      console.error("Registration Error:", error);
-      setErrorMessage(error.message);
-    } finally {
-      setIsLoading(false);
+      toast.error(error.message || "Registration failed. Please try again.");
     }
   };
 
@@ -189,26 +152,12 @@ const InstructorRegister = () => {
   };
 
   const handleResendOtp = async () => {
+    setOtpError("");
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
-      const endpoint = `${baseUrl}/api/instructor/register/send-otp?mobile=${encodeURIComponent(formData.mobile)}`;
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccessMessage("OTP resent successfully!");
-      } else {
-        setOtpError(data.message || "Failed to resend OTP");
-      }
+      await resendOtpMutation.mutateAsync({ mobile: formData.mobile });
+      toast.success("OTP resent successfully!");
     } catch (error: any) {
-      setOtpError("Failed to resend OTP. Please try again.");
+      setOtpError(error.message || "Failed to resend OTP. Please try again.");
     }
   };
 
@@ -221,47 +170,24 @@ const InstructorRegister = () => {
       return;
     }
 
-    setIsVerifying(true);
+    if (!userId) {
+      setOtpError("User ID not found. Please register again.");
+      return;
+    }
+
     setOtpError("");
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
-
-      if (!userId) {
-        throw new Error("User ID not found. Please register again.");
-      }
-
-      const endpoint = `${baseUrl}/api/instructor/verify-otp`;
-      const queryParams = `?user_id=${userId}&otp=${encodeURIComponent(otpCode)}`;
-
-      const response = await fetch(endpoint + queryParams, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json"
+      await verifyOtpMutation.mutateAsync({ user_id: userId, otp: otpCode });
+      toast.success("Account verified! Please login.");
+      navigate("/instructor/login", {
+        state: {
+          message: "Account verified! Please login.",
+          mobile: formData.mobile
         }
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Invalid OTP. Please try again.");
-      }
-
-      if (data.success) {
-        setSuccessMessage("Instructor account verified!");
-        navigate("/instructor/login", {
-          state: {
-            message: "Account verified! Please login.",
-            mobile: formData.mobile
-          }
-        });
-      } else {
-        throw new Error(data.message || "Verification failed");
-      }
     } catch (error: any) {
-      setOtpError(error.message);
-    } finally {
-      setIsVerifying(false);
+      setOtpError(error.message || "Invalid OTP. Please try again.");
     }
   };
 
@@ -276,22 +202,12 @@ const InstructorRegister = () => {
       : baseClass + "border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200";
   };
 
+  const isSubmitting = registerMutation.isPending;
+  const isVerifying = verifyOtpMutation.isPending;
+  const isResending = resendOtpMutation.isPending;
+
   return (
     <>
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50, x: "-50%" }}
-            animate={{ opacity: 1, y: 24, x: "-50%" }}
-            exit={{ opacity: 0, y: -50, x: "-50%" }}
-            className="fixed top-0 left-1/2 z-[200] flex items-center gap-3 bg-gray-900 text-white px-6 py-3.5 rounded-full shadow-2xl"
-          >
-            <CheckCircle2 className="w-5 h-5 text-green-400" />
-            <span className="font-medium text-sm tracking-wide">{successMessage}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="h-screen flex flex-col lg:flex-row shadow-2xl overflow-hidden">
         {/* Left Side: Registration Form */}
         <div className="w-full lg:w-1/2 flex flex-col items-center bg-gray-50/50 p-4 lg:py-12 md:py-8 py-6 overflow-y-auto custom-scrollbar">
@@ -306,7 +222,7 @@ const InstructorRegister = () => {
                 <span className="text-sm font-medium">Back to Home</span>
               </Link>
 
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center transform scale-125 md:scale-150 ">
                 <Link to="/">
                   <Logo />
                 </Link>
@@ -324,9 +240,9 @@ const InstructorRegister = () => {
 
               <div className="px-6 sm:px-10 pb-12">
                 <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                  {errorMessage && (
+                  {registerMutation.isError && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 font-medium text-center">
-                      {errorMessage}
+                      {registerMutation.error?.message}
                     </div>
                   )}
 
@@ -429,7 +345,7 @@ const InstructorRegister = () => {
                     <div className="flex items-center space-x-3">
                       <input
                         type="checkbox" name="acceptTerms" id="acceptTerms"
-                        checked={formData.acceptTerms} onChange={handleChange} disabled={isLoading}
+                        checked={formData.acceptTerms} onChange={handleChange} disabled={isSubmitting}
                         className="h-5 w-5 text-[#FF8A00] border-gray-300 rounded focus:ring-[#FF8A00] cursor-pointer"
                       />
                       <label htmlFor="acceptTerms" className="text-sm text-gray-600 cursor-pointer select-none">
@@ -442,10 +358,10 @@ const InstructorRegister = () => {
                   {/* Submit */}
                   <div className="pt-4">
                     <button
-                      type="submit" disabled={isLoading}
+                      type="submit" disabled={isSubmitting}
                       className="w-full bg-[#FF8A00] text-white py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-lg active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
                     >
-                      {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Apply as Instructor <ArrowRight className="w-5 h-5" /></>}
+                      {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Apply as Instructor <ArrowRight className="w-5 h-5" /></>}
                     </button>
                   </div>
                 </form>
@@ -462,10 +378,11 @@ const InstructorRegister = () => {
         <InstructorRegisterRightSideContent />
       </div>
 
+      {/* OTP Verification Modal */}
       <AnimatePresence>
         {showOtpModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white w-full max-md rounded-3xl p-8 sm:p-10 relative shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="bg-white w-full max-w-md rounded-3xl p-8 sm:p-10 relative shadow-2xl animate-in zoom-in-95 duration-200">
               <div className="p-2 text-center relative">
                 <button onClick={() => setShowOtpModal(false)} className="absolute right-0 top-0 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
                   <X className="w-5 h-5" />
@@ -490,7 +407,7 @@ const InstructorRegister = () => {
                       value={data}
                       onChange={e => handleOtpChange(index, e.target.value)}
                       onKeyDown={e => handleOtpKeyDown(index, e)}
-                      className="w-14 h-16 sm:w-16 sm:h-18 text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FF8A00] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,138,0,0.1)] outline-none transition-all"
+                      className="w-14 h-16 sm:w-16 text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FF8A00] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,138,0,0.1)] outline-none transition-all"
                       required autoFocus={index === 0}
                     />
                   ))}
@@ -507,10 +424,10 @@ const InstructorRegister = () => {
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    disabled={isVerifying}
+                    disabled={isVerifying || isResending}
                     className="text-[#FF8A00] hover:underline transition-colors font-medium disabled:opacity-50"
                   >
-                    Resend OTP
+                    {isResending ? 'Sending...' : 'Resend OTP'}
                   </button>
                 </p>
               </form>

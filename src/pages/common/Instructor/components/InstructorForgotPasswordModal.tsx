@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Smartphone, Lock, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Smartphone, Lock, Eye, EyeOff, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import OTPInput from './OTPInput';
+import { useForgotPasswordMutation, useResetPasswordMutation } from '@/hooks/useInstructorAuth';
 
 interface InstructorForgotPasswordModalProps {
   isOpen: boolean;
@@ -15,11 +14,14 @@ type Step = 'mobile' | 'otp' | 'reset';
 const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPasswordModalProps) => {
   const [step, setStep] = useState<Step>('mobile');
   const [mobile, setMobile] = useState('');
-  const [userId, setUserId] = useState<number | null>(null);
-  const [otp, setOtp] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showCountdown, setShowCountdown] = useState(false);
+  const [mobileError, setMobileError] = useState('');
+
+  // OTP state – 4-digit array for a premium UI, joined before sending
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otpError, setOtpError] = useState('');
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Countdown timer
   const [countdown, setCountdown] = useState(0);
 
   // Reset Password States
@@ -27,214 +29,122 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [resetError, setResetError] = useState('');
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  // ─── TanStack Query Mutations ─────────────────────────────────────────────
+  const forgotMutation = useForgotPasswordMutation();
+  const resetMutation = useResetPasswordMutation();
 
-  // Countdown Timer
-  const startCountdown = () => {
-    setCountdown(60);
-    setShowCountdown(true);
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  // ─── Countdown Timer ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  // ─── OTP input helpers ────────────────────────────────────────────────────
+  const handleOtpChange = (index: number, value: string) => {
+    if (isNaN(Number(value))) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1); // keep only last char
+    setOtp(newOtp);
+    if (value && index < 3) otpRefs.current[index + 1]?.focus();
+    if (otpError) setOtpError('');
   };
 
-  // Step 1: Send OTP
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  // ─── Step 1: Send OTP ─────────────────────────────────────────────────────
   const handleSendOTP = async () => {
-    setError('');
-
-    // Validation
-    if (!mobile) {
-      setError('Mobile number is required');
-      return;
-    }
-
+    setMobileError('');
+    if (!mobile) { setMobileError('Mobile number is required'); return; }
     if (!/^01[3-9]\d{8}$/.test(mobile)) {
-      setError('Enter a valid 11-digit mobile number (01XXXXXXXXX)');
+      setMobileError('Enter a valid 11-digit mobile number (01XXXXXXXXX)');
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      const response = await axios.post(
-        `${baseURL}/api/instructor/password/forgot`,
-        null,
-        {
-          params: { mobile },
-          headers: { 
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data?.success) {
-        setUserId(response.data.user_id);
-        toast.success('OTP sent successfully! Please check your mobile.');
-        setStep('otp');
-        startCountdown();
-      } else {
-        throw new Error(response.data?.message || 'Failed to send OTP');
-      }
+      await forgotMutation.mutateAsync({ mobile });
+      toast.success('OTP sent! Check your mobile.');
+      setStep('otp');
+      setCountdown(60);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to send OTP. Please try again.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setMobileError(err.message || 'Failed to send OTP.');
+      toast.error(err.message || 'Failed to send OTP.');
     }
   };
 
-  // Step 2: Verify OTP
-  const handleVerifyOTP = async (otpCode: string) => {
-    setError('');
-    setIsLoading(true);
+  // ─── Step 2: Move to reset form after entering OTP ───────────────────────
+  const handleOtpNext = () => {
+    const code = otp.join('');
+    if (code.length !== 4) { setOtpError('Enter the complete 4-digit OTP.'); return; }
+    setOtpError('');
+    setStep('reset');
+  };
 
+  // ─── Resend OTP ────────────────────────────────────────────────────────────
+  const handleResendOTP = async () => {
     try {
-      const response = await axios.post(
-        `${baseURL}/api/instructor/password/verify-otp`,
-        null,
-        {
-          params: {
-            mobile,
-            otp: otpCode,
-            user_id: userId
-          },
-          headers: { 
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data?.success) {
-        setOtp(otpCode);
-        toast.success('OTP verified successfully!');
-        setStep('reset');
-      } else {
-        throw new Error(response.data?.message || 'Invalid OTP');
-      }
+      await forgotMutation.mutateAsync({ mobile });
+      toast.success('OTP resent!');
+      setCountdown(60);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Invalid OTP. Please try again.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
+      toast.error(err.message || 'Failed to resend OTP.');
     }
   };
 
-  // Step 3: Reset Password
+  // ─── Step 3: Reset Password (OTP + new password in one call) ─────────────
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setResetError('');
 
-    if (!newPassword || !confirmPassword) {
-      setError('Both password fields are required');
-      return;
-    }
+    if (!newPassword || !confirmPassword) { setResetError('Both password fields are required'); return; }
+    if (newPassword !== confirmPassword) { setResetError('Passwords do not match'); return; }
+    if (newPassword.length < 6) { setResetError('Password must be at least 6 characters'); return; }
 
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    setIsLoading(true);
+    const otpCode = otp.join('');
 
     try {
-      const response = await axios.post(
-        `${baseURL}/api/instructor/password/reset`,
-        null,
-        {
-          params: {
-            mobile,
-            otp,
-            password: newPassword,
-            password_confirmation: confirmPassword
-          },
-          headers: { 
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data?.success) {
-        toast.success('Password reset successful! Please login with your new password.');
-        handleClose();
-      } else {
-        throw new Error(response.data?.message || 'Failed to reset password');
-      }
+      await resetMutation.mutateAsync({
+        mobile,
+        otp: otpCode,
+        password: newPassword,
+        password_confirmation: confirmPassword,
+      });
+      toast.success('Password reset successful! Please login with your new password.');
+      handleClose();
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to reset password. Please try again.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setResetError(err.message || 'Failed to reset password. Please try again.');
+      toast.error(err.message || 'Failed to reset password.');
     }
   };
 
-  // Resend OTP
-  const handleResendOTP = async () => {
-    setError('');
-    setIsLoading(true);
-
-    try {
-      const response = await axios.post(
-        `${baseURL}/api/instructor/password/forgot`,
-        null,
-        {
-          params: { mobile },
-          headers: { 
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (response.data?.success) {
-        toast.success('OTP resent successfully!');
-        startCountdown();
-      } else {
-        throw new Error(response.data?.message || 'Failed to resend OTP');
-      }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to resend OTP';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle Close
+  // ─── Handle Close ─────────────────────────────────────────────────────────
   const handleClose = () => {
     setStep('mobile');
     setMobile('');
-    setUserId(null);
-    setOtp('');
+    setMobileError('');
+    setOtp(['', '', '', '']);
+    setOtpError('');
     setNewPassword('');
     setConfirmPassword('');
-    setError('');
+    setResetError('');
+    setCountdown(0);
+    forgotMutation.reset();
+    resetMutation.reset();
     onClose();
   };
 
-  // Format mobile for display
-  const formattedMobile = mobile.length === 11 
+  const formattedMobile = mobile.length === 11
     ? `${mobile.slice(0, 4)}-${mobile.slice(4, 8)}-${mobile.slice(8)}`
     : mobile;
+
+  const isSendingOtp = forgotMutation.isPending;
+  const isResetting = resetMutation.isPending;
 
   return (
     <AnimatePresence>
@@ -256,17 +166,27 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">
-                  {step === 'mobile' && 'Instructor Forgot Password'}
-                  {step === 'otp' && 'Verify OTP'}
-                  {step === 'reset' && 'Reset Password'}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {step === 'mobile' && 'Enter your mobile number'}
-                  {step === 'otp' && 'Enter the OTP sent to your mobile'}
-                  {step === 'reset' && 'Create a new password'}
-                </p>
+              <div className="flex items-center gap-3">
+                {step !== 'mobile' && (
+                  <button
+                    onClick={() => setStep(step === 'reset' ? 'otp' : 'mobile')}
+                    className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-gray-500" />
+                  </button>
+                )}
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {step === 'mobile' && 'Forgot Password'}
+                    {step === 'otp' && 'Verify OTP'}
+                    {step === 'reset' && 'Reset Password'}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {step === 'mobile' && 'Enter your registered mobile number'}
+                    {step === 'otp' && 'Enter the OTP sent to your mobile'}
+                    {step === 'reset' && 'Create a new secure password'}
+                  </p>
+                </div>
               </div>
               <button
                 onClick={handleClose}
@@ -276,10 +196,23 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
               </button>
             </div>
 
+            {/* Step Indicator */}
+            <div className="flex gap-1.5 px-6 pt-5">
+              {(['mobile', 'otp', 'reset'] as Step[]).map((s, i) => (
+                <div
+                  key={s}
+                  className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                    ['mobile', 'otp', 'reset'].indexOf(step) >= i ? 'bg-[#FF8A00]' : 'bg-gray-200'
+                  }`}
+                />
+              ))}
+            </div>
+
             {/* Content */}
             <div className="p-6">
               <AnimatePresence mode="wait">
-                {/* Step 1: Mobile Input */}
+
+                {/* ── Step 1: Mobile Input ─────────────────────────── */}
                 {step === 'mobile' && (
                   <motion.div
                     key="mobile-step"
@@ -290,9 +223,7 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                     className="space-y-5"
                   >
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Mobile Number
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
                       <div className="relative">
                         <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
@@ -302,43 +233,39 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '').slice(0, 11);
                             setMobile(value);
-                            if (error) setError('');
+                            if (mobileError) setMobileError('');
                           }}
-                          className={`w-full pl-10 pr-4 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          className={`w-full pl-10 pr-4 py-3.5 border ${mobileError ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                       </div>
-                      {error && (
+                      {mobileError && (
                         <p className="text-sm text-red-500 flex items-center gap-1">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          {error}
+                          {mobileError}
                         </p>
                       )}
                     </div>
 
                     <motion.button
                       onClick={handleSendOTP}
-                      disabled={isLoading}
+                      disabled={isSendingOtp}
                       className="w-full bg-[#FF8A00] text-white py-3.5 rounded-xl font-bold text-lg hover:bg-orange-600 shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-                      whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                      whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                      whileHover={{ scale: isSendingOtp ? 1 : 1.02 }}
+                      whileTap={{ scale: isSendingOtp ? 1 : 0.98 }}
                     >
-                      {isLoading ? (
+                      {isSendingOtp ? (
                         <span className="flex items-center justify-center gap-2">
                           <Loader2 className="w-5 h-5 animate-spin" />
                           Sending OTP...
                         </span>
-                      ) : (
-                        'Send OTP'
-                      )}
+                      ) : 'Send OTP'}
                     </motion.button>
                   </motion.div>
                 )}
 
-                {/* Step 2: OTP Verification */}
+                {/* ── Step 2: OTP Verification ─────────────────────── */}
                 {step === 'otp' && (
                   <motion.div
                     key="otp-step"
@@ -352,60 +279,72 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                       <div className="mx-auto w-16 h-16 bg-orange-100 text-[#FF8A00] flex items-center justify-center rounded-full mb-4">
                         <CheckCircle2 className="w-8 h-8" />
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
-                        Verify Your Mobile
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        Enter 4-digit OTP sent to
-                      </p>
-                      <p className="text-gray-800 font-bold mt-1">
-                        +88 {formattedMobile}
-                      </p>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Verify Your Mobile</h3>
+                      <p className="text-gray-500 text-sm">Enter 4-digit OTP sent to</p>
+                      <p className="text-gray-800 font-bold mt-1">+88 {formattedMobile}</p>
                     </div>
 
-                    {error && (
+                    {otpError && (
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center border border-red-100"
                       >
-                        {error}
+                        {otpError}
                       </motion.div>
                     )}
 
-                    <OTPInput
-                      length={4}
-                      onComplete={handleVerifyOTP}
-                      disabled={isLoading}
-                      error={error || undefined}
-                    />
+                    {/* 4-box OTP Input */}
+                    <div className="flex justify-center gap-3">
+                      {otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          maxLength={1}
+                          ref={el => otpRefs.current[index] = el}
+                          value={digit}
+                          onChange={e => handleOtpChange(index, e.target.value)}
+                          onKeyDown={e => handleOtpKeyDown(index, e)}
+                          className="w-14 h-16 text-center text-3xl font-black bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FF8A00] focus:bg-white focus:shadow-[0_0_0_4px_rgba(255,138,0,0.1)] outline-none transition-all"
+                          autoFocus={index === 0}
+                        />
+                      ))}
+                    </div>
+
+                    <motion.button
+                      onClick={handleOtpNext}
+                      disabled={otp.join('').length !== 4}
+                      className="w-full bg-[#FF8A00] text-white py-3.5 rounded-xl font-bold text-lg hover:bg-orange-600 shadow-lg transition-all disabled:opacity-70"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Continue
+                    </motion.button>
 
                     {/* Countdown & Resend */}
-                    <div className="text-center mt-6">
+                    <div className="text-center">
                       <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
                       {countdown > 0 ? (
                         <p className="text-sm text-gray-500">
-                          Resend available in{' '}
-                          <span className="font-bold text-[#FF8A00]">
-                            0:{countdown.toString().padStart(2, '0')}
-                          </span>
+                          Resend in{' '}
+                          <span className="font-bold text-[#FF8A00]">0:{countdown.toString().padStart(2, '0')}</span>
                         </p>
                       ) : (
                         <motion.button
                           onClick={handleResendOTP}
-                          disabled={isLoading}
+                          disabled={isSendingOtp}
                           className="text-[#FF8A00] hover:text-orange-700 font-bold text-sm transition-colors disabled:opacity-50"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          {isLoading ? 'Sending...' : 'Resend OTP'}
+                          {isSendingOtp ? 'Sending...' : 'Resend OTP'}
                         </motion.button>
                       )}
                     </div>
                   </motion.div>
                 )}
 
-                {/* Step 3: Reset Password */}
+                {/* ── Step 3: Reset Password ───────────────────────── */}
                 {step === 'reset' && (
                   <motion.form
                     key="reset-step"
@@ -416,23 +355,17 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                     onSubmit={handleResetPassword}
                     className="space-y-5"
                   >
+                    {/* New Password */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        New Password
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700">New Password</label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           value={newPassword}
-                          onChange={(e) => {
-                            setNewPassword(e.target.value);
-                            if (error) setError('');
-                          }}
-                          className={`w-full pl-10 pr-12 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          onChange={(e) => { setNewPassword(e.target.value); if (resetError) setResetError(''); }}
+                          className={`w-full pl-10 pr-12 py-3.5 border ${resetError ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                         <button
                           type="button"
@@ -444,23 +377,17 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                       </div>
                     </div>
 
+                    {/* Confirm Password */}
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Confirm Password
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="••••••••"
                           value={confirmPassword}
-                          onChange={(e) => {
-                            setConfirmPassword(e.target.value);
-                            if (error) setError('');
-                          }}
-                          className={`w-full pl-10 pr-12 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          onChange={(e) => { setConfirmPassword(e.target.value); if (resetError) setResetError(''); }}
+                          className={`w-full pl-10 pr-12 py-3.5 border ${resetError ? 'border-red-500' : 'border-gray-300'} rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                         <button
                           type="button"
@@ -470,34 +397,33 @@ const InstructorForgotPasswordModal = ({ isOpen, onClose }: InstructorForgotPass
                           {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
                       </div>
-                      {error && (
+                      {resetError && (
                         <p className="text-sm text-red-500 flex items-center gap-1">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          {error}
+                          {resetError}
                         </p>
                       )}
                     </div>
 
                     <motion.button
                       type="submit"
-                      disabled={isLoading}
+                      disabled={isResetting}
                       className="w-full bg-[#FF8A00] text-white py-3.5 rounded-xl font-bold text-lg hover:bg-orange-600 shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-                      whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                      whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                      whileHover={{ scale: isResetting ? 1 : 1.02 }}
+                      whileTap={{ scale: isResetting ? 1 : 0.98 }}
                     >
-                      {isLoading ? (
+                      {isResetting ? (
                         <span className="flex items-center justify-center gap-2">
                           <Loader2 className="w-5 h-5 animate-spin" />
                           Resetting Password...
                         </span>
-                      ) : (
-                        'Reset Password'
-                      )}
+                      ) : 'Reset Password'}
                     </motion.button>
                   </motion.form>
                 )}
+
               </AnimatePresence>
             </div>
           </motion.div>

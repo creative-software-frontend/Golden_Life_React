@@ -46,7 +46,7 @@ export function useProfile() {
   const [data, setData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   useEffect(() => {
     fetchProfile();
@@ -66,7 +66,7 @@ export function useProfile() {
       }
 
       console.log('[useProfile] Auth token present:', !!token);
-      
+
       const url = `${baseURL}/api/vendor/profile`;
       console.log('[useProfile] API URL:', url);
 
@@ -83,12 +83,12 @@ export function useProfile() {
 
       // Handle different response structures
       let profileData = response.data?.data || response.data;
-      
+
       // If response.data is the actual profile (not wrapped in data)
       if (response.data && !response.data.data && (response.data.user || response.data.vendor)) {
         profileData = response.data;
       }
-      
+
       console.log('✅ [useProfile] Processed Profile Data:', {
         hasUser: !!profileData?.user,
         hasVendor: !!profileData?.vendor,
@@ -101,13 +101,13 @@ export function useProfile() {
         vendorImage: profileData?.vendor?.image,
         vendorProfileImage: profileData?.vendor?.profile_image
       });
-      
+
       // Validate required data
       if (!profileData?.user && !profileData?.vendor) {
         console.error('❌ [useProfile] Invalid profile data structure:', profileData);
         throw new Error('Invalid profile data received from API');
       }
-      
+
       setData(profileData);
       setError(null);
       console.log('✅ [useProfile] Profile data loaded successfully');
@@ -136,7 +136,7 @@ export function useProfile() {
       }
 
       console.log('Sending update request to API...');
-      
+
       const response = await axios.post(
         `${baseURL}/api/vendor/profile/update`,
         formData,
@@ -152,9 +152,9 @@ export function useProfile() {
       console.log('Success field:', response.data?.success);
 
       // Check multiple possible success indicators
-      const isSuccess = response.data?.success === true || 
-                       response.data?.status === 'success' || 
-                       response.data?.message?.toLowerCase()?.includes('success');
+      const isSuccess = response.data?.success === true ||
+        response.data?.status === 'success' ||
+        response.data?.message?.toLowerCase()?.includes('success');
 
       if (isSuccess) {
         // Refresh data after successful update
@@ -171,14 +171,14 @@ export function useProfile() {
       console.error('Failed to update profile:', err);
       console.error('Error response:', err.response?.data);
       console.error('Error status:', err.response?.status);
-      
+
       // If it's a network error or server not found, for testing purposes
       if (err.code === 'ERR_NETWORK' || err.response?.status === 503) {
         console.warn('Backend not available - simulating success for UI testing');
         await fetchProfile();
         return true; // Simulate success for UI testing
       }
-      
+
       throw new Error(err.response?.data?.message || err.message || 'Failed to update profile');
     }
   };

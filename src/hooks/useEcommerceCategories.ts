@@ -26,7 +26,7 @@ export const useEcommerceCategories = (): UseCategoriesReturn => {
   const fetchCategories = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Get token
       const session = sessionStorage.getItem('vendor_session');
@@ -47,9 +47,9 @@ export const useEcommerceCategories = (): UseCategoriesReturn => {
       // Make API call with timeout
       console.log('Fetching categories from API...');
       const response = await axios.get(
-        'https://api.goldenlife.my/api/vendor/ecommerce/categories',
+        'https://admin.goldenlifeltd.com/api/vendor/ecommerce/categories',
         {
-          headers: token ? { 
+          headers: token ? {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'

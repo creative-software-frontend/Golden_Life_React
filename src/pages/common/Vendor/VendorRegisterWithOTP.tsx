@@ -10,7 +10,7 @@ type RegistrationStep = 'form' | 'otp' | 'success';
 
 const VendorRegisterWithOTP: React.FC = () => {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // State Management
   const [step, setStep] = useState<RegistrationStep>('form');
@@ -242,7 +242,7 @@ const VendorRegisterWithOTP: React.FC = () => {
             isLoading={isLoading}
             error={error}
             onClose={handleCloseModal}
-            onSuccess={() => {}} // Handled in handleOtpVerification
+            onSuccess={() => { }} // Handled in handleOtpVerification
           />
         )}
       </AnimatePresence>

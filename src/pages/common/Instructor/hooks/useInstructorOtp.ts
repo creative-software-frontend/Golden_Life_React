@@ -14,7 +14,7 @@ export const useInstructorOtp = () => {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Get auth token from session storage
   const getAuthToken = () => {
@@ -37,14 +37,14 @@ export const useInstructorOtp = () => {
 
     try {
       console.log('🔵 [useInstructorOtp] Sending OTP to:', { credential, type });
-      
+
       const endpoint = `${baseURL}/api/instructor/login/send-otp`;
       const queryParams = type === 'mobile' ? `?mobile=${encodeURIComponent(credential)}` : `?email=${encodeURIComponent(credential)}`;
-      
+
       console.log('📍 [useInstructorOtp] Request URL:', endpoint + queryParams);
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -56,7 +56,7 @@ export const useInstructorOtp = () => {
         success: response.data.success,
         user_id: response.data.user_id
       });
-      
+
       if (response.data.success && response.data.user_id) {
         setUserId(response.data.user_id);
       }
@@ -64,7 +64,7 @@ export const useInstructorOtp = () => {
       return response.data;
     } catch (err: any) {
       console.error('❌ [useInstructorOtp] Failed to send OTP:', err);
-      
+
       const errorMessage = err.response?.data?.message || err.message || 'Failed to send OTP';
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -86,12 +86,12 @@ export const useInstructorOtp = () => {
 
     try {
       console.log('🔵 [useInstructorOtp] Verifying OTP:', { userId, otp: otpCode });
-      
+
       const endpoint = `${baseURL}/api/instructor/login/verify-otp`;
       const queryParams = `?user_id=${userId}&otp=${encodeURIComponent(otpCode)}`;
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -103,7 +103,7 @@ export const useInstructorOtp = () => {
         // Store token in sessionStorage
         const expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-        
+
         sessionStorage.setItem('instructor_session', JSON.stringify({
           token: response.data.token,
           user: response.data.user,
@@ -133,12 +133,12 @@ export const useInstructorOtp = () => {
 
     try {
       console.log('🔵 [useInstructorOtp] Direct login with OTP:', { mobile, otp: otpCode });
-      
+
       const endpoint = `${baseURL}/api/instructor/loginWithOTP`;
       const queryParams = `?mobile=${encodeURIComponent(mobile)}&otp=${encodeURIComponent(otpCode)}`;
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -150,7 +150,7 @@ export const useInstructorOtp = () => {
         // Store token in sessionStorage
         const expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-        
+
         sessionStorage.setItem('instructor_session', JSON.stringify({
           token: response.data.token,
           user: response.data.user,

@@ -23,8 +23,8 @@ const fetchFAQs = async (search?: string, categoryId?: string): Promise<FAQ[]> =
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (categoryId) params.append('category_id', categoryId);
-    
-    const url = `https://api.goldenlife.my/api/get-faqs${params.toString() ? `?${params.toString()}` : ''}`;
+
+    const url = `https://admin.goldenlifeltd.com/api/get-faqs${params.toString() ? `?${params.toString()}` : ''}`;
     const response = await axios.get<FAQResponse>(url);
     return response.data.data;
 };

@@ -35,7 +35,7 @@ export function ImageUpload({
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       // Check if we've reached max images
       if (totalImages + validFiles.length >= maxImages) {
         newErrors.push(`Maximum ${maxImages} images allowed`);
@@ -91,14 +91,14 @@ export function ImageUpload({
   // Handle file input change
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    
+
     if (disabled || !canUploadMore) return;
 
     const files = e.target.files;
     if (files && files.length > 0) {
       handleFiles(files);
     }
-    
+
     // Reset input value to allow selecting same file again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -125,8 +125,8 @@ export function ImageUpload({
         className={`
           relative border-2 border-dashed rounded-xl p-8
           transition-all duration-300 ease-in-out
-          ${dragActive 
-            ? 'border-primary-light bg-primary-light/10 scale-[1.02]' 
+          ${dragActive
+            ? 'border-primary-light bg-primary-light/10 scale-[1.02]'
             : 'border-gray-300 hover:border-primary-light/70 hover:bg-gray-50'
           }
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -152,7 +152,7 @@ export function ImageUpload({
           <div className={`
             w-16 h-16 rounded-full flex items-center justify-center
             ${canUploadMore && !disabled
-              ? 'bg-primary-light/10 text-primary-light' 
+              ? 'bg-primary-light/10 text-primary-light'
               : 'bg-gray-100 text-gray-400'
             }
           `}>
@@ -206,7 +206,7 @@ export function ImageUpload({
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-              
+
               {onExistingImagesRemove && (
                 <button
                   type="button"
@@ -219,7 +219,7 @@ export function ImageUpload({
                   <X size={14} />
                 </button>
               )}
-              
+
               <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 text-white text-xs rounded-md">
                 Existing
               </div>
@@ -234,7 +234,7 @@ export function ImageUpload({
             >
               <ImagePreview file={file} />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-              
+
               {!disabled && (
                 <button
                   type="button"
@@ -247,7 +247,7 @@ export function ImageUpload({
                   <X size={14} />
                 </button>
               )}
-              
+
               <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 text-white text-xs rounded-md truncate max-w-[calc(100%-16px)]">
                 {file.name}
               </div>
@@ -289,4 +289,4 @@ function ImagePreview({ file }: { file: File }) {
 }
 
 // Need to define baseURL for image URLs
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';

@@ -17,7 +17,7 @@ export default function ChangePassward() {
         confirm_password: ''
     });
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     const getAuthData = () => {
         const session = sessionStorage.getItem("student_session");
@@ -82,13 +82,13 @@ export default function ChangePassward() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 font-inter">
             {/* Warning Alert Banner */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-amber-50 border border-amber-100 rounded-[2rem] p-6 relative overflow-hidden group shadow-sm"
             >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700" />
-                
+
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 relative z-10">
                     <div className="p-3 bg-amber-100 text-amber-600 rounded-2xl shadow-inner">
                         <AlertTriangle size={24} />
@@ -98,7 +98,7 @@ export default function ChangePassward() {
                         <p className="text-sm font-bold text-amber-700/80 mt-1">Do not share your password with anyone. Keep your account secure.</p>
                     </div>
                     <div className="sm:ml-auto">
-                        <img src="https://api.goldenlife.my/uploads/student/image/security-shield.png" className="w-12 h-12 object-contain opacity-50 grayscale hover:grayscale-0 transition-all cursor-help" alt="Security" 
+                        <img src="https://admin.goldenlifeltd.com/uploads/student/image/security-shield.png" className="w-12 h-12 object-contain opacity-50 grayscale hover:grayscale-0 transition-all cursor-help" alt="Security"
                             onError={(e) => (e.currentTarget.style.display = 'none')}
                         />
                     </div>
@@ -108,7 +108,7 @@ export default function ChangePassward() {
             {/* Change Password Form Card */}
             <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-1000" />
-                
+
                 <div className="relative z-10">
                     <div className="flex items-center gap-4 mb-8">
                         <div className="p-3 bg-emerald-600/10 rounded-2xl text-emerald-600">
@@ -217,7 +217,7 @@ export default function ChangePassward() {
                                 className="w-full h-14 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn overflow-hidden relative"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-                                
+
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="animate-spin" size={20} />

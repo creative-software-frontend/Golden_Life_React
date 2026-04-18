@@ -2,27 +2,27 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import axios from "axios"
-import { 
-    Link, Outlet, useLocation, useNavigate 
+import {
+    Link, Outlet, useLocation, useNavigate
 } from "react-router-dom"
 import {
-    ChevronRight, ShoppingCart, GraduationCap, Package, 
-    Truck, Pill, HelpCircleIcon, Carrot, Baby, Home, 
-    Scissors, Snowflake, Milk, Fish, Coffee, Cookie, 
+    ChevronRight, ShoppingCart, GraduationCap, Package,
+    Truck, Pill, HelpCircleIcon, Carrot, Baby, Home,
+    Scissors, Snowflake, Milk, Fish, Coffee, Cookie,
     Tags, HelpCircle, Loader2, LogInIcon, XCircle, ChefHat
 } from 'lucide-react'
 
 import { useTranslation } from "react-i18next"
-import { 
-    SidebarProvider, 
-    SidebarInset 
+import {
+    SidebarProvider,
+    SidebarInset
 } from "@/components/ui/sidebar"
 
 export default function HelpLayout() {
     const { t } = useTranslation("global")
     const location = useLocation()
     const navigate = useNavigate()
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my'
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com'
 
     // --- STATE ---
     const [searchTerm, setSearchTerm] = React.useState('')
@@ -58,8 +58,8 @@ export default function HelpLayout() {
         const isActive = location.pathname === path;
         return cn(
             "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors",
-            isActive 
-                ? "border-secondary text-secondary" 
+            isActive
+                ? "border-secondary text-secondary"
                 : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
         );
     }
@@ -72,7 +72,7 @@ export default function HelpLayout() {
                     <section className="bg-secondary py-16 md:py-20 transition-all">
                         <div className="text-center text-white px-4">
                             <div className="mb-6">{getBannerForPage()}</div>
-                            
+
                             <div className="relative max-w-md mx-auto">
                                 <input
                                     type="text"

@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     const navigate = useNavigate();
     const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
     // Config : Dynamic Base URL from Environment Variables
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // Auth & UI States
     const [image, setImage] = useState<File | null>(null);

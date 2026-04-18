@@ -28,7 +28,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Countdown Timer
   const startCountdown = () => {
@@ -68,7 +68,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
         null,
         {
           params: { mobile },
-          headers: { 
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
@@ -107,7 +107,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
             otp: otpCode,
             user_id: userId
           },
-          headers: { 
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
@@ -164,7 +164,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
             password: newPassword,
             password_confirmation: confirmPassword
           },
-          headers: { 
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
@@ -197,7 +197,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
         null,
         {
           params: { mobile },
-          headers: { 
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
@@ -232,7 +232,7 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
   };
 
   // Format mobile for display
-  const formattedMobile = mobile.length === 11 
+  const formattedMobile = mobile.length === 11
     ? `${mobile.slice(0, 4)}-${mobile.slice(4, 8)}-${mobile.slice(8)}`
     : mobile;
 
@@ -304,9 +304,8 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
                             setMobile(value);
                             if (error) setError('');
                           }}
-                          className={`w-full pl-10 pr-4 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          className={`w-full pl-10 pr-4 py-3.5 border ${error ? 'border-red-500' : 'border-gray-300'
+                            } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                       </div>
                       {error && (
@@ -430,9 +429,8 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
                             setNewPassword(e.target.value);
                             if (error) setError('');
                           }}
-                          className={`w-full pl-10 pr-12 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          className={`w-full pl-10 pr-12 py-3.5 border ${error ? 'border-red-500' : 'border-gray-300'
+                            } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                         <button
                           type="button"
@@ -458,9 +456,8 @@ const VendorForgotPasswordModal = ({ isOpen, onClose }: VendorForgotPasswordModa
                             setConfirmPassword(e.target.value);
                             if (error) setError('');
                           }}
-                          className={`w-full pl-10 pr-12 py-3.5 border ${
-                            error ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
+                          className={`w-full pl-10 pr-12 py-3.5 border ${error ? 'border-red-500' : 'border-gray-300'
+                            } rounded-xl focus:ring-2 focus:ring-[#FF8A00] focus:border-[#FF8A00] outline-none transition-all`}
                         />
                         <button
                           type="button"

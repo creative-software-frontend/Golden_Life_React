@@ -20,7 +20,7 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const validatePassword = (password: string): boolean => {
     return password.length >= 6;
@@ -55,14 +55,14 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
     try {
       console.log('🔵 [Reset Password] Resetting password for:', mobile);
       console.log('🔵 [Reset Password] Using OTP:', otp);
-      
+
       // ✅ সঠিক ফরম্যাট: form-data with all required fields
       const formDataObj = new FormData();
       formDataObj.append('mobile', mobile);
       formDataObj.append('otp', otp); // ✅ OTP যোগ করা হয়েছে
       formDataObj.append('password', formData.password);
       formDataObj.append('password_confirmation', formData.password_confirmation);
-      
+
       const response = await axios.post(
         `${baseURL}/api/password/reset`,
         formDataObj,
@@ -86,9 +86,9 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
       }
     } catch (err: any) {
       console.error('🔴 [Reset Password] Error:', err);
-      
+
       let errorMessage = 'Failed to reset password. Please try again.';
-      
+
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       } else if (err.response?.data?.errors) {
@@ -97,7 +97,7 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -139,9 +139,8 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
                 value={formData.password}
                 onChange={handleInputChange}
                 placeholder="Enter new password"
-                className={`w-full pl-10 pr-12 py-3 border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+                className={`w-full pl-10 pr-12 py-3 border ${error ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
                 disabled={isLoading}
               />
               <button
@@ -178,9 +177,8 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
                 value={formData.password_confirmation}
                 onChange={handleInputChange}
                 placeholder="Confirm new password"
-                className={`w-full pl-10 pr-12 py-3 border ${
-                  error ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+                className={`w-full pl-10 pr-12 py-3 border ${error ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
                 disabled={isLoading}
               />
               <button
@@ -212,11 +210,10 @@ const ResetPasswordForm = ({ mobile, otp, onResetSuccess }: ResetPasswordFormPro
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
-              isLoading
+            className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${isLoading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-primary hover:bg-primary/90 text-white'
-            }`}
+              }`}
           >
             {isLoading ? (
               <>

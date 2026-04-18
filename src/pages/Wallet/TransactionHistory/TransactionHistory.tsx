@@ -19,7 +19,7 @@ export default function TransactionHistory() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     const getAuthToken = () => {
         try {

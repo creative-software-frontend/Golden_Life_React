@@ -75,17 +75,17 @@ const BANK_DETAILS = {
 
 export default function VendorWithdraw() {
     const navigate = useNavigate();
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // --- Store Integration ---
-    const { 
-        walletBalance: currentBalanceStr, 
-        transactions: storeTransactions, 
-        fetchNavbarData, 
+    const {
+        walletBalance: currentBalanceStr,
+        transactions: storeTransactions,
+        fetchNavbarData,
         fetchHistory,
         fetchCharges,
         withdrawCharge,
-        isWalletLoading: isLoadingStore 
+        isWalletLoading: isLoadingStore
     } = useAppStore();
 
     const currentBalance = Number(currentBalanceStr || 0);

@@ -52,7 +52,7 @@ const CheckSummaryBookView = ({
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [isFetchingBalance, setIsFetchingBalance] = useState(true);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // Fetch Initial Wallet Balance
     useEffect(() => {

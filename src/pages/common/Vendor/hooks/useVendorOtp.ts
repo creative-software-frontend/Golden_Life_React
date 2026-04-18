@@ -14,7 +14,7 @@ export const useVendorOtp = () => {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Get auth token from session storage
   const getAuthToken = () => {
@@ -37,14 +37,14 @@ export const useVendorOtp = () => {
 
     try {
       console.log('🔵 [useVendorOtp] Sending OTP to:', { credential, type });
-      
+
       const endpoint = `${baseURL}/api/vendor/login/send-otp`;
       const queryParams = type === 'mobile' ? `?mobile=${encodeURIComponent(credential)}` : `?email=${encodeURIComponent(credential)}`;
-      
+
       console.log('📍 [useVendorOtp] Request URL:', endpoint + queryParams);
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -56,7 +56,7 @@ export const useVendorOtp = () => {
         success: response.data.success,
         user_id: response.data.user_id
       });
-      
+
       if (response.data.success && response.data.user_id) {
         setUserId(response.data.user_id);
       }
@@ -70,7 +70,7 @@ export const useVendorOtp = () => {
         status: err.response?.status,
         url: err.config?.url
       });
-      
+
       const errorMessage = err.response?.data?.message || err.message || 'Failed to send OTP';
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -92,12 +92,12 @@ export const useVendorOtp = () => {
 
     try {
       console.log('🔵 [useVendorOtp] Verifying OTP:', { userId, otp: otpCode });
-      
+
       const endpoint = `${baseURL}/api/vendor/login/verify-otp`;
       const queryParams = `?user_id=${userId}&otp=${encodeURIComponent(otpCode)}`;
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -109,7 +109,7 @@ export const useVendorOtp = () => {
         // Store token in sessionStorage
         const expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-        
+
         sessionStorage.setItem('vendor_session', JSON.stringify({
           token: response.data.token,
           user: response.data.user,
@@ -139,12 +139,12 @@ export const useVendorOtp = () => {
 
     try {
       console.log('🔵 [useVendorOtp] Direct login with OTP:', { mobile, otp: otpCode });
-      
+
       const endpoint = `${baseURL}/api/vendor/loginWithOTP`;
       const queryParams = `?mobile=${encodeURIComponent(mobile)}&otp=${encodeURIComponent(otpCode)}`;
-      
+
       const response = await axios.post(endpoint + queryParams, {}, {
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
@@ -156,7 +156,7 @@ export const useVendorOtp = () => {
         // Store token in sessionStorage
         const expirationDate = new Date();
         expirationDate.setTime(expirationDate.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
-        
+
         sessionStorage.setItem('vendor_session', JSON.stringify({
           token: response.data.token,
           user: response.data.user,

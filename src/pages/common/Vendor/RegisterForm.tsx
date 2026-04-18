@@ -119,7 +119,7 @@ const RegisterForm = () => {
     setErrorMessage("");
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const baseUrl = import.meta.env.VITE_API_URL || "https://admin.goldenlifeltd.com";
       const endpoint = `${baseUrl}/api/vendor/register`;
 
       const response = await fetch(endpoint, {
@@ -201,7 +201,7 @@ const RegisterForm = () => {
   // --- RESEND OTP ---
   const handleResendOtp = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const baseUrl = import.meta.env.VITE_API_URL || "https://admin.goldenlifeltd.com";
       const endpoint = `${baseUrl}/api/vendor/register/send-otp?mobile=${encodeURIComponent(formData.mobile)}`;
 
       console.log('🔵 [Register] Resending OTP to:', formData.mobile);
@@ -242,7 +242,7 @@ const RegisterForm = () => {
     setOtpError("");
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || "https://api.goldenlife.my";
+      const baseUrl = import.meta.env.VITE_API_URL || "https://admin.goldenlifeltd.com";
 
       // Use user_id from state (captured during registration)
       if (!userId) {
@@ -476,7 +476,7 @@ const RegisterForm = () => {
               <p className="text-center text-gray-600 mt-6">
                 Already have a vendor account? <Link to="/vendor/login" className="text-[#FF8A00] font-bold hover:underline transition-all">Sign In</Link>
               </p>
-              
+
               <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
                 <Link
                   to="/instructor/register"

@@ -26,15 +26,15 @@ export default function VendorAddMoney() {
     const navigate = useNavigate();
     // Updated translation hook based on your request
     const { t, i18n } = useTranslation('global');
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // --- Store Integration ---
-    const { 
-        walletBalance: currentBalance, 
-        transactions: storeTransactions, 
-        fetchNavbarData, 
+    const {
+        walletBalance: currentBalance,
+        transactions: storeTransactions,
+        fetchNavbarData,
         fetchHistory,
-        isWalletLoading: isLoadingStore 
+        isWalletLoading: isLoadingStore
     } = useAppStore();
 
     // --- State Management ---
@@ -438,7 +438,7 @@ export default function VendorAddMoney() {
                             {/* Attachment Section */}
                             <div className="space-y-4">
                                 <label className="text-sm font-bold text-slate-700">Attachment (Optional Proof Image)</label>
-                                <div 
+                                <div
                                     className={cn(
                                         "relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-3xl transition-all cursor-pointer group",
                                         attachment ? "border-secondary bg-secondary/5" : "border-slate-200 bg-slate-50 hover:bg-slate-100"
@@ -462,10 +462,10 @@ export default function VendorAddMoney() {
                                             <p className="text-[10px] text-slate-400 font-bold uppercase">JPG, PNG, PDF up to 5MB</p>
                                         </div>
                                     )}
-                                    <input 
+                                    <input
                                         id="vendor-wallet-add-attachment"
-                                        type="file" 
-                                        className="hidden" 
+                                        type="file"
+                                        className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) setAttachment(file);

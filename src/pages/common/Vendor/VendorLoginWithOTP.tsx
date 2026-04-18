@@ -9,7 +9,7 @@ type LoginMethod = 'mobile' | 'email';
 
 const VendorLoginWithOTP: React.FC = () => {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // --- Form States ---
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('mobile');
@@ -39,23 +39,23 @@ const VendorLoginWithOTP: React.FC = () => {
   const validateForm = () => {
     let isValid = true;
     const newErrors = { mobile: '', email: '', password: '' };
-    
+
     if (loginMethod === 'mobile') {
       if (!formData.mobile || !/^01\d{9}$/.test(formData.mobile)) {
         newErrors.mobile = 'Enter a valid mobile (01XXXXXXXXX)';
         isValid = false;
       }
     } else {
-      if (!formData.email) { 
-        newErrors.email = 'Email required'; 
-        isValid = false; 
+      if (!formData.email) {
+        newErrors.email = 'Email required';
+        isValid = false;
       }
-      if (!formData.password) { 
-        newErrors.password = 'Password required'; 
-        isValid = false; 
+      if (!formData.password) {
+        newErrors.password = 'Password required';
+        isValid = false;
       }
     }
-    
+
     setErrors(newErrors);
     return isValid;
   };
@@ -197,21 +197,19 @@ const VendorLoginWithOTP: React.FC = () => {
         </div>
 
         <div className="mx-8 mb-6 flex bg-gray-100 p-1.5 rounded-xl">
-          <button 
-            type="button" 
-            onClick={() => setLoginMethod('mobile')} 
-            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${
-              loginMethod === 'mobile' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
-            }`}
+          <button
+            type="button"
+            onClick={() => setLoginMethod('mobile')}
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${loginMethod === 'mobile' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Mobile (OTP)
           </button>
-          <button 
-            type="button" 
-            onClick={() => setLoginMethod('email')} 
-            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${
-              loginMethod === 'email' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
-            }`}
+          <button
+            type="button"
+            onClick={() => setLoginMethod('email')}
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${loginMethod === 'email' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:text-gray-800'
+              }`}
           >
             Email (Password)
           </button>
@@ -228,15 +226,14 @@ const VendorLoginWithOTP: React.FC = () => {
             {loginMethod === 'mobile' ? (
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                <input 
-                  name="mobile" 
-                  type="tel" 
-                  placeholder="01XXXXXXXXX" 
-                  value={formData.mobile} 
-                  onChange={handleChange} 
-                  className={`w-full px-4 py-3.5 border ${
-                    errors.mobile ? 'border-red-500' : 'border-gray-300'
-                  } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`} 
+                <input
+                  name="mobile"
+                  type="tel"
+                  placeholder="01XXXXXXXXX"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3.5 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'
+                    } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none transition-all`}
                 />
                 {errors.mobile && <p className="text-sm text-red-500">{errors.mobile}</p>}
               </div>
@@ -244,30 +241,28 @@ const VendorLoginWithOTP: React.FC = () => {
               <div className="space-y-5">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Email Address</label>
-                  <input 
-                    name="email" 
-                    type="email" 
-                    placeholder="vendor@example.com" 
-                    value={formData.email} 
-                    onChange={handleChange} 
-                    className={`w-full px-4 py-3.5 border ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`} 
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="vendor@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3.5 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                      } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`}
                   />
                   {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password</label>
                   <div className="relative">
-                    <input 
-                      name="password" 
-                      type={showPassword ? 'text' : 'password'} 
-                      placeholder="••••••••" 
-                      value={formData.password} 
-                      onChange={handleChange} 
-                      className={`w-full px-4 py-3.5 pr-12 border ${
-                        errors.password ? 'border-red-500' : 'border-gray-300'
-                      } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`} 
+                    <input
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3.5 pr-12 border ${errors.password ? 'border-red-500' : 'border-gray-300'
+                        } rounded-xl focus:ring-2 focus:ring-[#FF8A00] outline-none`}
                     />
                     <button
                       type="button"
@@ -291,9 +286,9 @@ const VendorLoginWithOTP: React.FC = () => {
               </div>
             )}
 
-            <button 
-              type="submit" 
-              disabled={isLoading} 
+            <button
+              type="submit"
+              disabled={isLoading}
               className="w-full bg-[#FF8A00] text-white py-3.5 rounded-xl font-bold text-lg hover:bg-orange-600 shadow-lg transform active:scale-95 transition-all disabled:opacity-70"
             >
               {isLoading ? "Processing..." : loginMethod === 'mobile' ? 'Login via OTP' : 'Login'}
@@ -328,11 +323,11 @@ const VendorLoginWithOTP: React.FC = () => {
       {showOtpModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 relative">
-            <button 
+            <button
               onClick={() => {
                 setShowOtpModal(false);
                 setOtpError('');
-              }} 
+              }}
               className="absolute top-4 right-4 text-gray-400 p-2 hover:bg-gray-100 rounded-full"
             >
               <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -366,7 +361,7 @@ const VendorLoginWithOTP: React.FC = () => {
               error={otpError}
             />
 
-            <button 
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 const otpInputs = document.querySelectorAll('input[maxlength="1"]');
@@ -375,7 +370,7 @@ const VendorLoginWithOTP: React.FC = () => {
                   handleOtpSubmit(otpCode);
                 }
               }}
-              disabled={isOtpLoading} 
+              disabled={isOtpLoading}
               className="w-full bg-[#FF8A00] text-white font-bold text-lg py-4 rounded-xl shadow-lg active:scale-95 transition-all mt-6 disabled:opacity-70"
             >
               {isOtpLoading ? "Verifying..." : "Verify & Continue"}
@@ -388,9 +383,9 @@ const VendorLoginWithOTP: React.FC = () => {
                   Resend in <span className="font-bold text-[#FF8A00]">{countdown}s</span>
                 </span>
               ) : (
-                <button 
-                  type="button" 
-                  onClick={handleResendOtp} 
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
                   disabled={isLoading}
                   className="text-[#FF8A00] font-bold hover:underline disabled:opacity-50"
                 >

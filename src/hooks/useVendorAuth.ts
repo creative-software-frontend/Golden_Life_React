@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
  */
 export function useVendorAuth() {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   /**
    * Get auth token from session storage
@@ -31,14 +31,14 @@ export function useVendorAuth() {
   const handleLogout = useCallback(async () => {
     try {
       const token = getAuthToken();
-      
+
       if (token) {
         // Call logout API to invalidate token on server
         await axios.post(
           `${baseURL}/api/vendor/logout`,
           {},
           {
-            headers: { 
+            headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
@@ -52,13 +52,13 @@ export function useVendorAuth() {
     } finally {
       // Clear session regardless of API success/failure
       sessionStorage.removeItem('vendor_session');
-      
+
       // Clear any vendor-related cookies
       document.cookie = 'vendor_token=; path=/; max-age=0; SameSite=Strict';
-      
+
       // Show success message
       toast.success('Logged out successfully');
-      
+
       // Redirect to login page
       navigate('/vendor/login');
     }

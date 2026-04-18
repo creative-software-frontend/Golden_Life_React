@@ -16,7 +16,7 @@ export function useProducts() {
     totalPages: 0,
   });
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Get auth token from session storage
   const getAuthToken = () => {
@@ -34,7 +34,7 @@ export function useProducts() {
   const fetchProducts = useCallback(async () => {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         setError('Authentication required. Please log in again.');
         setIsLoading(false);
@@ -47,7 +47,7 @@ export function useProducts() {
 
       console.log('🔄 [useProducts] Fetching products from API...');
       const response = await axios.get(`${baseURL}/api/vendor/product/list`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
@@ -99,14 +99,14 @@ export function useProducts() {
       });
 
       setProducts(productList);
-      setFilteredProducts(productList); 
-      const newPageSize = 25; 
+      setFilteredProducts(productList);
+      const newPageSize = 25;
       setPagination((prev: PaginationState) => ({
         ...prev,
-        totalItems: productList.length, 
+        totalItems: productList.length,
         totalPages: Math.ceil(productList.length / prev.pageSize),
       }));
-      
+
       console.log('✅ [useProducts] Initial state updated - ALL products shown:', {
         productsSet: productList.length,
         filteredProductsSet: productList.length,
@@ -114,7 +114,7 @@ export function useProducts() {
         pageSize: newPageSize,
         currentPage: 1
       });
-      
+
       toast.success(`Loaded ${productList.length} products`);
     } catch (err: any) {
       console.error('❌ [useProducts] Failed to fetch products:', err);
@@ -126,7 +126,7 @@ export function useProducts() {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load products';
       setError(errorMessage);
       toast.error(errorMessage);
-      
+
       // If network error, provide retry option
       if (err.code === 'ERR_NETWORK' || !err.response) {
         toast.error('Network error. Please check your connection and try again.');
@@ -155,7 +155,7 @@ export function useProducts() {
       // Remove from local state
       setProducts(prev => prev.filter(p => p.id !== productId));
       setFilteredProducts(prev => prev.filter(p => p.id !== productId));
-      
+
       toast.success('Product deleted successfully');
       return true;
     } catch (err: any) {
@@ -186,7 +186,7 @@ export function useProducts() {
       // Remove from local state
       setProducts(prev => prev.filter(p => !productIds.includes(p.id)));
       setFilteredProducts(prev => prev.filter(p => !productIds.includes(p.id)));
-      
+
       toast.success(`Deleted ${productIds.length} products successfully`);
       return true;
     } catch (err: any) {
@@ -201,9 +201,9 @@ export function useProducts() {
   const applyFilters = useCallback((filters: ProductFilters) => {
     console.log('🔍 [useProducts.applyFilters] Applying filters:', filters);
     console.log('📦 [useProducts.applyFilters] Total products in state:', products.length);
-    
+
     let result = [...products];
-    
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       result = result.filter(product =>
@@ -220,25 +220,25 @@ export function useProducts() {
       const beforeCount = result.length;
       console.log('🔵 [Status Filter] Filtering for ACTIVE products...');
       console.log('🔵 [Status Filter] Products before filter:', beforeCount);
-      
+
       result = result.filter(product => {
         const isActive = product.status === 1 || product.status === "1";
         console.log(`🔵 [Status Filter] Product ID ${product.id}: status="${product.status}" (${typeof product.status}), isActive=${isActive}`);
         return isActive;
       });
-      
+
       console.log('🔎 [applyFilters] After ACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else if (filters.status === 'inactive') {
       const beforeCount = result.length;
       console.log('🔵 [Status Filter] Filtering for INACTIVE products...');
       console.log('🔵 [Status Filter] Products before filter:', beforeCount);
-      
+
       result = result.filter(product => {
         const isInactive = product.status === 0 || product.status === "0";
         console.log(`🔵 [Status Filter] Product ID ${product.id}: status="${product.status}" (${typeof product.status}), isInactive=${isInactive}`);
         return isInactive;
       });
-      
+
       console.log('🔎 [applyFilters] After INACTIVE filter:', result.length, 'products (removed', beforeCount - result.length, ')');
     } else {
       console.log('✅ [applyFilters] Status filter is "all" - showing all statuses');
@@ -318,7 +318,7 @@ export function useProducts() {
         `${baseURL}/api/vendor/product/${productId}/ebook`,
         { ebook: isEbook ? '1' : '0' },
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
@@ -326,10 +326,10 @@ export function useProducts() {
       );
 
       // Update local state
-      setProducts(prev => prev.map(p => 
+      setProducts(prev => prev.map(p =>
         p.id === productId ? { ...p, ebook: isEbook ? '1' : '0' } : p
       ));
-      setFilteredProducts(prev => prev.map(p => 
+      setFilteredProducts(prev => prev.map(p =>
         p.id === productId ? { ...p, ebook: isEbook ? '1' : '0' } : p
       ));
     } catch (err: any) {
@@ -352,7 +352,7 @@ export function useProducts() {
         `${baseURL}/api/vendor/product/${productId}/video-link`,
         { video_link: videoLink },
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
@@ -360,10 +360,10 @@ export function useProducts() {
       );
 
       // Update local state
-      setProducts(prev => prev.map(p => 
+      setProducts(prev => prev.map(p =>
         p.id === productId ? { ...p, video_link: videoLink } : p
       ));
-      setFilteredProducts(prev => prev.map(p => 
+      setFilteredProducts(prev => prev.map(p =>
         p.id === productId ? { ...p, video_link: videoLink } : p
       ));
     } catch (err: any) {
@@ -379,7 +379,7 @@ export function useProducts() {
     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
     const endIndex = startIndex + pagination.pageSize;
     const paginatedResult = filteredProducts.slice(startIndex, endIndex);
-    
+
     console.log('📄 [useProducts.getPaginatedProducts] Pagination info:', {
       currentPage: pagination.currentPage,
       pageSize: pagination.pageSize,
@@ -389,7 +389,7 @@ export function useProducts() {
       showingCount: paginatedResult.length,
       productIds: paginatedResult.map(p => p.id)
     });
-    
+
     return paginatedResult;
   }, [filteredProducts, pagination.currentPage, pagination.pageSize]);
 

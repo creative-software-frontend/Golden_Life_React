@@ -18,7 +18,7 @@ export default function ChangePassword() {
     confirm_password: ''
   });
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const getAuthToken = () => {
     const session = sessionStorage.getItem('vendor_session');
@@ -51,7 +51,7 @@ export default function ChangePassword() {
 
     try {
       const token = getAuthToken();
-      
+
       const response = await axios.post(
         `${baseURL}/api/vendor/password/update`,
         {
@@ -95,13 +95,13 @@ export default function ChangePassword() {
       </Button>
 
       {/* Warning Alert */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-amber-50 border border-amber-100 rounded-2xl p-6 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full -mr-16 -mt-16 blur-2xl" />
-        
+
         <div className="flex items-start gap-4 relative z-10">
           <div className="p-3 bg-amber-100 rounded-2xl text-amber-600 shadow-inner">
             <AlertTriangle size={24} />
@@ -116,7 +116,7 @@ export default function ChangePassword() {
       {/* Change Password Form */}
       <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary-light/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
-        
+
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-8">
             <div className="p-3 bg-primary-light/10 rounded-2xl text-primary-light">
@@ -227,7 +227,7 @@ export default function ChangePassword() {
                 className="w-full h-14 bg-primary-light text-white font-black rounded-2xl shadow-xl shadow-primary-light/25 hover:shadow-primary-light/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:grayscale transition-all flex items-center justify-center gap-4 group/btn overflow-hidden relative"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-                
+
                 {isLoading ? (
                   <>
                     <Loader2 className="animate-spin" size={20} />

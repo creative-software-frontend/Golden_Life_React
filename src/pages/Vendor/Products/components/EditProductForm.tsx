@@ -71,7 +71,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
   useEffect(() => {
     // Only sync if initialData is present AND we haven't synced yet
     if (!initialData || Object.keys(initialData).length === 0 || hasSynced.current) return;
-    
+
     console.log('🔄 [EDIT FORM] First-time sync into form using reset()');
     reset(initialData);
 
@@ -155,7 +155,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
     const imageObj = existingGalleryImages[index];
     const newExistingImages = existingGalleryImages.filter((_, i) => i !== index);
     setExistingGalleryImages(newExistingImages);
-    
+
     // Track removed image names for safety
     const imgName = typeof imageObj === 'string' ? imageObj : imageObj.image;
     const newRemovedImages = [...removedGalleryImages, imgName];
@@ -546,7 +546,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                   <img src={URL.createObjectURL(mainImage)} alt="Main product" className="w-full h-full object-cover" />
                 ) : initialData?.existing_images?.[0] ? (
                   <img
-                    src={`https://api.goldenlife.my/uploads/ecommarce/product_image/${initialData.existing_images[0]}`}
+                    src={`https://admin.goldenlifeltd.com/uploads/ecommarce/product_image/${initialData.existing_images[0]}`}
                     alt="Current main image"
                     className="w-full h-full object-cover"
                   />
@@ -623,7 +623,7 @@ export function EditProductForm({ initialData, onSubmit, isLoading }: EditProduc
                     return (
                       <div key={`existing-${index}`} className="group relative aspect-square rounded-lg overflow-hidden border-2 border-gray-100 hover:border-primary-light transition-all shadow-sm">
                         <img
-                          src={imgName.startsWith('http') ? imgName : `https://api.goldenlife.my/uploads/ecommarce/gal_img/${imgName}`}
+                          src={imgName.startsWith('http') ? imgName : `https://admin.goldenlifeltd.com/uploads/ecommarce/gal_img/${imgName}`}
                           alt={`Existing Gallery ${index + 1}`}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

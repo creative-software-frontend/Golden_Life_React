@@ -21,7 +21,7 @@ export default function NomineeInfoTab() {
     const loading = useAppStore(s => s.isProfileLoading);
     const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
     const token = getAuthToken();
 
     // Helper to get correct path for nominee documents
@@ -63,10 +63,10 @@ export default function NomineeInfoTab() {
                     {/* Nominee Photo (Left Side) */}
                     <div className="w-16 h-16 shrink-0 rounded-full border-2 border-emerald-100 shadow-sm overflow-hidden bg-slate-50 relative">
                         {nomineeData.nominee_image ? (
-                            <img 
-                                src={getNomineeDocUrl(nomineeData.nominee_image, 'nominee_image') || ''} 
-                                className="w-full h-full object-cover" 
-                                alt="Nominee Photo" 
+                            <img
+                                src={getNomineeDocUrl(nomineeData.nominee_image, 'nominee_image') || ''}
+                                className="w-full h-full object-cover"
+                                alt="Nominee Photo"
                             />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-emerald-200">

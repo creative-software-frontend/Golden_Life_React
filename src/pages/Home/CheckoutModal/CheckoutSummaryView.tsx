@@ -20,7 +20,7 @@ interface Props {
 }
 
 const CheckoutSummaryView = ({
-    data, 
+    data,
     selectedAddress,
     paymentMethod,
     setPaymentMethod,
@@ -30,11 +30,11 @@ const CheckoutSummaryView = ({
     deliveryFee
 }: Props) => {
     const { changeCheckoutModal, toggleClicked, triggerWalletUpdate } = useModalStore();
-    const { 
-        walletBalance: storeWalletBalance, 
-        isWalletLoading: isFetchingBalance, 
+    const {
+        walletBalance: storeWalletBalance,
+        isWalletLoading: isFetchingBalance,
         fetchWallet,
-        fetchNavbarData 
+        fetchNavbarData
     } = useAppStore();
 
     const navigate = useNavigate();
@@ -49,7 +49,7 @@ const CheckoutSummaryView = ({
     // Convert string balance from store to number for calculations
     const walletBalance = parseFloat(storeWalletBalance) || 0;
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     // 1. Initial Data Load
     useEffect(() => {
@@ -100,11 +100,11 @@ const CheckoutSummaryView = ({
         const updatedCart = cartItems.filter(item => item.id !== idToRemove);
         setCartItems(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
-        window.dispatchEvent(new Event("cartUpdated")); 
+        window.dispatchEvent(new Event("cartUpdated"));
 
         if (updatedCart.length === 0) {
             toast.error("Cart is empty.");
-            onClose(); 
+            onClose();
         } else {
             toast.success("Item removed");
         }
@@ -182,7 +182,7 @@ const CheckoutSummaryView = ({
 
                 // GLOBAL STORE REFRESH: Refresh wallet and navbar components automatically
                 await Promise.all([
-                    fetchWallet(true), 
+                    fetchWallet(true),
                     fetchNavbarData(true)
                 ]);
 

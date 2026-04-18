@@ -37,7 +37,7 @@ export function ProfileForm({
       email: user?.email || '',
       mobile: user?.mobile ? user.mobile.replace(/^\+880/, '') : '',
       owner_name: vendor?.owner_name || '',
-      businee_name: vendor?.businee_name || '',  
+      businee_name: vendor?.businee_name || '',
       mobile_business: vendor?.mobile ? vendor.mobile.replace(/^\+880/, '') : '',
       country: vendor?.country || '',
       district: vendor?.district || '',
@@ -53,7 +53,7 @@ export function ProfileForm({
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
       onImageChange(file);
-      
+
       // Dispatch custom event for navbar/profile refresh (same as header camera icon)
       window.dispatchEvent(new CustomEvent('vendor-profile-image-upload', { detail: { file } }));
       console.log('📸 [ProfileForm] Image selected, event dispatched');
@@ -65,7 +65,7 @@ export function ProfileForm({
       {/* Profile Image Upload */}
       <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Picture</h3>
-        
+
         <div className="flex items-center gap-6">
           <div className="relative group">
             <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-primary-light overflow-hidden bg-gray-50 flex items-center justify-center">
@@ -77,7 +77,7 @@ export function ProfileForm({
                 />
               ) : vendor?.image ? (
                 <img
-                  src={`https://api.goldenlife.my/uploads/vendor/image/${vendor.image}`}
+                  src={`https://admin.goldenlifeltd.com/uploads/vendor/image/${vendor.image}`}
                   alt="Current profile"
                   className="w-full h-full object-cover"
                 />
@@ -85,7 +85,7 @@ export function ProfileForm({
                 <Upload size={40} className="text-gray-400" />
               )}
             </div>
-            
+
             {imagePreview && (
               <button
                 type="button"
@@ -207,9 +207,8 @@ export function ProfileForm({
             <input
               type="text"
               {...register('businee_name')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.businee_name ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              className={`w-full px-4 py-2.5 bg-gray-50 border ${errors.businee_name ? 'border-red-500' : 'border-gray-200'
+                } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
               placeholder="Your business name"
             />
             {errors.businee_name && (
@@ -250,9 +249,8 @@ export function ProfileForm({
             </label>
             <select
               {...register('country')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.country ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              className={`w-full px-4 py-2.5 bg-gray-50 border ${errors.country ? 'border-red-500' : 'border-gray-200'
+                } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
             >
               <option value="">Select Country</option>
               {countries && countries.length > 0 ? (
@@ -276,9 +274,8 @@ export function ProfileForm({
             </label>
             <select
               {...register('district')}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.district ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
+              className={`w-full px-4 py-2.5 bg-gray-50 border ${errors.district ? 'border-red-500' : 'border-gray-200'
+                } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all`}
             >
               <option value="">Select District</option>
               {districts && districts.length > 0 ? (
@@ -312,9 +309,8 @@ export function ProfileForm({
             <textarea
               {...register('address')}
               rows={3}
-              className={`w-full px-4 py-2.5 bg-gray-50 border ${
-                errors.address ? 'border-red-500' : 'border-gray-200'
-              } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all resize-none`}
+              className={`w-full px-4 py-2.5 bg-gray-50 border ${errors.address ? 'border-red-500' : 'border-gray-200'
+                } rounded-xl focus:ring-2 focus:ring-primary-light focus:border-transparent outline-none transition-all resize-none`}
               placeholder="House, Road, Area..."
             />
             {errors.address && (
@@ -390,7 +386,7 @@ export function ProfileForm({
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </button>
-        
+
         <button
           type="button"
           onClick={onCancel}

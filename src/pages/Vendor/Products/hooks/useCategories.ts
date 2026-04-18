@@ -7,8 +7,8 @@ export function useCategories() {
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Get auth token from session storage
   const getAuthToken = () => {
@@ -31,10 +31,10 @@ export function useCategories() {
 
       const token = getAuthToken();
       console.log('[useCategories] Auth token:', token ? 'Present' : 'Missing');
-      
+
       const url = `${baseURL}/api/vendor/ecommerce/categories`;
       console.log('[useCategories] API URL:', url);
-      
+
       const response = await axios.get(url, {
         headers: {
           'Content-Type': 'application/json',

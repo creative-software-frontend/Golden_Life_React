@@ -50,7 +50,7 @@ export default function AdditionalInfoTab() {
     const loading = useAppStore(s => s.isProfileLoading);
     const fetchProfile = useAppStore(s => s.fetchProfile);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
     const token = getAuthToken();
 
     useEffect(() => {

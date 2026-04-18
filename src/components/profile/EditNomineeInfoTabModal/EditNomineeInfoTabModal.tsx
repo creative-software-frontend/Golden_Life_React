@@ -85,7 +85,7 @@ export default function EditNomineeInfoTabModal({
   const nidFrontRef = useRef<HTMLInputElement>(null);
   const nidBackRef = useRef<HTMLInputElement>(null);
 
-  const effectiveBaseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const effectiveBaseURL = baseURL || import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   useEffect(() => {
     if (data && isOpen) {
@@ -131,7 +131,7 @@ export default function EditNomineeInfoTabModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Fix: Use data.id as a fallback if student_id is missing
     const effectiveStudentId = data?.student_id || data?.id?.toString();
 
@@ -238,12 +238,12 @@ export default function EditNomineeInfoTabModal({
               {/* Data Section */}
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <InputField icon={User} label="Nominee Full Name" value={formData.nominee_name} onChange={(v:any) => setFormData({...formData, nominee_name: v})} placeholder="Full name" />
-                  <InputField icon={Phone} label="Mobile" value={formData.nominee_mobile} onChange={(v:any) => setFormData({...formData, nominee_mobile: v.slice(0,11)})} placeholder="11-digit mobile" />
+                  <InputField icon={User} label="Nominee Full Name" value={formData.nominee_name} onChange={(v: any) => setFormData({ ...formData, nominee_name: v })} placeholder="Full name" />
+                  <InputField icon={Phone} label="Mobile" value={formData.nominee_mobile} onChange={(v: any) => setFormData({ ...formData, nominee_mobile: v.slice(0, 11) })} placeholder="11-digit mobile" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <InputField icon={FileText} label="Nominee NID Number" value={formData.nominee_nid_number} onChange={(v:any) => setFormData({...formData, nominee_nid_number: v})} placeholder="NID Number" />
-                  <InputField icon={Heart} label="Relation Profile" value={formData.relation_with} onChange={(v:any) => setFormData({...formData, relation_with: v})} placeholder="e.g. Spouse / Brother" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
+                  <InputField icon={FileText} label="Nominee NID Number" value={formData.nominee_nid_number} onChange={(v: any) => setFormData({ ...formData, nominee_nid_number: v })} placeholder="NID Number" />
+                  <InputField icon={Heart} label="Relation Profile" value={formData.relation_with} onChange={(v: any) => setFormData({ ...formData, relation_with: v })} placeholder="e.g. Spouse / Brother" options={['Father', 'Mother', 'Spouse', 'Brother', 'Sister', 'Son', 'Daughter', 'Other']} />
                 </div>
               </div>
 

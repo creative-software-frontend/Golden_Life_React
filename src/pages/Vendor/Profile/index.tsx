@@ -33,7 +33,7 @@ export default function VendorProfile() {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { setIsAIChatOpen, setIsHotlineModalOpen, setIsFAQModalOpen, setIsTicketModalOpen } = useModalStore();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   // Debug logging for data changes
   console.log('📄 [VendorProfile] Component render:', {
@@ -145,7 +145,7 @@ export default function VendorProfile() {
     }
 
     // Otherwise, assume it's just a filename and construct full URL
-    // Pattern: https://api.goldenlife.my/uploads/vendor/image/{filename}
+    // Pattern: https://admin.goldenlifeltd.com/uploads/vendor/image/{filename}
     const fullUrl = `${baseURL}/uploads/vendor/image/${imagePath}`;
     console.log('[getImageUrl] Filename path constructed:', fullUrl);
     return fullUrl;

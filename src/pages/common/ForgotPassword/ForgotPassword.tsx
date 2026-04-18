@@ -6,13 +6,13 @@ import Logo from '../Logo';
 
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-  
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [mobile, setMobile] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [mobileError, setMobileError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const ForgotPassword: React.FC = () => {
   // ✅ 1. HANDLE REQUEST OTP (FormData ব্যবহার করে)
   const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!mobile) {
       setMobileError('Mobile number is required');
       return;
@@ -42,7 +42,7 @@ const ForgotPassword: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append('mobile', mobile);
-      
+
       const response = await axios.post(
         `${baseURL}/api/password/forgot`,
         formData,
@@ -74,8 +74,8 @@ const ForgotPassword: React.FC = () => {
 
   // 2. OTP INPUT HANDLERS
   const handleOtpChange = (index: number, value: string) => {
-    if (isNaN(Number(value))) return; 
-    
+    if (isNaN(Number(value))) return;
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -92,7 +92,7 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  
+
   const handleOtpSubmit = async () => {
     const otpCode = otp.join("");
     if (otpCode.length !== 4) {
@@ -109,7 +109,7 @@ const ForgotPassword: React.FC = () => {
       toast.success('OTP verified successfully!');
       setShowOtpModal(false);
       setStep(2); // Move to set password step
-      
+
     } catch (err: any) {
       console.error('🔴 [OTP Verification] Error:', err);
       setOtpError('Invalid OTP. Please try again.');
@@ -121,7 +121,7 @@ const ForgotPassword: React.FC = () => {
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (newPassword.length < 6) {
       setPasswordError("Password must be at least 6 characters.");
       return;
@@ -137,14 +137,14 @@ const ForgotPassword: React.FC = () => {
     try {
       console.log('🔵 [Reset Password] Resetting password for:', mobile);
       console.log('🔵 [Reset Password] OTP:', otp.join(""));
-      
+
 
       const formData = new FormData();
       formData.append('mobile', mobile);
       formData.append('otp', otp.join(""));
       formData.append('password', newPassword);
       formData.append('password_confirmation', confirmPassword);
-      
+
       const response = await axios.post(
         `${baseURL}/api/password/reset`,
         formData,
@@ -168,9 +168,9 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (err: any) {
       console.error('🔴 [Reset Password] Error:', err);
-      
+
       let errorMessage = 'Failed to reset password. Please try again.';
-      
+
       if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       } else if (err.response?.data?.errors) {
@@ -179,7 +179,7 @@ const ForgotPassword: React.FC = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setPasswordError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -190,13 +190,13 @@ const ForgotPassword: React.FC = () => {
   return (
     <>
       <div className="w-full max-w-xl mx-auto flex flex-col items-center mt-8 md:mt-12 mb-8 px-4">
-        
+
         <div className="mb-8 transform scale-125 md:scale-150 origin-bottom">
           <Logo />
         </div>
 
         <div className="w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
-          
+
           {step === 1 && (
             <div className="animate-in fade-in duration-500">
               <div className="px-8 pt-8 pb-6 text-center">
@@ -221,10 +221,10 @@ const ForgotPassword: React.FC = () => {
                         type="tel"
                         placeholder="01XXXXXXXXX"
                         value={mobile}
-                        onChange={(e) => { 
+                        onChange={(e) => {
                           const cleaned = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
-                          setMobile(cleaned); 
-                          setMobileError(''); 
+                          setMobile(cleaned);
+                          setMobileError('');
                         }}
                         maxLength={11}
                         pattern="[0-9]{11}"
@@ -271,7 +271,7 @@ const ForgotPassword: React.FC = () => {
 
               <div className="px-8 pb-10">
                 <form onSubmit={handlePasswordReset} className="space-y-5">
-                  
+
                   {passwordError && (
                     <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 text-center">
                       {passwordError}
@@ -328,7 +328,7 @@ const ForgotPassword: React.FC = () => {
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Password Reset!</h2>
               <p className="text-gray-500 text-sm mb-8">Your password has been successfully changed. You can now login with your new credentials.</p>
-              
+
               <button
                 onClick={() => navigate('/login')}
                 className="w-full bg-[#FF8A00] text-white py-3.5 px-4 rounded-xl font-bold text-lg hover:bg-orange-600 shadow-lg transition-all"
@@ -345,8 +345,8 @@ const ForgotPassword: React.FC = () => {
       {showOtpModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 transform transition-all animate-in zoom-in-95 relative">
-            
-            <button 
+
+            <button
               onClick={() => setShowOtpModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 p-2 rounded-full transition-colors"
             >
@@ -363,7 +363,7 @@ const ForgotPassword: React.FC = () => {
               </div>
               <h2 className="text-2xl font-black text-gray-900">Verify OTP</h2>
               <p className="text-gray-500 mt-2 text-sm">
-                We've sent a 4-digit code to <br/>
+                We've sent a 4-digit code to <br />
                 <span className="font-bold text-gray-800">{mobile}</span>
               </p>
             </div>

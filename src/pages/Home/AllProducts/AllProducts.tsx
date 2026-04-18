@@ -30,7 +30,7 @@ export default function AllProduct() {
     const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
     const [pendingProduct, setPendingProduct] = useState<any>(null);
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
     const getAuthToken = () => {
         const session = sessionStorage.getItem("student_session");

@@ -31,15 +31,15 @@ export const calculateDiscount = (regularPrice: number, offerPrice: number): num
 export const validateImageFile = (file: File): { valid: boolean; error?: string } => {
   const maxSize = 2 * 1024 * 1024; // 2MB
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  
+
   if (!allowedTypes.includes(file.type)) {
     return { valid: false, error: 'Only JPG, PNG, and WEBP files are allowed' };
   }
-  
+
   if (file.size > maxSize) {
     return { valid: false, error: 'File size must be less than 2MB' };
   }
-  
+
   return { valid: true };
 };
 
@@ -75,19 +75,19 @@ export const truncateText = (text: string, maxLength: number): string => {
  */
 export const getProductImageUrl = (filename: string | undefined): string => {
   if (!filename) return '';
-  
+
   // If already a full URL, return as-is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-  
+
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
+
   // If it's a relative path starting with /, prepend API base URL
   if (filename.startsWith('/')) {
     return `${baseURL}${filename}`;
   }
-  
+
   // Otherwise, assume it's just a filename and construct full URL
   return `${baseURL}/uploads/ecommarce/product_image/${filename}`;
 };

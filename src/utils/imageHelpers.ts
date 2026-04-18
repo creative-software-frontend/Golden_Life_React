@@ -1,5 +1,5 @@
 // Base API URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
 // Image path configurations
 const IMAGE_PATHS = {
@@ -22,12 +22,12 @@ export const getVendorImageUrl = (filename?: string | null): string => {
   if (!filename || filename === '') {
     return FALLBACK_IMAGES.VENDOR_PROFILE;
   }
-  
+
   // If already a full URL, return as is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
+
   return `${API_BASE_URL}${IMAGE_PATHS.VENDOR_PROFILE}/${filename}`;
 };
 
@@ -38,12 +38,12 @@ export const getProductImageUrl = (filename?: string | null): string => {
   if (!filename || filename === '') {
     return FALLBACK_IMAGES.PRODUCT;
   }
-  
+
   // If already a full URL, return as is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
+
   return `${API_BASE_URL}${IMAGE_PATHS.PRODUCT}/${filename}`;
 };
 
@@ -54,12 +54,12 @@ export const getProductGalleryUrl = (filename?: string | null): string => {
   if (!filename || filename === '') {
     return FALLBACK_IMAGES.GALLERY;
   }
-  
+
   // If already a full URL, return as is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
+
   return `${API_BASE_URL}${IMAGE_PATHS.PRODUCT_GALLERY}/${filename}`;
 };
 

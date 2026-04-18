@@ -14,10 +14,10 @@ interface ProfileHeaderProps {
   onEditToggle?: () => void;
 }
 
-export function ProfileHeader({ 
-  name, 
-  email, 
-  sellerId, 
+export function ProfileHeader({
+  name,
+  email,
+  sellerId,
   imageUrl,
   coverGradient = 'from-primary-light/20 via-primary-dark/20 to-primary-light/10',
   onEditToggle
@@ -27,27 +27,27 @@ export function ProfileHeader({
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
-  
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
+
   const getVendorToken = () => {
     const session = sessionStorage.getItem('vendor_session');
     return session ? JSON.parse(session).token : null;
   };
-  
+
   const displayImageUrl = imageError ? getFallbackImage('vendor') : (imageUrl || getFallbackImage('vendor'));
   const displayName = name || 'User';
   const displayEmail = email || '';
   const displaySellerId = sellerId || '';
-  
+
   const fetchBanner = async () => {
     try {
       const token = getVendorToken();
       if (!token) return;
-      
+
       const response = await axios.get(`${baseURL}/api/vendor/banner`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       if (response.data?.banner) {
         setBanner(response.data.banner);
       }
@@ -55,41 +55,41 @@ export function ProfileHeader({
       console.error('Failed to fetch banner:', error);
     }
   };
-  
+
   useEffect(() => {
     fetchBanner();
   }, []);
-  
+
   const handleBannerUpload = async (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
       toast.error('File size must be less than 2MB');
       return;
     }
-    
+
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       toast.error('Only JPG, PNG, and WEBP formats are allowed');
       return;
     }
-    
+
     try {
       setUploading(true);
       const formData = new FormData();
       formData.append('image', file);
-      
+
       const token = getVendorToken();
       if (!token) {
         toast.error('Authentication required');
         return;
       }
-      
+
       const response = await axios.post(`${baseURL}/api/vendor/banner`, formData, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       if (response.data?.vendor?.banner) {
         setBanner(response.data.vendor.banner);
         toast.success('Banner uploaded successfully!');
@@ -104,7 +104,7 @@ export function ProfileHeader({
       setUploading(false);
     }
   };
-  
+
   const handleBannerDelete = async () => {
     try {
       setDeleting(true);
@@ -113,11 +113,11 @@ export function ProfileHeader({
         toast.error('Authentication required');
         return;
       }
-      
+
       await axios.delete(`${baseURL}/api/vendor/banner`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setBanner(null);
       setShowDeleteConfirm(false);
       toast.success('Banner removed successfully!');
@@ -128,17 +128,17 @@ export function ProfileHeader({
       setDeleting(false);
     }
   };
-  
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       handleBannerUpload(file);
     }
   };
-  
+
   const hasBanner = !!banner;
   const bannerUrl = banner ? `${baseURL}/uploads/vendor/banner/${banner}` : undefined;
-  
+
   // ✅ Scroll to edit form function
   const handleEditClick = () => {
     if (onEditToggle) {
@@ -152,7 +152,7 @@ export function ProfileHeader({
       }, 100);
     }
   };
-  
+
   return (
     <div className="relative mb-6">
       {/* Cover Banner */}
@@ -166,15 +166,15 @@ export function ProfileHeader({
         ) : (
           <div className={`h-full bg-gradient-to-br ${coverGradient}`} />
         )}
-        
+
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-        
+
         <label className="absolute bottom-3 right-3 cursor-pointer bg-black/60 hover:bg-black/80 p-2 rounded-full transition-all z-10">
           <Pen className="w-4 h-4 text-white" />
-          <input 
-            type="file" 
-            accept="image/*" 
-            className="hidden" 
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
             onChange={handleFileSelect}
             disabled={uploading}
           />
@@ -192,7 +192,7 @@ export function ProfileHeader({
               <h3 className="text-xl font-bold text-gray-900 mb-2">Remove Cover Photo?</h3>
               <p className="text-gray-600">Are you sure you want to remove your cover photo? This action cannot be undone.</p>
             </div>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
@@ -217,7 +217,7 @@ export function ProfileHeader({
       <div className="relative px-6 pb-6 -mt-12 md:-mt-16">
         <div className="mt-4">
           <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
-            
+
             {/* Avatar - Camera icon removed, only image */}
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
@@ -229,32 +229,32 @@ export function ProfileHeader({
                 />
               </div>
             </div>
-            
+
             {/* NAME, SELLER ID, EMAIL, ADDRESS */}
             <div className="flex-1">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                 {displayName}
               </h1>
-              
+
               {displaySellerId && (
                 <p className="text-sm text-gray-600">
                   Seller ID: {displaySellerId}
                 </p>
               )}
-              
+
               <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-600 mt-1">
                 <div className="flex items-center gap-1.5">
                   <Mail size={14} className="text-primary-light flex-shrink-0" />
                   <span>{displayEmail}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-1.5">
                   <MapPin size={14} className="text-primary-light flex-shrink-0" />
                   <span>Dhaka, Bangladesh</span>
                 </div>
               </div>
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex gap-2 ml-auto">
               {/* ✅ Edit Profile Button - replaces camera icon */}

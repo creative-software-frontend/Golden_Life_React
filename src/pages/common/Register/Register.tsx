@@ -8,7 +8,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const refCode = searchParams.get('ref') || '';
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,7 +42,7 @@ const Register: React.FC = () => {
     const { name, value, type, checked } = e.target;
 
     let finalValue = value;
-    
+
     // Limit mobile number to 11 digits and only allow numbers
     if (name === 'mobile') {
       finalValue = value.replace(/\D/g, '').slice(0, 11);

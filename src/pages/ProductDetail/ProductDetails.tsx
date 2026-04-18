@@ -65,7 +65,7 @@ export default function ProductDetails() {
     const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
 
     // --- API & IMAGE PATHS ---
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.goldenlife.my';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
     const mainImgBase = `${baseURL}/uploads/ecommarce/product_image/`;
     const galleryImgBase = `${baseURL}/uploads/ecommarce/gal_img/`;
 
