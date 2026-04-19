@@ -1,111 +1,109 @@
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Briefcase, Code, Database, ChevronRight } from 'lucide-react';
 
 const Career = () => {
+    const jobs = [
+        {
+            title: "Frontend Developer",
+            icon: Code,
+            desc: "Looking for an expert React/TypeScript developer.",
+            color: "text-blue-500",
+            bg: "bg-blue-50"
+        },
+        {
+            title: "Backend Developer",
+            icon: Database,
+            desc: "Node.js and MongoDB expert wanted.",
+            color: "text-emerald-500",
+            bg: "bg-emerald-50"
+        },
+        {
+            title: "Product Manager",
+            icon: Briefcase,
+            desc: "Lead our agile product teams to success.",
+            color: "text-purple-500",
+            bg: "bg-purple-50"
+        }
+    ];
+
     return (
-        <div className="min-h-screen ">
-
-
-
-
-
-
-
-
-            {/* Job Openings Section */}
-            <section className="mb-12">
-                <h2 className="text-4xl font-semibold mb-8 text-center text-gray-800">Current Openings</h2>
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Sample Job Card */}
-                    <div className="p-6 border border-gray-300 rounded-lg shadow-lg bg-white hover:shadow-xl transition">
-                        <img
-                            src="/path/to/frontend-dev.jpg" // Replace with an image related to the job
-                            alt="Frontend Developer"
-                            className="w-full h-40 object-cover rounded-t-lg mb-4"
-                        />
-                        <h3 className="text-2xl font-semibold mb-2 text-gray-800">Frontend Developer</h3>
-                        <p className="text-gray-600 mb-4">
-                            We are looking for a skilled Frontend Developer with experience in React and TypeScript to join our team.
-                        </p>
-                        <Link
-                            to="/careers/frontend-developer"
-                            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                        >
-                            View Details
-                        </Link>
-                    </div>
-
-                    {/* Additional Job Cards */}
-                    <div className="p-6 border border-gray-300 rounded-lg shadow-lg bg-white hover:shadow-xl transition">
-                        <img
-                            src="/path/to/backend-dev.jpg" // Replace with an image related to the job
-                            alt="Backend Developer"
-                            className="w-full h-40 object-cover rounded-t-lg mb-4"
-                        />
-                        <h3 className="text-2xl font-semibold mb-2 text-gray-800">Backend Developer</h3>
-                        <p className="text-gray-600 mb-4">
-                            Seeking an experienced Backend Developer proficient in Node.js and MongoDB.
-                        </p>
-                        <Link
-                            to="/careers/backend-developer"
-                            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                        >
-                            View Details
-                        </Link>
-                    </div>
-                    {/* Additional Job Cards */}
-                    <div className="p-6 border border-gray-300 rounded-lg shadow-lg bg-white hover:shadow-xl transition">
-                        <img
-                            src="/path/to/backend-dev.jpg" // Replace with an image related to the job
-                            alt="Backend Developer"
-                            className="w-full h-40 object-cover rounded-t-lg mb-4"
-                        />
-                        <h3 className="text-2xl font-semibold mb-2 text-gray-800">Backend Developer</h3>
-                        <p className="text-gray-600 mb-4">
-                            Seeking an experienced Backend Developer proficient in Node.js and MongoDB.
-                        </p>
-                        <Link
-                            to="/careers/backend-developer"
-                            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                        >
-                            View Details
-                        </Link>
-                    </div>
-                    {/* Additional Job Cards */}
-                    <div className="p-6 border border-gray-300 rounded-lg shadow-lg bg-white hover:shadow-xl transition">
-                        <img
-                            src="/path/to/backend-dev.jpg" // Replace with an image related to the job
-                            alt="Backend Developer"
-                            className="w-full h-40 object-cover rounded-t-lg mb-4"
-                        />
-                        <h3 className="text-2xl font-semibold mb-2 text-gray-800">Backend Developer</h3>
-                        <p className="text-gray-600 mb-4">
-                            Seeking an experienced Backend Developer proficient in Node.js and MongoDB.
-                        </p>
-                        <Link
-                            to="/careers/backend-developer"
-                            className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                        >
-                            View Details
-                        </Link>
-                    </div>
+        <div className="min-h-[70vh] bg-transparent py-8 px-4 sm:px-6 lg:px-8">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-6xl mx-auto space-y-16"
+            >
+                {/* Header */}
+                <div className="text-center max-w-2xl mx-auto">
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-4xl md:text-5xl font-black mb-4 text-gray-800 tracking-tight"
+                    >
+                        Current Openings
+                    </motion.h2>
+                    <p className="text-gray-500 text-lg">Join us and do the best work of your life.</p>
                 </div>
-            </section>
 
-            {/* Join Our Team Section */}
-            <section className="bg-blue-50 p-8 rounded-lg text-center">
-                <h2 className="text-4xl font-bold mb-4 text-blue-900">Why Work with Us?</h2>
-                <p className="text-gray-700 mb-6">
-                    We offer a collaborative work environment, competitive salaries, and growth opportunities. Join us and be part of a company that values innovation and creativity.
-                </p>
-                <Link
-                    to="/contact-us"
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                {/* Job Grid */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {jobs.map((job, idx) => (
+                        <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="p-8 border border-gray-100 rounded-3xl shadow-sm bg-white hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <job.icon size={80} />
+                            </div>
+                            
+                            <div className={`w-14 h-14 ${job.bg} ${job.color} rounded-2xl flex items-center justify-center mb-6`}>
+                                <job.icon size={28} />
+                            </div>
+                            
+                            <h3 className="text-2xl font-bold mb-3 text-gray-800">{job.title}</h3>
+                            <p className="text-gray-600 mb-8 font-medium">
+                                {job.desc}
+                            </p>
+                            
+                            <Link
+                                to="#"
+                                className="inline-flex items-center text-emerald-600 font-bold group-hover:underline"
+                            >
+                                View Details 
+                                <ChevronRight size={18} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        </motion.div>
+                    ))}
+                </div>
+
+                {/* CTA Section */}
+                <motion.section 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-10 md:p-16 rounded-[2rem] text-center shadow-lg relative overflow-hidden"
                 >
-                    Contact Us for Career Opportunities
-                </Link>
-            </section>
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    <h2 className="text-3xl md:text-5xl font-black mb-6 text-white tracking-tight">Why Work With Us?</h2>
+                    <p className="text-emerald-50 mb-10 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
+                        We offer a collaborative work environment, competitive salaries, and limitless growth opportunities. Join a company that values innovation above all else.
+                    </p>
+                    <Link
+                        to="/dashboard/help/contact"
+                        className="inline-block bg-white text-emerald-700 font-bold px-8 py-4 rounded-xl hover:bg-emerald-50 transition shadow-md active:scale-95"
+                    >
+                        Contact Us for Opportunities
+                    </Link>
+                </motion.section>
+            </motion.div>
         </div>
     );
-}
+};
 
-export default Career
+export default Career;

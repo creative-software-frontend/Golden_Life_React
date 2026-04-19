@@ -90,6 +90,22 @@ export default function HelpLayout() {
                                     </button>
                                 )}
                             </div>
+
+                            {/* Suggested Student Panel Questions */}
+                            <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-2xl mx-auto">
+                                <button onClick={() => setSearchTerm('How to earn money?')} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full px-4 py-1.5 text-sm transition-colors shadow-sm">
+                                    How to earn money?
+                                </button>
+                                <button onClick={() => setSearchTerm('Referral income')} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full px-4 py-1.5 text-sm transition-colors shadow-sm">
+                                    Referral income
+                                </button>
+                                <button onClick={() => setSearchTerm('Wallet withdraw')} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full px-4 py-1.5 text-sm transition-colors shadow-sm">
+                                    Wallet withdraw
+                                </button>
+                                <button onClick={() => setSearchTerm('Course enroll')} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full px-4 py-1.5 text-sm transition-colors shadow-sm">
+                                    Course enroll
+                                </button>
+                            </div>
                         </div>
                     </section>
 
@@ -100,17 +116,20 @@ export default function HelpLayout() {
                                 <Link to={basePath} className={getTabClass(basePath)}>
                                     Help Center
                                 </Link>
-                                <Link to={`${basePath}/ai`} className={getTabClass(`${basePath}/ai`)}>
-                                    Support AI
+                                <Link to={`${basePath}/our-story`} className={getTabClass(`${basePath}/our-story`)}>
+                                    {t("Hmenu.story")}
                                 </Link>
-                                <Link to={`${basePath}/hotline`} className={getTabClass(`${basePath}/hotline`)}>
-                                    Hotline
+                                <Link to={`${basePath}/career`} className={getTabClass(`${basePath}/career`)}>
+                                    {t("Hmenu.Career")}
                                 </Link>
-                                <Link to={`${basePath}/faq`} className={getTabClass(`${basePath}/faq`)}>
-                                    FAQ
+                                <Link to={`${basePath}/contact`} className={getTabClass(`${basePath}/contact`)}>
+                                    {t("Hmenu.ContactUs")}
                                 </Link>
-                                <Link to={`${basePath}/ticket`} className={getTabClass(`${basePath}/ticket`)}>
-                                    Ticket
+                                <Link to={`${basePath}/privacy-policy`} className={getTabClass(`${basePath}/privacy-policy`)}>
+                                    {t("Hmenu.PrivacyPolicy")}
+                                </Link>
+                                <Link to={`${basePath}/terms`} className={getTabClass(`${basePath}/terms`)}>
+                                    {t("Hmenu.TermsofUse")}
                                 </Link>
                             </nav>
                         </div>

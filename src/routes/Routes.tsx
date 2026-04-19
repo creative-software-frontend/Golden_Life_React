@@ -88,6 +88,7 @@ import NomineeInfoTab from "@/components/profile/NomineeInfoTab/NomineeInfoTab";
 import AdditionalInfoTab from "@/components/profile/AdditionalInfoTab/AdditionalInfoTab";
 import ProjectOverviewTab from "@/components/profile/ProjectOverviewTab/ProjectOverviewTab";
 import ChangePassward from "@/components/profile/ChangePassward/ChangePassward";
+import ReferralsTab from "@/components/profile/ReferralsTab/ReferralsTab";
 
 // Vendor Wallet
 import VendorAddMoney from "@/pages/Vendor/Wallet/VendorAddMoney";
@@ -275,6 +276,7 @@ export const routes = createBrowserRouter([
                             { path: "nominee-info", element: <NomineeInfoTab /> },
                             { path: "Additional-info", element: <AdditionalInfoTab /> },
                             { path: "Change-passward", element: <ChangePassward /> },
+                            { path: "referrals", element: <ReferralsTab /> },
                         ]
                     },
                     {
@@ -311,8 +313,20 @@ export const routes = createBrowserRouter([
                                 element: <Story />,
                             },
                             {
+                                path: 'career',
+                                element: <Career />,
+                            },
+                            {
                                 path: 'contact',
                                 element: <Contact />,
+                            },
+                            {
+                                path: 'privacy-policy',
+                                element: <PrivacyPolicy />,
+                            },
+                            {
+                                path: 'terms',
+                                element: <TermsOfUse />,
                             }
                         ]
                     },
@@ -433,6 +447,22 @@ export const routes = createBrowserRouter([
                                     {
                                         path: 'contact',
                                         element: <Contact />,
+                                    },
+                                    {
+                                        path: 'our-story',
+                                        element: <Story />,
+                                    },
+                                    {
+                                        path: 'career',
+                                        element: <Career />,
+                                    },
+                                    {
+                                        path: 'privacy-policy',
+                                        element: <PrivacyPolicy />,
+                                    },
+                                    {
+                                        path: 'terms',
+                                        element: <TermsOfUse />,
                                     }
                                 ]
                             }

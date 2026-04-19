@@ -10,7 +10,7 @@ import HotlineModal from '@/components/shared/HotlineModal';
 import FAQModal from '@/components/shared/FAQModal';
 import { useAppStore } from '@/store/useAppStore';
 import useModalStore from '@/store/modalStore';
-import { Ticket as TicketIcon, HelpCircle, PhoneCall } from 'lucide-react';
+import { Wrench, HelpCircle, PhoneCall } from 'lucide-react';
 
 type Message = {
     id: number
@@ -167,18 +167,18 @@ export default function LiveChat({ showLegacy = true }: LiveChatProps) {
                     </button>
 
                     {/* Lower Row: Icons in a single row */}
-                    <div className="flex items-center justify-center gap-5">
+                    <div className="flex items-center justify-center gap-2">
                         <Link to="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform duration-300">
                             <FontAwesomeIcon icon={faWhatsapp} className="h-6 w-6 text-green-600" />
                         </Link>
 
-                        <div className="h-6 w-[1px] bg-gray-200" />
+                        <div className="h-5 w-[1px] bg-gray-200" />
 
                         <Link to="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform duration-300">
-                            <FontAwesomeIcon icon={faTelegram} className="h-6 w-6 text-blue-600" />
+                            <FontAwesomeIcon icon={faTelegram} className="h-6 w-6 text-blue-500" />
                         </Link>
 
-                        <div className="h-6 w-[1px] bg-gray-200" />
+                        <div className="h-5 w-[1px] bg-gray-200" />
 
                         <button
                             onClick={() => {
@@ -192,7 +192,7 @@ export default function LiveChat({ showLegacy = true }: LiveChatProps) {
                             }}
                             className="hover:scale-125 transition-transform duration-300 flex items-center justify-center"
                         >
-                            <TicketIcon className="h-5 w-5 text-[#4d4ee2]" />
+                            <Wrench className="h-5 w-5 text-[#4d4ee2]" />
                         </button>
                     </div>
                 </div>

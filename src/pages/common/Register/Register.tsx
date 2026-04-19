@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Smartphone, Mail, User, Lock, TicketCheck, ShieldCheck, Loader2, AlertCircle, RefreshCcw, X } from 'lucide-react';
 import Logo from '../Logo';
@@ -23,6 +23,16 @@ const Register: React.FC = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+  const [isResent, setIsResent] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -116,6 +126,7 @@ const Register: React.FC = () => {
 
       setOtp(["", "", "", ""]); // Reset OTP inputs
       setShowOtpModal(true);
+      setResendTimer(5);
     } catch (error: any) {
       setApiError(error.message);
     } finally {
@@ -136,17 +147,25 @@ const Register: React.FC = () => {
     setOtpError('');
 
     try {
-      const response = await fetch(`${baseURL}/api/student/verify-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          otp: otpCode
-        }),
-      });
+      let response;
+      if (isResent) {
+        response = await fetch(`${baseURL}/api/login/verify-otp?mobile=${formData.mobile}&otp=${otpCode}`, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' }
+        });
+      } else {
+        response = await fetch(`${baseURL}/api/student/verify-otp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            otp: otpCode
+          }),
+        });
+      }
 
       const data = await response.json();
       console.log("OTP API Response:", data); // Add this line!
@@ -156,11 +175,13 @@ const Register: React.FC = () => {
         // Save the authentication token so the dashboard knows you are logged in.
         // Make sure 'data.token' matches whatever your API actually returns (e.g., data.data.token, data.access_token)
         const token = data.token || data.data?.token;
+        const user = data.user || data.data?.user;
+        const student = data.student || data.data?.student;
 
         if (token) {
           setOtp(["", "", "", ""]);
           setShowOtpModal(false);
-          handleAuthSuccess(token);
+          handleAuthSuccess(token, user, student);
         } else {
           throw new Error("Verification successful but no token received.");
         }
@@ -176,6 +197,38 @@ const Register: React.FC = () => {
       setIsOtpLoading(false);
     }
   };
+
+  const handleResendOtp = async () => {
+    setIsLoading(true);
+    setOtpError('');
+    try {
+      const response = await fetch(`${baseURL}/api/login/send-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          mobile: formData.mobile
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok || data.success) {
+        setOtp(["", "", "", ""]);
+        setResendTimer(5);
+        setIsResent(true);
+      } else {
+        throw new Error(data.message || "Failed to resend OTP.");
+      }
+    } catch (error: any) {
+      setOtpError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleOtpChange = (index: number, value: string) => {
     const cleanValue = value.replace(/[^0-9]/g, "").substring(0, 1);
     const newOtp = [...otp];
@@ -189,13 +242,15 @@ const Register: React.FC = () => {
       otpInputRefs.current[index - 1]?.focus();
     }
   };
-  const handleAuthSuccess = (token: string) => {
+  const handleAuthSuccess = (token: string, user?: any, student?: any) => {
     const expirationDate = new Date();
     expirationDate.setTime(expirationDate.getTime() + (1 * 24 * 60 * 60 * 1000));
 
     document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
     sessionStorage.setItem('student_session', JSON.stringify({
       token: token,
+      user: user,
+      student: student,
       expiry: expirationDate.getTime()
     }));
 
@@ -300,11 +355,12 @@ const Register: React.FC = () => {
               </button>
 
               <button
-                onClick={() => handleSubmit()}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-orange-500 font-bold text-xs py-2 transition-colors disabled:opacity-50"
+                onClick={handleResendOtp}
+                disabled={isLoading || resendTimer > 0}
+                className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-orange-500 font-bold text-xs py-2 transition-colors disabled:opacity-50 disabled:hover:text-slate-400 disabled:cursor-not-allowed"
               >
-                <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} /> Resend OTP
+                <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} /> 
+                {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
               </button>
             </div>
           </div>

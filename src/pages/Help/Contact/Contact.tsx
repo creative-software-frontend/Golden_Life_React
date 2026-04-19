@@ -1,104 +1,122 @@
-
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Phone, Mail, MapPin, Send } from 'lucide-react';
 
 const Contact = () => {
-  return (
-      <div className="min-h-screen ">
-        
-     
-          {/* Hero Section */}
-          <section className="text-center mb-12">
-              <h1 className="text-5xl font-bold mb-4 text-gray-800">Get in Touch</h1>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                  We would love to hear from you. Whether you have a question, feedback, or just want to say hello,
-                  reach out to us and we'll get back to you as soon as possible.
-              </p>
-          </section>
+    return (
+        <div className="min-h-[70vh] bg-transparent py-8 px-4 sm:px-6 lg:px-8">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-6xl mx-auto space-y-16"
+            >
+                {/* Hero Section */}
+                <section className="text-center max-w-3xl mx-auto">
+                    <motion.h1 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-4xl md:text-5xl font-black mb-6 text-gray-800 tracking-tight"
+                    >
+                        Get in Touch
+                    </motion.h1>
+                    <p className="text-lg text-gray-500 font-medium leading-relaxed">
+                        We would love to hear from you. Whether you have a question, feedback, or just want to say hello,
+                        reach out to us and we'll get back to you as soon as possible.
+                    </p>
+                </section>
 
-          {/* Contact Form */}
-          <section className="bg-white p-8 shadow-md rounded-lg max-w-2xl mx-auto">
-              <h2 className="text-3xl font-semibold mb-6 text-gray-800">Contact Us</h2>
-              <form className="space-y-6">
-                  {/* Name Input */}
-                  <div>
-                      <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Name</label>
-                      <input
-                          type="text"
-                          id="name"
-                          placeholder="Your Name"
-                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                  </div>
+                <div className="grid lg:grid-cols-3 gap-8">
+                    {/* Contact Information Cards */}
+                    <div className="lg:col-span-1 space-y-4">
+                        {[
+                            { icon: Phone, title: "Phone", info: "+1 123-456-7890", color: "text-blue-500", bg: "bg-blue-50" },
+                            { icon: Mail, title: "Email", info: "support@goldenlife.com", color: "text-emerald-500", bg: "bg-emerald-50" },
+                            { icon: MapPin, title: "Address", info: "123 Golden Life Street, City", color: "text-purple-500", bg: "bg-purple-50" }
+                        ].map((item, idx) => (
+                            <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 + (idx * 0.1) }}
+                                className="flex items-center p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                            >
+                                <div className={`w-12 h-12 ${item.bg} ${item.color} rounded-xl flex items-center justify-center shrink-0 mr-4`}>
+                                    <item.icon size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">{item.title}</h3>
+                                    <p className="font-bold text-gray-800">{item.info}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
 
-                  {/* Email Input */}
-                  <div>
-                      <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email</label>
-                      <input
-                          type="email"
-                          id="email"
-                          placeholder="Your Email"
-                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                  </div>
+                    {/* Contact Form */}
+                    <motion.section 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="lg:col-span-2 bg-white p-8 md:p-10 shadow-sm border border-gray-100 rounded-[2rem]"
+                    >
+                        <h2 className="text-2xl font-bold mb-8 text-gray-800 flex items-center gap-2">
+                            Send a Message
+                        </h2>
+                        
+                        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        placeholder="John Doe"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        placeholder="john@example.com"
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
 
-                  {/* Subject Input */}
-                  <div>
-                      <label htmlFor="subject" className="block text-gray-700 font-medium mb-2">Subject</label>
-                      <input
-                          type="text"
-                          id="subject"
-                          placeholder="Subject"
-                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                  </div>
+                            <div>
+                                <label htmlFor="subject" className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
+                                <input
+                                    type="text"
+                                    id="subject"
+                                    placeholder="How can we help?"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                                />
+                            </div>
 
-                  {/* Message Input */}
-                  <div>
-                      <label htmlFor="message" className="block text-gray-700 font-medium mb-2">Message</label>
-                      <textarea
-                          id="message"
-                          placeholder="Your Message"
-                          rows={5}
-                          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      ></textarea>
-                  </div>
+                            <div>
+                                <label htmlFor="message" className="block text-sm font-bold text-gray-700 mb-2">Message</label>
+                                <textarea
+                                    id="message"
+                                    placeholder="Write your message here..."
+                                    rows={5}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium resize-none"
+                                ></textarea>
+                            </div>
 
-                  {/* Submit Button */}
-                  <div>
-                      <button
-                          type="submit"
-                          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-                      >
-                          Send Message
-                      </button>
-                  </div>
-              </form>
-          </section>
+                            <button
+                                type="submit"
+                                className="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 transition shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                <Send size={18} />
+                                Send Message
+                            </button>
+                        </form>
+                    </motion.section>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
-          {/* Contact Information */}
-          <section className="mt-12 text-center">
-              <h2 className="text-3xl font-semibold mb-4 text-gray-800">Other Ways to Reach Us</h2>
-              <p className="text-lg text-gray-600 mb-6">You can also contact us through the following channels:</p>
-              <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
-                  <div className="flex items-center justify-center bg-gray-200 p-4 rounded-lg">
-                      <p className="text-gray-800">
-                          <strong>Phone:</strong> +1 123-456-7890
-                      </p>
-                  </div>
-                  <div className="flex items-center justify-center bg-gray-200 p-4 rounded-lg">
-                      <p className="text-gray-800">
-                          <strong>Email:</strong> support@goldenlife.com
-                      </p>
-                  </div>
-                  <div className="flex items-center justify-center bg-gray-200 p-4 rounded-lg">
-                      <p className="text-gray-800">
-                          <strong>Address:</strong> 123 Golden Life Street, City, Country
-                      </p>
-                  </div>
-              </div>
-          </section>
-
-      </div>
-  )
-}
-
-export default Contact
+export default Contact;

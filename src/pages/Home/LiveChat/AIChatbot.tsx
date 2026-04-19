@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Bot, Send, X, ChevronRight, MessageSquare, Bell, User, RotateCcw } from 'lucide-react';
+import { Bot, Send, X, ChevronRight, Bell, RotateCcw, DollarSign, Users, Wallet, BookOpen, LifeBuoy, MessageSquare } from 'lucide-react';
 import { useAppStore } from '../../../store/useAppStore';
+import { getVendorAvatarUrl, getVendorDisplayName } from '@/hooks/useVendorProfile';
 
 interface AIChatbotProps {
   isOpen: boolean;
@@ -15,8 +16,37 @@ const AIChatbot: React.FC<AIChatbotProps> = ({ isOpen, onClose }) => {
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Access Zustand Store
-  const { chatbotMessages, isChatbotLoading, sendChatbotMessage, clearChatbotMessages } = useAppStore();
+  // Access Zustand Store for both student & vendor profiles
+  const { chatbotMessages, isChatbotLoading, sendChatbotMessage, clearChatbotMessages, studentProfile, vendorProfile } = useAppStore();
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://admin.goldenlifeltd.com';
+
+  // Determine active user type from session storage
+  const isVendorSession = !!sessionStorage.getItem('vendor_session');
+  const isStudentSession = !!sessionStorage.getItem('student_session');
+
+  // Resolve profile image and display name for current panel
+  const profileImageUrl: string | null = (() => {
+    if (isVendorSession && vendorProfile) {
+      const vendorUrl = getVendorAvatarUrl(vendorProfile as any);
+      return vendorUrl || null;
+    }
+    if (isStudentSession && studentProfile?.image) {
+      // Use the same path convention as UserLayout
+      return studentProfile.image.startsWith('http')
+        ? studentProfile.image
+        : `${baseURL}/uploads/student/image/${studentProfile.image}`;
+    }
+    return null;
+  })();
+
+  const displayName: string = (() => {
+    if (isVendorSession && vendorProfile) {
+      return getVendorDisplayName(vendorProfile as any);
+    }
+    return studentProfile?.name || '';
+  })();
+
+  const nameInitial = displayName.charAt(0).toUpperCase() || '?';
 
   const handleClearChat = () => {
     clearChatbotMessages();
@@ -47,13 +77,23 @@ const AIChatbot: React.FC<AIChatbotProps> = ({ isOpen, onClose }) => {
     await sendChatbotMessage(text);
   };
 
-  const initialQuestions = [
-    { id: 'reseller', icon: <MessageSquare size={18} /> },
-    { id: 'productList', icon: <MessageSquare size={18} /> },
-    { id: 'payment', icon: <MessageSquare size={18} /> },
-    { id: 'orderTrack', icon: <MessageSquare size={18} /> },
-    { id: 'withdraw', icon: <MessageSquare size={18} /> },
+  const studentQuestions = [
+    { id: 'earnMoney',      icon: <DollarSign size={18} /> },
+    { id: 'referralIncome', icon: <Users size={18} /> },
+    { id: 'walletWithdraw', icon: <Wallet size={18} /> },
+    { id: 'courseEnroll',   icon: <BookOpen size={18} /> },
+    { id: 'supportTicket',  icon: <LifeBuoy size={18} /> },
   ];
+
+  const vendorQuestions = [
+    { id: 'vendor_startReseller',  icon: <MessageSquare size={18} /> },
+    { id: 'vendor_listProduct',    icon: <MessageSquare size={18} /> },
+    { id: 'vendor_paymentMethods', icon: <MessageSquare size={18} /> },
+    { id: 'vendor_trackOrder',     icon: <MessageSquare size={18} /> },
+    { id: 'vendor_withdrawTime',   icon: <MessageSquare size={18} /> },
+  ];
+
+  const initialQuestions = isVendorSession ? vendorQuestions : studentQuestions;
 
   return (
     <AnimatePresence>
@@ -204,10 +244,30 @@ const AIChatbot: React.FC<AIChatbotProps> = ({ isOpen, onClose }) => {
                         {m.timestamp}
                       </span>
                     </div>
+
+                    {/* User Avatar: Profile image (student or vendor) → name initial fallback */}
                     {m.sender === 'user' && (
-                       <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 flex-shrink-0 shadow-sm border border-white">
-                        <User size={16} />
-                       </div>
+                      <div className="w-8 h-8 rounded-full flex-shrink-0 shadow-sm border-2 border-white overflow-hidden bg-slate-200 flex items-center justify-center">
+                        {profileImageUrl ? (
+                          <img
+                            src={profileImageUrl}
+                            alt={displayName || 'You'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              const parent = (e.target as HTMLImageElement).parentElement;
+                              if (parent && !parent.querySelector('.name-initial')) {
+                                const el = document.createElement('span');
+                                el.className = 'name-initial text-xs font-bold text-slate-500';
+                                el.textContent = nameInitial;
+                                parent.appendChild(el);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-slate-500">{nameInitial}</span>
+                        )}
+                      </div>
                     )}
                   </motion.div>
                 ))}

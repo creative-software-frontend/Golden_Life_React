@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 import {
-    LayoutDashboard, User, FileText, FileBadge, Info, ShieldCheck, UserCircle2, Facebook, Send, Twitter, Youtube, Linkedin
+    LayoutDashboard, User, FileText, FileBadge, Info, ShieldCheck, UserCircle2, Facebook, Send, Twitter, Youtube, Linkedin, Users
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { baseURL } from '@/store/utils';
@@ -85,7 +85,7 @@ export default function ProfileSidebar() {
         { path: 'nominee-info', label: 'Nominee Information', icon: UserCircle2 },
         { path: 'Additional-info', label: 'Additional Information', icon: Info },
         { path: 'Change-passward', label: 'Change Password', icon: ShieldCheck },
-
+        { path: 'referrals', label: 'Refer', icon: Users },
     ];
 
     return (

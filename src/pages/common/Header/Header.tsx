@@ -210,84 +210,10 @@ const Header: React.FC = () => {
                 <div className="flex items-center gap-4 shrink-0">
 
                     {/* --- USER PROFILE DROPDOWN (NEW) --- */}
-                    <div className="relative inline-block z-50" ref={profileDropdownRef}>
-                        {/* Trigger Button */}
-                        <button
-                            onClick={() => setIsProfileOpen(!isProfileOpen)}
-                            className="group flex items-center gap-3 pl-4 pr-3 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300"
-                        >
-                            {/* 1st: Profile Avatar */}
-                            <div className="relative shrink-0">
-                                <div className="h-10 w-10 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300 overflow-hidden bg-slate-100">
-                                    <img
-                                        src={avatarUrl}
-                                        alt={studentProfile?.name || 'Profile'}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'S')}&background=FF8A00&color=fff&bold=true`;
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Online Badge */}
-                                <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
-                                    <GraduationCap size={12} className="text-white" />
-                                </div>
-                            </div>
-
-                            {/* 2nd: Text Info (Name & Tier) */}
-                            <div className="flex flex-col items-start justify-center text-left hidden md:flex">
-                                {isProfileLoading && !studentProfile ? (
-                                    <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-md" />
-                                ) : (
-                                    <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
-                                        {studentProfile?.name || "Student"}
-                                    </span>
-                                )}
-
-                                <div className="flex items-center gap-1.5 mt-1.5">
-                                    <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
-                                        Golden Tier
-                                    </span>
-                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                </div>
-                            </div>
-
-                            {/* Dropdown Indicator Arrow */}
-                            <ChevronDown className={`w-4 h-4 text-slate-400 ml-1 transition-transform duration-300 ${isProfileOpen ? 'rotate-180 text-emerald-500' : ''}`} />
-                        </button>
-
-                        {/* Dropdown Menu */}
-                        {isProfileOpen && (
-                            <div className="absolute left-0 mt-3 w-48 bg-white/90 backdrop-blur-2xl rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-left z-[999]">
-                                <div className="p-1.5">
-                                    <Link
-                                        to="/dashboard/order"
-                                        onClick={() => setIsProfileOpen(false)}
-                                        className="group flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
-                                    >
-                                        <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-slate-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-emerald-100 transition-all duration-200">
-                                            <Package className="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
-                                        </div>
-                                        <span>Order History</span>
-                                    </Link>
-                                    <button
-                                        onClick={() => {
-                                            sessionStorage.removeItem("student_session");
-                                            navigate("/login");
-                                            window.location.reload();
-                                        }}
-                                        className="group flex items-center gap-3 w-full px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-50 transition-all duration-200"
-                                    >
-                                        <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-red-100 transition-all duration-200">
-                                            <X className="w-4 h-4 text-red-400 group-hover:text-red-500" />
-                                        </div>
-                                        <span>Sign Out</span>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <Link to="/dashboard" className="flex items-center gap-2 bg-primary-default text-white px-5 py-3 rounded-xl text-sm font-black hover:bg-green-600 shadow-md shadow-primary-default/25 transition-all active:scale-95">
+                        <LayoutDashboard className="h-5 w-5" />
+                        <span>{t('header.dashboard') || "Dashboard"}</span>
+                    </Link>
 
                     {/* --- WALLET WITH DROPDOWN MENU --- */}
                     <div className="relative group z-40">
@@ -416,12 +342,92 @@ const Header: React.FC = () => {
                             BN
                         </button>
                     </div>
+                    {/* 1st: Profile Avatar */}
+                    <div className="relative shrink-0">
 
+                        {/* --- USER PROFILE DROPDOWN (NEW) --- */}
+                        <div className="relative inline-block z-50" ref={profileDropdownRef}>
+                            {/* Trigger Button */}
+                            <button
+                                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                className="group flex items-center gap-3 pl-4 pr-3 py-2 bg-slate-50/80 backdrop-blur-sm rounded-2xl border border-slate-200/60 hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300"
+                            >
+                                {/* 1st: Profile Avatar */}
+                                <div className="relative shrink-0">
+                                    <div className="h-10 w-10 rounded-xl border border-slate-200 shadow-sm group-hover:rotate-3 group-hover:scale-110 transition-all duration-300 overflow-hidden bg-slate-100">
+                                        <img
+                                            src={avatarUrl}
+                                            alt={studentProfile?.name || 'Profile'}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(studentProfile?.name || 'S')}&background=FF8A00&color=fff&bold=true`;
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Online Badge */}
+                                    <div className="absolute -bottom-1 -right-1 flex items-center justify-center h-5 w-5 bg-emerald-500 rounded-lg border-2 border-white shadow-lg shadow-emerald-200">
+                                        <GraduationCap size={12} className="text-white" />
+                                    </div>
+                                </div>
+
+                                {/* 2nd: Text Info (Name & Tier) */}
+                                <div className="flex flex-col items-start justify-center text-left hidden md:flex">
+                                    {isProfileLoading && !studentProfile ? (
+                                        <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-md" />
+                                    ) : (
+                                        <span className="text-[14px] font-semibold text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                            {studentProfile?.name || "Student"}
+                                        </span>
+                                    )}
+
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <span className="text-[11px] text-slate-400 font-medium tracking-wide uppercase">
+                                            Golden Tier
+                                        </span>
+                                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    </div>
+                                </div>
+
+                                {/* Dropdown Indicator Arrow */}
+                                <ChevronDown className={`w-4 h-4 text-slate-400 ml-1 transition-transform duration-300 ${isProfileOpen ? 'rotate-180 text-emerald-500' : ''}`} />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isProfileOpen && (
+                                <div className="absolute left-0 mt-3 w-48 bg-white/90 backdrop-blur-2xl rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-left z-[999]">
+                                    <div className="p-1.5">
+                                        <Link
+                                            to="/dashboard/order"
+                                            onClick={() => setIsProfileOpen(false)}
+                                            className="group flex items-center gap-3 px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200"
+                                        >
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-slate-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-emerald-100 transition-all duration-200">
+                                                <Package className="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
+                                            </div>
+                                            <span>Order History</span>
+                                        </Link>
+                                        <button
+                                            onClick={() => {
+                                                sessionStorage.removeItem("student_session");
+                                                navigate("/login");
+                                                window.location.reload();
+                                            }}
+                                            className="group flex items-center gap-3 w-full px-2.5 py-2.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-50 transition-all duration-200"
+                                        >
+                                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 group-hover:bg-white group-hover:shadow-sm border border-transparent group-hover:border-red-100 transition-all duration-200">
+                                                <X className="w-4 h-4 text-red-400 group-hover:text-red-500" />
+                                            </div>
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
                     {/* Dashboard Button */}
-                    <Link to="/dashboard" className="flex items-center gap-2 bg-primary-default text-white px-5 py-3 rounded-xl text-sm font-black hover:bg-green-600 shadow-md shadow-primary-default/25 transition-all active:scale-95">
-                        <LayoutDashboard className="h-5 w-5" />
-                        <span>{t('header.dashboard') || "Dashboard"}</span>
-                    </Link>
+
                 </div>
             </header>
 

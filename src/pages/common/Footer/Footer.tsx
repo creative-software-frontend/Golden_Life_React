@@ -25,10 +25,10 @@ const Footer = () => {
                         {t('footer.aboutGoldenLife')}
                     </h3>
                     <ul className="space-y-2.5">
-                        <li><Link to="/help/our-story" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.ourStory')}</Link></li>
+                        <li><Link to="/dashboard/help/our-story" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.ourStory')}</Link></li>
                         <li><Link to="#" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.team')}</Link></li>
-                        <li><Link to="/help/privacy-policy" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.privacyPolicy')}</Link></li>
-                        <li><Link to="/help/terms" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.termsOfUse')}</Link></li>
+                        <li><Link to="/dashboard/help/privacy-policy" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.privacyPolicy')}</Link></li>
+                        <li><Link to="/dashboard/help/terms" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.termsOfUse')}</Link></li>
                     </ul>
                 </div>
 
@@ -38,9 +38,9 @@ const Footer = () => {
                         {t('footer.customerService')}
                     </h3>
                     <ul className="space-y-2.5">
-                        <li><Link to="/help/contact" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.contactUs')}</Link></li>
-                        <li><Link to="/help" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.faq')}</Link></li>
-                        <li><Link to="/help" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.help')}</Link></li>
+                        <li><Link to="/dashboard/help/contact" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.contactUs')}</Link></li>
+                        <li><Link to="/dashboard/help" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.faq')}</Link></li>
+                        <li><Link to="/dashboard/help" className="text-gray-600 hover:text-emerald-600 transition-colors text-sm md:text-base font-medium">{t('footer.help')}</Link></li>
                     </ul>
                 </div>
 

@@ -32,13 +32,13 @@ export function ProfileForm({
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
+    values: {
       name: user?.name || '',
       email: user?.email || '',
-      mobile: user?.mobile ? user.mobile.replace(/^\+880/, '') : '',
+      mobile: (user?.mobile && user.mobile !== 'null') ? String(user.mobile).replace(/^\+880/, '') : (vendor?.mobile ? String(vendor.mobile).replace(/^\+880/, '') : ''),
       owner_name: vendor?.owner_name || '',
       businee_name: vendor?.businee_name || '',
-      mobile_business: vendor?.mobile ? vendor.mobile.replace(/^\+880/, '') : '',
+      mobile_business: vendor?.mobile ? String(vendor.mobile).replace(/^\+880/, '') : (user?.mobile ? String(user.mobile).replace(/^\+880/, '') : ''),
       country: vendor?.country || '',
       district: vendor?.district || '',
       address: vendor?.address || '',
@@ -165,7 +165,7 @@ export function ProfileForm({
               <input
                 type="tel"
                 {...register('mobile')}
-                disabled
+                readOnly
                 className="flex-1 px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-r-xl cursor-not-allowed outline-none font-medium"
                 placeholder="1XXXXXXXXX"
               />

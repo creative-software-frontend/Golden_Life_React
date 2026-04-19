@@ -56,7 +56,7 @@ export function ProfileInfo({ user, vendor }: ProfileInfoProps) {
         {
           icon: Phone,
           label: 'Mobile Number',
-          value: `${safeUser.mobile || 'Not provided'} ${safeUser.mobile_verify ? '✓' : ''}`,
+          value: `${safeUser.mobile || safeVendor.mobile || 'Not provided'} ${safeUser.mobile_verify ? '✓' : ''}`,
           color: 'primary-light'
         }
       ]

@@ -790,11 +790,16 @@
     "askPrompt": "Ask any question. I'm ready to help you.",
     "inputPlaceholder": "Write here...",
     "questions": {
-      "reseller": "I want to start working as a reseller",
-      "productList": "How to list products?",
-      "payment": "What are the payment methods?",
-      "orderTrack": "How to track orders?",
-      "withdraw": "How long does it take to withdraw?"
+      "earnMoney": "How can I earn money from the student panel?",
+      "referralIncome": "How does the referral income work?",
+      "walletWithdraw": "How do I withdraw my wallet balance?",
+      "courseEnroll": "How do I enroll in a course?",
+      "supportTicket": "How do I create a support ticket?",
+      "vendor_startReseller": "I want to start working as a reseller",
+      "vendor_listProduct": "How do I list a product?",
+      "vendor_paymentMethods": "What are the payment methods?",
+      "vendor_trackOrder": "How do I track an order?",
+      "vendor_withdrawTime": "How long does a withdrawal take?"
     }
   }
 }

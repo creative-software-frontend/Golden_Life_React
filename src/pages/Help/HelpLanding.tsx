@@ -5,38 +5,46 @@ import {
     HelpCircle, 
     Ticket as TicketIcon 
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import useModalStore from '@/store/modalStore';
 import { useTranslation } from 'react-i18next';
 
 const HelpLanding: React.FC = () => {
     const { t } = useTranslation("global");
+    
+    // Global Modal Store Handlers
+    const { 
+        setIsAIChatOpen, 
+        setIsHotlineModalOpen, 
+        setIsFAQModalOpen, 
+        setIsTicketModalOpen 
+    } = useModalStore();
 
     const supportItems = [
         {
             title: "Support AI",
             icon: Headphones,
-            path: "ai",
+            onClick: () => setIsAIChatOpen(true),
             color: "text-slate-800",
             bgColor: "bg-white"
         },
         {
             title: "Hotline",
             icon: Phone,
-            path: "hotline",
+            onClick: () => setIsHotlineModalOpen(true),
             color: "text-slate-800",
             bgColor: "bg-white"
         },
         {
             title: "FAQ",
             icon: HelpCircle,
-            path: "faq",
+            onClick: () => setIsFAQModalOpen(true),
             color: "text-slate-800",
-            bgColor: "bg-[#F3F4F6]" // Slightly grayer as per screenshot
+            bgColor: "bg-[#F3F4F6]" // Slightly grayer for visual variety
         },
         {
             title: "Ticket",
             icon: TicketIcon,
-            path: "ticket",
+            onClick: () => setIsTicketModalOpen(true),
             color: "text-slate-800",
             bgColor: "bg-white"
         }
@@ -46,9 +54,9 @@ const HelpLanding: React.FC = () => {
         <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {supportItems.map((item) => (
-                    <Link
+                    <button
                         key={item.title}
-                        to={item.path}
+                        onClick={item.onClick}
                         className={`
                             ${item.bgColor} 
                             border border-gray-200 
@@ -63,7 +71,7 @@ const HelpLanding: React.FC = () => {
                         <span className="text-xl md:text-2xl font-bold text-gray-800">
                             {item.title}
                         </span>
-                    </Link>
+                    </button>
                 ))}
             </div>
         </div>
