@@ -62,6 +62,8 @@ import WalletAdd from "@/pages/Wallet/WalletAdd/WalletAdd";
 import VendorInfo from "@/pages/Home/VendorInfo/VendorInfo";
 import InstructorLogin from "@/pages/common/Instructor/InstructorLogin";
 import InstructorRegister from "@/pages/common/Instructor/InstructorRegister";
+import InstructorLayout from "@/layout/InstructorLayout/InstructorLayout";
+import InstructorHome from "@/pages/InstructorHome/InstructorHome";
 
 
 // Vendor Profile
@@ -465,6 +467,29 @@ export const routes = createBrowserRouter([
                                         element: <TermsOfUse />,
                                     }
                                 ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        path: '/instructor',
+        children: [
+            {
+                element: <InstructorLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="dashboard" replace />
+                    },
+                    {
+                        path: 'dashboard',
+                        children: [
+                            {
+                                index: true,
+                                element: <InstructorHome />
                             }
                         ]
                     }

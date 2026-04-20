@@ -20,14 +20,14 @@ const LoginRightSideContent = () => {
       role: "Electronics Seller",
       quote: "Dashboard is super intuitive. Sales tracking is a breeze!",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
+      image: "https://randomuser.me/api/portraits/men/32.jpg"
     },
     {
       name: "Fatema Begum",
       role: "Fashion Store",
       quote: "Best decision to join GoldenLife. My business grew 200%.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1494790108777-466fd034c0b1?w=150&h=150&fit=crop"
+      image: "https://randomuser.me/api/portraits/women/44.jpg"
     }
   ];
 

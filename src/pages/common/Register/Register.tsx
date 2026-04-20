@@ -312,9 +312,28 @@ const Register: React.FC = () => {
               {isLoading ? "Creating Account..." : "Register Now"}
             </button>
 
-            <p className="text-center text-slate-500 font-medium">
+            <p className="text-center text-slate-500 font-medium pb-2">
               Already a member? <Link to="/login" className="text-orange-500 font-bold hover:underline">Login here</Link>
             </p>
+
+            {/* --- NEW VENDOR AND INSTRUCTOR REGISTER LINKS --- */}
+            <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                to="/vendor/register"
+                className="group flex items-center justify-center gap-2 px-6 py-3 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 rounded-2xl text-sm font-bold text-slate-600 transition-all duration-300 w-full sm:w-auto shadow-sm"
+              >
+                <span>Become a Vendor?</span>
+                <span className="text-orange-500">Register</span>
+              </Link>
+              
+              <Link
+                to="/instructor/register"
+                className="group flex items-center justify-center gap-2 px-6 py-3 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-2xl text-sm font-bold text-slate-600 transition-all duration-300 w-full sm:w-auto shadow-sm"
+              >
+                <span>Become an Instructor?</span>
+                <span className="text-indigo-600">Register</span>
+              </Link>
+            </div>
           </form>
         </div>
       </div>

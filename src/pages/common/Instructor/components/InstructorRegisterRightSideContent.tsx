@@ -20,7 +20,7 @@ const InstructorRegisterRightSideContent = () => {
       growth: "+312%",
       period: "6 months",
       quote: "Managing 1000+ students became easier with GoldenLife.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
+      image: "https://randomuser.me/api/portraits/men/32.jpg"
     },
     {
       name: "Language Hub",
@@ -28,7 +28,7 @@ const InstructorRegisterRightSideContent = () => {
       growth: "+245%",
       period: "4 months",
       quote: "The automated enrollment system is a lifesaver.",
-      image: "https://images.unsplash.com/photo-1494790108777-466fd034c0b1?w=150&h=150&fit=crop"
+      image: "https://randomuser.me/api/portraits/women/44.jpg"
     },
     {
       name: "Creative Design",
@@ -36,7 +36,7 @@ const InstructorRegisterRightSideContent = () => {
       growth: "+189%",
       period: "3 months",
       quote: "Exceptional support for course setup.",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
+      image: "https://randomuser.me/api/portraits/men/46.jpg"
     }
   ];
 

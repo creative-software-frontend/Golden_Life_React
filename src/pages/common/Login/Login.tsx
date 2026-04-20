@@ -247,16 +247,32 @@ const Login: React.FC = () => {
               Don't have an account? <Link to="/register" className="text-[#FF8A00] font-bold hover:underline">Register</Link>
             </p>
 
-            {/* --- NEW VENDOR LOGIN LINK --- */}
-            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
+            {/* --- NEW VENDOR AND INSTRUCTOR LOGIN LINKS --- */}
+            <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 to="/vendor/login"
-                className="group flex items-center gap-2 px-6 py-3 bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow"
+                className="group flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 hover:bg-orange-50 border border-gray-200 hover:border-orange-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow w-full sm:w-auto"
               >
                 <span>Are you a vendor?</span>
                 <span className="text-[#FF8A00] font-bold">Login here</span>
                 <svg
                   className="w-4 h-4 text-[#FF8A00] transform group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+              
+              <Link
+                to="/instructor/login"
+                className="group flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 hover:bg-indigo-50 border border-gray-200 hover:border-indigo-200 rounded-full text-sm font-medium text-gray-600 transition-all duration-300 shadow-sm hover:shadow w-full sm:w-auto"
+              >
+                <span>Are you an instructor?</span>
+                <span className="text-indigo-600 font-bold">Login here</span>
+                <svg
+                  className="w-4 h-4 text-indigo-600 transform group-hover:translate-x-1 transition-transform duration-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
